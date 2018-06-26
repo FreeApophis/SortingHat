@@ -1,0 +1,22 @@
+﻿/* Create Tags */
+
+CREATE TABLE IF NOT EXISTS `Tags` (
+	`ID`	INTEGER PRIMARY KEY AUTOINCREMENT,
+	`ParentID`	INTEGER NULL,
+	`Left`	INTEGER NOT NULL,
+	`Right`	INTEGER NOT NULL,
+	`Name`	VARCHAR (255),
+	FOREIGN KEY(`ParentID`) REFERENCES `Files`(`ID`)
+);
+
+CREATE INDEX TagsParentIndex
+ON Tags (ParentID); 
+
+CREATE INDEX TagsLeftIndex
+ON Tags (Left); 
+
+CREATE INDEX TagsRightIndex
+ON Tags (Right); 
+
+CREATE INDEX TagsNameIndex
+ON Tags (Name); 

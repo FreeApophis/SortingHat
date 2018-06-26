@@ -1,0 +1,20 @@
+﻿/* Create Files */
+
+CREATE TABLE IF NOT EXISTS `Files` (
+	`ID`	INTEGER PRIMARY KEY AUTOINCREMENT,
+	`FileTypeID`	INTEGER NOT NULL,
+	`SHA1`	VARCHAR ( 40 ) UNIQUE,
+	`MD5`	VARCHAR ( 32 ) UNIQUE,
+	`Size`	INTEGER NOT NULL,
+	`CreatedAt`	TIMESTAMP NOT NULL,
+	FOREIGN KEY(`FileTypeID`) REFERENCES `FileTypes`(`ID`)
+);
+
+CREATE INDEX FilesSHA1Index
+ON Files (SHA1); 
+
+CREATE INDEX FilesMD5Index
+ON Files (MD5); 
+
+CREATE INDEX FilesCreatedAtIndex
+ON Files (CreatedAt); 

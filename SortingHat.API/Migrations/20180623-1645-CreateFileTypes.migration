@@ -1,0 +1,11 @@
+﻿/* Create FileTypes */
+
+CREATE TABLE IF NOT EXISTS `FileTypes` (
+	`ID`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	`IdentificationSignature`	TEXT NULL,
+	`Name`	VARCHAR (255) NOT NULL,
+	`Suffix`	VARCHAR (64) NOT NULL
+);
+
+CREATE INDEX FileTypesNameIndex
+ON FileTypes (Name); 

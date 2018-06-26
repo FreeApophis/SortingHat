@@ -1,0 +1,14 @@
+﻿/* Adding File Type Identification signatures */
+
+INSERT INTO `FileTypes` (`IdentificationSignature`, `Name`, `Suffix`) VALUES ('basic:0:3c3f786d6c20', 'XML', '.xml');
+INSERT INTO `FileTypes` (`IdentificationSignature`, `Name`, `Suffix`) VALUES ('basic:0:ffd8ffdb', 'JPEG', '.jpg');
+INSERT INTO `FileTypes` (`IdentificationSignature`, `Name`, `Suffix`) VALUES ('basic:0:ffd8ffe0????4a4649460001', 'JPEG', '.jpg');
+INSERT INTO `FileTypes` (`IdentificationSignature`, `Name`, `Suffix`) VALUES ('basic:0:ffd8ffe1????457869660000', 'JPEG', '.jpg');
+INSERT INTO `FileTypes` (`IdentificationSignature`, `Name`, `Suffix`) VALUES ('basic:4:667479703367', '3GPP', '.3gp');
+INSERT INTO `FileTypes` (`IdentificationSignature`, `Name`, `Suffix`) VALUES ('basic:0:425a68', 'Compressed file using Bzip2 algorithm', '.bz2');
+INSERT INTO `FileTypes` (`IdentificationSignature`, `Name`, `Suffix`) VALUES ('basic:0:474946383761', 'Graphics Interchange Format', '.gif');
+INSERT INTO `FileTypes` (`IdentificationSignature`, `Name`, `Suffix`) VALUES ('basic:0:474946383961', 'Graphics Interchange Format', '.gif');
+INSERT INTO `FileTypes` (`IdentificationSignature`, `Name`, `Suffix`) VALUES ('basic:0:89504e470d0a1a0a', 'Portable Network Graphics', '.png');
+INSERT INTO `FileTypes` (`IdentificationSignature`, `Name`, `Suffix`) VALUES ('basic:0:25504446', 'PDF', '.pdf');
+INSERT INTO `FileTypes` (`IdentificationSignature`, `Name`, `Suffix`) VALUES ('basic:0:52494646????????41564920', 'Audio Video Interleave video format', '.avi');
+
