@@ -6,7 +6,104 @@
         xmlns:local="clr-namespace:SortingHat.UI"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_New DB" />
+                <MenuItem Header="_Open DB" />
+                <Separator />
+                <MenuItem Header="_Add Files" />
+                <MenuItem Header="_Add Folder" />
+                <Separator />
+                <MenuItem Header="_Exit" />
+            </MenuItem>
+
+            <MenuItem Header="_Views">
+                <MenuItem  Header="_Log" IsCheckable="true" IsChecked="{Binding LogViewVisible, Mode=TwoWay}" />
+            </MenuItem>
+        </Menu>
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+            <StatusBarItem>
+                <TextBlock Text="{Binding RunningThreads}" />
+            </StatusBarItem>
+            <Separator Grid.Column="1" />
+            <StatusBarItem Grid.Column="2">
+                <TextBlock Text="Cool stuff!" />
+            </StatusBarItem>
+        </StatusBar>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200*"/>
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="300*" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Margin="10,10,10,10">
+                <Label Content="Suche"/>
+                <TextBox Text="{Binding FilterString, Mode=OneWayToSource}" />
+                <Label Content="Tags"/>
+                <TreeView>
+                    <TreeViewItem IsExpanded="True">
+                        <TreeViewItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Level 1 (Blue)" />
+                            </StackPanel>
+                        </TreeViewItem.Header>
+                        <TreeViewItem>
+                            <TreeViewItem.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Level 2.1" Foreground="Blue" />
+                                </StackPanel>
+                            </TreeViewItem.Header>
+                        </TreeViewItem>
+                        <TreeViewItem IsExpanded="True">
+                            <TreeViewItem.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Level 2.2 (Green)" Foreground="Blue" />
+                                </StackPanel>
+                            </TreeViewItem.Header>
+                            <TreeViewItem>
+                                <TreeViewItem.Header>
+                                    <TextBlock Text="Level 3.1" Foreground="Green" />
+                                </TreeViewItem.Header>
+                            </TreeViewItem>
+                            <TreeViewItem>
+                                <TreeViewItem.Header>
+                                    <TextBlock Text="Level 3.2" Foreground="Green" />
+                                </TreeViewItem.Header>
+                            </TreeViewItem>
+                        </TreeViewItem>
+                        <TreeViewItem>
+                            <TreeViewItem.Header>
+                                <TextBlock Text="Level 2.3" Foreground="Blue" />
+                            </TreeViewItem.Header>
+                        </TreeViewItem>
+                    </TreeViewItem>
+                </TreeView>
+
+            </StackPanel>
+
+            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Margin="0,0,0.333,-0.333" />
+            <DataGrid Margin="10,10,10,10" Grid.Column="2" x:Name="FileGrid" AlternatingRowBackground="#EEE" ItemsSource="{Binding Files}">
+                <DataGrid.RowDetailsTemplate>
+                    <DataTemplate>
+                        <DockPanel Background="GhostWhite">
+                            <TextBlock Text="SHA1" />
+                            <TextBlock Text="{Binding FileNamesString}" />
+                        </DockPanel>
+                    </DataTemplate>
+                </DataGrid.RowDetailsTemplate>
+            </DataGrid>
+        </Grid>
+    </DockPanel>
 </Window>
