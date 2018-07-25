@@ -1,18 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.IO;
 
 namespace SortingHat.API.Models
 {
     class File
     {
-        private string _path;
         private IEnumerable<Tag> _tags;
 
         File(string path)
         {
-            _path = path;
         }
 
+        File(Stream file)
+        {
+        }
     }
 }

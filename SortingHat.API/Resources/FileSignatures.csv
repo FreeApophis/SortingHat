@@ -1,0 +1,72 @@
+﻿# 
+# File Type Identification signatures
+#
+# Sources :
+# https://www.garykessler.net/library/file_sigs.html
+# https://en.wikipedia.org/wiki/List_of_file_signatures
+# https://www.filesignatures.net/
+#
+# Order can be important (the signatures are not prefix free)
+#
+basic,image,0,ffd8ffdb,JPEG Raw,jpg,jpeg
+basic,image,0,ffd8ffe0????4a4649460001,JPEG JFIF,jpg,jpeg,jpe,jfif
+basic,image,0,ffd8ffe1????457869660000,JPEG Exif,jpg,jpeg
+basic,image,0,ffd8ffe2,Canon Camera Image File Format (CIFF) JPEG file,jpg,jpeg
+basic,image,0,ffd8ffe8????535049464600,Still Picture Interchange File Format (SPIFF),jpg,jpeg
+basic,image,0,ffd8,Generic JPEGimage file,jpg,jpeg,jpe
+basic,image,0,474946383761,Graphics Interchange Format,gif
+basic,image,0,474946383961,Graphics Interchange Format,gif
+basic,image,0,89504e470d0a1a0a,Portable Network Graphics,png
+basic,image,0,49492a00,Tagged Image File Format (Little Endian),tif,tiff
+basic,image,0,4d4d002a,Tagged Image File Format (Big Endian),tif,tiff
+basic,image,0,424d,Bitmap,bmp 
+basic,image,0,49492a00100000004352,Canon digital camera RAW file,cr2
+basic,image,0,7e424b00,Corel Paint Shop Pro image file,psp
+basic,video,0,42,Audio Video Interleave video format,avi
+basic,video,0,3026b2758e66cf11a6d900aa0062ce6c,Advanced Systems Format,wmv,asf,wma
+basic,video,0,1a45dfa3,Matroska media container,mkv,mka,mks,mk3d,webm
+basic,video,0,000001b3,MPEG Program Stream,mpg,mpeg
+basic,video,0,52494646????????415649204c495354,Windows Audio Video Interleave file (RIFF),avi
+basic,video,4,66747970336770,3GPP,3gg,3gp,3g2
+basic,video,4,667479704d534e56,MPEG-4 video file,mp4
+basic,video,4,6674797069736f6d,ISO Base Media file (MPEG-4) v1,mp4
+basic,video,4,667479706d703432,MPEG-4 video - QuickTime file,m4v,mp4
+basic,video,4,6674797071742020,QuickTime movie file,mov
+basic,video,4,667479704d345620,ISO Media, MPEG v4 system, or iTunes AVC-LC file,flv,m4v
+basic,video,0,464c5601,Flash video file,flv
+basic,video,0,3c,Advanced Stream Redirector,asx
+basic,video,0,000001ba,DVD Video Movie File or DVD MPEG2,mpg,vob
+basic,video,0,000001b?,MPEG video file,mpg,mpeg
+basic,video,0,2e524d46,RealMedia streaming media,rm,rmvb
+basic,audio,0,52494646????????57415645666d7420,Audio for Windows file (RIFF),wav
+basic,audio,0,664C614300000022,Free Lossless Audio Codec file,flac
+basic,audio,0,494433,MP3,mp3
+basic,audio,0,fffb,MP3 IDv2,mp3
+basic,document,0,3c3f786d6c20,XML,xml
+basic,document,0,25504446,PDF,pdf
+basic,document,0,25215053,Post Script,ps
+basic,document,0,7b5c72746631,Rich Text Format,rtf
+basic,executable,0,4d5a,DOS/Windows Executable,exe,dll,com,pif,sys
+basic,executable,0,cafebabe,Java Class File,class
+basic,compressed,0,425a68,Compressed file using Bzip2 algorithm,bz2
+basic,compressed,0,4c5a4950,Compressed file using lzip algorithm,lz
+basic,compressed,0,526172211a0700,RAR archive,rar
+basic,compressed,0,526172211a070100,RAR archive v5,rar
+basic,compressed,0,377abcaf271c,7-Zip compressed file,7z
+basic,database,0,53514c69746520666f726d6174203300,SQLite Database v3,sqlite,db,db3
+basic,document,512,006e1ef0,PowerPoint presentation,ppt
+basic,document,512,0f00e803,PowerPoint presentation,ppt
+basic,document,512,a0461df0,PowerPoint presentation,ppt
+basic,document,512,52006f006f007400200045006e00740072007900,Outlook/Exchange message,msg
+basic,document,512,0908100000060500,Excel spreadsheet,xls
+basic,generic,512,fdffffff????????????????04000000,Thumbs.db subheader,db
+basic,document,512,fdffffff????0000,PowerPoint presentation,ppt
+basic,document,512,fdffffff??00,Excel spreadsheet,xls
+basic,document,512,fdffffff??02,Excel spreadsheet,xls
+basic,generic,512,fdffffff04,Visual Studio Solution User Options,suo
+basic,document,512,fdffffff20000000,Excel spreadsheet,xls
+basic,document,512,eca5c100,Word document,doc
+basic,generic,0,d0cf11e0a1b11ae1,Compound Binary File format,doc,dot,pps,ppt,xla,xls,wiz,ac_,adp,apr,db,msc,msg,msi,mtw,mxd,opt,pub,qbm,rvt,sou,spo,vsd,wps
+basic,generic,0,4d6963726f736f667420432f432b2b20,Microsoft C++ debugging symbols file,pdb
+basic,generic,0,7472756500,TrueType font file,ttf
+ts,video,0,,MPEG transport stream,ts

@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SortingHat.API
+namespace SortingHat.Test
 {
-    interface IdentifyFileType
-    {        
+    class FileTest
+    {
+        
     }
 }

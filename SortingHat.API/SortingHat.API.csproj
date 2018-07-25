@@ -16,8 +16,8 @@
     <EmbeddedResource Include="Migrations\20180623-1645-CreateFileTypes.migration">
       <CustomToolNamespace>Migrations</CustomToolNamespace>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\20180623-1650-FileSignatures.migration">
-      <CustomToolNamespace>Migrations</CustomToolNamespace>
+    <EmbeddedResource Include="Resources\FileSignatures.csv">
+      <CustomToolNamespace>Resource</CustomToolNamespace>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\20180625-1915-CreateFiles.migration">
       <CustomToolNamespace>Migrations</CustomToolNamespace>
@@ -32,6 +32,12 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite" Version="2.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System">
+      <HintPath>System</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
