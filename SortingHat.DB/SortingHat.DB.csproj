@@ -1,14 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <NeutralLanguage>en-GB</NeutralLanguage>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SortingHat.API\SortingHat.API.csproj" />
-    <ProjectReference Include="..\SortingHat.DB\SortingHat.DB.csproj" />
   </ItemGroup>
 
 </Project>

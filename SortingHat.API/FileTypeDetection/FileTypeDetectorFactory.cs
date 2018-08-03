@@ -6,7 +6,7 @@
 
         internal static IFileTypeDetector Create(string signature)
         {
-            var parts = signature.Split(",");
+            var parts = signature.Split(',');
 
             switch (parts[FileTypeDetectorOffset])
             {
