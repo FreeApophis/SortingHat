@@ -3,26 +3,27 @@ using SortingHat.API.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System;
 
 namespace SortingHat.CLI.Commands
 {
-    class ListTagsCommand : ICommand
+    class AddTagCommand : ICommand
     {
         private readonly IServices _services;
 
-        public ListTagsCommand(IServices services)
+        public AddTagCommand(IServices services)
         {
             _services = services;
         }
 
         public bool Execute(IEnumerable<string> arguments)
         {
-            Console.WriteLine("Used tags: ");
-            foreach (var tag in Tag.List())
+            foreach (var tagString in arguments.Skip(2))
             {
-                Console.WriteLine($"* {tag.FullName}");
+                var tag = Tag.Parse(tagString);
+
+                return tag.Store(_services);
             }
+
             return true;
         }
 
@@ -34,7 +35,7 @@ namespace SortingHat.CLI.Commands
 
                 if (matcher.IsMatch(arguments.First()))
                 {
-                    return arguments.Skip(1).First() == "list";
+                    return arguments.Skip(1).First() == "add";
                 }
             }
 

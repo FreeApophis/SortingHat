@@ -19,12 +19,12 @@ namespace SortingHat.CLI.Commands
         {
             if (arguments.Count() == 1)
             {
-                return true;
+                _services.DB.Setup();
             }
 
             if (arguments.Count() == 2)
             {
-                return true;
+                _services.DB.Setup();
             }
 
             return false;

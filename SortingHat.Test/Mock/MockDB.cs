@@ -1,4 +1,5 @@
 ﻿using SortingHat.API.DI;
+using SortingHat.API.Models;
 
 namespace SortingHat.Test
 {
@@ -9,9 +10,12 @@ namespace SortingHat.Test
             throw new System.NotImplementedException();
         }
 
-        public void TearDown()
+        public void StoreTag(Tag tag)
         {
-            throw new System.NotImplementedException();
+            if (tag.Parent != null)
+            {
+                StoreTag(tag.Parent);
+            }
         }
     }
 }

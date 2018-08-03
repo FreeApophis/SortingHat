@@ -10,7 +10,7 @@ namespace SortingHat.CLI.Commands
     {
         private const string Command = "identify";
         private const string CommandShort = "id";
-        private IServices _services;
+        private readonly IServices _services;
 
         public IdentifyCommand(IServices services)
         {

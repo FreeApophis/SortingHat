@@ -8,7 +8,7 @@ namespace SortingHat.CLI.Commands
     class SortCommand : ICommand
     {
         private const string Command = "sort";
-        private IServices _services;
+        private readonly IServices _services;
 
         public SortCommand(IServices services)
         {

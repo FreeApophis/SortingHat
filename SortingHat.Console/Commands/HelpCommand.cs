@@ -20,7 +20,7 @@ namespace SortingHat.CLI.Commands
     class HelpCommand : ICommand
     {
         private const string Command = "help";
-        private IServices _services;
+        private readonly IServices _services;
 
         public HelpCommand(IServices services)
         {

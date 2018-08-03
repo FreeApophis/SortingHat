@@ -9,7 +9,7 @@ namespace SortingHat.CLI.Commands
     class RepairCommand : ICommand
     {
         private const string Command = "repair";
-        private IServices _services;
+        private readonly IServices _services;
 
         public RepairCommand(IServices services)
         {

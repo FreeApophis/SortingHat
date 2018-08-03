@@ -1,5 +1,6 @@
 ﻿using SortingHat.API.DI;
 using SortingHat.DB;
+using System;
 
 namespace SortingHat.CLI
 {
@@ -9,7 +10,7 @@ namespace SortingHat.CLI
         internal CLIService()
         {
             Logger = new CLILogger();
-            DB = new SQLiteDB();
+            DB = new SQLiteDB(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
         }
 
         public ILogger Logger { get; }

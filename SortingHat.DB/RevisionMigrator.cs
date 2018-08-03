@@ -5,16 +5,22 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.Data.Sqlite;
 
-namespace SortingHat.API
+namespace SortingHat.DB
 {
-    public class RevisionMigrator
+     class RevisionMigrator
     {
         private const string CreateRevisionTableCommand = @"CREATE TABLE IF NOT EXISTS [Revisions] ([ID] INTEGER  NOT NULL PRIMARY KEY AUTOINCREMENT, [Name] VARCHAR(255)  UNIQUE NOT NULL, [MigratedAt] TIME DEFAULT CURRENT_TIME NOT NULL);";
         private string _tableExists = string.Format("SELECT name FROM sqlite_master WHERE type='table' AND name='{0}';", "Revisions");
+        private SQLiteDB _connection;
+
+        public RevisionMigrator(SQLiteDB connection)
+        {
+            _connection = connection;
+        }
 
         public void Migrate()
         {
-            using (var connection = DB.Connection())
+            using (var connection = _connection.Connection())
             {
                 foreach (var migration in Migrations())
                 {
@@ -42,7 +48,7 @@ namespace SortingHat.API
 
         public void Initialize()
         {
-            using (var connection = DB.Connection(DB.DBFile(Directory.GetCurrentDirectory())))
+            using (var connection = _connection.Connection())
             {
                 connection.Open();
 
