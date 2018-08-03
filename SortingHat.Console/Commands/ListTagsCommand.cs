@@ -1,10 +1,9 @@
-﻿using SortingHat.API.Interfaces;
+﻿using SortingHat.API.DI;
 using SortingHat.API.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
+using System;
 
 namespace SortingHat.CLI.Commands
 {

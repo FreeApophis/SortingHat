@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using SortingHat.API.Interfaces;
+using SortingHat.API.DI;
 
 namespace SortingHat.CLI.Commands
 {

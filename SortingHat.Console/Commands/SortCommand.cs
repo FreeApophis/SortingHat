@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SortingHat.API.Interfaces;
+using SortingHat.API.DI;
 
 namespace SortingHat.CLI.Commands
 {

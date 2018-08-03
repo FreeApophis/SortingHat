@@ -1,4 +1,4 @@
-﻿using SortingHat.API.Interfaces;
+﻿using SortingHat.API.DI;
 using SortingHat.CLI.Commands;
 using System;
 using System.Collections.Generic;

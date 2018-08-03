@@ -5,28 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Migrations\20180623-1645-CreateFileTypes.migration" />
-    <None Remove="Migrations\20180623-1650-FileSignatures.migration" />
-    <None Remove="Migrations\20180625-1915-CreateFiles.migration" />
-    <None Remove="Migrations\20180625-1920-CreateTags.migration" />
-    <None Remove="Migrations\20180625-1925-CreateTagsFiles.migration" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\20180623-1645-CreateFileTypes.migration">
-      <CustomToolNamespace>Migrations</CustomToolNamespace>
-    </EmbeddedResource>
     <EmbeddedResource Include="Resources\FileSignatures.csv">
       <CustomToolNamespace>Resource</CustomToolNamespace>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\20180625-1915-CreateFiles.migration">
-      <CustomToolNamespace>Migrations</CustomToolNamespace>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\20180625-1920-CreateTags.migration">
-      <CustomToolNamespace>Migrations</CustomToolNamespace>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\20180625-1925-CreateTagsFiles.migration">
-      <CustomToolNamespace>Migrations</CustomToolNamespace>
     </EmbeddedResource>
   </ItemGroup>
 

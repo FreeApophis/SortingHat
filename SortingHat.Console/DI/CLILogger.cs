@@ -1,6 +1,6 @@
-﻿using System;
+﻿using SortingHat.API.DI;
 using System.Runtime.CompilerServices;
-using SortingHat.API.Interfaces;
+using System;
 
 namespace SortingHat.CLI
 {

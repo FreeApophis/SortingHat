@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace SortingHat.API.Interfaces
+namespace SortingHat.API.DI
 {
     public interface ILogger
     {

@@ -1,5 +1,5 @@
 ﻿using SortingHat.API.FileTypeDetection;
-using SortingHat.API.Interfaces;
+using SortingHat.API.DI;
 using System;
 using System.Collections.Generic;
 using System.Linq;

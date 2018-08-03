@@ -1,4 +1,4 @@
-﻿using SortingHat.API.Interfaces;
+﻿using SortingHat.API.DI;
 using System.Linq;
 using Xunit;
 

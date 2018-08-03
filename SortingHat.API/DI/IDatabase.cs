@@ -4,9 +4,9 @@ using System.Text;
 
 namespace SortingHat.API.DI
 {
-    public interface IServices
+    public interface IDatabase
     {
-        ILogger Logger { get; }
-        IDatabase DB { get; } 
+        void Setup();
+        void TearDown();
     }
 }
