@@ -71,6 +71,7 @@ namespace SortingHat.DB
         {
             long fileID = FindOrCreateFile(file);
             long tagID = FindOrCreateTag(tag);
+
             using (var connection = Connection())
             {
                 connection.Open();
@@ -83,9 +84,47 @@ namespace SortingHat.DB
             }
         }
 
+        private long? FindFile(API.Models.File file)
+        {
+            long? resultID;
+            using (var connection = Connection())
+            {
+                connection.Open();
+
+                SqliteCommand findCommand = connection.CreateCommand();
+                findCommand.CommandText = $"SELECT ID FROM Files WHERE Hash = '{file.Hash}'";
+                resultID = findCommand.ExecuteScalar() as long?;
+
+                connection.Close();
+            }
+
+            return resultID;
+        }
+        private long CreateFile(API.Models.File file)
+        {
+            using (var connection = Connection())
+            {
+                connection.Open();
+
+                SqliteCommand initializeCommand = connection.CreateCommand();
+                initializeCommand.CommandText = $"INSERT INTO Files (Hash, Size, CreatedAt) VALUES('{file.Hash}','{file.Size}','{file.CreatedAt}'); SELECT last_insert_rowid();";
+                var resultID = (long)initializeCommand.ExecuteScalar();
+                connection.Close();
+
+                return resultID;
+            }
+        }
+
         private long FindOrCreateFile(API.Models.File file)
         {
-            return 0;
+            long? fileID = FindFile(file);
+
+            if (fileID.HasValue)
+            {
+                return fileID.Value;
+            }
+
+            return CreateFile(file);
         }
 
         public void UntagFile(API.Models.File file, Tag tag)

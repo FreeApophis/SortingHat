@@ -7,18 +7,18 @@ namespace SortingHat.API.Models
 {
     public class File
     {
-        private IEnumerable<Tag> _tags;
+        public DateTime CreatedAt { get; }
+        public long Size { get; }
+        public string Hash { get; }
+        public string Path { get; }
 
-        private readonly string _hash;
-        public string Hash => _hash;
-
-        public File(string path)
+        public File(IServices services, string path)
         {
-            _hash = "null";
-        }
+            FileInfo fileInfo = new FileInfo(Path = path);
 
-        public File(Stream file)
-        {
+            Hash = services.HashService.GetHash(path);
+            Size = fileInfo.Length;
+            CreatedAt = fileInfo.CreationTimeUtc;
         }
 
         public void Tag(IServices services, Tag tag)

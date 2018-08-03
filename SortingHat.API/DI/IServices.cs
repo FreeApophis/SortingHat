@@ -8,6 +8,6 @@ namespace SortingHat.API.DI
     {
         ILogger Logger { get; }
         IDatabase DB { get; }
-        IHashService HashService { get; }
+        HashService HashService { get; }
     }
 }

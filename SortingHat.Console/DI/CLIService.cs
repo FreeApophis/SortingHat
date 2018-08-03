@@ -12,11 +12,11 @@ namespace SortingHat.CLI
         {
             Logger = new CLILogger();
             DB = new SQLiteDB(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
-            HashService = null;
+            HashService = new HashService(SHA256.Create(), nameof(SHA256));
         }
 
         public ILogger Logger { get; }
         public IDatabase DB { get; }
-        public IHashService HashService { get; }
+        public HashService HashService { get; }
     }
 }

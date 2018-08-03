@@ -33,9 +33,10 @@ namespace SortingHat.CLI.Commands
             var tags = parameters.Where(IsTag);
             var files = parameters.Where(IsFile);
 
-            foreach (var file in files.Select(file => new File(file)))
+            foreach (var file in files.Select(file => new File(_services, file)))
             {
-                foreach (var tag in tags.Select(tag => Tag.Parse(tag))) { 
+                foreach (var tag in tags.Select(tag => Tag.Parse(tag)))
+                {
                     file.Tag(_services, tag);
                 }
             }
