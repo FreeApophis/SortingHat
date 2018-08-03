@@ -1,7 +1,7 @@
 ﻿using Microsoft.Data.Sqlite;
 using SortingHat.API.Models;
+using System.Collections.Generic;
 using System.IO;
-using System;
 
 namespace SortingHat.DB
 {
@@ -28,6 +28,17 @@ namespace SortingHat.DB
             {
                 StoreTag(tag.Parent);
             }
+
+            using (var connection = Connection())
+            {
+                connection.Open();
+
+                SqliteCommand initializeCommand = connection.CreateCommand();
+                initializeCommand.CommandText = $"INSERT INTO Tags (ParentID, Name) VALUES(NULL, '{tag.Name}'); ";
+                initializeCommand.ExecuteNonQuery();
+
+                connection.Close();
+            }
         }
 
         private string DBPath()
@@ -50,6 +61,28 @@ namespace SortingHat.DB
         internal SqliteConnection Connection()
         {
             return new SqliteConnection($"Filename={DBFile()}");
+        }
+
+        public IEnumerable<Tag> GetAllTags()
+        {
+            var result = new List<Tag>();
+            using (var connection = Connection())
+            {
+                connection.Open();
+
+                SqliteCommand initializeCommand = connection.CreateCommand();
+                initializeCommand.CommandText = $"SELECT Name FROM Tags ORDER BY Name;";
+                var reader = initializeCommand.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    result.Add(new Tag(reader.GetString(0)));
+                }
+
+                connection.Close();
+            }
+
+            return result;
         }
     }
 }

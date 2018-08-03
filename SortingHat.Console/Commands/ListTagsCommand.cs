@@ -19,7 +19,7 @@ namespace SortingHat.CLI.Commands
         public bool Execute(IEnumerable<string> arguments)
         {
             Console.WriteLine("Used tags: ");
-            foreach (var tag in Tag.List())
+            foreach (var tag in Tag.List(_services))
             {
                 Console.WriteLine($"* {tag.FullName}");
             }
@@ -28,7 +28,7 @@ namespace SortingHat.CLI.Commands
 
         public bool Match(IEnumerable<string> arguments)
         {
-            if (arguments.Count() > 2)
+            if (arguments.Count() >= 2)
             {
                 var matcher = new Regex("tags?", RegexOptions.IgnoreCase);
 

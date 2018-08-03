@@ -12,5 +12,6 @@ namespace SortingHat.API.DI
         /// </summary>
         void Setup();
         void StoreTag(Tag tag);
+        IEnumerable<Tag> GetAllTags();
     }
 }

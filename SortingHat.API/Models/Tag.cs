@@ -94,36 +94,9 @@ namespace SortingHat.API.Models
             return FullName.GetHashCode();
         }
 
-        public static IEnumerable<Tag> List()
+        public static IEnumerable<Tag> List(IServices services)
         {
-            List<Tag> tags = new List<Tag>();
-
-            var taxYear = new Tag("Steuerjahr");
-            tags.Add(taxYear);
-            tags.Add(new Tag("2012", taxYear));
-            tags.Add(new Tag("2013", taxYear));
-            tags.Add(new Tag("2014", taxYear));
-            tags.Add(new Tag("2015", taxYear));
-            tags.Add(new Tag("2016", taxYear));
-            tags.Add(new Tag("2017", taxYear));
-            tags.Add(new Tag("2018", taxYear));
-
-            var gender = new Tag("Geschlecht");
-            tags.Add(gender);
-            tags.Add(new Tag("male", gender));
-            tags.Add(new Tag("female", gender));
-
-            var created = new Tag("created");
-            var year = new Tag("2018", created);
-            var month = new Tag("02", year);
-            var day = new Tag("17", month);
-
-            tags.Add(created);
-            tags.Add(year);
-            tags.Add(month);
-            tags.Add(day);
-
-            return tags;
+            return services.DB.GetAllTags();
         }
     }
 

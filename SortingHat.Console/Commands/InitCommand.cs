@@ -22,11 +22,6 @@ namespace SortingHat.CLI.Commands
                 _services.DB.Setup();
             }
 
-            if (arguments.Count() == 2)
-            {
-                _services.DB.Setup();
-            }
-
             return false;
         }
 
