@@ -16,8 +16,15 @@ namespace SortingHat.CLI
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
-                Environment.Exit(-1);
+                if (e.Message.Contains("no such table:"))
+                {
+                    Console.WriteLine("Database not initialized? Run .hat init");
+                }
+                else
+                {
+                    Console.WriteLine(e.Message);
+                    Environment.Exit(-1);
+                }
             }
         }
     }

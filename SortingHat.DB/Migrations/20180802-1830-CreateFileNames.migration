@@ -1,0 +1,9 @@
+﻿/* Create FileNames */
+
+CREATE TABLE IF NOT EXISTS `FileNames` (
+	`ID`	INTEGER PRIMARY KEY AUTOINCREMENT,
+	`FileID`	INTEGER NOT NULL,
+	`Name`	VARCHAR (255),
+	FOREIGN KEY(`FileID`) REFERENCES `Files`(`ID`)
+);
+

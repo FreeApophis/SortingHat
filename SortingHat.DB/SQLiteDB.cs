@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.Sqlite;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -68,7 +69,23 @@ namespace SortingHat.DB
         #region Files
         public void TagFile(API.Models.File file, Tag tag)
         {
-            throw new System.NotImplementedException();
+            long fileID = FindOrCreateFile(file);
+            long tagID = FindOrCreateTag(tag);
+            using (var connection = Connection())
+            {
+                connection.Open();
+
+                SqliteCommand tagCommand = connection.CreateCommand();
+                tagCommand.CommandText = $"INSERT INTO FileTags (TagID, FileID) VALUES({tagID},{fileID});";
+                tagCommand.ExecuteNonQuery();
+
+                connection.Close();
+            }
+        }
+
+        private long FindOrCreateFile(API.Models.File file)
+        {
+            return 0;
         }
 
         public void UntagFile(API.Models.File file, Tag tag)
@@ -81,6 +98,29 @@ namespace SortingHat.DB
         public void StoreTag(Tag tag)
         {
             FindOrCreateTag(tag);
+        }
+
+        private long? FindTag(Tag tag)
+        {
+            long? parentID = null;
+            if (tag.Parent != null)
+            {
+                parentID = FindTag(tag.Parent);
+            }
+
+            long? resultID = null;
+            using (var connection = Connection())
+            {
+                connection.Open();
+
+                SqliteCommand findCommand = connection.CreateCommand();
+                findCommand.CommandText = $"SELECT ID FROM Tags WHERE ParentID {ToComparison(parentID)} AND Name = '{tag.Name}'";
+                resultID = findCommand.ExecuteScalar() as long?;
+
+                connection.Close();
+            }
+
+            return resultID;
         }
 
         private long FindOrCreateTag(Tag tag)

@@ -5,23 +5,27 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Migrations\20180623-1645-CreateFileTypes.migration" />
     <None Remove="Migrations\20180625-1915-CreateFiles.migration" />
     <None Remove="Migrations\20180625-1920-CreateTags.migration" />
-    <None Remove="Migrations\20180625-1925-CreateTagsFiles.migration" />
+    <None Remove="Migrations\20180625-1925-CreateFileTags.migration" />
+    <None Remove="Migrations\20180802-1820-CreateSettings.migration" />
+    <None Remove="Migrations\20180802-1830-CreateFileNames.migration" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\20180623-1645-CreateFileTypes.migration">
-      <CustomToolNamespace>Migrations</CustomToolNamespace>
-    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\20180625-1915-CreateFiles.migration">
       <CustomToolNamespace>Migrations</CustomToolNamespace>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\20180625-1920-CreateTags.migration">
       <CustomToolNamespace>Migrations</CustomToolNamespace>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\20180625-1925-CreateTagsFiles.migration">
+    <EmbeddedResource Include="Migrations\20180625-1925-CreateFileTags.migration">
+      <CustomToolNamespace>Migrations</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\20180802-1820-CreateSettings.migration">
+      <CustomToolNamespace>Migrations</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\20180802-1830-CreateFileNames.migration">
       <CustomToolNamespace>Migrations</CustomToolNamespace>
     </EmbeddedResource>
   </ItemGroup>
