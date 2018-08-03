@@ -8,7 +8,7 @@ namespace SortingHat.CLI
 
     class ArgumentParser
     {
-        private IEnumerable<string> _arguments;
+        private readonly IEnumerable<string> _arguments;
         private readonly IServices _services;
         private List<ICommand> _commands = new List<ICommand>();
 

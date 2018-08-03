@@ -10,7 +10,7 @@ namespace SortingHat.DB
      class RevisionMigrator
     {
         private const string CreateRevisionTableCommand = @"CREATE TABLE IF NOT EXISTS [Revisions] ([ID] INTEGER  NOT NULL PRIMARY KEY AUTOINCREMENT, [Name] VARCHAR(255)  UNIQUE NOT NULL, [MigratedAt] TIME DEFAULT CURRENT_TIME NOT NULL);";
-        private string _tableExists = string.Format("SELECT name FROM sqlite_master WHERE type='table' AND name='{0}';", "Revisions");
+        private readonly string _tableExists = string.Format("SELECT name FROM sqlite_master WHERE type='table' AND name='{0}';", "Revisions");
         private SQLiteDB _connection;
 
         public RevisionMigrator(SQLiteDB connection)

@@ -8,7 +8,7 @@ namespace SortingHat.DB
 {
     public class SQLiteDB : IDatabase
     {
-        private string _path;
+        private readonly string _path;
 
         public SQLiteDB(string path)
         {

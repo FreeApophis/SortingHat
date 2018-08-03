@@ -65,9 +65,9 @@ namespace SortingHat.API.Models
 
         public static bool operator ==(Tag lhs, Tag rhs)
         {
-            if (ReferenceEquals(lhs, null))
+            if (lhs is null)
             {
-                return ReferenceEquals(rhs, null);
+                return rhs is null;
             }
 
             return lhs.Equals(rhs);

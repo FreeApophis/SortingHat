@@ -9,7 +9,7 @@ namespace SortingHat.API.Models
     {
         private IEnumerable<Tag> _tags;
 
-        private string _hash;
+        private readonly string _hash;
         public string Hash => _hash;
 
         public File(string path)
