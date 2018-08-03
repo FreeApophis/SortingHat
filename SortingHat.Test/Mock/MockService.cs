@@ -9,5 +9,6 @@ namespace SortingHat.Test
     {
         public ILogger Logger { get; } = new MockLogger();
         public IDatabase DB { get; } = new MockDB();
+        public IHashService HashService { get; } = null;
     }
 }

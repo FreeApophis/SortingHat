@@ -17,14 +17,16 @@ namespace SortingHat.CLI.Commands
 
         public bool Execute(IEnumerable<string> arguments)
         {
+            bool result = true;
+
             foreach (var tagString in arguments.Skip(2))
             {
                 var tag = Tag.Parse(tagString);
 
-                return tag.Store(_services);
+                result &= tag.Store(_services);
             }
 
-            return true;
+            return result;
         }
 
         public bool Match(IEnumerable<string> arguments)

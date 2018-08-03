@@ -7,6 +7,7 @@ namespace SortingHat.API.DI
     public interface IServices
     {
         ILogger Logger { get; }
-        IDatabase DB { get; } 
+        IDatabase DB { get; }
+        IHashService HashService { get; }
     }
 }

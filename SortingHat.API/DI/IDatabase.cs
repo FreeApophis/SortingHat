@@ -13,5 +13,8 @@ namespace SortingHat.API.DI
         void Setup();
         void StoreTag(Tag tag);
         IEnumerable<Tag> GetAllTags();
+
+        void TagFile(File file, Tag tag);
+        void UntagFile(File file, Tag tag);
     }
 }

@@ -1,11 +1,12 @@
 ﻿using Microsoft.Data.Sqlite;
+using SortingHat.API.DI;
 using SortingHat.API.Models;
 using System.Collections.Generic;
 using System.IO;
 
 namespace SortingHat.DB
 {
-    public class SQLiteDB : API.DI.IDatabase
+    public class SQLiteDB : IDatabase
     {
         private string _path;
 
@@ -20,25 +21,6 @@ namespace SortingHat.DB
 
             migrator.Initialize();
             migrator.Migrate();
-        }
-
-        public void StoreTag(Tag tag)
-        {
-            if (tag.Parent != null)
-            {
-                StoreTag(tag.Parent);
-            }
-
-            using (var connection = Connection())
-            {
-                connection.Open();
-
-                SqliteCommand initializeCommand = connection.CreateCommand();
-                initializeCommand.CommandText = $"INSERT INTO Tags (ParentID, Name) VALUES(NULL, '{tag.Name}'); ";
-                initializeCommand.ExecuteNonQuery();
-
-                connection.Close();
-            }
         }
 
         private string DBPath()
@@ -63,6 +45,75 @@ namespace SortingHat.DB
             return new SqliteConnection($"Filename={DBFile()}");
         }
 
+        string ToComparison(long? value)
+        {
+            if (value.HasValue)
+            {
+                return $"= {value}";
+            }
+
+            return "IS NULL";
+        }
+
+        string ToSQL(long? value)
+        {
+            if (value.HasValue)
+            {
+                return value.ToString();
+            }
+
+            return "NULL";
+        }
+
+        #region Files
+        public void TagFile(API.Models.File file, Tag tag)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void UntagFile(API.Models.File file, Tag tag)
+        {
+            throw new System.NotImplementedException();
+        }
+        #endregion
+
+        #region Tags
+        public void StoreTag(Tag tag)
+        {
+            FindOrCreateTag(tag);
+        }
+
+        private long FindOrCreateTag(Tag tag)
+        {
+            long? parentID = null;
+            if (tag.Parent != null)
+            {
+                parentID = FindOrCreateTag(tag.Parent);
+            }
+
+            long? resultID = null;
+            using (var connection = Connection())
+            {
+                connection.Open();
+
+                SqliteCommand findCommand = connection.CreateCommand();
+                findCommand.CommandText = $"SELECT ID FROM Tags WHERE ParentID {ToComparison(parentID)} AND Name = '{tag.Name}'";
+                resultID = findCommand.ExecuteScalar() as long?;
+
+
+                if (resultID.HasValue == false)
+                {
+                    SqliteCommand initializeCommand = connection.CreateCommand();
+                    initializeCommand.CommandText = $"INSERT INTO Tags (ParentID, Name) VALUES({ToSQL(parentID)}, '{tag.Name}'); SELECT last_insert_rowid();";
+                    resultID = (long)initializeCommand.ExecuteScalar();
+                }
+
+                connection.Close();
+            }
+
+            return resultID.Value;
+        }
+
         public IEnumerable<Tag> GetAllTags()
         {
             var result = new List<Tag>();
@@ -84,5 +135,7 @@ namespace SortingHat.DB
 
             return result;
         }
+
+        #endregion
     }
 }
