@@ -1,4 +1,5 @@
 ﻿using SortingHat.API.Models;
+using System.Collections.Generic;
 
 namespace SortingHat.API.DI
 {
@@ -7,6 +8,6 @@ namespace SortingHat.API.DI
         void Tag(File file, Tag tag);
         void Untag(File file, Tag tag);
 
-        void Search(string query);
+        IEnumerable<File> Search(string query);
     }
 }

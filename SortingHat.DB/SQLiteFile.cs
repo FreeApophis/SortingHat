@@ -1,6 +1,8 @@
 ﻿using Microsoft.Data.Sqlite;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SortingHat.DB
 {
@@ -13,7 +15,7 @@ namespace SortingHat.DB
             _db = db;
         }
 
-        public void Tag(API.Models.File file, Tag tag)
+        public void Tag(File file, Tag tag)
         {
             long fileID = FindOrCreate(file);
             long tagID = ((SQLiteTag)_db.Tag).FindOrCreate(tag);
@@ -30,7 +32,7 @@ namespace SortingHat.DB
             }
         }
 
-        private long? Find(API.Models.File file)
+        private long? Find(File file)
         {
             long? resultID;
             using (var connection = _db.Connection())
@@ -46,7 +48,7 @@ namespace SortingHat.DB
 
             return resultID;
         }
-        private long Create(API.Models.File file)
+        private long Create(File file)
         {
             using (var connection = _db.Connection())
             {
@@ -73,14 +75,25 @@ namespace SortingHat.DB
             return Create(file);
         }
 
-        public void Untag(API.Models.File file, Tag tag)
+        public void Untag(File file, Tag tag)
         {
             throw new System.NotImplementedException();
         }
 
-        public void Search(string query)
+        public IEnumerable<File> Search(string query)
         {
-            throw new System.NotImplementedException();
+            using (var connection = _db.Connection())
+            {
+                connection.Open();
+
+                SqliteCommand initializeCommand = connection.CreateCommand();
+                initializeCommand.CommandText = $"TODO";
+                var resultID = (long)initializeCommand.ExecuteScalar();
+                connection.Close();
+            }
+
+
+            return Enumerable.Empty<File>();
         }
     }
 }
