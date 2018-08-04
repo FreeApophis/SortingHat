@@ -3,7 +3,9 @@ using SortingHat.API.DI;
 using SortingHat.API.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
 namespace SortingHat.DB
 {
@@ -193,6 +195,18 @@ namespace SortingHat.DB
             return resultID.Value;
         }
 
+        const string allTags = @"WITH RECURSIVE
+  tree(id, parentid, name,level) AS (
+    SELECT Tags.ID, Tags.ParentID, Tags.name, 0
+    FROM Tags
+    WHERE ParentID IS NULL
+    UNION ALL
+    SELECT Tags.ID, Tags.ParentID, Tags.name, tree.level+1
+      FROM Tags JOIN tree ON Tags.ParentID=tree.ID
+     ORDER BY 4 DESC
+  )
+SELECT id, parentid, name, level FROM tree;";
+
         public IEnumerable<Tag> GetAllTags()
         {
             var result = new List<Tag>();
@@ -201,18 +215,54 @@ namespace SortingHat.DB
                 connection.Open();
 
                 SqliteCommand initializeCommand = connection.CreateCommand();
-                initializeCommand.CommandText = $"SELECT Name FROM Tags ORDER BY Name;";
+                initializeCommand.CommandText = allTags;
                 var reader = initializeCommand.ExecuteReader();
 
-                while (reader.Read())
+                if (reader.Read())
                 {
-                    result.Add(new Tag(reader.GetString(0)));
+                    GetTagTree(reader, ref result, null, 0);
                 }
 
                 connection.Close();
             }
 
-            return result;
+            return result.OrderBy(t => t.FullName);
+        }
+
+        private bool GetTagTree(SqliteDataReader reader, ref List<Tag> result, Tag parent, int level)
+        {
+            // We must be on the right level on entry into this method
+            Debug.Assert(reader.GetInt32(3) == level);
+
+            // we iterate on the siblings on the same level
+            while (reader.GetInt32(3) == level)
+            {
+                var tag = new Tag(reader.GetString(2), parent);
+                result.Add(tag);
+                if (reader.Read())
+                {
+                    var test = reader.IsDBNull(3);
+                    var nextLevel = reader.GetInt32(3);
+                    // A child has level + 1
+                    if (nextLevel == level + 1)
+                    {
+                        if (GetTagTree(reader, ref result, tag, level + 1) == false)
+                        {
+                            return false;
+                        }
+                    }
+                    else if (nextLevel < level)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    // We are at the end of the list ... 
+                    return false;
+                }
+            }
+            return true;
         }
 
         #endregion
