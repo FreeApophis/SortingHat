@@ -11,10 +11,13 @@ namespace SortingHat.API.DI
         /// Creates the necessary Database and tables...
         /// </summary>
         void Setup();
-        void StoreTag(Tag tag);
-        IEnumerable<Tag> GetAllTags();
 
-        void TagFile(File file, Tag tag);
-        void UntagFile(File file, Tag tag);
+        /// <summary>
+        /// Destroys or deletes the Database and tables...
+        /// </summary>
+        void TearDown();
+
+        IFile File { get; }
+        ITag Tag { get; }
     }
 }

@@ -20,7 +20,7 @@ namespace SortingHat.API.Models
 
         public bool Store(IServices services)
         {
-            services.DB.StoreTag(this);
+            services.DB.Tag.Store(this);
 
             return true;
         }
@@ -96,7 +96,7 @@ namespace SortingHat.API.Models
 
         public static IEnumerable<Tag> List(IServices services)
         {
-            return services.DB.GetAllTags();
+            return services.DB.Tag.GetTags();
         }
     }
 

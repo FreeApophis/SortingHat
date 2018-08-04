@@ -1,6 +1,7 @@
 ﻿using SortingHat.API.DI;
 using SortingHat.API.Models;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 
@@ -33,7 +34,7 @@ namespace SortingHat.CLI.Commands
             var tags = parameters.Where(IsTag);
             var files = parameters.Where(IsFile);
 
-            foreach (var file in files.Select(file => new File(_services, file)))
+            foreach (var file in files.Select(file => new API.Models.File(_services, file)))
             {
                 foreach (var tag in tags.Select(tag => Tag.Parse(tag)))
                 {

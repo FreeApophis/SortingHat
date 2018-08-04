@@ -30,6 +30,7 @@ namespace SortingHat.CLI
             _commands.Add(new AddTagCommand(_services));
 
             _commands.Add(new TagFileCommand(_services));
+            _commands.Add(new FindFilesCommand(_services));
 
             _commands.Add(new RepairCommand(_services));
             _commands.Add(new SortCommand(_services));

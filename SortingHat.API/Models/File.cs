@@ -23,12 +23,12 @@ namespace SortingHat.API.Models
 
         public void Tag(IServices services, Tag tag)
         {
-            services.DB.TagFile(this, tag);
+            services.DB.File.Tag(this, tag);
         }
 
         public void Untag(IServices services, Tag tag)
         {
-            services.DB.UntagFile(this, tag);
+            services.DB.File.Untag(this, tag);
         }
 
     }
