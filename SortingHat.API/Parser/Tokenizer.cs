@@ -29,7 +29,7 @@ namespace SortingHat.API.Parser
 
                 if (c == ':')
                 {
-                    var value = GetNextIdentifier();
+                    var value = GetNextIdentifier(true);
                     yield return new TagToken(value);
                 }
 
@@ -38,12 +38,38 @@ namespace SortingHat.API.Parser
                     _reader.Read();
                     yield return new OrToken();
                 }
+                if (c == '|')
+                {
+                    _reader.Read();
+                    if ('|' == (char)_reader.Read())
+                    {
+                        yield return new AndToken();
+                    }
+                    else
+                    {
+                        throw new Exception("Single & is not a legal operator...");
+                    }
+                }
+
                 if (c == '∧')
                 {
                     _reader.Read();
                     yield return new AndToken();
                 }
-                if (c == '¬')
+                if (c == '&')
+                {
+                    _reader.Read();
+                    if ('&' == (char)_reader.Read())
+                    {
+                        yield return new AndToken();
+                    }
+                    else
+                    {
+                        throw new Exception("Single & is not a legal operator...");
+                    }
+                }
+
+                if (c == '¬' || c == '!')
                 {
                     _reader.Read();
                     yield return new NotToken();
@@ -61,7 +87,7 @@ namespace SortingHat.API.Parser
                 }
                 else if (char.IsLetter(c))
                 {
-                    var name = GetNextIdentifier();
+                    var name = GetNextIdentifier(false);
                     switch (name.ToLower())
                     {
                         case "or":
@@ -83,14 +109,24 @@ namespace SortingHat.API.Parser
                             break;
                             throw new Exception("Unknown Identifier...");
                     }
-                } 
+                }
             }
         }
 
-        private string GetNextIdentifier()
+        private bool IsLegalIdentifier(bool tag)
+        {
+            var current = (char)_reader.Peek();
+            return char.IsLetter(current)
+                || char.IsNumber(current)
+                || current == '-'
+                || current == '_'
+                || tag && current == ':';
+        }
+
+        private string GetNextIdentifier(bool tag)
         {
             var sb = new StringBuilder();
-            while (_reader.Peek() != -1 && !char.IsWhiteSpace((char)_reader.Peek()))
+            while (_reader.Peek() != -1 && IsLegalIdentifier(tag))
             {
                 var character = (char)_reader.Read();
                 sb.Append(character);

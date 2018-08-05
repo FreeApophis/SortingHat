@@ -31,6 +31,11 @@ namespace SortingHat.API.Parser
 
         public IParseNode Parse()
         {
+            if (string.IsNullOrEmpty(_expression))
+            {
+                return null;
+            }
+
             var tokens = new Tokenizer().Scan(_expression);
             _walker = new TokenWalker(tokens);
 

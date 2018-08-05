@@ -66,7 +66,7 @@ namespace SortingHat.Test
         [Fact]
         public void FindOrphans()
         {
-            DirSearch("J:\\Kronos");
+            //DirSearch("J:\\Kronos");
         }
 
         [Fact]
