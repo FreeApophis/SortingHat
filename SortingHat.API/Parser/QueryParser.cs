@@ -6,9 +6,9 @@ namespace SortingHat.API.Parser
     /// <summary>
     /// This is a Recursive Descent Parser with the following Grammer in EBNF.
     /// 
-    /// Expression   := Not Term { Or Term }
+    /// Expression   := Term { Or Term }
     /// Term         := Factor { And Factor }
-    /// Factor       := Tag | BoolConstant | "(" Expression ")
+    /// Factor       := Tag | BoolConstant | Not Factor | "(" Expression ")
     /// Tag          := ":"  Any non whitespace { Any non whitespace }
     /// Or           := "or" | "||" | "∨"
     /// And          := "and" | "&&"| "∧"
@@ -38,19 +38,11 @@ namespace SortingHat.API.Parser
             return _parseTree;
         }
 
-        // Expression := Not Term { Or Term }
+        // Expression := Term { Or Term }
         public IParseNode ParseExpression()
         {
             IParseNode result;
-            if (NextIs<NotToken>())
-            {
-                _walker.Pop();
-                result = new NotOperatorNode(ParseTerm());
-            }
-            else
-            {
-                result = ParseTerm();
-            }
+            result = ParseTerm();
             while (NextIs<OrToken>())
             {
                 var op = _walker.Pop();
@@ -78,7 +70,7 @@ namespace SortingHat.API.Parser
             return result;
         }
 
-        /// Factor     := Tag | "(" Expression ")
+        // Factor       := Tag | BoolConstant | Not Factor | "(" Expression ")
         private IParseNode ParseFactor()
         {
             if (NextIs<TagToken>())
@@ -87,11 +79,17 @@ namespace SortingHat.API.Parser
                 return new TagNode(tagToken.Value);
             }
 
-            if (NextIs<BoolConstantToken>()) {
+            if (NextIs<BoolConstantToken>())
+            {
                 var boolToken = _walker.Pop() as BoolConstantToken;
                 return new BooleanNode(boolToken.Value);
             }
 
+            if (NextIs<NotToken>())
+            {
+                _walker.Pop();
+                return new NotOperatorNode(ParseFactor());
+            }
 
             ExpectOpeningParenthesis();
             var result = ParseExpression();
@@ -113,7 +111,7 @@ namespace SortingHat.API.Parser
         {
             if (!NextIs<OpenParenthesisToken>())
             {
-                throw new Exception("Expecting Real number or '(' in expression, instead got : " + (PeekNext() != null ? PeekNext().ToString() : "End of expression"));
+                throw new Exception("Expecting '(' in expression, instead got : " + (PeekNext() != null ? PeekNext().ToString() : "End of expression"));
             }
             _walker.Pop();
         }

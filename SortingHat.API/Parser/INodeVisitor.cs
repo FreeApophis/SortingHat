@@ -4,8 +4,6 @@ namespace SortingHat.API.Parser
 {
     public interface INodeVisitor
     {
-        void Visit(IParseNode op);
-
         void Visit(UnaryOperatorNode op);
         void Visit(BinaryOperatorNode op);
 
@@ -13,7 +11,7 @@ namespace SortingHat.API.Parser
         void Visit(AndOperatorNode op);
         void Visit(OrOperatorNode op);
 
-        void Visit(TagNode number);
+        void Visit(TagNode tag);
         void Visit(BooleanNode boolean);
     }
 }

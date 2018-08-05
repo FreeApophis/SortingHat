@@ -13,17 +13,17 @@ namespace SortingHat.API.Parser
     }
     public class AndToken : OperatorToken
     {
-        public override string ToString() => "Addition Operator";
+        public override string ToString() => "And Operator";
     }
 
     public class OrToken : OperatorToken
     {
-        public override string ToString() => "Subtraction Operator";
+        public override string ToString() => "Or Operator";
     }
 
     public class NotToken : OperatorToken
     {
-        public override string ToString() => "Multiplication Operator";
+        public override string ToString() => "Not Operator";
     }
 
     public abstract class ParenthesisToken : Token

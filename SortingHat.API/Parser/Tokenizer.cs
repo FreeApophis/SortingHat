@@ -83,18 +83,14 @@ namespace SortingHat.API.Parser
                             break;
                             throw new Exception("Unknown Identifier...");
                     }
-                } else
-                {
-                    throw new Exception("Unrecognized nex token...");
-                }
-
+                } 
             }
         }
 
         private string GetNextIdentifier()
         {
             var sb = new StringBuilder();
-            while (!char.IsWhiteSpace((char)_reader.Peek()))
+            while (_reader.Peek() != -1 && !char.IsWhiteSpace((char)_reader.Peek()))
             {
                 var character = (char)_reader.Read();
                 sb.Append(character);

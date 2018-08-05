@@ -22,32 +22,36 @@ namespace SortingHat.API.Parser
 
         public void Visit(NotOperatorNode op)
         {
-            throw new NotImplementedException();
+            _resultBuilder.Append(op.ToString());
+            op.Operand.Accept(this);
         }
 
         public void Visit(AndOperatorNode op)
         {
-            throw new NotImplementedException();
+            _resultBuilder.Append("(");
+            op.LeftOperand.Accept(this);
+            _resultBuilder.Append($" {op.ToString()} ");
+            op.RightOperand.Accept(this);
+            _resultBuilder.Append(")");
         }
 
         public void Visit(OrOperatorNode op)
         {
-            throw new NotImplementedException();
+            _resultBuilder.Append("(");
+            op.LeftOperand.Accept(this);
+            _resultBuilder.Append($" {op.ToString()} ");
+            op.RightOperand.Accept(this);
+            _resultBuilder.Append(")");
         }
 
-        public void Visit(TagNode number)
+        public void Visit(TagNode tag)
         {
-            throw new NotImplementedException();
+            _resultBuilder.Append(tag.ToString());
         }
 
         public void Visit(BooleanNode boolean)
         {
-            throw new NotImplementedException();
-        }
-
-        public void Visit(IParseNode op)
-        {
-            throw new NotImplementedException();
+            _resultBuilder.Append(boolean.ToString());
         }
     }
 }

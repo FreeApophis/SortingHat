@@ -6,15 +6,15 @@ namespace SortingHat.Test
     public class ParserTest
     {
         [Fact]
-        public void TagEquivalence()
+        public void SimpleQuery()
         {
-            var parser = new QueryParser(":test or true and (:movie or not :blue)");
+            var parser = new QueryParser(":test or true and ( :movie or not :blue )");
             var visitor = new ToStringVisitor();
 
             var ir = parser.Parse();
 
-            visitor.Visit(ir);
-            Assert.Equal("", visitor.Result);
+            ir.Accept(visitor);
+            Assert.Equal("(:test ∨ (true ∧ (:movie ∨ ¬:blue)))", visitor.Result);
 
         }
     }
