@@ -1,8 +1,8 @@
-﻿namespace SortingHat.API.Parser
+﻿namespace SortingHat.API.Parser.Nodes
 {
-    public class MinusOperator : BinaryOperator
+    public class OrOperatorNode : BinaryOperatorNode
     {
-        internal MinusOperator(IParseNode leftOperand, IParseNode rightOperand) :
+        internal OrOperatorNode(IParseNode leftOperand, IParseNode rightOperand) :
             base(leftOperand, rightOperand)
         {
         }
@@ -14,7 +14,7 @@
 
         public override string ToString()
         {
-            return "-";
+            return "∨";
         }
     }
 }

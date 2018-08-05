@@ -11,24 +11,19 @@ namespace SortingHat.API.Parser
     public abstract class OperatorToken : Token
     {
     }
-    public class PlusToken : OperatorToken
+    public class AndToken : OperatorToken
     {
         public override string ToString() => "Addition Operator";
     }
 
-    public class MinusToken : OperatorToken
+    public class OrToken : OperatorToken
     {
         public override string ToString() => "Subtraction Operator";
     }
 
-    public class MultiplicationToken : OperatorToken
+    public class NotToken : OperatorToken
     {
         public override string ToString() => "Multiplication Operator";
-    }
-
-    public class DivideToken : OperatorToken
-    {
-        public override string ToString() => "Division Operator";
     }
 
     public abstract class ParenthesisToken : Token
@@ -46,33 +41,27 @@ namespace SortingHat.API.Parser
         public override string ToString() => "Closing Parenthesis";
     }
 
-    public class CommaToken : ParenthesisToken
+    public class TagToken : Token
     {
-        public override string ToString() => "Comma";
-    }
-
-    public class NumberToken : Token
-    {
-        public NumberToken(double value)
+        public TagToken(string value)
         {
             Value = value;
         }
 
-        public double Value { get; private set; }
+        public string Value { get; private set; }
 
-        public override string ToString() => $"Number: {Value}";
+        public override string ToString() => $"Tag: {Value}";
     }
 
-    public class IdentifierToken : Token
+    public class BoolConstantToken : Token
     {
-        public IdentifierToken(string name)
+        public BoolConstantToken(bool value)
         {
-            Name = name;
+            Value = value;
         }
 
-        public string Name { get; private set; }
+        public bool Value { get; private set; }
 
-        public override string ToString() => $"Identifier: {Name}";
-
+        public override string ToString() => $"Bool Value: {Value}";
     }
 }

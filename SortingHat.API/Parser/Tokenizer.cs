@@ -13,6 +13,11 @@ namespace SortingHat.API.Parser
         {
             _reader = new StringReader(expression);
 
+            /// Or         := "or" | "||" | "∨"
+            /// And        := "and" | "&&"| "∧"
+            /// Not        := "not" | "!" | "¬"
+            /// True       := "true" | "1"
+            /// False      := "false" | "0"
             while (_reader.Peek() != -1)
             {
                 var c = (char)_reader.Peek();
@@ -22,90 +27,80 @@ namespace SortingHat.API.Parser
                     continue;
                 }
 
-                if (char.IsDigit(c) || c == '.')
+                if (c == ':')
                 {
-                    var value = ParseNumber();
-                    yield return new NumberToken(value);
+                    var value = GetNextIdentifier();
+                    yield return new TagToken(value);
                 }
-                else if (c == '-')
+
+                if (c == '∨')
                 {
-                    yield return new MinusToken();
                     _reader.Read();
+                    yield return new OrToken();
                 }
-                else if (c == '+')
+                if (c == '∧')
                 {
-                    yield return new PlusToken();
                     _reader.Read();
+                    yield return new AndToken();
                 }
-                else if (c == '*')
+                if (c == '¬')
                 {
-                    yield return new MultiplicationToken();
                     _reader.Read();
+                    yield return new NotToken();
                 }
-                else if (c == '/')
-                {
-                    yield return new DivideToken();
-                    _reader.Read();
-                }
+
                 else if (c == '(')
                 {
-                    yield return new OpenParenthesisToken();
                     _reader.Read();
+                    yield return new OpenParenthesisToken();
                 }
                 else if (c == ')')
                 {
+                    _reader.Read();
                     yield return new ClosedParenthesisToken();
-                    _reader.Read();
-                }
-                else if (c == ',')
-                {
-                    yield return new CommaToken();
-                    _reader.Read();
                 }
                 else if (char.IsLetter(c))
                 {
-                    var name = ParseIdentifier();
-                    yield return new IdentifierToken(name);
-
-                }
-
-            }
-        }
-
-        private double ParseNumber()
-        {
-            var sb = new StringBuilder();
-            var decimalExists = false;
-            while (char.IsDigit((char)_reader.Peek()) || ((char)_reader.Peek() == '.'))
-            {
-                var digit = (char)_reader.Read();
-                if (digit == '.')
+                    var name = GetNextIdentifier();
+                    switch (name.ToLower())
+                    {
+                        case "or":
+                            yield return new OrToken();
+                            break;
+                        case "and":
+                            yield return new AndToken();
+                            break;
+                        case "not":
+                            yield return new NotToken();
+                            break;
+                        case "true":
+                            yield return new BoolConstantToken(true);
+                            break;
+                        case "false":
+                            yield return new BoolConstantToken(false);
+                            break;
+                        default:
+                            break;
+                            throw new Exception("Unknown Identifier...");
+                    }
+                } else
                 {
-                    if (decimalExists) throw new Exception("Multiple dots in decimal number");
-                    decimalExists = true;
+                    throw new Exception("Unrecognized nex token...");
                 }
-                sb.Append(digit);
-            }
 
-            double res;
-            if (!double.TryParse(sb.ToString(), out res))
-            {
-                throw new Exception("Could not parse number: " + sb);
             }
-
-            return res;
         }
 
-        private string ParseIdentifier()
+        private string GetNextIdentifier()
         {
             var sb = new StringBuilder();
-            while (_reader.Peek() != -1 && char.IsLetterOrDigit((char)_reader.Peek()))
+            while (!char.IsWhiteSpace((char)_reader.Peek()))
             {
-                sb.Append((char)_reader.Read());
+                var character = (char)_reader.Read();
+                sb.Append(character);
             }
 
             return sb.ToString();
         }
-
     }
 }

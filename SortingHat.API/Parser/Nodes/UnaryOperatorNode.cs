@@ -1,10 +1,10 @@
-﻿namespace SortingHat.API.Parser
+﻿namespace SortingHat.API.Parser.Nodes
 {
-    public class UnaryOperator : IParseNode
+    public class UnaryOperatorNode : IParseNode
     {
         public IParseNode Operand { get; set; }
 
-        internal UnaryOperator(IParseNode operand)
+        internal UnaryOperatorNode(IParseNode operand)
         {
             Operand = operand;
 

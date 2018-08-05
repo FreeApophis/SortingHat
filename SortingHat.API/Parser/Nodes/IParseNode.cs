@@ -1,4 +1,4 @@
-﻿namespace SortingHat.API.Parser
+﻿namespace SortingHat.API.Parser.Nodes
 {
     public interface IParseNode
     {

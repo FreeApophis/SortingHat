@@ -1,8 +1,8 @@
-﻿namespace SortingHat.API.Parser
+﻿namespace SortingHat.API.Parser.Nodes
 {
-    public class BinaryOperator : IParseNode
+    public class BinaryOperatorNode : IParseNode
     {
-        internal BinaryOperator(IParseNode leftOperand, IParseNode rightOperand)
+        internal BinaryOperatorNode(IParseNode leftOperand, IParseNode rightOperand)
         {
             LeftOperand = leftOperand;
             RightOperand = rightOperand;
