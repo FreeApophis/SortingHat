@@ -13,11 +13,6 @@ namespace SortingHat.API.Parser
         {
             _reader = new StringReader(expression);
 
-            /// Or         := "or" | "||" | "∨"
-            /// And        := "and" | "&&"| "∧"
-            /// Not        := "not" | "!" | "¬"
-            /// True       := "true" | "1"
-            /// False      := "false" | "0"
             while (_reader.Peek() != -1)
             {
                 var c = (char)_reader.Peek();
