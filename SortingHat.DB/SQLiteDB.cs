@@ -8,14 +8,16 @@ namespace SortingHat.DB
     public class SQLiteDB : IDatabase
     {
         private readonly string _path;
+        private readonly string _dbName;
 
         public IFile File { get; }
-
         public ITag Tag { get; }
 
-        public SQLiteDB(string path)
+        public SQLiteDB(string path, string dbName)
         {
             _path = path;
+            _dbName = dbName;
+
             File = new SQLiteFile(this);
             Tag = new SQLiteTag(this);
         }
@@ -47,7 +49,7 @@ namespace SortingHat.DB
 
         private string DBFile()
         {
-            return Path.Combine(DBPath(), "hat.db");
+            return Path.Combine(DBPath(), $"{_dbName}.db");
         }
 
         internal SqliteConnection Connection()

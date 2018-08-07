@@ -10,6 +10,7 @@
     <None Remove="Migrations\20180625-1925-CreateFileTags.migration" />
     <None Remove="Migrations\20180802-1820-CreateSettings.migration" />
     <None Remove="Migrations\20180802-1830-CreateFileNames.migration" />
+    <None Remove="Migrations\20180802-2030-CreateFilePaths.migration" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,6 +27,9 @@
       <CustomToolNamespace>Migrations</CustomToolNamespace>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\20180802-1830-CreateFileNames.migration">
+      <CustomToolNamespace>Migrations</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\20180802-2030-CreateFilePaths.migration">
       <CustomToolNamespace>Migrations</CustomToolNamespace>
     </EmbeddedResource>
   </ItemGroup>

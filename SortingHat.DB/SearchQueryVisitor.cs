@@ -7,15 +7,24 @@ namespace SortingHat.DB
 {
     class SearchQueryVisitor : INodeVisitor
     {
-        public string Result => _resultBuilder.ToString();
+        public string Result
+        {
+            get
+            {
+                _resultBuilder.Append("\n");
+                _resultBuilder.Append("GROUP BY FileID");
+
+                return _resultBuilder.ToString();
+            }
+        }
         private StringBuilder _resultBuilder = new StringBuilder();
 
         public SearchQueryVisitor()
         {
-            _resultBuilder.Append("SELECT File.Hash, File.Size\n");
-            _resultBuilder.Append("FROM File\n");
-            _resultBuilder.Append("JOIN FileTags ON FileTags.FileID = File.ID\n");
-            _resultBuilder.Append("JOIN Tags ON FileTags.TagID = ID\n");
+            _resultBuilder.Append("SELECT Files.ID\n");
+            _resultBuilder.Append("FROM Files\n");
+            _resultBuilder.Append("JOIN FileTags ON FileTags.FileID = Files.ID\n");
+            _resultBuilder.Append("JOIN Tags ON FileTags.TagID = Tags.ID\n");
             _resultBuilder.Append("WHERE ");
         }
 
