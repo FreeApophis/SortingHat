@@ -1,11 +1,12 @@
 ﻿/* Create TagsFiles */
 
-CREATE TABLE IF NOT EXISTS `FileTags` (
-	`ID`	INTEGER PRIMARY KEY AUTOINCREMENT,
-	`TagID`	INTEGER NULL,
-	`FileID`	INTEGER NOT NULL,
-	FOREIGN KEY(`TagID`) REFERENCES `Tags`(`ID`),
-	FOREIGN KEY(`FileID`) REFERENCES `Files`(`ID`),
-	UNIQUE (TagID, FileID) ON CONFLICT REPLACE
+CREATE TABLE `FileTags` (
+    `ID`                        INTEGER PRIMARY KEY AUTOINCREMENT,
+    `TagID`                     INTEGER NULL,
+    `FileID`                    INTEGER NOT NULL,
+
+    FOREIGN KEY(`TagID`)        REFERENCES `Tags`(`ID`),
+    FOREIGN KEY(`FileID`)       REFERENCES `Files`(`ID`),
+    UNIQUE (TagID, FileID)      ON CONFLICT REPLACE
 );
 

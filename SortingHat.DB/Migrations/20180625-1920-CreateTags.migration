@@ -1,10 +1,11 @@
 ﻿/* Create Tags */
 
-CREATE TABLE IF NOT EXISTS `Tags` (
-	`ID`	INTEGER PRIMARY KEY AUTOINCREMENT,
-	`ParentID`	INTEGER NULL,
-	`Name`	VARCHAR (255),
-	FOREIGN KEY(`ParentID`) REFERENCES `Tags`(`ID`)
+CREATE TABLE `Tags` (
+    `ID`                        INTEGER PRIMARY KEY AUTOINCREMENT,
+    `ParentID`                  INTEGER NULL,
+    `Name`                      VARCHAR (255),
+
+    FOREIGN KEY(`ParentID`)     REFERENCES `Tags`(`ID`)
 );
 
 CREATE INDEX TagsParentIndex
