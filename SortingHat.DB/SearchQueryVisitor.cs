@@ -12,29 +12,24 @@ namespace SortingHat.DB
         {
             get
             {
-                if (_done == false)
-                {
-                    _resultBuilder.Append("\n");
-                    _resultBuilder.Append("GROUP BY FilePaths.ID");
-                    _done = true;
-                }
-
-                return _resultBuilder.ToString();
+                return _selectBuilder.ToString() + _whereBuilder.ToString() + GroupBy;
             }
         }
-        private StringBuilder _resultBuilder = new StringBuilder();
+        private StringBuilder _selectBuilder = new StringBuilder();
+        private StringBuilder _whereBuilder = new StringBuilder();
+        private const string GroupBy = "\nGROUP BY FilePaths.ID";
         private SQLiteDB _db;
-        private bool _done = false;
+        private int _fileTagCount = 0;
 
         public SearchQueryVisitor(SQLiteDB db)
         {
             _db = db;
 
-            _resultBuilder.AppendLine("SELECT FilePaths.Path, Files.Hash, Files.ID");
-            _resultBuilder.AppendLine("FROM Files");
-            _resultBuilder.AppendLine("JOIN FileTags ON FileTags.FileID = Files.ID");
-            _resultBuilder.AppendLine("JOIN FilePaths ON FilePaths.FileID = Files.ID");
-            _resultBuilder.Append("WHERE ");
+            _selectBuilder.AppendLine("SELECT FilePaths.Path, Files.Hash, Files.ID");
+            _selectBuilder.AppendLine("FROM Files");
+            _selectBuilder.AppendLine("JOIN FilePaths ON FilePaths.FileID = Files.ID");
+            
+            _whereBuilder.Append("WHERE ");
         }
 
         public void Visit(UnaryOperatorNode op)
@@ -49,27 +44,27 @@ namespace SortingHat.DB
 
         public void Visit(NotOperatorNode op)
         {
-            _resultBuilder.Append("NOT (");
+            _whereBuilder.Append("NOT (");
             op.Operand.Accept(this);
-            _resultBuilder.Append(")");
+            _whereBuilder.Append(")");
         }
 
         public void Visit(AndOperatorNode op)
         {
-            _resultBuilder.Append("(");
+            _whereBuilder.Append("(");
             op.LeftOperand.Accept(this);
-            _resultBuilder.Append($" AND ");
+            _whereBuilder.Append($" AND ");
             op.RightOperand.Accept(this);
-            _resultBuilder.Append(")");
+            _whereBuilder.Append(")");
         }
 
         public void Visit(OrOperatorNode op)
         {
-            _resultBuilder.Append("(");
+            _whereBuilder.Append("(");
             op.LeftOperand.Accept(this);
-            _resultBuilder.Append($" OR ");
+            _whereBuilder.Append($" OR ");
             op.RightOperand.Accept(this);
-            _resultBuilder.Append(")");
+            _whereBuilder.Append(")");
         }
 
         public void Visit(TagNode tagNode)
@@ -79,18 +74,20 @@ namespace SortingHat.DB
 
             if (tagID.HasValue)
             {
-                _resultBuilder.Append($"FileTags.TagID = {tagID.Value}");
+                _selectBuilder.AppendLine($"JOIN FileTags ft{_fileTagCount} ON ft{_fileTagCount}.FileID = Files.ID");
+                _whereBuilder.Append($"ft{_fileTagCount}.TagID = {tagID.Value}");
+                _fileTagCount++;
             }
             else
             {
                 // Emitting false because the tag does not exist in the database
-                _resultBuilder.Append(0);
+                _whereBuilder.Append(0);
             }
         }
 
         public void Visit(BooleanNode boolean)
         {
-            _resultBuilder.Append(boolean.BoolConstant ? "1" : "0");
+            _whereBuilder.Append(boolean.BoolConstant ? "1" : "0");
         }
     }
 }

@@ -44,7 +44,7 @@ namespace SortingHat.DB
             var tags = Ancestors(tag).Select((t, ID) => new { ID, t.Name });
             var query = new StringBuilder();
 
-            query.AppendLine($"SELECT {string.Join(", ", tags.Select(t => $"T{t.ID}.ID"))}");
+            query.AppendLine($"SELECT {string.Join(", ", tags.Select(t => $"T{t.ID}.ID ID{t.ID}"))}");
             query.AppendLine("FROM Tags T0");
 
             foreach (var t in tags.Skip(1))
@@ -86,7 +86,7 @@ namespace SortingHat.DB
         {
             var tagIDs = TagIDs(tag);
 
-            return (tagIDs.Count == 0) ? (long?)null : tagIDs.First();
+            return (tagIDs.Count == 0) ? (long?)null : tagIDs.Last();
         }
 
         internal long FindOrCreate(Tag tag)
