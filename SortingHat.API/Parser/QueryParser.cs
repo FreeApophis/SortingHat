@@ -8,7 +8,8 @@ namespace SortingHat.API.Parser
     /// 
     /// Expression   := Term { Or Term }
     /// Term         := Factor { And Factor }
-    /// Factor       := Tag | BoolConstant | Not Factor | "(" Expression ")
+    /// Factor       := Tag | BoolConstant | Not Factor | "(" Expression ") | Predicate
+    /// Predicate    :=  
     /// Tag          := ":"  Any non whitespace { Any non whitespace }
     /// Or           := "or" | "||" | "∨"
     /// And          := "and" | "&&"| "∧"
@@ -75,7 +76,7 @@ namespace SortingHat.API.Parser
             return result;
         }
 
-        // Factor       := Tag | BoolConstant | Not Factor | "(" Expression ")
+        // Factor       := Tag | BoolConstant | Not Factor | "(" Expression ") 
         private IParseNode ParseFactor()
         {
             if (NextIs<TagToken>())

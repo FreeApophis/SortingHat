@@ -42,7 +42,7 @@ namespace SortingHat.API.Parser
                     }
                     else
                     {
-                        throw new Exception("Single & is not a legal operator...");
+                        throw new ParseException("Single | is not a legal operator...");
                     }
                 }
 
@@ -60,7 +60,7 @@ namespace SortingHat.API.Parser
                     }
                     else
                     {
-                        throw new Exception("Single & is not a legal operator...");
+                        throw new ParseException("Single & is not a legal operator...");
                     }
                 }
 
@@ -101,8 +101,7 @@ namespace SortingHat.API.Parser
                             yield return new BoolConstantToken(false);
                             break;
                         default:
-                            break;
-                            throw new Exception("Unknown Identifier...");
+                            throw new ParseException("Unknown Identifier...");
                     }
                 }
             }
