@@ -16,12 +16,30 @@ namespace SortingHat.CLI.Commands
             _services = services;
         }
 
+        private static string ShortHash(string hash)
+        {
+            return hash.Split(':')[1].Substring(0, 8);
+        }
+
         public bool Execute(IEnumerable<string> arguments)
         {
             var search = string.Join(" ", arguments.Skip(2));
             Console.WriteLine($"Find Files: {search}");
 
-            _services.DB.File.Search(search);
+            var files = _services.DB.File.Search(search);
+
+            if (files.Any())
+            {
+
+                foreach (var file in files)
+                {
+                    Console.WriteLine($"* {ShortHash(file.Hash)} {file.Path}");
+                }
+            }
+            else {
+                Console.WriteLine($"No files found for your search query...");
+            }
+
             return true;
         }
 

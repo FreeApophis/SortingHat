@@ -1,14 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using SortingHat.API.Parser.Nodes;
 
 namespace SortingHat.API.Parser
 {
+
     public class ToStringVisitor : INodeVisitor
     {
+        public ToStringVisitor(OperatorType operatorType = OperatorType.Text)
+        {
+            _operatorType = operatorType;
+        }
+
         public string Result => _resultBuilder.ToString();
         private StringBuilder _resultBuilder = new StringBuilder();
+        readonly private OperatorType _operatorType;
 
         public void Visit(UnaryOperatorNode op)
         {
@@ -22,15 +28,23 @@ namespace SortingHat.API.Parser
 
         public void Visit(NotOperatorNode op)
         {
-            _resultBuilder.Append(op.ToString());
+            _resultBuilder.Append(op.ToString(_operatorType));
+            if (_operatorType == OperatorType.Text)
+            {
+                _resultBuilder.Append("(");
+            }
             op.Operand.Accept(this);
+            if (_operatorType == OperatorType.Text)
+            {
+                _resultBuilder.Append(")");
+            }
         }
 
         public void Visit(AndOperatorNode op)
         {
             _resultBuilder.Append("(");
             op.LeftOperand.Accept(this);
-            _resultBuilder.Append($" {op.ToString()} ");
+            _resultBuilder.Append($" {op.ToString(_operatorType)} ");
             op.RightOperand.Accept(this);
             _resultBuilder.Append(")");
         }
@@ -39,7 +53,7 @@ namespace SortingHat.API.Parser
         {
             _resultBuilder.Append("(");
             op.LeftOperand.Accept(this);
-            _resultBuilder.Append($" {op.ToString()} ");
+            _resultBuilder.Append($" {op.ToString(_operatorType)} ");
             op.RightOperand.Accept(this);
             _resultBuilder.Append(")");
         }

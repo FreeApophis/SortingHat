@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 
 namespace SortingHat.DB
 {
@@ -26,27 +27,66 @@ namespace SortingHat.DB
             FindOrCreate(tag);
         }
 
-        private long? Find(Tag tag)
+        private List<Tag> Ancestors(Tag tag)
         {
-            long? parentID = null;
-            if (tag.Parent != null)
+            if (tag.Parent == null)
             {
-                parentID = Find(tag.Parent);
+                return new List<Tag> { tag };
             }
 
-            long? resultID = null;
+            var result = Ancestors(tag.Parent);
+            result.Add(tag);
+            return result;
+        }
+
+        private string TagIDsQuery(Tag tag)
+        {
+            var tags = Ancestors(tag).Select((t, ID) => new { ID, t.Name });
+            var query = new StringBuilder();
+
+            query.AppendLine($"SELECT {string.Join(", ", tags.Select(t => $"T{t.ID}.ID"))}");
+            query.AppendLine("FROM Tags T0");
+
+            foreach (var t in tags.Skip(1))
+            {
+                query.AppendLine($"JOIN Tags T{t.ID} ON T{t.ID}.ParentID == T{t.ID - 1}.ID");
+            }
+
+            query.AppendLine($"WHERE {string.Join(" AND ", tags.Select(t => $"T{t.ID}.Name = '{t.Name}'"))}");
+
+            return query.ToString();
+        }
+
+        internal List<long> TagIDs(Tag tag)
+        {
+            var result = new List<long>();
+
             using (var connection = _db.Connection())
             {
                 connection.Open();
 
                 SqliteCommand findCommand = connection.CreateCommand();
-                findCommand.CommandText = $"SELECT ID FROM Tags WHERE ParentID {DBString.ToComparison(parentID)} AND Name = '{tag.Name}'";
-                resultID = findCommand.ExecuteScalar() as long?;
+                findCommand.CommandText = TagIDsQuery(tag);
+                var reader = findCommand.ExecuteReader();
+
+                if (reader.HasRows)
+                {
+                    for (int i = 0; i < reader.FieldCount; ++i)
+                    {
+                        result.Add(reader.GetInt64(i));
+                    }
+                }
 
                 connection.Close();
             }
+            return result;
+        }
 
-            return resultID;
+        internal long? Find(Tag tag)
+        {
+            var tagIDs = TagIDs(tag);
+
+            return (tagIDs.Count == 0) ? (long?)null : tagIDs.First();
         }
 
         internal long FindOrCreate(Tag tag)

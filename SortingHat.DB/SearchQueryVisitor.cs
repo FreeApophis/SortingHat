@@ -1,7 +1,8 @@
-﻿using SortingHat.API.Parser;
+﻿using SortingHat.API.Models;
 using SortingHat.API.Parser.Nodes;
-using System;
+using SortingHat.API.Parser;
 using System.Text;
+using System;
 
 namespace SortingHat.DB
 {
@@ -11,20 +12,28 @@ namespace SortingHat.DB
         {
             get
             {
-                _resultBuilder.Append("\n");
-                _resultBuilder.Append("GROUP BY FileID");
+                if (_done == false)
+                {
+                    _resultBuilder.Append("\n");
+                    _resultBuilder.Append("GROUP BY FilePaths.ID");
+                    _done = true;
+                }
 
                 return _resultBuilder.ToString();
             }
         }
         private StringBuilder _resultBuilder = new StringBuilder();
+        private SQLiteDB _db;
+        private bool _done = false;
 
-        public SearchQueryVisitor()
+        public SearchQueryVisitor(SQLiteDB db)
         {
-            _resultBuilder.Append("SELECT Files.ID\n");
-            _resultBuilder.Append("FROM Files\n");
-            _resultBuilder.Append("JOIN FileTags ON FileTags.FileID = Files.ID\n");
-            _resultBuilder.Append("JOIN Tags ON FileTags.TagID = Tags.ID\n");
+            _db = db;
+
+            _resultBuilder.AppendLine("SELECT FilePaths.Path, Files.Hash, Files.ID");
+            _resultBuilder.AppendLine("FROM Files");
+            _resultBuilder.AppendLine("JOIN FileTags ON FileTags.FileID = Files.ID");
+            _resultBuilder.AppendLine("JOIN FilePaths ON FilePaths.FileID = Files.ID");
             _resultBuilder.Append("WHERE ");
         }
 
@@ -63,9 +72,20 @@ namespace SortingHat.DB
             _resultBuilder.Append(")");
         }
 
-        public void Visit(TagNode tag)
+        public void Visit(TagNode tagNode)
         {
-            _resultBuilder.Append($"Tags.ID = ToID({tag.Tag})");
+            var tag = Tag.Parse(tagNode.Tag);
+            var tagID = ((SQLiteTag)_db.Tag).Find(tag);
+
+            if (tagID.HasValue)
+            {
+                _resultBuilder.Append($"FileTags.TagID = {tagID.Value}");
+            }
+            else
+            {
+                // Emitting false because the tag does not exist in the database
+                _resultBuilder.Append(0);
+            }
         }
 
         public void Visit(BooleanNode boolean)

@@ -1,5 +1,6 @@
 ﻿using SortingHat.API.Parser;
 using SortingHat.API.Parser.Nodes;
+using System;
 using Xunit;
 
 namespace SortingHat.Test
@@ -30,7 +31,7 @@ namespace SortingHat.Test
         public void SimpleQuery()
         {
             var parser = new QueryParser(":test or true and (:movie or not :blue)");
-            var visitor = new ToStringVisitor();
+            var visitor = new ToStringVisitor(OperatorType.Logical);
 
             var ir = parser.Parse();
 
@@ -39,15 +40,66 @@ namespace SortingHat.Test
         }
 
         [Fact]
-        public void SQLQuery()
+        public void PrecedenceTest()
         {
-            var parser = new QueryParser(":test && :cool");
-            var visitor = new DB.SearchQueryVisitor();
+            var parser = new QueryParser(":A || :B && :C");
+            var visitor = new ToStringVisitor(OperatorType.Logical);
 
             var ir = parser.Parse();
 
             ir.Accept(visitor);
-            //Assert.Equal("", visitor.Result);
+            Assert.Equal("(:A ∨ (:B ∧ :C))", visitor.Result);
+        }
+
+        [Fact]
+        public void OrAssociativityTest()
+        {
+            var parser = new QueryParser(":A || :B || :C || :D");
+            var visitor = new ToStringVisitor(OperatorType.Programming);
+
+            var ir = parser.Parse();
+
+            ir.Accept(visitor);
+            Assert.Equal("(((:A || :B) || :C) || :D)", visitor.Result);
+        }
+
+
+        [Fact]
+        public void AndAssociativityTest()
+        {
+            var parser = new QueryParser(":A && :B && :C && :D");
+            var visitor = new ToStringVisitor(OperatorType.Programming);
+
+            var ir = parser.Parse();
+
+            ir.Accept(visitor);
+            Assert.Equal("(((:A && :B) && :C) && :D)", visitor.Result);
+        }
+
+        [Fact]
+        public void MultipleNotTest()
+        {
+            var parser = new QueryParser("!!!:A && !!:B");
+            var visitor = new ToStringVisitor();
+
+            var ir = parser.Parse();
+
+            ir.Accept(visitor);
+            Assert.Equal("(not(not(not(:A))) and not(not(:B)))", visitor.Result);
+        }
+
+
+        [Fact]
+        public void SQLQuery()
+        {
+            var parser = new QueryParser(":tax:2016 || :cool && :audio:original");
+            var visitor = new DB.SearchQueryVisitor(new DB.SQLiteDB(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "hat"));
+
+            var ir = parser.Parse();
+
+            ir.Accept(visitor);
+
+            Assert.Equal("", visitor.Result);
         }
     }
 }

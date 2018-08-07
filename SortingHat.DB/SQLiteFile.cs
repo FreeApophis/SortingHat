@@ -116,22 +116,28 @@ namespace SortingHat.DB
 
         public void Untag(File file, Tag tag)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public IEnumerable<File> Search(string query)
         {
+            var files = new List<File>();
+
             using (var connection = _db.Connection())
             {
                 connection.Open();
 
                 SqliteCommand initializeCommand = connection.CreateCommand();
                 initializeCommand.CommandText = ParseQuery(query);
-                var resultID = (long)initializeCommand.ExecuteScalar();
-                connection.Close();
+                var reader = initializeCommand.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    files.Add(new File(reader.GetString(0), reader.GetString(1)));
+                }
             }
 
-            return Enumerable.Empty<File>();
+            return files;
         }
 
         private string ParseQuery(string query)
@@ -139,7 +145,7 @@ namespace SortingHat.DB
             var parser = new QueryParser(query);
             var ir = parser.Parse();
 
-            var visitor = new SearchQueryVisitor();
+            var visitor = new SearchQueryVisitor(_db);
             ir.Accept(visitor);
 
             return visitor.Result;

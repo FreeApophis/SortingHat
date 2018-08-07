@@ -1,4 +1,6 @@
-﻿namespace SortingHat.API.Parser.Nodes
+﻿using System;
+
+namespace SortingHat.API.Parser.Nodes
 {
     public class OrOperatorNode : BinaryOperatorNode
     {
@@ -12,9 +14,19 @@
             visitor.Visit(this);
         }
 
-        public override string ToString()
+        internal object ToString(OperatorType operatorType = OperatorType.Text)
         {
-            return "∨";
+            switch (operatorType)
+            {
+                case OperatorType.Logical:
+                    return "∨";
+                case OperatorType.Text:
+                    return "or";
+                case OperatorType.Programming:
+                    return "||";
+            }
+
+            throw new NotImplementedException();
         }
     }
 }

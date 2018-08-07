@@ -38,7 +38,7 @@ namespace SortingHat.API.Parser
                     _reader.Read();
                     if ('|' == (char)_reader.Read())
                     {
-                        yield return new AndToken();
+                        yield return new OrToken();
                     }
                     else
                     {

@@ -32,7 +32,7 @@ namespace SortingHat.CLI.Commands
             var tags = arguments.Skip(1).Where(IsTag);
             var files = GetFilePaths(arguments.Skip(1).Where(IsFile));
 
-            foreach (var file in files.Select(file => new API.Models.File(_services, file)))
+            foreach (var file in files.Select(file => new API.Models.File(file, _services)))
             {
                 foreach (var tag in tags.Select(tag => API.Models.Tag.Parse(tag)))
                 {
