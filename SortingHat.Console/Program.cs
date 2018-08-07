@@ -1,6 +1,6 @@
 ﻿
 using System;
-using SortingHat.API;
+using SortingHat.API.Parser;
 
 namespace SortingHat.CLI
 {
@@ -13,6 +13,11 @@ namespace SortingHat.CLI
                 var argumentParser = new ArgumentParser(args, new CLIService());
 
                 argumentParser.Execute();
+            }
+            catch (ParseException e)
+            {
+                Console.WriteLine("Parser is not happy with your input, maybe find a ravenclaw...");
+                Console.WriteLine(e.Message);
             }
             catch (Exception e)
             {

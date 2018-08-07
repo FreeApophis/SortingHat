@@ -11,7 +11,7 @@ namespace SortingHat.CLI
         internal CLIService()
         {
             Logger = new CLILogger();
-            DB = new SQLiteDB(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+            DB = new SQLiteDB(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "hat");
             HashService = new HashService(SHA256.Create(), nameof(SHA256));
         }
 

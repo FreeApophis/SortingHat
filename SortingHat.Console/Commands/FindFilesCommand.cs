@@ -21,7 +21,7 @@ namespace SortingHat.CLI.Commands
             var search = string.Join(" ", arguments.Skip(2));
             Console.WriteLine($"Find Files: {search}");
 
-            _services.DB.File.Search(arguments.First());
+            _services.DB.File.Search(search);
             return true;
         }
 

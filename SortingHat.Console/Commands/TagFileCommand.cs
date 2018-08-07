@@ -1,5 +1,5 @@
 ﻿using SortingHat.API.DI;
-using SortingHat.API.Models;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -29,14 +29,12 @@ namespace SortingHat.CLI.Commands
 
         public bool Execute(IEnumerable<string> arguments)
         {
-            var parameters = arguments.Skip(1);
-
-            var tags = parameters.Where(IsTag);
-            var files = parameters.Where(IsFile);
+            var tags = arguments.Skip(1).Where(IsTag);
+            var files = GetFilePaths(arguments.Skip(1).Where(IsFile));
 
             foreach (var file in files.Select(file => new API.Models.File(_services, file)))
             {
-                foreach (var tag in tags.Select(tag => Tag.Parse(tag)))
+                foreach (var tag in tags.Select(tag => API.Models.Tag.Parse(tag)))
                 {
                     file.Tag(_services, tag);
                 }
@@ -44,6 +42,22 @@ namespace SortingHat.CLI.Commands
 
             return true;
 
+        }
+
+        private static IEnumerable<string> GetFilePaths(IEnumerable<string> filePatterns)
+        {
+            var paths = new List<string>();
+            foreach (var filePattern in filePatterns)
+            {
+                //Directory.GetFiles(path, pattern);
+                paths.Add(filePattern);
+            }
+            return paths;
+        }
+
+        private static string FullFilePath(string arg)
+        {
+            throw new NotImplementedException();
         }
 
         public bool Match(IEnumerable<string> arguments)
