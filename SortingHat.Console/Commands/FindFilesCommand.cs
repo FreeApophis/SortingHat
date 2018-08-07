@@ -1,8 +1,8 @@
-﻿using SortingHat.API.DI;
+﻿using SortingHat.CLI;
+using SortingHat.API.DI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace SortingHat.CLI.Commands
@@ -33,7 +33,7 @@ namespace SortingHat.CLI.Commands
 
                 foreach (var file in files)
                 {
-                    Console.WriteLine($"* {ShortHash(file.Hash)} {file.Path}");
+                    Console.WriteLine($"{ShortHash(file.Hash)} {file.Size.FixedHumanSize()} {file.Path}");
                 }
             }
             else {

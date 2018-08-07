@@ -50,7 +50,8 @@ namespace SortingHat.CLI.Commands
             foreach (var filePattern in filePatterns)
             {
                 //Directory.GetFiles(path, pattern);
-                paths.Add(filePattern);
+                var absolutePath = Path.Combine(Directory.GetCurrentDirectory(), filePattern);  
+                paths.Add(absolutePath);
             }
             return paths;
         }
