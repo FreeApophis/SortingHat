@@ -1,6 +1,6 @@
-﻿using Autofac;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SortingHat.CLI.Commands;
+using System;
 using System.Collections.Generic;
 
 namespace SortingHat.CLI
@@ -9,9 +9,9 @@ namespace SortingHat.CLI
     class ArgumentParser
     {
         private IEnumerable<ICommand> _commands;
-        ILogger<ArgumentParser> _logger;
+        Lazy<ILogger<ArgumentParser>> _logger;
 
-        public ArgumentParser(ILogger<ArgumentParser> logger , IEnumerable<ICommand> commands)
+        public ArgumentParser(Lazy<ILogger<ArgumentParser>> logger, IEnumerable<ICommand> commands)
         {
             _commands = commands;
             _logger = logger;
@@ -25,10 +25,10 @@ namespace SortingHat.CLI
                 {
                     if (command.Execute(arguments) == false)
                     {
-                        _logger.Log(LogLevel.Error, "Command Execution failed!");
+                        _logger.Value.Log(LogLevel.Warning, "Command Execution failed!");
                     }
 
-                    return;
+                    break;
                 }
             }
         }

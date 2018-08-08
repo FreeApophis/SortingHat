@@ -12,6 +12,10 @@ namespace SortingHat.CLI
     [ExcludeFromCodeCoverage]
     class Program
     {
+        // Could be configurable
+        const LogLevel MinLogLevel = LogLevel.Trace;
+        const string DBName = "hat";
+
         static void Main(string[] args)
         {
             CompositionRoot().Resolve<Application>().Run(args);
@@ -20,27 +24,24 @@ namespace SortingHat.CLI
         private static IContainer ConfigureLogger(IContainer container)
         {
             var loggerFactory = container.Resolve<ILoggerFactory>();
-            loggerFactory.AddConsole();
+            loggerFactory.AddConsole(MinLogLevel);
 
             return container;
         }
 
         private static IContainer CompositionRoot()
         {
-            // Create your builder.
             var builder = new ContainerBuilder();
 
             builder.RegisterType<Application>().AsSelf();
             builder.RegisterType<ArgumentParser>().AsSelf();
 
-
-            builder.Register(c => new SQLiteDB(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "hat")).As<IDatabase>().SingleInstance();
+            builder.Register(c => new SQLiteDB(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), DBName)).As<IDatabase>().SingleInstance();
             builder.Register(c => new HashService(SHA256.Create(), nameof(SHA256))).As<IHashService>().SingleInstance();
             builder.RegisterType<LoggerFactory>().As<ILoggerFactory>().SingleInstance();
             builder.RegisterGeneric(typeof(Logger<>)).As(typeof(ILogger<>)).SingleInstance();
 
             RegisterCommands(builder);
-
 
             return ConfigureLogger(builder.Build());
         }

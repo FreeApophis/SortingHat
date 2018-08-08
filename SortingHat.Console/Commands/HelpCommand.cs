@@ -16,7 +16,7 @@ namespace SortingHat.CLI.Commands
 
         public bool Execute(IEnumerable<string> arguments)
         {
-            _logger.Log(LogLevel.Trace, "Execute Help Command");
+            _logger.Log(LogLevel.Information, "Execute Help Command");
             return true;
         }
 
