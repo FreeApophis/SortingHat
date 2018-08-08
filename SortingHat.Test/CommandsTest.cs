@@ -1,9 +1,5 @@
-﻿using SortingHat.API.Models;
-using SortingHat.CLI.Commands;
-using SortingHat.DB;
-using System;
+﻿using SortingHat.CLI.Commands;
 using System.Collections.Generic;
-using System.Linq;
 using Xunit;
 
 namespace SortingHat.Test

@@ -28,7 +28,7 @@ namespace SortingHat.DB
             _selectBuilder.AppendLine("SELECT FilePaths.Path, Files.Hash, Files.ID");
             _selectBuilder.AppendLine("FROM Files");
             _selectBuilder.AppendLine("JOIN FilePaths ON FilePaths.FileID = Files.ID");
-            
+
             _whereBuilder.Append("WHERE ");
         }
 
@@ -69,8 +69,7 @@ namespace SortingHat.DB
 
         public void Visit(TagNode tagNode)
         {
-            var tag = Tag.Parse(tagNode.Tag);
-            var tagID = ((SQLiteTag)_db.Tag).Find(tag);
+            long? tagID = GetTagID(tagNode);
 
             if (tagID.HasValue)
             {
@@ -83,6 +82,13 @@ namespace SortingHat.DB
                 // Emitting false because the tag does not exist in the database
                 _whereBuilder.Append(0);
             }
+        }
+
+        private long? GetTagID(TagNode tagNode)
+        {
+            var tag = Tag.Parse(tagNode.Tag);
+
+            return ((SQLiteTag)_db.Tag).Find(tag);
         }
 
         public void Visit(BooleanNode boolean)

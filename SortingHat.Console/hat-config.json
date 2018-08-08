@@ -1,0 +1,7 @@
+﻿{
+  "Database": {
+    "db-type": "sqlite",
+    "db-name": "hat",
+    "db-path": "#USERDOC"
+  }
+}
