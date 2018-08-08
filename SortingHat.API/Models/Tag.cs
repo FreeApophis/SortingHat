@@ -9,6 +9,7 @@ namespace SortingHat.API.Models
     {
         public string Name;
         public Tag Parent;
+        public List<Tag> Children { get; } = new List<Tag>();
 
         public string FullName => $"{(Parent == null ? string.Empty : Parent.FullName)}:{Name}";
 
@@ -28,6 +29,8 @@ namespace SortingHat.API.Models
         {
             Name = name;
             Parent = parent;
+
+            parent?.Children?.Add(this);
         }
 
         /// <summary>
