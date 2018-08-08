@@ -1,4 +1,4 @@
-﻿using Autofac;
+﻿using SortingHat.API.DI;
 using SortingHat.API.Models;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,11 +8,11 @@ namespace SortingHat.CLI.Commands
 {
     class AddTagCommand : ICommand
     {
-        private readonly IContainer _container;
+        private readonly IDatabase _db;
 
-        public AddTagCommand(IContainer container)
+        public AddTagCommand(IDatabase db)
         {
-            _container = container;
+            _db = db;
         }
 
         public bool Execute(IEnumerable<string> arguments)
@@ -23,7 +23,7 @@ namespace SortingHat.CLI.Commands
             {
                 var tag = Tag.Parse(tagString);
 
-                result &= tag.Store(_container);
+                result &= tag.Store(_db);
             }
 
             return result;

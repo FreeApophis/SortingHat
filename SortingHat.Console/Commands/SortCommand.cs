@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Autofac;
-using SortingHat.API.DI;
+using System;
 
 namespace SortingHat.CLI.Commands
 {
     class SortCommand : ICommand
     {
         private const string Command = "sort";
-        private readonly IContainer _container;
 
-        public SortCommand(IContainer container)
+        public SortCommand()
         {
-            _container = container;
         }
 
         public bool Execute(IEnumerable<string> arguments)

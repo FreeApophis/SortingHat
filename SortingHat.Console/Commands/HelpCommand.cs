@@ -1,5 +1,4 @@
-﻿using Autofac;
-using System;
+﻿using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,16 +7,16 @@ namespace SortingHat.CLI.Commands
     class HelpCommand : ICommand
     {
         private const string Command = "help";
-        private readonly IContainer _container;
+        private readonly ILogger<HelpCommand> _logger;
 
-        public HelpCommand(IContainer container)
+        public HelpCommand(ILogger<HelpCommand> logger)
         {
-            _container = container;
+            _logger = logger;
         }
 
         public bool Execute(IEnumerable<string> arguments)
         {
-            Console.WriteLine("XXX");
+            _logger.Log(LogLevel.Trace, "Execute Help Command");
             return true;
         }
 

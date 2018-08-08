@@ -1,5 +1,4 @@
-﻿using Autofac;
-using SortingHat.API.DI;
+﻿using SortingHat.API.DI;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,22 +7,18 @@ namespace SortingHat.CLI.Commands
     class InitCommand : ICommand
     {
         private const string Command = "init";
-        private IContainer _container;
+        private readonly IDatabase _db;
 
-        public InitCommand(IContainer container)
+        public InitCommand(IDatabase db)
         {
-            _container = container;
+            _db = db;
         }
 
         public bool Execute(IEnumerable<string> arguments)
         {
             if (arguments.Count() == 1)
             {
-                using (var scope = _container.BeginLifetimeScope())
-                {
-                    var db = scope.Resolve<IDatabase>();
-                    db.Setup();
-                }
+                _db.Setup();
             }
 
             return false;

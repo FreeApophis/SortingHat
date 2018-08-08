@@ -1,20 +1,18 @@
-﻿using SortingHat.CLI;
-using SortingHat.API.DI;
-using System;
+﻿using SortingHat.API.DI;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Autofac;
+using System;
 
 namespace SortingHat.CLI.Commands
 {
     class FindFilesCommand : ICommand
     {
-        private readonly IContainer _container;
+        private readonly IDatabase _db;
 
-        public FindFilesCommand(IContainer container)
+        public FindFilesCommand(IDatabase db)
         {
-            _container = container;
+            _db = db;
         }
 
         private static string ShortHash(string hash)
@@ -27,23 +25,19 @@ namespace SortingHat.CLI.Commands
             var search = string.Join(" ", arguments.Skip(2));
             Console.WriteLine($"Find Files: {search}");
 
-            using (var scope = _container.BeginLifetimeScope())
+            var files = _db.File.Search(search);
+
+            if (files.Any())
             {
-                var db = scope.Resolve<IDatabase>();
-                var files = db.File.Search(search);
 
-                if (files.Any())
+                foreach (var file in files)
                 {
-
-                    foreach (var file in files)
-                    {
-                        Console.WriteLine($"{ShortHash(file.Hash)} {file.Size.FixedHumanSize()} {file.Path}");
-                    }
+                    Console.WriteLine($"{ShortHash(file.Hash)} {file.Size.FixedHumanSize()} {file.Path}");
                 }
-                else
-                {
-                    Console.WriteLine($"No files found for your search query...");
-                }
+            }
+            else
+            {
+                Console.WriteLine($"No files found for your search query...");
             }
 
             return true;

@@ -1,7 +1,6 @@
-﻿using Autofac;
+﻿using SortingHat.API.DI;
 using System.IO;
 using System;
-using SortingHat.API.DI;
 
 namespace SortingHat.API.Models
 {
@@ -38,22 +37,14 @@ namespace SortingHat.API.Models
             CreatedAt = fileInfo.CreationTimeUtc;
         }
 
-        public void Tag(IContainer container, Tag tag)
+        public void Tag(IDatabase db, Tag tag)
         {
-            using (var scope = container.BeginLifetimeScope())
-            {
-                var db = scope.Resolve<IDatabase>();
-                db.File.Tag(this, tag);
-            }
+            db.File.Tag(this, tag);
         }
 
-        public void Untag(IContainer container, Tag tag)
+        public void Untag(IDatabase db, Tag tag)
         {
-            using (var scope = container.BeginLifetimeScope())
-            {
-                var db = scope.Resolve<IDatabase>();
-                db.File.Untag(this, tag);
-            }
+            db.File.Untag(this, tag);
         }
 
     }

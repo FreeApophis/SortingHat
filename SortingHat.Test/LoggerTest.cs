@@ -1,6 +1,4 @@
-﻿using SortingHat.API.DI;
-using System.Linq;
-using Xunit;
+﻿using Xunit;
 
 namespace SortingHat.Test
 {

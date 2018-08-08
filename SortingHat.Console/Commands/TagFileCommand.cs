@@ -1,21 +1,21 @@
-﻿using Autofac;
-using SortingHat.API.DI;
-using System;
+﻿using SortingHat.API.DI;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-
+using System;
 
 namespace SortingHat.CLI.Commands
 {
     class TagFileCommand : ICommand
     {
         private const string Command = "tag-file";
-        private readonly IContainer _container;
+        private readonly IDatabase _db;
+        private readonly IHashService _hashService;
 
-        public TagFileCommand(IContainer container)
+        public TagFileCommand(IDatabase db, IHashService hashService)
         {
-            _container = container;
+            _db = db;
+            _hashService = hashService;
         }
 
         private static bool IsTag(string value)
@@ -33,14 +33,11 @@ namespace SortingHat.CLI.Commands
             var tags = arguments.Skip(1).Where(IsTag);
             var files = GetFilePaths(arguments.Skip(1).Where(IsFile));
 
-            using (var scope = _container.BeginLifetimeScope())
+            foreach (var file in files.Select(file => new API.Models.File(file, _hashService)))
             {
-                foreach (var file in files.Select(file => new API.Models.File(file, scope.Resolve<HashService>())))
+                foreach (var tag in tags.Select(tag => API.Models.Tag.Parse(tag)))
                 {
-                    foreach (var tag in tags.Select(tag => API.Models.Tag.Parse(tag)))
-                    {
-                        file.Tag(_container, tag);
-                    }
+                    file.Tag(_db, tag);
                 }
             }
 

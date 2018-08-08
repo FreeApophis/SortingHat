@@ -8,49 +8,24 @@ namespace SortingHat.CLI
 
     class ArgumentParser
     {
-        private readonly IEnumerable<string> _arguments;
-        private readonly IContainer _container;
-        private List<ICommand> _commands = new List<ICommand>();
+        private IEnumerable<ICommand> _commands;
+        ILogger<ArgumentParser> _logger;
 
-        public ArgumentParser(IEnumerable<string> arguments, IContainer container)
+        public ArgumentParser(ILogger<ArgumentParser> logger , IEnumerable<ICommand> commands)
         {
-            _arguments = arguments;
-            _container = container;
-
-            RegisterCommands();
-
+            _commands = commands;
+            _logger = logger;
         }
 
-        private void RegisterCommands()
-        {
-            _commands.Add(new HelpCommand(_container));
-            _commands.Add(new InitCommand(_container));
-
-            _commands.Add(new ListTagsCommand(_container));
-            _commands.Add(new AddTagCommand(_container));
-
-            _commands.Add(new TagFileCommand(_container));
-            _commands.Add(new FindFilesCommand(_container));
-
-            _commands.Add(new RepairCommand(_container));
-            _commands.Add(new SortCommand(_container));
-            _commands.Add(new IdentifyCommand(_container));
-        }
-
-        internal void Execute()
+        internal void Execute(IEnumerable<string> arguments)
         {
             foreach (var command in _commands)
             {
-                if (command.Match(_arguments))
+                if (command.Match(arguments))
                 {
-                    if (command.Execute(_arguments) == false)
+                    if (command.Execute(arguments) == false)
                     {
-                        using (var scope = _container.BeginLifetimeScope())
-                        {
-                            var logger = scope.Resolve<ILogger>();
-                            logger.Log(LogLevel.Error, "Command Execution failed!");
-                        }
-
+                        _logger.Log(LogLevel.Error, "Command Execution failed!");
                     }
 
                     return;

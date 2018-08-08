@@ -1,9 +1,7 @@
 ﻿using SortingHat.API.FileTypeDetection;
-using SortingHat.API.DI;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using Autofac;
+using System;
 
 namespace SortingHat.CLI.Commands
 {
@@ -11,11 +9,9 @@ namespace SortingHat.CLI.Commands
     {
         private const string Command = "identify";
         private const string CommandShort = "id";
-        private readonly IContainer _container;
 
-        public IdentifyCommand(IContainer container)
+        public IdentifyCommand()
         {
-            _container = container;
         }
 
         public bool Execute(IEnumerable<string> arguments)

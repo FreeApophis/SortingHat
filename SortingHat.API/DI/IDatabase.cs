@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using SortingHat.API.Models;
-
-namespace SortingHat.API.DI
+﻿namespace SortingHat.API.DI
 {
     public interface IDatabase
     {

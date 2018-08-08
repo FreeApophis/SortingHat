@@ -1,65 +1,64 @@
 ﻿using Autofac;
 using Microsoft.Extensions.Logging;
 using SortingHat.API.DI;
-using SortingHat.API.Parser;
+using SortingHat.CLI.Commands;
 using SortingHat.DB;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System;
 
 namespace SortingHat.CLI
 {
+    [ExcludeFromCodeCoverage]
     class Program
     {
-        private static IContainer Container { get; set; }
-
         static void Main(string[] args)
         {
-            try
-            {
-                RegisterServices();
-                ConfigureLogger();
-
-                var argumentParser = new ArgumentParser(args, Container);
-
-                argumentParser.Execute();
-            }
-            catch (ParseException e)
-            {
-                Console.WriteLine("Parser is not happy with your input, maybe find a ravenclaw...");
-                Console.WriteLine(e.Message);
-            }
-            catch (Exception e)
-            {
-                if (e.Message.Contains("no such table:"))
-                {
-                    Console.WriteLine("Database not initialized? Run .hat init");
-                }
-                else
-                {
-                    Console.WriteLine(e.Message);
-                    Environment.Exit(-1);
-                }
-            }
+            CompositionRoot().Resolve<Application>().Run(args);
         }
 
-        private static void ConfigureLogger()
+        private static IContainer ConfigureLogger(IContainer container)
         {
-            var loggerFactory = Container.Resolve<ILoggerFactory>();
+            var loggerFactory = container.Resolve<ILoggerFactory>();
             loggerFactory.AddConsole();
+
+            return container;
         }
 
-        static void RegisterServices()
+        private static IContainer CompositionRoot()
         {
             // Create your builder.
             var builder = new ContainerBuilder();
-            builder.RegisterType<SQLiteDB>().As<IDatabase>().SingleInstance();
-            var hashAlgorithm = new TypedParameter(typeof(HashAlgorithm), SHA256.Create());
-            var hashPrefix = new TypedParameter(typeof(string), nameof(SHA256));
-            builder.RegisterType<HashService>().AsSelf().WithParameter(hashAlgorithm).WithParameter(hashPrefix).SingleInstance();
+
+            builder.RegisterType<Application>().AsSelf();
+            builder.RegisterType<ArgumentParser>().AsSelf();
+
+
+            builder.Register(c => new SQLiteDB(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "hat")).As<IDatabase>().SingleInstance();
+            builder.Register(c => new HashService(SHA256.Create(), nameof(SHA256))).As<IHashService>().SingleInstance();
             builder.RegisterType<LoggerFactory>().As<ILoggerFactory>().SingleInstance();
             builder.RegisterGeneric(typeof(Logger<>)).As(typeof(ILogger<>)).SingleInstance();
 
-            Container = builder.Build();
+            RegisterCommands(builder);
+
+
+            return ConfigureLogger(builder.Build());
+        }
+
+        private static void RegisterCommands(ContainerBuilder builder)
+        {
+            builder.RegisterType<HelpCommand>().As<ICommand>();
+            builder.RegisterType<InitCommand>().As<ICommand>();
+
+            builder.RegisterType<ListTagsCommand>().As<ICommand>();
+            builder.RegisterType<AddTagCommand>().As<ICommand>();
+
+            builder.RegisterType<TagFileCommand>().As<ICommand>();
+            builder.RegisterType<FindFilesCommand>().As<ICommand>();
+
+            builder.RegisterType<RepairCommand>().As<ICommand>();
+            builder.RegisterType<SortCommand>().As<ICommand>();
+            builder.RegisterType<IdentifyCommand>().As<ICommand>();
         }
     }
 }

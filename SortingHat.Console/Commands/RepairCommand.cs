@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Autofac;
-using SortingHat.API.DI;
+using System;
 
 namespace SortingHat.CLI.Commands
 {
     class RepairCommand : ICommand
     {
         private const string Command = "repair";
-        private readonly IContainer _container;
 
-        public RepairCommand(IContainer container)
+        public RepairCommand()
         {
-            _container = container;
         }
 
         public bool Execute(IEnumerable<string> arguments)
