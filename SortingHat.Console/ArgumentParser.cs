@@ -25,7 +25,7 @@ namespace SortingHat.CLI
                 {
                     if (command.Execute(arguments) == false)
                     {
-                        _logger.Value.Log(LogLevel.Warning, "Command Execution failed!");
+                        _logger.Value.LogWarning("Command Execution failed!");
                     }
 
                     break;
