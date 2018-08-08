@@ -1,4 +1,4 @@
-﻿using SortingHat.API.DI;
+﻿using Autofac;
 using SortingHat.API.Models;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,17 +9,17 @@ namespace SortingHat.CLI.Commands
 {
     class ListTagsCommand : ICommand
     {
-        private readonly IServices _services;
+        private readonly IContainer _container;
 
-        public ListTagsCommand(IServices services)
+        public ListTagsCommand(IContainer container)
         {
-            _services = services;
+            _container = container;
         }
 
         public bool Execute(IEnumerable<string> arguments)
         {
             Console.WriteLine("Used tags: ");
-            foreach (var tag in Tag.List(_services))
+            foreach (var tag in Tag.List(_container))
             {
                 Console.WriteLine($"* {tag.FullName}");
             }

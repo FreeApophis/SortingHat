@@ -1,4 +1,5 @@
-﻿using SortingHat.API.DI;
+﻿using Autofac;
+using SortingHat.API.DI;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,11 +11,11 @@ namespace SortingHat.CLI.Commands
     class TagFileCommand : ICommand
     {
         private const string Command = "tag-file";
-        private readonly IServices _services;
+        private readonly IContainer _container;
 
-        public TagFileCommand(IServices services)
+        public TagFileCommand(IContainer container)
         {
-            _services = services;
+            _container = container;
         }
 
         private static bool IsTag(string value)
@@ -32,11 +33,14 @@ namespace SortingHat.CLI.Commands
             var tags = arguments.Skip(1).Where(IsTag);
             var files = GetFilePaths(arguments.Skip(1).Where(IsFile));
 
-            foreach (var file in files.Select(file => new API.Models.File(file, _services)))
+            using (var scope = _container.BeginLifetimeScope())
             {
-                foreach (var tag in tags.Select(tag => API.Models.Tag.Parse(tag)))
+                foreach (var file in files.Select(file => new API.Models.File(file, scope.Resolve<HashService>())))
                 {
-                    file.Tag(_services, tag);
+                    foreach (var tag in tags.Select(tag => API.Models.Tag.Parse(tag)))
+                    {
+                        file.Tag(_container, tag);
+                    }
                 }
             }
 
@@ -50,7 +54,7 @@ namespace SortingHat.CLI.Commands
             foreach (var filePattern in filePatterns)
             {
                 //Directory.GetFiles(path, pattern);
-                var absolutePath = Path.Combine(Directory.GetCurrentDirectory(), filePattern);  
+                var absolutePath = Path.Combine(Directory.GetCurrentDirectory(), filePattern);
                 paths.Add(absolutePath);
             }
             return paths;

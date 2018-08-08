@@ -1,8 +1,8 @@
-﻿using SortingHat.API.DI;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Autofac;
 using System.Linq;
-using System.Text;
+using SortingHat.API.DI;
 
 namespace SortingHat.API.Models
 {
@@ -18,9 +18,13 @@ namespace SortingHat.API.Models
             Name = name;
         }
 
-        public bool Store(IServices services)
+        public bool Store(IContainer container)
         {
-            services.DB.Tag.Store(this);
+            using (var scope = container.BeginLifetimeScope())
+            {
+                var db = scope.Resolve<IDatabase>();
+                db.Tag.Store(this);
+            }
 
             return true;
         }
@@ -94,9 +98,13 @@ namespace SortingHat.API.Models
             return FullName.GetHashCode();
         }
 
-        public static IEnumerable<Tag> List(IServices services)
+        public static IEnumerable<Tag> List(IContainer container)
         {
-            return services.DB.Tag.GetTags();
+            using (var scope = container.BeginLifetimeScope())
+            {
+                var db = scope.Resolve<IDatabase>();
+                return db.Tag.GetTags();
+            }
         }
     }
 

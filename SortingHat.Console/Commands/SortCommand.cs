@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Autofac;
 using SortingHat.API.DI;
 
 namespace SortingHat.CLI.Commands
@@ -8,11 +9,11 @@ namespace SortingHat.CLI.Commands
     class SortCommand : ICommand
     {
         private const string Command = "sort";
-        private readonly IServices _services;
+        private readonly IContainer _container;
 
-        public SortCommand(IServices services)
+        public SortCommand(IContainer container)
         {
-            _services = services;
+            _container = container;
         }
 
         public bool Execute(IEnumerable<string> arguments)

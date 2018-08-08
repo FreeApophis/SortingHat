@@ -1,16 +1,25 @@
-﻿
-using System;
+﻿using Autofac;
+using Microsoft.Extensions.Logging;
+using SortingHat.API.DI;
 using SortingHat.API.Parser;
+using SortingHat.DB;
+using System.Security.Cryptography;
+using System;
 
 namespace SortingHat.CLI
 {
     class Program
     {
+        private static IContainer Container { get; set; }
+
         static void Main(string[] args)
         {
             try
             {
-                var argumentParser = new ArgumentParser(args, new CLIService());
+                RegisterServices();
+                ConfigureLogger();
+
+                var argumentParser = new ArgumentParser(args, Container);
 
                 argumentParser.Execute();
             }
@@ -31,6 +40,26 @@ namespace SortingHat.CLI
                     Environment.Exit(-1);
                 }
             }
+        }
+
+        private static void ConfigureLogger()
+        {
+            var loggerFactory = Container.Resolve<ILoggerFactory>();
+            loggerFactory.AddConsole();
+        }
+
+        static void RegisterServices()
+        {
+            // Create your builder.
+            var builder = new ContainerBuilder();
+            builder.RegisterType<SQLiteDB>().As<IDatabase>().SingleInstance();
+            var hashAlgorithm = new TypedParameter(typeof(HashAlgorithm), SHA256.Create());
+            var hashPrefix = new TypedParameter(typeof(string), nameof(SHA256));
+            builder.RegisterType<HashService>().AsSelf().WithParameter(hashAlgorithm).WithParameter(hashPrefix).SingleInstance();
+            builder.RegisterType<LoggerFactory>().As<ILoggerFactory>().SingleInstance();
+            builder.RegisterGeneric(typeof(Logger<>)).As(typeof(ILogger<>)).SingleInstance();
+
+            Container = builder.Build();
         }
     }
 }

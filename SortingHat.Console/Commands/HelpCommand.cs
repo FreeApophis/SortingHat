@@ -1,30 +1,18 @@
-﻿using SortingHat.API.DI;
+﻿using Autofac;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
-//Console.WriteLine("SortingHat [command]");
-//Console.WriteLine("<tag> = :tag:subtag:...");
-//Console.WriteLine("    tags list <tag>");
-//Console.WriteLine("    tags add <tag>");
-//Console.WriteLine("    tags remove <tag>");
-//Console.WriteLine("    files tag <tags> <files>");
-//Console.WriteLine("    files untag <tags> <files>");
-//Console.WriteLine("    files search <tag> [and|or [not] <tag>]");
-//Console.WriteLine("    init [location]");
-//Console.WriteLine("    repair");
-//Console.WriteLine("    sort");
 
 namespace SortingHat.CLI.Commands
 {
     class HelpCommand : ICommand
     {
         private const string Command = "help";
-        private readonly IServices _services;
+        private readonly IContainer _container;
 
-        public HelpCommand(IServices services)
+        public HelpCommand(IContainer container)
         {
-            _services = services;
+            _container = container;
         }
 
         public bool Execute(IEnumerable<string> arguments)

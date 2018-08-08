@@ -3,6 +3,7 @@ using SortingHat.API.DI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Autofac;
 
 namespace SortingHat.CLI.Commands
 {
@@ -10,11 +11,11 @@ namespace SortingHat.CLI.Commands
     {
         private const string Command = "identify";
         private const string CommandShort = "id";
-        private readonly IServices _services;
+        private readonly IContainer _container;
 
-        public IdentifyCommand(IServices services)
+        public IdentifyCommand(IContainer container)
         {
-            _services = services;
+            _container = container;
         }
 
         public bool Execute(IEnumerable<string> arguments)

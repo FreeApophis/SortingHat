@@ -1,5 +1,6 @@
-﻿using System;
+﻿using Autofac;
 using System.IO;
+using System;
 using SortingHat.API.DI;
 
 namespace SortingHat.API.Models
@@ -28,23 +29,31 @@ namespace SortingHat.API.Models
             }
         }
 
-        public File(string path, IServices services)
+        public File(string path, IHashService hashService)
         {
             FileInfo fileInfo = new FileInfo(Path = path);
 
-            Hash = services.HashService.GetHash(path);
+            Hash = hashService.GetHash(path);
             Size = fileInfo.Length;
             CreatedAt = fileInfo.CreationTimeUtc;
         }
 
-        public void Tag(IServices services, Tag tag)
+        public void Tag(IContainer container, Tag tag)
         {
-            services.DB.File.Tag(this, tag);
+            using (var scope = container.BeginLifetimeScope())
+            {
+                var db = scope.Resolve<IDatabase>();
+                db.File.Tag(this, tag);
+            }
         }
 
-        public void Untag(IServices services, Tag tag)
+        public void Untag(IContainer container, Tag tag)
         {
-            services.DB.File.Untag(this, tag);
+            using (var scope = container.BeginLifetimeScope())
+            {
+                var db = scope.Resolve<IDatabase>();
+                db.File.Untag(this, tag);
+            }
         }
 
     }

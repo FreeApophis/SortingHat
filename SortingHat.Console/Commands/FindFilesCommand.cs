@@ -4,16 +4,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Autofac;
 
 namespace SortingHat.CLI.Commands
 {
     class FindFilesCommand : ICommand
     {
-        private readonly IServices _services;
+        private readonly IContainer _container;
 
-        public FindFilesCommand(IServices services)
+        public FindFilesCommand(IContainer container)
         {
-            _services = services;
+            _container = container;
         }
 
         private static string ShortHash(string hash)
@@ -26,18 +27,23 @@ namespace SortingHat.CLI.Commands
             var search = string.Join(" ", arguments.Skip(2));
             Console.WriteLine($"Find Files: {search}");
 
-            var files = _services.DB.File.Search(search);
-
-            if (files.Any())
+            using (var scope = _container.BeginLifetimeScope())
             {
+                var db = scope.Resolve<IDatabase>();
+                var files = db.File.Search(search);
 
-                foreach (var file in files)
+                if (files.Any())
                 {
-                    Console.WriteLine($"{ShortHash(file.Hash)} {file.Size.FixedHumanSize()} {file.Path}");
+
+                    foreach (var file in files)
+                    {
+                        Console.WriteLine($"{ShortHash(file.Hash)} {file.Size.FixedHumanSize()} {file.Path}");
+                    }
                 }
-            }
-            else {
-                Console.WriteLine($"No files found for your search query...");
+                else
+                {
+                    Console.WriteLine($"No files found for your search query...");
+                }
             }
 
             return true;

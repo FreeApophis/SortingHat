@@ -1,11 +1,10 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 
 namespace SortingHat.API.DI
 {
-    public class HashService
+    public class HashService : IHashService
     {
         readonly HashAlgorithm _hashAlgorithm;
         readonly string _hashPrefix;

@@ -1,6 +1,6 @@
-﻿using SortingHat.API.DI;
+﻿using Autofac;
+using Microsoft.Extensions.Logging;
 using SortingHat.CLI.Commands;
-using System;
 using System.Collections.Generic;
 
 namespace SortingHat.CLI
@@ -9,13 +9,13 @@ namespace SortingHat.CLI
     class ArgumentParser
     {
         private readonly IEnumerable<string> _arguments;
-        private readonly IServices _services;
+        private readonly IContainer _container;
         private List<ICommand> _commands = new List<ICommand>();
 
-        public ArgumentParser(IEnumerable<string> arguments, IServices services)
+        public ArgumentParser(IEnumerable<string> arguments, IContainer container)
         {
             _arguments = arguments;
-            _services = services;
+            _container = container;
 
             RegisterCommands();
 
@@ -23,18 +23,18 @@ namespace SortingHat.CLI
 
         private void RegisterCommands()
         {
-            _commands.Add(new HelpCommand(_services));
-            _commands.Add(new InitCommand(_services));
+            _commands.Add(new HelpCommand(_container));
+            _commands.Add(new InitCommand(_container));
 
-            _commands.Add(new ListTagsCommand(_services));
-            _commands.Add(new AddTagCommand(_services));
+            _commands.Add(new ListTagsCommand(_container));
+            _commands.Add(new AddTagCommand(_container));
 
-            _commands.Add(new TagFileCommand(_services));
-            _commands.Add(new FindFilesCommand(_services));
+            _commands.Add(new TagFileCommand(_container));
+            _commands.Add(new FindFilesCommand(_container));
 
-            _commands.Add(new RepairCommand(_services));
-            _commands.Add(new SortCommand(_services));
-            _commands.Add(new IdentifyCommand(_services));
+            _commands.Add(new RepairCommand(_container));
+            _commands.Add(new SortCommand(_container));
+            _commands.Add(new IdentifyCommand(_container));
         }
 
         internal void Execute()
@@ -45,14 +45,17 @@ namespace SortingHat.CLI
                 {
                     if (command.Execute(_arguments) == false)
                     {
-                        _services.Logger.Log("Command Execution failed!");
+                        using (var scope = _container.BeginLifetimeScope())
+                        {
+                            var logger = scope.Resolve<ILogger>();
+                            logger.Log(LogLevel.Error, "Command Execution failed!");
+                        }
+
                     }
 
                     return;
                 }
             }
-
-            _services.Logger.Log("Unknown command, try help!");
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Autofac;
 using SortingHat.API.DI;
 
 namespace SortingHat.CLI.Commands
@@ -9,11 +10,11 @@ namespace SortingHat.CLI.Commands
     class RepairCommand : ICommand
     {
         private const string Command = "repair";
-        private readonly IServices _services;
+        private readonly IContainer _container;
 
-        public RepairCommand(IServices services)
+        public RepairCommand(IContainer container)
         {
-            _services = services;
+            _container = container;
         }
 
         public bool Execute(IEnumerable<string> arguments)
