@@ -19,14 +19,15 @@ namespace SortingHat.DB
 
         public bool Destroy(Tag tag)
         {
-            long? x;
-            if ((x = Find(tag)).HasValue)
+            long? tagID = Find(tag);
+            if (tagID.HasValue)
             {
-
+                var tagIDParameter = new SqliteParameter("@tagID", tagID);
+                _db.ExecuteNonQuery("DELETE FROM FileTags WHERE TagID = @tagID", tagIDParameter);
+                _db.ExecuteNonQuery("DELETE FROM Tags WHERE ID = @tagID", tagIDParameter);
             }
 
-            // No tag to destroy
-            return false;
+            return tagID.HasValue;
         }
 
         public bool Store(Tag tag)

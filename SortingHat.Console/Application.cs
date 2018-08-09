@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Logging;
 using SortingHat.API.Parser;
 using System;
 
@@ -32,16 +33,20 @@ namespace SortingHat.CLI
                 Environment.Exit(-1);
 
             }
+            catch (SqliteException e)
+            {
+                _logger.LogWarning("The database is throwing an exception...");
+                _logger.LogError(e.Message);
+                Environment.Exit(-1);
+            }
             catch (Exception e)
             {
                 if (e.Message.Contains("no such table:"))
                 {
                     _logger.LogWarning("Database not initialized? Run .hat init");
                 }
-                else
-                {
-                    _logger.LogError(e.Message);
-                }
+
+                _logger.LogError(e.Message);
                 Environment.Exit(-1);
             }
 
