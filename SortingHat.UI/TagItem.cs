@@ -9,7 +9,7 @@ namespace SortingHat.UI
             Items = new ObservableCollection<TagItem>();
         }
 
-        public string Title { get; set; }
+        public string Name { get; set; }
 
         public ObservableCollection<TagItem> Items { get; set; }
     }

@@ -20,9 +20,12 @@ namespace SortingHat.API.Models
 
         public bool Store(IDatabase db)
         {
-            db.Tag.Store(this);
+            return db.Tag.Store(this);
+        }
 
-            return true;
+        public bool Destroy(IDatabase db)
+        {
+            return db.Tag.Destroy(this);
         }
 
         public Tag(string name, Tag parent)

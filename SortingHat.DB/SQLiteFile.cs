@@ -22,69 +22,41 @@ namespace SortingHat.DB
             long fileID = FindOrCreate(file);
             long tagID = ((SQLiteTag)_db.Tag).FindOrCreate(tag);
 
-            using (var connection = _db.Connection())
-            {
-                connection.Open();
-
-                SqliteCommand tagCommand = connection.CreateCommand();
-                tagCommand.CommandText = $"INSERT INTO FileTags (TagID, FileID) VALUES({tagID},{fileID});";
-                tagCommand.ExecuteNonQuery();
-
-                connection.Close();
-            }
+            _db.ExecuteNonQuery($"INSERT INTO FileTags (TagID, FileID) VALUES(@tagID, @fileID);", new SqliteParameter("@tagID", fileID), new SqliteParameter("@fileID", tagID));
         }
 
         private long? Find(File file)
         {
-            long? resultID;
-            using (var connection = _db.Connection())
-            {
-                connection.Open();
-
-                SqliteCommand findCommand = connection.CreateCommand();
-                findCommand.CommandText = $"SELECT ID FROM Files WHERE Hash = '{file.Hash}'";
-                resultID = findCommand.ExecuteScalar() as long?;
-
-                connection.Close();
-            }
-
-            return resultID;
+            return _db.ExecuteScalar("SELECT ID FROM Files WHERE Hash = @hash", new SqliteParameter("@hash", file.Hash)) as long?;
         }
+
         private long Create(File file)
         {
-            using (var connection = _db.Connection())
-            {
-                connection.Open();
 
-                long fileID = InsertFile(connection, file);
-                InsertFileName(connection, file, fileID);
-                InsertFilePath(connection, file, fileID);
+            long fileID = InsertFile(file);
+            InsertFileName(file, fileID);
+            InsertFilePath(file, fileID);
 
-                connection.Close();
-
-                return fileID;
-            }
+            return fileID;
         }
 
-        private static long InsertFile(SqliteConnection connection, File file)
+        private long InsertFile(File file)
         {
-            SqliteCommand createFileCommand = connection.CreateCommand();
-            createFileCommand.CommandText = $"INSERT INTO Files (Hash, Size, CreatedAt) VALUES('{file.Hash}','{file.Size}','{file.CreatedAt}'); SELECT last_insert_rowid();";
-            return (long)createFileCommand.ExecuteScalar();
+            var hash = new SqliteParameter("@hash", file.Hash);
+            var size = new SqliteParameter("@size", file.Size);
+            var createdAt = new SqliteParameter("@createdAt", file.CreatedAt);
+
+            return (long)_db.ExecuteScalar("INSERT INTO Files (Hash, Size, CreatedAt) VALUES(@hash,@size, @createdAt); SELECT last_insert_rowid();", hash, size, createdAt);
         }
 
-        private static void InsertFileName(SqliteConnection connection, File file, long fileID)
+        private void InsertFileName(File file, long fileID)
         {
-            SqliteCommand createFileNameCommand = connection.CreateCommand();
-            createFileNameCommand.CommandText = $"INSERT INTO FileNames (FileID, Name) VALUES('{fileID}','{System.IO.Path.GetFileName(file.Path)}');";
-            createFileNameCommand.ExecuteNonQuery();
+            _db.ExecuteNonQuery($"INSERT INTO FileNames (FileID, Name) VALUES('{fileID}','{System.IO.Path.GetFileName(file.Path)}');");
         }
 
-        private static void InsertFilePath(SqliteConnection connection, File file, long fileID)
+        private void InsertFilePath(File file, long fileID)
         {
-            SqliteCommand createFilePathCommand = connection.CreateCommand();
-            createFilePathCommand.CommandText = $"INSERT INTO FilePaths (FileID, Path) VALUES('{fileID}','{file.Path}');";
-            createFilePathCommand.ExecuteNonQuery();
+            _db.ExecuteNonQuery($"INSERT INTO FilePaths (FileID, Path) VALUES('{fileID}','{file.Path}');");
         }
 
         private long FindOrCreate(File file)
@@ -101,17 +73,11 @@ namespace SortingHat.DB
 
         private long UpdateFileAttributes(File file, long fileID)
         {
-            using (var connection = _db.Connection())
-            {
-                connection.Open();
 
-                InsertFileName(connection, file, fileID);
-                InsertFilePath(connection, file, fileID);
+            InsertFileName(file, fileID);
+            InsertFilePath(file, fileID);
 
-                connection.Close();
-
-                return fileID;
-            }
+            return fileID;
         }
 
         public void Untag(File file, Tag tag)
@@ -121,20 +87,12 @@ namespace SortingHat.DB
 
         public IEnumerable<File> Search(string query)
         {
+            var reader = _db.ExecuteReader(ParseQuery(query));
             var files = new List<File>();
 
-            using (var connection = _db.Connection())
+            while (reader.Read())
             {
-                connection.Open();
-
-                SqliteCommand initializeCommand = connection.CreateCommand();
-                initializeCommand.CommandText = ParseQuery(query);
-                var reader = initializeCommand.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    files.Add(new File(reader.GetString(0), reader.GetString(1)));
-                }
+                files.Add(new File(reader.GetString(0), reader.GetString(1)));
             }
 
             return files;

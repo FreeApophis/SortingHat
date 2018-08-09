@@ -6,5 +6,11 @@ namespace SortingHat.CLI.Commands
     {
         bool Match(IEnumerable<string> arguments);
         bool Execute(IEnumerable<string> arguments);
+
+        /// <summary>
+        /// Should return a single line description
+        /// </summary>
+        /// <returns></returns>
+        string ShortHelp { get; }
     }
 }

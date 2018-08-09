@@ -26,5 +26,8 @@ namespace SortingHat.CLI.Commands
 
             return false;
         }
+
+        public string ShortHelp => "";
+
     }
 }

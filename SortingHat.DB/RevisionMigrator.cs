@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Microsoft.Data.Sqlite;
+using SortingHat.API.DI;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Microsoft.Data.Sqlite;
 
 namespace SortingHat.DB
 {
@@ -11,11 +11,11 @@ namespace SortingHat.DB
     {
         private const string CreateRevisionTableCommand = @"CREATE TABLE IF NOT EXISTS [Revisions] ([ID] INTEGER  NOT NULL PRIMARY KEY AUTOINCREMENT, [Name] VARCHAR(255)  UNIQUE NOT NULL, [MigratedAt] DATETIME DEFAULT CURRENT_TIME NOT NULL);";
         private readonly string _tableExists = string.Format("SELECT name FROM sqlite_master WHERE type='table' AND name='{0}';", "Revisions");
-        private SQLiteDB _connection;
+        private readonly SQLiteDB _db;
 
-        public RevisionMigrator(SQLiteDB connection)
+        public RevisionMigrator(SQLiteDB db)
         {
-            _connection = connection;
+            _db = db;
         }
 
         public void Migrate()
@@ -37,18 +37,9 @@ namespace SortingHat.DB
             {
                 using (StreamReader reader = new StreamReader(stream))
                 {
-                    using (var connection = _connection.Connection())
-                    {
-                        connection.Open();
+                    _db.ExecuteNonQuery(reader.ReadToEnd());
 
-                        SqliteCommand initializeCommand = connection.CreateCommand();
-                        initializeCommand.CommandText = reader.ReadToEnd();
-                        initializeCommand.ExecuteNonQuery();
-
-                        connection.Close();
-
-                        SetMigrated(migration);
-                    }
+                    SetMigrated(migration);
                 }
             }
         }
@@ -56,34 +47,13 @@ namespace SortingHat.DB
         private void SetMigrated(string migration)
         {
 
-            using (var connection = _connection.Connection())
-            {
-                connection.Open();
-
-                SqliteCommand migratedCommand = connection.CreateCommand();
-                migratedCommand.CommandText = $"INSERT INTO Revisions (Name, MigratedAt) VALUES ('{migration}',  datetime('now'))";
-                migratedCommand.ExecuteNonQuery();
-
-                connection.Close();
-            }
+            _db.ExecuteNonQuery($"INSERT INTO Revisions (Name, MigratedAt) VALUES ('{migration}',  datetime('now'))");
         }
 
         private bool HasMigrated(string migration)
         {
-            bool result = true;
 
-            using (var connection = _connection.Connection())
-            {
-                connection.Open();
-
-                SqliteCommand hasMigratedCommand = connection.CreateCommand();
-                hasMigratedCommand.CommandText = $"SELECT ID From Revisions WHERE Name = '{migration}'";
-                result = ((long?)hasMigratedCommand.ExecuteScalar()).HasValue;
-
-                connection.Close();
-            }
-
-            return result;
+            return ((long?)_db.ExecuteScalar($"SELECT ID From Revisions WHERE Name = '{migration}'")).HasValue;
         }
 
         private IEnumerable<string> Migrations()
@@ -93,16 +63,7 @@ namespace SortingHat.DB
 
         public void Initialize()
         {
-            using (var connection = _connection.Connection())
-            {
-                connection.Open();
-
-                SqliteCommand initializeCommand = connection.CreateCommand();
-                initializeCommand.CommandText = CreateRevisionTableCommand;
-                initializeCommand.ExecuteNonQuery();
-
-                connection.Close();
-            }
+            _db.ExecuteNonQuery(CreateRevisionTableCommand);
         }
     }
 }

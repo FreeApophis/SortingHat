@@ -17,14 +17,22 @@ namespace SortingHat.DB
             _db = db;
         }
 
-        public void Destroy(Tag tag)
+        public bool Destroy(Tag tag)
         {
-            throw new NotImplementedException();
+            long? x;
+            if ((x = Find(tag)).HasValue)
+            {
+
+            }
+
+            // No tag to destroy
+            return false;
         }
 
-        public void Store(Tag tag)
+        public bool Store(Tag tag)
         {
             FindOrCreate(tag);
+            return true;
         }
 
         private List<Tag> Ancestors(Tag tag)
@@ -59,26 +67,17 @@ namespace SortingHat.DB
 
         internal List<long> TagIDs(Tag tag)
         {
+            var reader = _db.ExecuteReader(TagIDsQuery(tag));
             var result = new List<long>();
 
-            using (var connection = _db.Connection())
+            if (reader.HasRows)
             {
-                connection.Open();
-
-                SqliteCommand findCommand = connection.CreateCommand();
-                findCommand.CommandText = TagIDsQuery(tag);
-                var reader = findCommand.ExecuteReader();
-
-                if (reader.HasRows)
+                for (int i = 0; i < reader.FieldCount; ++i)
                 {
-                    for (int i = 0; i < reader.FieldCount; ++i)
-                    {
-                        result.Add(reader.GetInt64(i));
-                    }
+                    result.Add(reader.GetInt64(i));
                 }
-
-                connection.Close();
             }
+
             return result;
         }
 
@@ -97,24 +96,10 @@ namespace SortingHat.DB
                 parentID = FindOrCreate(tag.Parent);
             }
 
-            long? resultID = null;
-            using (var connection = _db.Connection())
+            long? resultID = _db.ExecuteScalar($"SELECT ID FROM Tags WHERE ParentID {DBString.ToComparison(parentID)} AND Name = '{tag.Name}'") as long?;
+            if (resultID.HasValue == false)
             {
-                connection.Open();
-
-                SqliteCommand findCommand = connection.CreateCommand();
-                findCommand.CommandText = $"SELECT ID FROM Tags WHERE ParentID {DBString.ToComparison(parentID)} AND Name = '{tag.Name}'";
-                resultID = findCommand.ExecuteScalar() as long?;
-
-
-                if (resultID.HasValue == false)
-                {
-                    SqliteCommand initializeCommand = connection.CreateCommand();
-                    initializeCommand.CommandText = $"INSERT INTO Tags (ParentID, Name) VALUES({DBString.ToSQL(parentID)}, '{tag.Name}'); SELECT last_insert_rowid();";
-                    resultID = (long)initializeCommand.ExecuteScalar();
-                }
-
-                connection.Close();
+                resultID = (long)_db.ExecuteScalar($"INSERT INTO Tags (ParentID, Name) VALUES({DBString.ToSQL(parentID)}, '{tag.Name}'); SELECT last_insert_rowid();");
             }
 
             return resultID.Value;
@@ -134,24 +119,17 @@ SELECT id, parentid, name, level FROM tree;";
 
         public IEnumerable<Tag> GetTags()
         {
-            var result = new List<Tag>();
-            using (var connection = _db.Connection())
+            var reader = _db.ExecuteReader(allTags);
+
+            if (reader.Read())
             {
-                connection.Open();
-
-                SqliteCommand initializeCommand = connection.CreateCommand();
-                initializeCommand.CommandText = allTags;
-                var reader = initializeCommand.ExecuteReader();
-
-                if (reader.Read())
-                {
-                    GetTagTree(reader, ref result, null, 0);
-                }
-
-                connection.Close();
+                var result = new List<Tag>();
+                GetTagTree(reader, ref result, null, 0);
+                return result;
             }
 
-            return result.OrderBy(t => t.FullName);
+
+            return Enumerable.Empty<Tag>();
         }
 
         private bool GetTagTree(SqliteDataReader reader, ref List<Tag> result, Tag parent, int level)

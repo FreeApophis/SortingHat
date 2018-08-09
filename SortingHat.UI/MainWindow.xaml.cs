@@ -20,13 +20,34 @@ namespace SortingHat.UI
 
             IDatabase db = new SQLiteDB(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "hat");
 
+            InitializeTokenizer();
+
+            LoadTags(db);
+        }
+
+        private void InitializeTokenizer()
+        {
+            Tokenizer.TokenMatcher = text =>
+            {
+                if (text.EndsWith(";"))
+                {
+                    // Remove the ';'
+                    return text.Substring(0, text.Length - 1).Trim().ToUpper();
+                }
+
+                return null;
+            };
+        }
+
+        private void LoadTags(IDatabase db)
+        {
             var tags = API.Models.Tag.List(db);
 
             foreach (var tag in tags)
             {
                 if (tag.Parent == null)
                 {
-                    var tagItem = new TagItem() { Title = tag.FullName };
+                    var tagItem = new TagItem() { Name= tag.Name };
                     TagHierarchy.Items.Add(tagItem);
                     BuildTagTree(tagItem.Items, tag.Children);
                 }
@@ -37,7 +58,7 @@ namespace SortingHat.UI
         {
             foreach (var tag in children)
             {
-                var tagItem = new TagItem() { Title = tag.Name };
+                var tagItem = new TagItem() { Name = tag.Name };
                 items.Add(tagItem);
                 BuildTagTree(tagItem.Items, tag.Children);
             }

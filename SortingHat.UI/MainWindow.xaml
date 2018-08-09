@@ -6,6 +6,40 @@
         xmlns:local="clr-namespace:SortingHat.UI"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <DataTemplate x:Key="NameTokenTemplate">
+            <DataTemplate.Resources>
+                <Storyboard x:Key="OnLoadedTag">
+                    <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="border">
+                        <SplineDoubleKeyFrame KeyTime="0" Value="0"/>
+                        <SplineDoubleKeyFrame KeyTime="0:0:0.5" Value="1"/>
+                    </DoubleAnimationUsingKeyFrames>
+                </Storyboard>
+            </DataTemplate.Resources>
+            <Border x:Name="border" BorderBrush="#FF7E7E7E" BorderThickness="1" CornerRadius="5" Height="Auto" d:DesignWidth="139" d:DesignHeight="40" Padding="3,1" Margin="1,0,1,1">
+                <Border.Background>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="#a7cfdf" Offset="0"/>
+                        <GradientStop Color="#23538a" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <Grid HorizontalAlignment="Left" Width="Auto">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.21*"/>
+                        <ColumnDefinition Width="0.79*"/>
+                    </Grid.ColumnDefinitions>
+                    <Image HorizontalAlignment="Right" Source="images/icon-tag.png" Stretch="None" Width="Auto" Grid.Column="0" VerticalAlignment="Center" />
+                    <TextBlock TextWrapping="NoWrap" Text="{Binding}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Margin="10,0,0,0" FontWeight="Bold" FontSize="12"/>
+                </Grid>
+            </Border>
+            <DataTemplate.Triggers>
+                <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                    <BeginStoryboard Storyboard="{StaticResource OnLoadedTag}"/>
+                </EventTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+    </Window.Resources>
+
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
@@ -39,7 +73,7 @@
             </StatusBarItem>
             <Separator Grid.Column="1" />
             <StatusBarItem Grid.Column="2">
-                <TextBlock Text="Cool stuff!" />
+                <TextBlock Text="{Binding AllTags}" />
             </StatusBarItem>
         </StatusBar>
         <Grid>
@@ -48,17 +82,31 @@
                 <ColumnDefinition Width="5" />
                 <ColumnDefinition Width="300*" />
             </Grid.ColumnDefinitions>
-            <Grid Margin="10">
-                <TreeView Name="TagHierarchy" >
-                    <TreeView.ItemTemplate>
-                        <HierarchicalDataTemplate DataType="{x:Type local:TagItem}" ItemsSource="{Binding Items}">
-                            <TextBlock Text="{Binding Title}" />
-                        </HierarchicalDataTemplate>
-                    </TreeView.ItemTemplate>
-                </TreeView>
-            </Grid>
-            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Margin="0,0,0.333,-0.333" />
-            <DataGrid Margin="10,10,10,10" Grid.Column="2" x:Name="FileGrid" AlternatingRowBackground="#EEE" ItemsSource="{Binding Files}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <local:TokenizingControl Grid.ColumnSpan="3" x:Name="Tokenizer" VerticalAlignment="Top" Margin="5,11,5,0" TokenTemplate="{DynamicResource NameTokenTemplate}" FontSize="16" MinHeight="40" VerticalScrollBarVisibility="Auto">
+                <FlowDocument>
+                    <Paragraph>
+                        <Run />
+                    </Paragraph>
+                </FlowDocument>
+            </local:TokenizingControl>
+            <TreeView Name="TagHierarchy" Grid.Row="2" Margin="10">
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type local:TagItem}" ItemsSource="{Binding Items}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="images/icon-tag.png" Margin="0,0,5,0" Width="10" Stretch="Uniform" />
+                            <TextBlock Text="{Binding Name}" />
+                            <TextBlock Text="(0)" Foreground="Green" />
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+            <GridSplitter Grid.Column="1" Grid.Row="2" Width="5" HorizontalAlignment="Stretch" Margin="0,0,0.333,-0.333" />
+            <DataGrid Margin="10,10,10,10" Grid.Column="2" Grid.Row="2" x:Name="FileGrid" AlternatingRowBackground="#EEE" ItemsSource="{Binding Files}">
                 <DataGrid.RowDetailsTemplate>
                     <DataTemplate>
                         <DockPanel Background="GhostWhite">

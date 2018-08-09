@@ -53,6 +53,8 @@ namespace SortingHat.CLI
 
             builder.RegisterType<ListTagsCommand>().As<ICommand>();
             builder.RegisterType<AddTagCommand>().As<ICommand>();
+            builder.RegisterType<RemoveTagCommand>().As<ICommand>();
+            builder.RegisterType<RenameTagCommand>().As<ICommand>();
 
             builder.RegisterType<TagFileCommand>().As<ICommand>();
             builder.RegisterType<FindFilesCommand>().As<ICommand>();

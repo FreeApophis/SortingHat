@@ -40,5 +40,7 @@ namespace SortingHat.CLI.Commands
         {
             return arguments.Any() && (arguments.First() == Command || arguments.First() == CommandShort);
         }
+
+        public string ShortHelp => "";
     }
 }

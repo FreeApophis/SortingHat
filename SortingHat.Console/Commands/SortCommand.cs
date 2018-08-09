@@ -21,5 +21,8 @@ namespace SortingHat.CLI.Commands
         {
             return arguments.Any() && arguments.First() == Command;
         }
+
+        public string ShortHelp => "";
+
     }
 }

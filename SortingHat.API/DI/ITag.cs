@@ -7,8 +7,8 @@ namespace SortingHat.API.DI
 {
     public interface ITag 
     {
-        void Store(Tag tag);
-        void Destroy(Tag tag);
+        bool Store(Tag tag);
+        bool Destroy(Tag tag);
 
         IEnumerable<Tag> GetTags();
     }
