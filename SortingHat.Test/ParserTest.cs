@@ -1,4 +1,5 @@
-﻿using SortingHat.API.Parser;
+﻿using SortingHat.API;
+using SortingHat.API.Parser;
 using SortingHat.API.Parser.Nodes;
 using System;
 using Xunit;
@@ -93,7 +94,7 @@ namespace SortingHat.Test
         public void SQLQuery()
         {
             var parser = new QueryParser(":tax:2016 || :cool && :audio:original");
-            var visitor = new DB.SearchQueryVisitor(new DB.SQLiteDB(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "hat"));
+            var visitor = new DB.SearchQueryVisitor(new DB.SQLiteDB(new DatabaseSettings { DBName = "hat", DBPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) }));
 
             var ir = parser.Parse();
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
+using SortingHat.API;
 using SortingHat.API.DI;
 using System;
 using System.IO;
@@ -15,10 +16,10 @@ namespace SortingHat.DB
         public IFile File { get; }
         public ITag Tag { get; }
 
-        public SQLiteDB(string path, string dbName)
+        public SQLiteDB(DatabaseSettings databaseSettings)
         {
-            _path = path;
-            _dbName = dbName;
+            _path = databaseSettings.DBPath == "#USERDOC" ? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) : databaseSettings.DBPath;
+            _dbName = databaseSettings.DBName;
             _connection = new SqliteConnection($"Filename={DBFile()}");
             _connection.Open();
 

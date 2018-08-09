@@ -1,4 +1,5 @@
-﻿using SortingHat.API.DI;
+﻿using SortingHat.API;
+using SortingHat.API.DI;
 using SortingHat.API.Models;
 using SortingHat.DB;
 using System;
@@ -18,7 +19,9 @@ namespace SortingHat.UI
         {
             InitializeComponent();
 
-            IDatabase db = new SQLiteDB(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "hat");
+
+            DatabaseSettings databaseSettings = new DatabaseSettings { DBName = "hat", DBPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) };
+            IDatabase db = new SQLiteDB(databaseSettings);
 
             InitializeTokenizer();
 
@@ -47,7 +50,7 @@ namespace SortingHat.UI
             {
                 if (tag.Parent == null)
                 {
-                    var tagItem = new TagItem() { Name= tag.Name };
+                    var tagItem = new TagItem() { Name = tag.Name };
                     TagHierarchy.Items.Add(tagItem);
                     BuildTagTree(tagItem.Items, tag.Children);
                 }

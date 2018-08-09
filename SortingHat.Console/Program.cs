@@ -1,20 +1,22 @@
 ﻿using Autofac;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SortingHat.API.DI;
+using SortingHat.API;
 using SortingHat.CLI.Commands;
 using SortingHat.DB;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Security.Cryptography;
-using System;
 
 namespace SortingHat.CLI
 {
+
     [ExcludeFromCodeCoverage]
     class Program
     {
         // Could be configurable
         const LogLevel MinLogLevel = LogLevel.Trace;
-        const string DBName = "hat";
 
         static void Main(string[] args)
         {
@@ -36,14 +38,35 @@ namespace SortingHat.CLI
             builder.RegisterType<Application>().AsSelf();
             builder.RegisterType<ArgumentParser>().AsSelf();
 
-            builder.Register(c => new SQLiteDB(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), DBName)).As<IDatabase>().SingleInstance();
+            builder.RegisterType<SQLiteDB>().As<IDatabase>().SingleInstance();
             builder.Register(c => new HashService(SHA256.Create(), nameof(SHA256))).As<IHashService>().SingleInstance();
             builder.RegisterType<LoggerFactory>().As<ILoggerFactory>().SingleInstance();
             builder.RegisterGeneric(typeof(Logger<>)).As(typeof(ILogger<>)).SingleInstance();
+            RegisterConfiguration(builder);
 
             RegisterCommands(builder);
 
             return ConfigureLogger(builder.Build());
+        }
+
+        public static string ConfigurationPath()
+        {
+            return Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+        }
+
+        private static void RegisterConfiguration(ContainerBuilder builder)
+        {
+            IConfigurationRoot configuration = ConfigurationRoot();
+
+            builder.Register(c => configuration.GetSection("Database").Get<DatabaseSettings>()).As<DatabaseSettings>();
+        }
+
+        private static IConfigurationRoot ConfigurationRoot()
+        {
+            return new ConfigurationBuilder()
+              .SetBasePath(ConfigurationPath())
+              .AddJsonFile("hat-config.json", false)
+              .Build();
         }
 
         private static void RegisterCommands(ContainerBuilder builder)
