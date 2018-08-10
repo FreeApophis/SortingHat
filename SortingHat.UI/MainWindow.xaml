@@ -83,20 +83,20 @@
                 <ColumnDefinition Width="300*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="50" />
+                <RowDefinition Height="40" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-
-            <local:TokenizingControl Grid.Column="3" x:Name="Tokenizer" VerticalAlignment="Top" Margin="5,11,5,0" TokenTemplate="{DynamicResource NameTokenTemplate}" FontSize="16" MinHeight="40" VerticalScrollBarVisibility="Auto">
+            <TextBox Grid.Column="3" Margin="7" Text="{Binding SearchString, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Background="{Binding SearchBackground, Mode=OneWay}"></TextBox>
+            <!--<local:TokenizingControl Grid.Column="3" x:Name="Tokenizer" VerticalAlignment="Top" Margin="5,11,5,0" TokenTemplate="{DynamicResource NameTokenTemplate}" FontSize="16" MinHeight="40" VerticalScrollBarVisibility="Auto">
                 <FlowDocument>
                     <Paragraph>
                         <Run />
                     </Paragraph>
                 </FlowDocument>
-            </local:TokenizingControl>
+            </local:TokenizingControl>-->
             <TabControl Grid.RowSpan="2" >
                 <TabItem Header="Tags">
-                    <TreeView Name="TagHierarchy" Margin="10">
+                    <TreeView Name="TagHierarchy" Margin="7">
                         <TreeView.ItemTemplate>
                             <HierarchicalDataTemplate DataType="{x:Type local:TagItem}" ItemsSource="{Binding Items}">
                                 <StackPanel Orientation="Horizontal">
@@ -109,12 +109,12 @@
                     </TreeView>
                 </TabItem>
                 <TabItem Header="Folders" >
-                    <TreeView Name="FolderBrowser" TreeViewItem.Expanded="FolderBrowser_Expanded" Margin="10" />
+                    <TreeView Name="FolderBrowser" TreeViewItem.Expanded="FolderBrowser_Expanded" Margin="7" />
                 </TabItem>
             </TabControl>
-            
+
             <GridSplitter Grid.Column="1" Grid.RowSpan="2" Width="5" HorizontalAlignment="Stretch" Margin="0,0,0.333,-0.333" />
-            <DataGrid Margin="10,10,10,10" Grid.Column="2" Grid.Row="2" x:Name="FileGrid" AlternatingRowBackground="#EEE" ItemsSource="{Binding Files}">
+            <DataGrid Margin="7" Grid.Column="2" Grid.Row="2" x:Name="FileGrid" AlternatingRowBackground="#EEE" ItemsSource="{Binding Files}">
                 <DataGrid.RowDetailsTemplate>
                     <DataTemplate>
                         <DockPanel Background="GhostWhite">

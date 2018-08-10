@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SortingHat.API.Parser;
+using System;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -29,15 +31,21 @@ namespace SortingHat.UI
 
         private void OnTokenTextChanged(object sender, TextChangedEventArgs e)
         {
-            var text = CaretPosition.GetTextInRun(LogicalDirection.Backward);
-            if (TokenMatcher != null)
-            {
-                var token = TokenMatcher(text);
-                if (token != null)
-                {
-                    ReplaceTextWithToken(text, token);
-                }
-            }
+            string text = new TextRange(Document.ContentStart, Document.ContentEnd).Text;
+            var reader = new StringReader(text);
+            QueryParser parser = new QueryParser(reader.ReadLine());
+
+            var tree = parser.Parse();
+
+            //var text = CaretPosition.GetTextInRun(LogicalDirection.Backward);
+            //if (TokenMatcher != null)
+            //{
+            //    var token = TokenMatcher(text);
+            //    if (token != null)
+            //    {
+            //        ReplaceTextWithToken(text, token);
+            //    }
+            //}
         }
 
         private void ReplaceTextWithToken(string inputText, object token)
@@ -85,7 +93,10 @@ namespace SortingHat.UI
             };
 
             // BaselineAlignment is needed to align with Run
-            return new InlineUIContainer(presenter) { BaselineAlignment = BaselineAlignment.TextBottom };
+            return new InlineUIContainer(presenter)
+            {
+                BaselineAlignment = BaselineAlignment.TextBottom
+            };
         }
 
 

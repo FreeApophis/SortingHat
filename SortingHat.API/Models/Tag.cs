@@ -18,6 +18,14 @@ namespace SortingHat.API.Models
             Name = name;
         }
 
+        public Tag(string name, Tag parent)
+        {
+            Name = name;
+            Parent = parent;
+
+            parent?.Children?.Add(this);
+        }
+
         public bool Store(IDatabase db)
         {
             return db.Tag.Store(this);
@@ -33,13 +41,7 @@ namespace SortingHat.API.Models
             return db.Tag.Rename(this, newName);
         }
 
-        public Tag(string name, Tag parent)
-        {
-            Name = name;
-            Parent = parent;
 
-            parent?.Children?.Add(this);
-        }
 
         /// <summary>
         /// A tag always begins with a colon (:) and can have multiple parts, each part beginning with a colon (:)

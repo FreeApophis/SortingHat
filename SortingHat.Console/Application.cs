@@ -36,7 +36,7 @@ namespace SortingHat.CLI
             catch (SqliteException e)
             {
                 _logger.LogWarning("The database is throwing an exception...");
-                _logger.LogError(e.Message);
+                _logger.LogWarning(e.Message);
                 Environment.Exit(-1);
             }
             catch (Exception e)

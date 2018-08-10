@@ -40,9 +40,9 @@ namespace SortingHat.DB
             SqliteCommand command = _connection.CreateCommand();
             command.CommandText = commandText;
 
-            foreach (var paramter in parameters)
+            foreach (var parameter in parameters)
             {
-                command.Parameters.Add(paramter);
+                command.Parameters.Add(parameter);
             }
 
             return command;
