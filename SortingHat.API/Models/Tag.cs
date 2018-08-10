@@ -28,6 +28,11 @@ namespace SortingHat.API.Models
             return db.Tag.Destroy(this);
         }
 
+        public bool Rename(IDatabase db, string newName)
+        {
+            return db.Tag.Rename(this, newName);
+        }
+
         public Tag(string name, Tag parent)
         {
             Name = name;

@@ -7,6 +7,7 @@ namespace SortingHat.API.DI
     {
         bool Store(Tag tag);
         bool Destroy(Tag tag);
+        bool Rename(Tag tag, string newName);
 
         IEnumerable<Tag> GetTags();
     }

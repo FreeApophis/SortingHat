@@ -17,6 +17,12 @@ namespace SortingHat.DB
             _db = db;
         }
 
+        public bool Store(Tag tag)
+        {
+            FindOrCreate(tag);
+            return true;
+        }
+
         public bool Destroy(Tag tag)
         {
             long? tagID = Find(tag);
@@ -30,10 +36,18 @@ namespace SortingHat.DB
             return tagID.HasValue;
         }
 
-        public bool Store(Tag tag)
+        public bool Rename(Tag tag, string newName)
         {
-            FindOrCreate(tag);
-            return true;
+            long? tagID = Find(tag);
+            if (tagID.HasValue)
+            {
+                var tagIDParameter = new SqliteParameter("@tagID", tagID);
+                var tagNameParameter = new SqliteParameter("@tagName", tagID);
+
+                _db.ExecuteNonQuery("UPDATE FROM Tags SET Name = @tagName WHERE TagID = @tagID", tagIDParameter, tagNameParameter);
+            }
+
+            return tagID.HasValue;
         }
 
         private List<Tag> Ancestors(Tag tag)
