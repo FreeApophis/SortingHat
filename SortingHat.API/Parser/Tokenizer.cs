@@ -21,19 +21,17 @@ namespace SortingHat.API.Parser
                     _reader.Read();
                     continue;
                 }
-
-                if (c == ':')
+                else if (c == ':')
                 {
                     var value = GetNextIdentifier(true);
                     yield return new TagToken(value);
                 }
-
-                if (c == '∨')
+                else if (c == '∨')
                 {
                     _reader.Read();
                     yield return new OrToken();
                 }
-                if (c == '|')
+                else if (c == '|')
                 {
                     _reader.Read();
                     if ('|' == (char)_reader.Read())
@@ -45,13 +43,12 @@ namespace SortingHat.API.Parser
                         throw new ParseException("Single | is not a legal operator...");
                     }
                 }
-
-                if (c == '∧')
+                else if (c == '∧')
                 {
                     _reader.Read();
                     yield return new AndToken();
                 }
-                if (c == '&')
+                else if (c == '&')
                 {
                     _reader.Read();
                     if ('&' == (char)_reader.Read())
@@ -63,13 +60,11 @@ namespace SortingHat.API.Parser
                         throw new ParseException("Single & is not a legal operator...");
                     }
                 }
-
-                if (c == '¬' || c == '!')
+                else if(c == '¬' || c == '!')
                 {
                     _reader.Read();
                     yield return new NotToken();
                 }
-
                 else if (c == '(')
                 {
                     _reader.Read();
@@ -103,6 +98,10 @@ namespace SortingHat.API.Parser
                         default:
                             throw new ParseException("Unknown Identifier...");
                     }
+                }
+                else
+                {
+                    throw new ParseException("Unknown Characters...");
                 }
             }
         }
