@@ -164,10 +164,11 @@ namespace SortingHat.UI
         private void OnItemMouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             var treeViewItem = sender as TreeViewItem;
-            if (treeViewItem != null)
+            if (treeViewItem != null && treeViewItem.IsSelected)
             {
                 var tagItem = treeViewItem.DataContext as TagItem;
                 SearchBox.Text = tagItem.Tag.FullName;
+                e.Handled = true;
             }
         }
 
