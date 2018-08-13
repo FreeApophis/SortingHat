@@ -80,6 +80,7 @@ namespace SortingHat.CLI
             builder.RegisterType<RenameTagCommand>().As<ICommand>();
 
             builder.RegisterType<TagFileCommand>().As<ICommand>();
+            builder.RegisterType<UntagFileCommand>().As<ICommand>();
             builder.RegisterType<FindFilesCommand>().As<ICommand>();
 
             builder.RegisterType<RepairCommand>().As<ICommand>();
