@@ -1,22 +1,22 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace SortingHat.CLI
 {
     class FilePathExtractor
     {
         private List<string> _filePaths = new List<string>();
-
         public IEnumerable<string> FilePaths => _filePaths;
 
         public FilePathExtractor(IEnumerable<string> filePatterns)
         {
-
+            GetFilePaths(filePatterns);
         }
 
         public FilePathExtractor(string filePattern)
         {
-
+            GetFilePaths(Enumerable.Repeat(filePattern, 1));
         }
 
         private void GetFilePaths(IEnumerable<string> filePatterns)
@@ -30,9 +30,11 @@ namespace SortingHat.CLI
                         AddExistingFiles(filePath);
                     }
                 }
-
-                var absolutePath = Path.Combine(Directory.GetCurrentDirectory(), filePattern);
-                AddExistingFiles(absolutePath);
+                else
+                {
+                    var absolutePath = Path.Combine(Directory.GetCurrentDirectory(), filePattern);
+                    AddExistingFiles(absolutePath);
+                }
             }
         }
 
