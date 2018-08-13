@@ -5,12 +5,19 @@ namespace SortingHat.CLI.Commands
 {
     class FileInfoCommand : ICommand
     {
+        public FileInfoCommand()
+        {
+        }
+
         public bool Execute(IEnumerable<string> arguments)
         {
-            foreach (var file in arguments)
-            {
-                Console.WriteLine($"File: {file}");
+            var filePaths = new FilePathExtractor(arguments);
 
+            foreach (var filePath in filePaths.FilePaths)
+            {
+                
+                Console.WriteLine($"File: {filePath}");
+                Console.WriteLine($"File not in index");
             }
 
             return true;
