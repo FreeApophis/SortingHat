@@ -3,7 +3,6 @@ using SortingHat.API.DI;
 using SortingHat.API.Models;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace SortingHat.CLI.Commands
 {
@@ -20,7 +19,7 @@ namespace SortingHat.CLI.Commands
 
         public bool Execute(IEnumerable<string> arguments)
         {
-            foreach (var tagString in arguments.Skip(2))
+            foreach (var tagString in arguments)
             {
                 var tag = Tag.Parse(tagString);
 
@@ -30,21 +29,9 @@ namespace SortingHat.CLI.Commands
             return true;
         }
 
-        public bool Match(IEnumerable<string> arguments)
-        {
-            if (arguments.Count() > 2)
-            {
-                var matcher = new Regex("tags?", RegexOptions.IgnoreCase);
-
-                if (matcher.IsMatch(arguments.First()))
-                {
-                    return arguments.Skip(1).First() == "remove";
-                }
-            }
-
-            return false;
-        }
-
+        public string LongCommand => "remove-tags";
+        public string ShortCommand => null;
         public string ShortHelp => "Removes a tag from database";
+
     }
 }

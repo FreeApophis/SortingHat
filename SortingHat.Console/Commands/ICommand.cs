@@ -4,8 +4,14 @@ namespace SortingHat.CLI.Commands
 {
     interface ICommand
     {
-        bool Match(IEnumerable<string> arguments);
         bool Execute(IEnumerable<string> arguments);
+
+        string LongCommand { get; }
+
+        /// <summary>
+        /// Can be null
+        /// </summary>
+        string ShortCommand { get; }
 
         /// <summary>
         /// Should return a single line description

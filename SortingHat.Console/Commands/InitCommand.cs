@@ -6,7 +6,6 @@ namespace SortingHat.CLI.Commands
 {
     class InitCommand : ICommand
     {
-        private const string Command = "init";
         private readonly IDatabase _db;
 
         public InitCommand(IDatabase db)
@@ -16,7 +15,7 @@ namespace SortingHat.CLI.Commands
 
         public bool Execute(IEnumerable<string> arguments)
         {
-            if (arguments.Count() == 1)
+            if (arguments.Count() == 0)
             {
                 _db.Setup();
             }
@@ -24,11 +23,8 @@ namespace SortingHat.CLI.Commands
             return false;
         }
 
-        public bool Match(IEnumerable<string> arguments)
-        {
-            return arguments.Any() && arguments.First() == Command;
-        }
-
+        public string LongCommand => "init";
+        public string ShortCommand => null;
         public string ShortHelp => "";
 
     }

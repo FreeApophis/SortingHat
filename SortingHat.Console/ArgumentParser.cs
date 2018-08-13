@@ -1,36 +1,50 @@
 ﻿using Microsoft.Extensions.Logging;
 using SortingHat.CLI.Commands;
-using System;
 using System.Collections.Generic;
+using System.Linq;
+using System;
 
 namespace SortingHat.CLI
 {
 
     class ArgumentParser
     {
-        private IEnumerable<ICommand> _commands;
+        private Dictionary<string, ICommand> _commandTargets = new Dictionary<string, ICommand>();
         Lazy<ILogger<ArgumentParser>> _logger;
 
         public ArgumentParser(Lazy<ILogger<ArgumentParser>> logger, IEnumerable<ICommand> commands)
         {
-            _commands = commands;
+            AssignCommands(commands);
             _logger = logger;
+        }
+
+        private void AssignCommands(IEnumerable<ICommand> commands)
+        {
+            foreach (var command in commands)
+            {
+                _commandTargets[command.LongCommand] = command;
+                if (command.ShortCommand != null)
+                {
+                    _commandTargets[command.ShortCommand] = command;
+                }
+            }
         }
 
         internal void Execute(IEnumerable<string> arguments)
         {
-            foreach (var command in _commands)
+            if (_commandTargets.TryGetValue(arguments.First(), out var command))
             {
-                if (command.Match(arguments))
+                if (command.Execute(arguments.Skip(1)) == false)
                 {
-                    if (command.Execute(arguments) == false)
-                    {
-                        _logger.Value.LogWarning("Command Execution failed!");
-                    }
-
-                    break;
+                    _logger.Value.LogWarning("Command Execution failed!");
                 }
             }
+            else
+            {
+                _logger.Value.LogWarning($"Unknown command: '{arguments.First()}' cannot be executed.");
+                Console.WriteLine($"Unknown command: '{arguments.First()}'");
+            }
+
         }
     }
 }

@@ -1,13 +1,10 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System;
 
 namespace SortingHat.CLI.Commands
 {
     class SortCommand : ICommand
     {
-        private const string Command = "sort";
-
         public SortCommand()
         {
         }
@@ -17,10 +14,8 @@ namespace SortingHat.CLI.Commands
             throw new NotImplementedException();
         }
 
-        public bool Match(IEnumerable<string> arguments)
-        {
-            return arguments.Any() && arguments.First() == Command;
-        }
+        public string LongCommand => "sort";
+        public string ShortCommand => null;
 
         public string ShortHelp => "";
 

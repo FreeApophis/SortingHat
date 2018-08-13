@@ -1,15 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SortingHat.CLI.Commands
 {
     class RenameTagCommand : ICommand
     {
-        private const string Command = "tag rename";
         private readonly ILogger<RenameTagCommand> _logger;
         private readonly IDatabase _db;
 
@@ -21,32 +19,19 @@ namespace SortingHat.CLI.Commands
 
         public bool Execute(IEnumerable<string> arguments)
         {
-            if (arguments.Count() == 4)
+            if (arguments.Count() == 2)
             {
-                var tag = Tag.Parse(arguments.Skip(2).First());
+                var tag = Tag.Parse(arguments.First());
 
-                tag.Rename(_db, arguments.Skip(3).First());
+                tag.Rename(_db, arguments.Skip(1).First());
             }
 
             return true;
         }
 
-        public bool Match(IEnumerable<string> arguments)
-        {
-            if (arguments.Count() > 2)
-            {
-                var matcher = new Regex("tags?", RegexOptions.IgnoreCase);
-
-                if (matcher.IsMatch(arguments.First()))
-                {
-                    return arguments.Skip(1).First() == "rename";
-                }
-            }
-
-            return false;
-        }
+        public string LongCommand => "rename-tag";
+        public string ShortCommand => null;
 
         public string ShortHelp => "Renames a tag from database";
-
     }
 }

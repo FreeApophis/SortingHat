@@ -1,15 +1,14 @@
-﻿using SortingHat.API.DI;
+﻿using Microsoft.Extensions.Logging;
+using SortingHat.API.DI;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System;
-using Microsoft.Extensions.Logging;
 
 namespace SortingHat.CLI.Commands
 {
     class TagFileCommand : ICommand
     {
-        private const string Command = "tag-file";
         private readonly IDatabase _db;
         private readonly ILogger<TagFileCommand> _logger;
         private readonly IHashService _hashService;
@@ -33,8 +32,8 @@ namespace SortingHat.CLI.Commands
 
         public bool Execute(IEnumerable<string> arguments)
         {
-            var tags = arguments.Skip(1).Where(IsTag);
-            var files = GetFilePaths(arguments.Skip(1).Where(IsFile));
+            var tags = arguments.Where(IsTag);
+            var files = GetFilePaths(arguments.Where(IsFile));
 
             foreach (var file in files.Select(file => new API.Models.File(file, _hashService)))
             {
@@ -81,12 +80,9 @@ namespace SortingHat.CLI.Commands
             throw new NotImplementedException();
         }
 
-        public bool Match(IEnumerable<string> arguments)
-        {
-            return arguments.Any() && arguments.First() == Command;
-        }
+        public string LongCommand => "tag-files";
+        public string ShortCommand => null;
 
         public string ShortHelp => "";
-
     }
 }

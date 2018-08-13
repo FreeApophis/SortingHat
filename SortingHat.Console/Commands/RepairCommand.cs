@@ -1,13 +1,10 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System;
 
 namespace SortingHat.CLI.Commands
 {
     class RepairCommand : ICommand
     {
-        private const string Command = "repair";
-
         public RepairCommand()
         {
         }
@@ -17,12 +14,10 @@ namespace SortingHat.CLI.Commands
             throw new NotImplementedException();
         }
 
-        public bool Match(IEnumerable<string> arguments)
-        {
-            return arguments.Any() && arguments.First() == Command;
-        }
+
+        public string LongCommand => "repair";
+        public string ShortCommand => null;
 
         public string ShortHelp => "";
-
     }
 }

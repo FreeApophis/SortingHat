@@ -7,7 +7,7 @@ namespace SortingHat.API.Models
 {
     public class Tag
     {
-        public string Name;
+        public string Name { get; set; }
         public Tag Parent;
         public List<Tag> Children { get; } = new List<Tag>();
 

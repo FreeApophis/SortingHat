@@ -170,5 +170,10 @@ namespace SortingHat.UI
                 SearchBox.Text = tagItem.Tag.FullName;
             }
         }
+
+        private void ExitClick(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
