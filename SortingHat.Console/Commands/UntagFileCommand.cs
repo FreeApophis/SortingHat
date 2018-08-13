@@ -2,16 +2,17 @@
 using SortingHat.API.DI;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace SortingHat.CLI.Commands
 {
-    class TagFileCommand : ICommand
+    class UntagFileCommand : ICommand
     {
         private readonly IDatabase _db;
         private readonly ILogger<TagFileCommand> _logger;
         private readonly IHashService _hashService;
 
-        public TagFileCommand(IDatabase db, ILogger<TagFileCommand> logger, IHashService hashService)
+        public UntagFileCommand(IDatabase db, ILogger<TagFileCommand> logger, IHashService hashService)
         {
             _db = db;
             _logger = logger;
@@ -38,15 +39,17 @@ namespace SortingHat.CLI.Commands
                 foreach (var tag in tags.Select(tag => API.Models.Tag.Parse(tag)))
                 {
                     _logger.LogInformation($"File {file.Path} tagged with {tag.Name}");
-                    file.Tag(_db, tag);
+                    file.Untag(_db, tag);
                 }
             }
+
             return true;
+
         }
 
-        public string LongCommand => "tag-files";
+        public string LongCommand => "untag-files";
         public string ShortCommand => null;
 
-        public string ShortHelp => "";
+        public string ShortHelp => "Remove tags from the indicated files";
     }
 }
