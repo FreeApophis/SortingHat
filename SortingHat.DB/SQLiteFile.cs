@@ -21,7 +21,7 @@ namespace SortingHat.DB
             long fileID = FindOrCreate(file);
             long tagID = ((SQLiteTag)_db.Tag).FindOrCreate(tag);
 
-            _db.ExecuteNonQuery($"INSERT INTO FileTags (TagID, FileID) VALUES(@tagID, @fileID);", new SqliteParameter("@tagID", fileID), new SqliteParameter("@fileID", tagID));
+            _db.ExecuteNonQuery($"INSERT INTO FileTags (TagID, FileID) VALUES(@tagID, @fileID);", new SqliteParameter("@tagID", tagID), new SqliteParameter("@fileID", fileID));
         }
 
         private long? Find(File file)
