@@ -7,37 +7,7 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Window.Resources>
-        <DataTemplate x:Key="NameTokenTemplate">
-            <DataTemplate.Resources>
-                <Storyboard x:Key="OnLoadedTag">
-                    <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="border">
-                        <SplineDoubleKeyFrame KeyTime="0" Value="0"/>
-                        <SplineDoubleKeyFrame KeyTime="0:0:0.5" Value="1"/>
-                    </DoubleAnimationUsingKeyFrames>
-                </Storyboard>
-            </DataTemplate.Resources>
-            <Border x:Name="border" BorderBrush="#FF7E7E7E" BorderThickness="1" CornerRadius="5" Height="Auto" d:DesignWidth="139" d:DesignHeight="40" Padding="3,1" Margin="1,0,1,1">
-                <Border.Background>
-                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                        <GradientStop Color="#a7cfdf" Offset="0"/>
-                        <GradientStop Color="#23538a" Offset="1"/>
-                    </LinearGradientBrush>
-                </Border.Background>
-                <Grid HorizontalAlignment="Left" Width="Auto">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="0.21*"/>
-                        <ColumnDefinition Width="0.79*"/>
-                    </Grid.ColumnDefinitions>
-                    <Image HorizontalAlignment="Right" Source="images/icon-tag.png" Stretch="None" Width="Auto" Grid.Column="0" VerticalAlignment="Center" />
-                    <TextBlock TextWrapping="NoWrap" Text="{Binding}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Margin="10,0,0,0" FontWeight="Bold" FontSize="12"/>
-                </Grid>
-            </Border>
-            <DataTemplate.Triggers>
-                <EventTrigger RoutedEvent="FrameworkElement.Loaded">
-                    <BeginStoryboard Storyboard="{StaticResource OnLoadedTag}"/>
-                </EventTrigger>
-            </DataTemplate.Triggers>
-        </DataTemplate>
+
     </Window.Resources>
 
     <DockPanel>
@@ -86,22 +56,20 @@
                 <RowDefinition Height="40" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <TextBox Grid.Column="3" Margin="7" Text="{Binding SearchString, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Background="{Binding SearchBackground, Mode=OneWay}"></TextBox>
-            <!--<local:TokenizingControl Grid.Column="3" x:Name="Tokenizer" VerticalAlignment="Top" Margin="5,11,5,0" TokenTemplate="{DynamicResource NameTokenTemplate}" FontSize="16" MinHeight="40" VerticalScrollBarVisibility="Auto">
-                <FlowDocument>
-                    <Paragraph>
-                        <Run />
-                    </Paragraph>
-                </FlowDocument>
-            </local:TokenizingControl>-->
+            <TextBox Name="SearchBox" Grid.Column="3" Margin="7" Text="{Binding SearchString, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Background="{Binding SearchBackground, Mode=OneWay}"></TextBox>
             <TabControl Grid.RowSpan="2" >
                 <TabItem Header="Tags">
                     <TreeView Name="TagHierarchy" Margin="7">
+                        <TreeView.ItemContainerStyle>
+                            <Style TargetType="{x:Type TreeViewItem}">
+                                <EventSetter Event="MouseDoubleClick" Handler="OnItemMouseDoubleClick" />
+                            </Style>
+                        </TreeView.ItemContainerStyle>
                         <TreeView.ItemTemplate>
                             <HierarchicalDataTemplate DataType="{x:Type local:TagItem}" ItemsSource="{Binding Items}">
                                 <StackPanel Orientation="Horizontal">
                                     <Image Source="images/icon-tag.png" Margin="0,0,5,0" Width="10" Stretch="Uniform" />
-                                    <TextBlock Text="{Binding Name}" />
+                                    <TextBlock Text="{Binding Tag.Name}" />
                                     <TextBlock Text="(0)" Foreground="Green" />
                                 </StackPanel>
                             </HierarchicalDataTemplate>

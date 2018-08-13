@@ -114,7 +114,7 @@ namespace SortingHat.UI
             {
                 if (tag.Parent == null)
                 {
-                    var tagItem = new TagItem() { Name = tag.Name };
+                    var tagItem = new TagItem(tag);
                     TagHierarchy.Items.Add(tagItem);
                     BuildTagTree(tagItem.Items, tag.Children);
                 }
@@ -125,7 +125,7 @@ namespace SortingHat.UI
         {
             foreach (var tag in children)
             {
-                var tagItem = new TagItem() { Name = tag.Name };
+                var tagItem = new TagItem(tag);
                 items.Add(tagItem);
                 BuildTagTree(tagItem.Items, tag.Children);
             }
@@ -161,5 +161,14 @@ namespace SortingHat.UI
             return item;
         }
 
+        private void OnItemMouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var treeViewItem = sender as TreeViewItem;
+            if (treeViewItem != null)
+            {
+                var tagItem = treeViewItem.DataContext as TagItem;
+                SearchBox.Text = tagItem.Tag.FullName;
+            }
+        }
     }
 }
