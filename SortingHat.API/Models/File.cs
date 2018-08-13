@@ -1,6 +1,8 @@
 ﻿using SortingHat.API.DI;
+using System.Collections.Generic;
 using System.IO;
 using System;
+using System.Linq;
 
 namespace SortingHat.API.Models
 {
@@ -45,6 +47,19 @@ namespace SortingHat.API.Models
         public void Untag(IDatabase db, Tag tag)
         {
             db.File.Untag(this, tag);
+        }
+
+        public IEnumerable<Tag> GetTags(IDatabase db)
+        {
+            return Enumerable.Empty<Tag>();
+        }
+        public IEnumerable<string> GetPaths(IDatabase db)
+        {
+            return Enumerable.Empty<string>();
+        }
+        public IEnumerable<string> GetNames(IDatabase db)
+        {
+            return Enumerable.Empty<string>();
         }
 
     }

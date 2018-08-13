@@ -1,7 +1,6 @@
 ﻿using SortingHat.API.DI;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System;
 
 namespace SortingHat.CLI.Commands
@@ -22,7 +21,7 @@ namespace SortingHat.CLI.Commands
 
         public bool Execute(IEnumerable<string> arguments)
         {
-            var search = string.Join(" ", arguments.Skip(2));
+            var search = string.Join(" ", arguments);
             Console.WriteLine($"Find Files: {search}");
 
             var files = _db.File.Search(search);
@@ -43,20 +42,8 @@ namespace SortingHat.CLI.Commands
             return true;
         }
 
-        public bool Match(IEnumerable<string> arguments)
-        {
-            if (arguments.Count() > 2)
-            {
-                var matcher = new Regex("files?", RegexOptions.IgnoreCase);
-
-                if (matcher.IsMatch(arguments.First()))
-                {
-                    return arguments.Skip(1).First() == "search";
-                }
-            }
-
-            return false;
-        }
+        public string LongCommand => "find-files";
+        public string ShortCommand => null;
 
         public string ShortHelp => "";
 

@@ -2,9 +2,8 @@
 using SortingHat.API.DI;
 using SortingHat.API.Models;
 using SortingHat.API.Parser;
-using System;
 using System.Collections.Generic;
-using System.Linq;
+using System;
 
 namespace SortingHat.DB
 {
@@ -22,7 +21,7 @@ namespace SortingHat.DB
             long fileID = FindOrCreate(file);
             long tagID = ((SQLiteTag)_db.Tag).FindOrCreate(tag);
 
-            _db.ExecuteNonQuery($"INSERT INTO FileTags (TagID, FileID) VALUES(@tagID, @fileID);", new SqliteParameter("@tagID", fileID), new SqliteParameter("@fileID", tagID));
+            _db.ExecuteNonQuery($"INSERT INTO FileTags (TagID, FileID) VALUES(@tagID, @fileID);", new SqliteParameter("@tagID", tagID), new SqliteParameter("@fileID", fileID));
         }
 
         private long? Find(File file)
@@ -82,7 +81,13 @@ namespace SortingHat.DB
 
         public void Untag(File file, Tag tag)
         {
-            throw new NotImplementedException();
+            long? fileID = Find(file);
+            long? tagID = ((SQLiteTag)_db.Tag).Find(tag);
+
+            if (fileID.HasValue && tagID.HasValue)
+            {
+                _db.ExecuteNonQuery($"DELETE FROM FileTags (TagID, FileID) WHERE TagID = @tagID AND FileID = @fileID;", new SqliteParameter("@tagID", fileID), new SqliteParameter("@fileID", tagID));
+            }
         }
 
         public IEnumerable<File> Search(string query)

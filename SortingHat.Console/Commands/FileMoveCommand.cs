@@ -1,32 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System;
 using System.Linq;
-using System.Text.RegularExpressions;
+using SortingHat.API.DI;
 
 namespace SortingHat.CLI.Commands
 {
     class FileMoveCommand : ICommand
     {
+        private IDatabase _db;
+
+        public FileMoveCommand(IDatabase db)
+        {
+            _db = db;
+        }
+
         public bool Execute(IEnumerable<string> arguments)
         {
-            throw new NotImplementedException();
-        }
+            var path = ".";
+            var search = string.Join(" ", arguments);
+            Console.WriteLine($"Find Files: {search}");
 
-        public bool Match(IEnumerable<string> arguments)
-        {
-            if (arguments.Count() > 2)
+            var files = _db.File.Search(search);
+
+            if (files.Any())
             {
-                var matcher = new Regex("files?", RegexOptions.IgnoreCase);
 
-                if (matcher.IsMatch(arguments.First()))
+                foreach (var file in files)
                 {
-                    return arguments.Skip(1).First() == "mv";
+                    System.IO.File.Move(file.Path, path);
                 }
             }
+            else
+            {
+                Console.WriteLine($"No files found for your search query...");
+            }
 
-            return false;
+            return true;
         }
 
+        public string LongCommand => "move-files";
+        public string ShortCommand => null;
         public string ShortHelp => "";
 
     }

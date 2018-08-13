@@ -2,7 +2,6 @@
 using SortingHat.API.Models;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace SortingHat.CLI.Commands
 {
@@ -19,7 +18,7 @@ namespace SortingHat.CLI.Commands
         {
             bool result = true;
 
-            foreach (var tagString in arguments.Skip(2))
+            foreach (var tagString in arguments)
             {
                 var tag = Tag.Parse(tagString);
 
@@ -29,21 +28,8 @@ namespace SortingHat.CLI.Commands
             return result;
         }
 
-        public bool Match(IEnumerable<string> arguments)
-        {
-            if (arguments.Count() > 2)
-            {
-                var matcher = new Regex("tags?", RegexOptions.IgnoreCase);
-
-                if (matcher.IsMatch(arguments.First()))
-                {
-                    return arguments.Skip(1).First() == "add";
-                }
-            }
-
-            return false;
-        }
-
+        public string LongCommand => "add-tag";
+        public string ShortCommand => null;
         public string ShortHelp => "";
 
     }

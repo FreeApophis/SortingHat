@@ -1,8 +1,6 @@
 ﻿using SortingHat.API.DI;
 using SortingHat.API.Models;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System;
 
 namespace SortingHat.CLI.Commands
@@ -26,21 +24,8 @@ namespace SortingHat.CLI.Commands
             return true;
         }
 
-        public bool Match(IEnumerable<string> arguments)
-        {
-            if (arguments.Count() >= 2)
-            {
-                var matcher = new Regex("tags?", RegexOptions.IgnoreCase);
-
-                if (matcher.IsMatch(arguments.First()))
-                {
-                    return arguments.Skip(1).First() == "list";
-                }
-            }
-
-            return false;
-        }
-
+        public string LongCommand => "list-tags";
+        public string ShortCommand => null;
         public string ShortHelp => "";
 
     }

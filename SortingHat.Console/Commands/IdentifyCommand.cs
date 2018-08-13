@@ -7,8 +7,6 @@ namespace SortingHat.CLI.Commands
 {
     internal class IdentifyCommand : ICommand
     {
-        private const string Command = "identify";
-        private const string CommandShort = "id";
 
         public IdentifyCommand()
         {
@@ -18,7 +16,7 @@ namespace SortingHat.CLI.Commands
         {
             var detector = new FileTypeDetector();
 
-            foreach (var argument in arguments.Skip(1))
+            foreach (var argument in arguments)
             {
                 Console.WriteLine($"File: {argument}");
                 var fileType = detector.Identify(argument);
@@ -28,7 +26,8 @@ namespace SortingHat.CLI.Commands
                     Console.WriteLine($"C: {fileType.Category}");
                     Console.WriteLine($"N: {fileType.Name}");
                     Console.WriteLine($"E: {string.Join(",", fileType.Extensions)}");
-                } else
+                }
+                else
                 {
                     Console.WriteLine($"Unknown filetype");
                 }
@@ -36,10 +35,8 @@ namespace SortingHat.CLI.Commands
             return true;
         }
 
-        public bool Match(IEnumerable<string> arguments)
-        {
-            return arguments.Any() && (arguments.First() == Command || arguments.First() == CommandShort);
-        }
+        public string LongCommand => "identify";
+        public string ShortCommand => "id";
 
         public string ShortHelp => "";
     }
