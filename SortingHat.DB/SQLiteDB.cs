@@ -11,7 +11,6 @@ namespace SortingHat.DB
         private readonly string _path;
         private readonly string _dbName;
         private readonly string _encryptionKey = "Encrypted";
-        private readonly SqliteConnection _connection;
 
         public IFile File { get; }
         public ITag Tag { get; }
@@ -20,8 +19,8 @@ namespace SortingHat.DB
         {
             _path = databaseSettings.DBPath == "#USERDOC" ? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) : databaseSettings.DBPath;
             _dbName = databaseSettings.DBName;
-            _connection = new SqliteConnection($"Filename={DBFile()}");
-            _connection.Open();
+            Connection = new SqliteConnection($"Filename={DBFile()}");
+            Connection.Open();
 
             ExecuteNonQuery("PRAGMA foreign_keys=ON;");
 
@@ -37,7 +36,7 @@ namespace SortingHat.DB
 
         private SqliteCommand CreateCommand(string commandText, params SqliteParameter[] parameters)
         {
-            SqliteCommand command = _connection.CreateCommand();
+            SqliteCommand command = Connection.CreateCommand();
             command.CommandText = commandText;
 
             foreach (var parameter in parameters)
@@ -93,7 +92,7 @@ namespace SortingHat.DB
             return Path.Combine(DBPath(), $"{_dbName}.db");
         }
 
-        internal SqliteConnection Connection => _connection;
+        internal SqliteConnection Connection { get; }
 
         #region IDisposable Support
         private bool disposedValue = false;
@@ -104,8 +103,8 @@ namespace SortingHat.DB
             {
                 if (disposing)
                 {
-                    _connection.Close();
-                    _connection.Dispose();
+                    Connection.Close();
+                    Connection.Dispose();
                 }
 
                 disposedValue = true;
