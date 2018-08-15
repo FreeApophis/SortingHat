@@ -182,5 +182,25 @@ SELECT id, parentid, name, level FROM tree;";
             }
             return true;
         }
+
+        internal Tag Load(long tagID)
+        {
+            var reader = _db.ExecuteReader("SELECT ParentID, Name FROM Tags WHERE ID = @tagID", new SqliteParameter("@tagID", tagID));
+
+            if (reader.Read())
+            {
+                if (reader.IsDBNull(0))
+                {
+                    return new Tag(reader.GetString(1));
+                }
+                else
+                {
+                    return new Tag(reader.GetString(1), Load(reader.GetInt64(0)));
+
+                }
+            }
+
+            throw new NotSupportedException();
+        }
     }
 }

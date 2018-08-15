@@ -21,7 +21,7 @@ namespace SortingHat.DB
             long fileID = FindOrCreate(file);
             long tagID = ((SQLiteTag)_db.Tag).FindOrCreate(tag);
 
-            _db.ExecuteNonQuery($"INSERT INTO FileTags (TagID, FileID) VALUES(@tagID, @fileID);", new SqliteParameter("@tagID", tagID), new SqliteParameter("@fileID", fileID));
+            _db.ExecuteNonQuery("INSERT INTO FileTags (TagID, FileID) VALUES(@tagID, @fileID);", new SqliteParameter("@tagID", tagID), new SqliteParameter("@fileID", fileID));
         }
 
         private long? Find(File file)
@@ -50,12 +50,13 @@ namespace SortingHat.DB
 
         private void InsertFileName(File file, long fileID)
         {
-            _db.ExecuteNonQuery($"INSERT INTO FileNames (FileID, Name) VALUES('{fileID}','{System.IO.Path.GetFileName(file.Path)}');");
+            var fileName = System.IO.Path.GetFileName(file.Path);
+            _db.ExecuteNonQuery("INSERT INTO FileNames (FileID, Name) VALUES(@fileID, @fileName);", new SqliteParameter("@fileID", fileID), new SqliteParameter("@fileName", fileName));
         }
 
         private void InsertFilePath(File file, long fileID)
         {
-            _db.ExecuteNonQuery($"INSERT INTO FilePaths (FileID, Path) VALUES('{fileID}','{file.Path}');");
+            _db.ExecuteNonQuery("INSERT INTO FilePaths (FileID, Path) VALUES(@fileID, @filePath);", new SqliteParameter("@fileID", fileID), new SqliteParameter("@filePath", file.Path));
         }
 
         private long FindOrCreate(File file)
@@ -86,7 +87,7 @@ namespace SortingHat.DB
 
             if (fileID.HasValue && tagID.HasValue)
             {
-                _db.ExecuteNonQuery($"DELETE FROM FileTags (TagID, FileID) WHERE TagID = @tagID AND FileID = @fileID;", new SqliteParameter("@tagID", fileID), new SqliteParameter("@fileID", tagID));
+                _db.ExecuteNonQuery("DELETE FROM FileTags WHERE TagID = @tagID AND FileID = @fileID;", new SqliteParameter("@fileID", fileID), new SqliteParameter("@tagID", tagID));
             }
         }
 
@@ -112,6 +113,91 @@ namespace SortingHat.DB
             ir.Accept(visitor);
 
             return visitor.Result;
+        }
+
+
+        public void Load(File file)
+        {
+            if (LoadByPath(file) == false)
+            {
+                //LoadByHash(file);
+            }
+        }
+
+        private bool LoadFileFromReader(SqliteDataReader reader, File file)
+        {
+            if (reader.HasRows && reader.Read())
+            {
+                file.CreatedAt = reader.GetDateTime(0);
+                file.Hash = reader.GetString(1);
+                file.Size = reader.GetInt64(2);
+            }
+
+            return false;
+        }
+
+        private bool LoadByHash(File file)
+        {
+            var reader = _db.ExecuteReader("SELECT Files.CreatedAt, Files.Hash, Files.Size FROM Files WHERE Files.Hash= @fileHash", new SqliteParameter("@fileHash", file.Hash));
+
+            return LoadFileFromReader(reader, file);
+        }
+
+        private bool LoadByPath(File file)
+        {
+            var reader = _db.ExecuteReader("SELECT Files.CreatedAt, Files.Hash, Files.Size FROM Files JOIN FilePaths ON FilePaths.FileID = Files.ID WHERE FilePaths.Path = @filePath", new SqliteParameter("@filePath", file.Path));
+
+            return LoadFileFromReader(reader, file);
+        }
+
+        const string allFileTags = @"SELECT Tags.ID
+FROM Tags
+JOIN FileTags ON FileTags.TagID = Tags.ID
+JOIN Files ON FileTags.FileID = Files.ID
+WHERE Files.Hash = @fileHash";
+
+        public IEnumerable<Tag> GetTags(File file)
+        {
+            var tags = new List<Tag>();
+
+
+            var reader = _db.ExecuteReader(allFileTags, new SqliteParameter("@fileHash", file.Hash));
+
+            while (reader.Read())
+            {
+                Tag tag =  ((SQLiteTag)_db.Tag).Load(reader.GetInt64(0));
+                tags.Add(tag);
+            }
+
+            return tags;
+        }
+
+        public IEnumerable<string> GetPaths(File file)
+        {
+            var paths = new List<string>();
+
+            var reader = _db.ExecuteReader("SELECT FilePaths.Path FROM FilePaths JOIN Files ON FilePaths.FileID = Files.ID WHERE Files.Hash = @fileHash", new SqliteParameter("@fileHash", file.Hash));
+
+            while (reader.Read())
+            {
+                paths.Add(reader.GetString(0));
+            }
+
+            return paths;
+        }
+
+        public IEnumerable<string> GetNames(File file)
+        {
+            var names = new List<string>();
+
+            var reader = _db.ExecuteReader("SELECT FileNames.Name FROM FileNames JOIN Files ON FileNames.FileID = Files.ID WHERE Files.Hash = @fileHash", new SqliteParameter("@fileHash", file.Hash));
+
+            while (reader.Read())
+            {
+                names.Add(reader.GetString(0));
+            }
+
+            return names;
         }
     }
 }

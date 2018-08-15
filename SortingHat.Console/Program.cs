@@ -26,7 +26,7 @@ namespace SortingHat.CLI
         private static IContainer ConfigureLogger(IContainer container)
         {
             var loggerFactory = container.Resolve<ILoggerFactory>();
-            loggerFactory.AddConsole(MinLogLevel);
+            //loggerFactory.AddConsole(MinLogLevel);
 
             return container;
         }
@@ -39,6 +39,9 @@ namespace SortingHat.CLI
             builder.RegisterType<ArgumentParser>().AsSelf();
 
             builder.RegisterType<SQLiteDB>().As<IDatabase>().SingleInstance();
+            builder.RegisterType<API.Models.File>().As<API.Models.File>().UsingConstructor(typeof(IDatabase), typeof(string)).InstancePerDependency();
+
+
             builder.Register(c => new HashService(SHA256.Create(), nameof(SHA256))).As<IHashService>().SingleInstance();
             builder.RegisterType<LoggerFactory>().As<ILoggerFactory>().SingleInstance();
             builder.RegisterGeneric(typeof(Logger<>)).As(typeof(ILogger<>)).SingleInstance();

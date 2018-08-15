@@ -8,10 +8,12 @@ namespace SortingHat.API.Models
 {
     public class File
     {
-        public DateTime CreatedAt { get; }
-        public long Size { get; }
-        public string Hash { get; }
+        public DateTime CreatedAt { get; set; }
+        public long Size { get; set; }
+        public string Hash { get; set; }
         public string Path { get; }
+
+        private IDatabase _db;
 
         public File(string path, string hash)
         {
@@ -39,6 +41,21 @@ namespace SortingHat.API.Models
             CreatedAt = fileInfo.CreationTimeUtc;
         }
 
+
+        public File(IDatabase db, string path)
+        {
+            Path = path;
+            _db = db;
+
+            Load();
+        }
+
+        private void Load()
+        {
+            _db.File.Load(this);
+        }
+
+
         public void Tag(IDatabase db, Tag tag)
         {
             db.File.Tag(this, tag);
@@ -49,17 +66,17 @@ namespace SortingHat.API.Models
             db.File.Untag(this, tag);
         }
 
-        public IEnumerable<Tag> GetTags(IDatabase db)
+        public IEnumerable<Tag> GetTags()
         {
-            return Enumerable.Empty<Tag>();
+            return _db.File.GetTags(this);
         }
-        public IEnumerable<string> GetPaths(IDatabase db)
+        public IEnumerable<string> GetPaths()
         {
-            return Enumerable.Empty<string>();
+            return _db.File.GetPaths(this);
         }
-        public IEnumerable<string> GetNames(IDatabase db)
+        public IEnumerable<string> GetNames()
         {
-            return Enumerable.Empty<string>();
+            return _db.File.GetNames(this);
         }
 
     }

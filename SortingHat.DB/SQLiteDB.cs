@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Logging;
 using SortingHat.API;
 using SortingHat.API.DI;
 using System;
@@ -12,6 +13,8 @@ namespace SortingHat.DB
         private readonly string _dbName;
         private readonly string _encryptionKey = "Encrypted";
 
+        internal SqliteConnection Connection { get; }
+
         public IFile File { get; }
         public ITag Tag { get; }
 
@@ -19,6 +22,7 @@ namespace SortingHat.DB
         {
             _path = databaseSettings.DBPath == "#USERDOC" ? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) : databaseSettings.DBPath;
             _dbName = databaseSettings.DBName;
+
             Connection = new SqliteConnection($"Filename={DBFile()}");
             Connection.Open();
 
@@ -31,7 +35,6 @@ namespace SortingHat.DB
 
             File = new SQLiteFile(this);
             Tag = new SQLiteTag(this);
-
         }
 
         private SqliteCommand CreateCommand(string commandText, params SqliteParameter[] parameters)
@@ -91,8 +94,6 @@ namespace SortingHat.DB
         {
             return Path.Combine(DBPath(), $"{_dbName}.db");
         }
-
-        internal SqliteConnection Connection { get; }
 
         #region IDisposable Support
         private bool disposedValue = false;

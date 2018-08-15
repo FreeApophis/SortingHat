@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace SortingHat.API.DI
 {
-    public interface ITag 
+    public interface ITag
     {
         bool Store(Tag tag);
         bool Destroy(Tag tag);

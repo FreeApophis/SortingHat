@@ -47,13 +47,13 @@ namespace SortingHat.DB
         private void SetMigrated(string migration)
         {
 
-            _db.ExecuteNonQuery($"INSERT INTO Revisions (Name, MigratedAt) VALUES ('{migration}',  datetime('now'))");
+            _db.ExecuteNonQuery("INSERT INTO Revisions (Name, MigratedAt) VALUES ('@migration',  datetime('now'))", new SqliteParameter("@migration", migration));
         }
 
         private bool HasMigrated(string migration)
         {
 
-            return ((long?)_db.ExecuteScalar($"SELECT ID From Revisions WHERE Name = '{migration}'")).HasValue;
+            return ((long?)_db.ExecuteScalar("SELECT ID From Revisions WHERE Name = @migration", new SqliteParameter("@migration", migration))).HasValue;
         }
 
         private IEnumerable<string> Migrations()

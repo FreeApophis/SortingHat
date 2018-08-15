@@ -5,9 +5,13 @@ namespace SortingHat.API.DI
 {
     public interface IFile
     {
+        void Load(File file);
         void Tag(File file, Tag tag);
         void Untag(File file, Tag tag);
 
+        IEnumerable<Tag> GetTags(File file);
+        IEnumerable<string> GetPaths(File file);
+        IEnumerable<string> GetNames(File file);
         IEnumerable<File> Search(string query);
     }
 }

@@ -37,6 +37,7 @@ namespace SortingHat.CLI
             {
                 _logger.LogWarning("The database is throwing an exception...");
                 _logger.LogWarning(e.Message);
+                Console.WriteLine(e.Message);
                 Environment.Exit(-1);
             }
             catch (Exception e)
@@ -47,6 +48,7 @@ namespace SortingHat.CLI
                 }
 
                 _logger.LogError(e.Message);
+                Console.WriteLine(e.Message);
                 Environment.Exit(-1);
             }
 
