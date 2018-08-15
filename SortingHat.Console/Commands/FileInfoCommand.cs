@@ -59,6 +59,6 @@ namespace SortingHat.CLI.Commands
 
         public string LongCommand => "file-info";
         public string ShortCommand => null;
-        public string ShortHelp => "Shows file information of a certain file...";
+        public string ShortHelp => "Shows all available information about the current file.";
     }
 }

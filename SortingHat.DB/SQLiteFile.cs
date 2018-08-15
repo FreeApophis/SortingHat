@@ -120,7 +120,11 @@ namespace SortingHat.DB
         {
             if (LoadByPath(file) == false)
             {
-                //LoadByHash(file);
+                //if (System.IO.File.Exists(file.Path))
+                //{
+                //    file.Hash = hashService.GetHash(file.Path);
+                //    LoadByHash(file);
+                //}
             }
         }
 
@@ -165,7 +169,7 @@ WHERE Files.Hash = @fileHash";
 
             while (reader.Read())
             {
-                Tag tag =  ((SQLiteTag)_db.Tag).Load(reader.GetInt64(0));
+                Tag tag = ((SQLiteTag)_db.Tag).Load(reader.GetInt64(0));
                 tags.Add(tag);
             }
 
