@@ -18,5 +18,10 @@
         {
             return HumanSize(size, 0);
         }
+
+        public static string ShortHash(string hash)
+        {
+            return hash.Split(':')[1].Substring(0, 8);
+        }
     }
 }

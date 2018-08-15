@@ -2,6 +2,7 @@
 using SortingHat.API.Parser;
 using SortingHat.API.Parser.Nodes;
 using System;
+using System.Linq;
 using Xunit;
 
 namespace SortingHat.Test
@@ -64,7 +65,6 @@ namespace SortingHat.Test
             Assert.Equal("(((:A || :B) || :C) || :D)", visitor.Result);
         }
 
-
         [Fact]
         public void AndAssociativityTest()
         {
@@ -89,6 +89,15 @@ namespace SortingHat.Test
             Assert.Equal("(not(not(not(:A))) and not(not(:B)))", visitor.Result);
         }
 
+        [Fact]
+        public void EmptyStringNextNode()
+        {
+            var parser = new QueryParser("");
+            var ir = parser.Parse();
+            var next = parser.NextNode();
+
+            Assert.IsType<TagNode>(next.First());
+        }
 
         [Fact]
         public void SQLQuery()
@@ -100,7 +109,7 @@ namespace SortingHat.Test
 
             ir.Accept(visitor);
 
-            Assert.Equal("", visitor.Result);
+            Assert.Equal("SELECT FilePaths.Path, Files.Hash, Files", visitor.Result);
         }
     }
 }

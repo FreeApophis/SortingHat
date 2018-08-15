@@ -1,5 +1,7 @@
 ﻿using SortingHat.API.Parser.Nodes;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SortingHat.API.Parser
 {
@@ -29,7 +31,6 @@ namespace SortingHat.API.Parser
             _expression = expression;
         }
 
-
         public IParseNode Parse()
         {
             if (string.IsNullOrEmpty(_expression))
@@ -42,6 +43,11 @@ namespace SortingHat.API.Parser
 
             _parseTree = ParseExpression();
             return _parseTree;
+        }
+
+        public IEnumerable<IParseNode> NextNode()
+        {
+            return Enumerable.Empty<IParseNode>();
         }
 
         // Expression := Term { Or Term }

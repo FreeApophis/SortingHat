@@ -14,11 +14,6 @@ namespace SortingHat.CLI.Commands
             _db = db;
         }
 
-        private static string ShortHash(string hash)
-        {
-            return hash.Split(':')[1].Substring(0, 8);
-        }
-
         public bool Execute(IEnumerable<string> arguments)
         {
             var search = string.Join(" ", arguments);
@@ -31,7 +26,7 @@ namespace SortingHat.CLI.Commands
 
                 foreach (var file in files)
                 {
-                    Console.WriteLine($"{ShortHash(file.Hash)} {file.Size.FixedHumanSize()} {file.Path}");
+                    Console.WriteLine($"{FormatHelper.ShortHash(file.Hash)} {file.Size.FixedHumanSize()} {file.Path}");
                 }
             }
             else
