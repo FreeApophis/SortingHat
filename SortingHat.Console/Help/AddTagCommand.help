@@ -1,0 +1,6 @@
+﻿<PROGRAMNAME> add-tags <tag>+
+
+What is a tag?
+* A tag always begins with a colon
+* A tag cannot have whitespace
+
