@@ -22,7 +22,12 @@ namespace SortingHat.CLI.Commands
             {
                 var tag = Tag.Parse(tagString);
 
-                tag.Destroy(_db);
+                if (tag.Destroy(_db) == false)
+                {
+                    _logger.LogWarning("Remove tag failed");
+                }
+
+
             }
 
             return true;

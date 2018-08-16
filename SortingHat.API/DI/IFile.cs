@@ -10,6 +10,7 @@ namespace SortingHat.API.DI
         void Untag(File file, Tag tag);
 
         IEnumerable<Tag> GetTags(File file);
+        IEnumerable<string> GetPaths();
         IEnumerable<string> GetPaths(File file);
         IEnumerable<string> GetNames(File file);
         IEnumerable<File> Search(string query);

@@ -11,7 +11,7 @@ namespace SortingHat.API.Parser
     /// Expression   := Term { Or Term }
     /// Term         := Factor { And Factor }
     /// Factor       := Tag | BoolConstant | Not Factor | "(" Expression ") | Predicate
-    /// Predicate    :=  
+    /// Predicate    := TODO: not yet defined...
     /// Tag          := ":"  Any non whitespace { Any non whitespace }
     /// Or           := "or" | "||" | "∨"
     /// And          := "and" | "&&"| "∧"

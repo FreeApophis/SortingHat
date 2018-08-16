@@ -9,8 +9,9 @@ namespace SortingHat.CLI.Commands
         public bool Execute(IEnumerable<string> arguments)
         {
             var detector = new FileTypeDetector();
+            var filePathExtractor = new FilePathExtractor(arguments);
 
-            foreach (var argument in arguments)
+            foreach (var argument in filePathExtractor.FilePaths)
             {
                 Console.WriteLine($"File: {argument}");
                 var fileType = detector.Identify(argument);

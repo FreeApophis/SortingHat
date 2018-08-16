@@ -176,6 +176,20 @@ WHERE Files.Hash = @fileHash";
             return tags;
         }
 
+        public IEnumerable<string> GetPaths()
+        {
+            var paths = new List<string>();
+
+            var reader = _db.ExecuteReader("SELECT FilePaths.Path FROM FilePaths");
+
+            while (reader.Read())
+            {
+                paths.Add(reader.GetString(0));
+            }
+
+            return paths;
+        }
+
         public IEnumerable<string> GetPaths(File file)
         {
             var paths = new List<string>();

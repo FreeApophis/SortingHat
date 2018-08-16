@@ -120,7 +120,7 @@ namespace SortingHat.DB
             return resultID.Value;
         }
 
-        const string allTags = @"WITH RECURSIVE
+        private const string AllTags = @"WITH RECURSIVE
   tree(id, parentid, name,level) AS (
     SELECT Tags.ID, Tags.ParentID, Tags.name, 0
     FROM Tags
@@ -128,13 +128,13 @@ namespace SortingHat.DB
     UNION ALL
     SELECT Tags.ID, Tags.ParentID, Tags.name, tree.level+1
       FROM Tags JOIN tree ON Tags.ParentID=tree.ID
-     ORDER BY 4 DESC
+     ORDER BY 4 DESC, 3 ASC
   )
 SELECT id, parentid, name, level FROM tree;";
 
         public IEnumerable<Tag> GetTags()
         {
-            var reader = _db.ExecuteReader(allTags);
+            var reader = _db.ExecuteReader(AllTags);
 
             if (reader.Read())
             {
