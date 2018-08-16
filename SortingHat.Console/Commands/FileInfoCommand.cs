@@ -1,18 +1,15 @@
 ﻿using System.Collections.Generic;
 using System;
 using SortingHat.API.Models;
-using SortingHat.API.DI;
 
 namespace SortingHat.CLI.Commands
 {
     class FileInfoCommand : ICommand
     {
-        private IDatabase _db;
-        private Func<string, File> _newFile;
+        private readonly Func<string, File> _newFile;
 
-        public FileInfoCommand(IDatabase db, Func<string, File> newFile)
+        public FileInfoCommand(Func<string, File> newFile)
         {
-            _db = db;
             _newFile = newFile;
         }
 

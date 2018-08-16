@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using SortingHat.API.DI;
+﻿using SortingHat.API.DI;
 using SortingHat.API.Models;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,12 +7,10 @@ namespace SortingHat.CLI.Commands
 {
     class RenameTagCommand : ICommand
     {
-        private readonly ILogger<RenameTagCommand> _logger;
         private readonly IDatabase _db;
 
-        public RenameTagCommand(ILogger<RenameTagCommand> logger, IDatabase db)
+        public RenameTagCommand(IDatabase db)
         {
-            _logger = logger;
             _db = db;
         }
 

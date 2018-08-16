@@ -42,7 +42,7 @@ namespace SortingHat.DB
             if (tagID.HasValue)
             {
                 var tagIDParameter = new SqliteParameter("@tagID", tagID);
-                var tagNameParameter = new SqliteParameter("@tagName", tagID);
+                var tagNameParameter = new SqliteParameter("@tagName", newName);
 
                 _db.ExecuteNonQuery("UPDATE FROM Tags SET Name = @tagName WHERE TagID = @tagID", tagIDParameter, tagNameParameter);
             }

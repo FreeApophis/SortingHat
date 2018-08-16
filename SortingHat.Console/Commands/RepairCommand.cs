@@ -5,10 +5,6 @@ namespace SortingHat.CLI.Commands
 {
     class RepairCommand : ICommand
     {
-        public RepairCommand()
-        {
-        }
-
         public bool Execute(IEnumerable<string> arguments)
         {
             throw new NotImplementedException();
@@ -18,6 +14,6 @@ namespace SortingHat.CLI.Commands
         public string LongCommand => "repair";
         public string ShortCommand => null;
 
-        public string ShortHelp => "";
+        public string ShortHelp => "Check each path locked in the database if the file still exists and is not corrupted / changed";
     }
 }

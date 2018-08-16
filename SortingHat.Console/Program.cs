@@ -52,7 +52,7 @@ namespace SortingHat.CLI
             return ConfigureLogger(builder.Build());
         }
 
-        public static string ConfigurationPath()
+        private static string ConfigurationPath()
         {
             return Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
         }
@@ -75,10 +75,11 @@ namespace SortingHat.CLI
         private static void RegisterCommands(ContainerBuilder builder)
         {
             builder.RegisterType<HelpCommand>().As<ICommand>();
+            builder.RegisterType<VersionCommand>().As<ICommand>();
             builder.RegisterType<InitCommand>().As<ICommand>();
 
-            builder.RegisterType<ListTagsCommand>().As<ICommand>();
             builder.RegisterType<AddTagCommand>().As<ICommand>();
+            builder.RegisterType<ListTagsCommand>().As<ICommand>();
             builder.RegisterType<RemoveTagCommand>().As<ICommand>();
             builder.RegisterType<RenameTagCommand>().As<ICommand>();
 
@@ -88,7 +89,6 @@ namespace SortingHat.CLI
             builder.RegisterType<FileInfoCommand>().As<ICommand>();
 
             builder.RegisterType<RepairCommand>().As<ICommand>();
-            builder.RegisterType<SortCommand>().As<ICommand>();
             builder.RegisterType<IdentifyCommand>().As<ICommand>();
         }
     }

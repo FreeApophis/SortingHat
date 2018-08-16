@@ -1,8 +1,8 @@
 ﻿namespace SortingHat.API.FileTypeDetection
 {
-    class FileTypeDetectorFactory
+    internal static class FileTypeDetectorFactory
     {
-        const int FileTypeDetectorOffset = 0;
+        private const int FileTypeDetectorOffset = 0;
 
         internal static IFileTypeDetector Create(string signature)
         {

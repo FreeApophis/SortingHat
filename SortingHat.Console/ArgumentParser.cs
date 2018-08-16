@@ -9,8 +9,8 @@ namespace SortingHat.CLI
 
     class ArgumentParser
     {
-        private Dictionary<string, ICommand> _commandTargets = new Dictionary<string, ICommand>();
-        Lazy<ILogger<ArgumentParser>> _logger;
+        private readonly Dictionary<string, ICommand> _commandTargets = new Dictionary<string, ICommand>();
+        private readonly Lazy<ILogger<ArgumentParser>> _logger;
 
         public ArgumentParser(Lazy<ILogger<ArgumentParser>> logger, IEnumerable<ICommand> commands)
         {

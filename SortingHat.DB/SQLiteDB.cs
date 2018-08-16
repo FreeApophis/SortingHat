@@ -1,5 +1,4 @@
 ﻿using Microsoft.Data.Sqlite;
-using Microsoft.Extensions.Logging;
 using SortingHat.API;
 using SortingHat.API.DI;
 using System;
@@ -7,7 +6,7 @@ using System.IO;
 
 namespace SortingHat.DB
 {
-    public class SQLiteDB : IDatabase, IDisposable
+    public sealed class SQLiteDB : IDatabase, IDisposable
     {
         private readonly string _path;
         private readonly string _dbName;
@@ -96,11 +95,11 @@ namespace SortingHat.DB
         }
 
         #region IDisposable Support
-        private bool disposedValue = false;
+        private bool _disposedValue;
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!_disposedValue)
             {
                 if (disposing)
                 {
@@ -108,7 +107,7 @@ namespace SortingHat.DB
                     Connection.Dispose();
                 }
 
-                disposedValue = true;
+                _disposedValue = true;
             }
         }
 

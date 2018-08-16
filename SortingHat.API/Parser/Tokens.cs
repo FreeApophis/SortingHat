@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SortingHat.API.Parser
+﻿namespace SortingHat.API.Parser
 {
     public abstract class Token
     {
@@ -60,7 +56,7 @@ namespace SortingHat.API.Parser
             Value = value;
         }
 
-        public bool Value { get; private set; }
+        public bool Value { get; }
 
         public override string ToString() => $"Bool Value: {Value}";
     }

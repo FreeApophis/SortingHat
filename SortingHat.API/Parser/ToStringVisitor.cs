@@ -13,17 +13,17 @@ namespace SortingHat.API.Parser
         }
 
         public string Result => _resultBuilder.ToString();
-        private StringBuilder _resultBuilder = new StringBuilder();
-        readonly private OperatorType _operatorType;
+        private readonly StringBuilder _resultBuilder = new StringBuilder();
+        private readonly OperatorType _operatorType;
 
         public void Visit(UnaryOperatorNode op)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public void Visit(BinaryOperatorNode op)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public void Visit(NotOperatorNode op)
@@ -60,12 +60,12 @@ namespace SortingHat.API.Parser
 
         public void Visit(TagNode tag)
         {
-            _resultBuilder.Append(tag.ToString());
+            _resultBuilder.Append(tag);
         }
 
         public void Visit(BooleanNode boolean)
         {
-            _resultBuilder.Append(boolean.ToString());
+            _resultBuilder.Append(boolean);
         }
     }
 }

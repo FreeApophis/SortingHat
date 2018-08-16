@@ -6,7 +6,7 @@ namespace SortingHat.CLI
 {
     class FilePathExtractor
     {
-        private List<string> _filePaths = new List<string>();
+        private readonly List<string> _filePaths = new List<string>();
         public IEnumerable<string> FilePaths => _filePaths;
 
         public FilePathExtractor(IEnumerable<string> filePatterns)

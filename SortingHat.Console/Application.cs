@@ -7,7 +7,7 @@ namespace SortingHat.CLI
 {
     class Application
     {
-        ILogger<Application> _logger;
+        readonly ILogger<Application> _logger;
         readonly ArgumentParser _argumentParser;
         readonly ILoggerFactory _loggerFactory;
 

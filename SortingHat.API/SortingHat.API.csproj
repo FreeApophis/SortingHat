@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\FileSignatures.csv">
-      <CustomToolNamespace>Resource</CustomToolNamespace>
+      <CustomToolNamespace></CustomToolNamespace>
     </EmbeddedResource>
   </ItemGroup>
 

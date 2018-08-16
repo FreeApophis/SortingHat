@@ -6,12 +6,9 @@ namespace SortingHat.API.Parser
     public class TokenWalker
     {
         private readonly List<Token> _tokens = new List<Token>();
-        private int _currentIndex = 0;
+        private int _currentIndex;
 
-        public bool ThereAreMoreTokens
-        {
-            get { return _currentIndex < _tokens.Count; }
-        }
+        public bool ThereAreMoreTokens => _currentIndex < _tokens.Count;
 
         public TokenWalker(IEnumerable<Token> tokens)
         {

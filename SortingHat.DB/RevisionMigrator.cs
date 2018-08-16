@@ -1,5 +1,4 @@
 ﻿using Microsoft.Data.Sqlite;
-using SortingHat.API.DI;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,7 +9,6 @@ namespace SortingHat.DB
     class RevisionMigrator
     {
         private const string CreateRevisionTableCommand = @"CREATE TABLE IF NOT EXISTS [Revisions] ([ID] INTEGER  NOT NULL PRIMARY KEY AUTOINCREMENT, [Name] VARCHAR(255)  UNIQUE NOT NULL, [MigratedAt] DATETIME DEFAULT CURRENT_TIME NOT NULL);";
-        private readonly string _tableExists = string.Format("SELECT name FROM sqlite_master WHERE type='table' AND name='{0}';", "Revisions");
         private readonly SQLiteDB _db;
 
         public RevisionMigrator(SQLiteDB db)
@@ -33,14 +31,12 @@ namespace SortingHat.DB
 
         private void Migrate(string migration)
         {
-            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(migration))
+            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(migration))
+            using (var reader = new StreamReader(stream))
             {
-                using (StreamReader reader = new StreamReader(stream))
-                {
-                    _db.ExecuteNonQuery(reader.ReadToEnd());
+                _db.ExecuteNonQuery(reader.ReadToEnd());
 
-                    SetMigrated(migration);
-                }
+                SetMigrated(migration);
             }
         }
 

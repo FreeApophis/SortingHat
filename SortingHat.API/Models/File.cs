@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System;
-using System.Linq;
 
 namespace SortingHat.API.Models
 {
@@ -13,7 +12,7 @@ namespace SortingHat.API.Models
         public string Hash { get; set; }
         public string Path { get; }
 
-        private IDatabase _db;
+        private readonly IDatabase _db;
 
         public File(string path, string hash)
         {

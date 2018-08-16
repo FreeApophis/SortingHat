@@ -7,7 +7,7 @@ namespace SortingHat.CLI.Commands
 {
     class FileMoveCommand : ICommand
     {
-        private IDatabase _db;
+        private readonly IDatabase _db;
 
         public FileMoveCommand(IDatabase db)
         {
@@ -32,7 +32,7 @@ namespace SortingHat.CLI.Commands
             }
             else
             {
-                Console.WriteLine($"No files found for your search query...");
+                Console.WriteLine("No files found for your search query...");
             }
 
             return true;

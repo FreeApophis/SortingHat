@@ -3,13 +3,13 @@ using SortingHat.API.DI;
 using SortingHat.API.Models;
 using SortingHat.API.Parser;
 using System.Collections.Generic;
-using System;
+
 
 namespace SortingHat.DB
 {
     class SQLiteFile : IFile
     {
-        SQLiteDB _db;
+        readonly SQLiteDB _db;
 
         public SQLiteFile(SQLiteDB db)
         {
@@ -18,8 +18,8 @@ namespace SortingHat.DB
 
         public void Tag(File file, Tag tag)
         {
-            long fileID = FindOrCreate(file);
-            long tagID = ((SQLiteTag)_db.Tag).FindOrCreate(tag);
+            var fileID = FindOrCreate(file);
+            var tagID = ((SQLiteTag)_db.Tag).FindOrCreate(tag);
 
             _db.ExecuteNonQuery("INSERT INTO FileTags (TagID, FileID) VALUES(@tagID, @fileID);", new SqliteParameter("@tagID", tagID), new SqliteParameter("@fileID", fileID));
         }
@@ -32,7 +32,7 @@ namespace SortingHat.DB
         private long Create(File file)
         {
 
-            long fileID = InsertFile(file);
+            var fileID = InsertFile(file);
             InsertFileName(file, fileID);
             InsertFilePath(file, fileID);
 
@@ -82,8 +82,8 @@ namespace SortingHat.DB
 
         public void Untag(File file, Tag tag)
         {
-            long? fileID = Find(file);
-            long? tagID = ((SQLiteTag)_db.Tag).Find(tag);
+            var fileID = Find(file);
+            var tagID = ((SQLiteTag)_db.Tag).Find(tag);
 
             if (fileID.HasValue && tagID.HasValue)
             {
@@ -154,7 +154,7 @@ namespace SortingHat.DB
             return LoadFileFromReader(reader, file);
         }
 
-        const string allFileTags = @"SELECT Tags.ID
+        const string AllFileTags = @"SELECT Tags.ID
 FROM Tags
 JOIN FileTags ON FileTags.TagID = Tags.ID
 JOIN Files ON FileTags.FileID = Files.ID
@@ -165,7 +165,7 @@ WHERE Files.Hash = @fileHash";
             var tags = new List<Tag>();
 
 
-            var reader = _db.ExecuteReader(allFileTags, new SqliteParameter("@fileHash", file.Hash));
+            var reader = _db.ExecuteReader(AllFileTags, new SqliteParameter("@fileHash", file.Hash));
 
             while (reader.Read())
             {

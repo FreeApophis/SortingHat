@@ -8,7 +8,7 @@ namespace SortingHat.API.FileTypeDetection
 
     public class FileTypeDetector
     {
-        private List<IFileTypeDetector> _detectors = new List<IFileTypeDetector>();
+        private readonly List<IFileTypeDetector> _detectors = new List<IFileTypeDetector>();
         private string SignatureResource()
         {
             return "SortingHat.API.Resources.FileSignatures.csv";

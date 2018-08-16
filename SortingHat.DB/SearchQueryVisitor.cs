@@ -8,18 +8,12 @@ namespace SortingHat.DB
 {
     class SearchQueryVisitor : INodeVisitor
     {
-        public string Result
-        {
-            get
-            {
-                return _selectBuilder.ToString() + _whereBuilder.ToString() + GroupBy;
-            }
-        }
-        private StringBuilder _selectBuilder = new StringBuilder();
-        private StringBuilder _whereBuilder = new StringBuilder();
+        public string Result => _selectBuilder.ToString() + _whereBuilder + GroupBy;
+        private readonly StringBuilder _selectBuilder = new StringBuilder();
+        private readonly StringBuilder _whereBuilder = new StringBuilder();
         private const string GroupBy = "\nGROUP BY FilePaths.ID";
-        private SQLiteDB _db;
-        private int _fileTagCount = 0;
+        private readonly SQLiteDB _db;
+        private int _fileTagCount;
 
         public SearchQueryVisitor(SQLiteDB db)
         {
@@ -34,12 +28,12 @@ namespace SortingHat.DB
 
         public void Visit(UnaryOperatorNode op)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public void Visit(BinaryOperatorNode op)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public void Visit(NotOperatorNode op)
@@ -53,7 +47,7 @@ namespace SortingHat.DB
         {
             _whereBuilder.Append("(");
             op.LeftOperand.Accept(this);
-            _whereBuilder.Append($" AND ");
+            _whereBuilder.Append(" AND ");
             op.RightOperand.Accept(this);
             _whereBuilder.Append(")");
         }
@@ -62,7 +56,7 @@ namespace SortingHat.DB
         {
             _whereBuilder.Append("(");
             op.LeftOperand.Accept(this);
-            _whereBuilder.Append($" OR ");
+            _whereBuilder.Append(" OR ");
             op.RightOperand.Accept(this);
             _whereBuilder.Append(")");
         }

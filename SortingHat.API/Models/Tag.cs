@@ -8,7 +8,7 @@ namespace SortingHat.API.Models
     public class Tag
     {
         public string Name { get; set; }
-        public Tag Parent;
+        public Tag Parent { get; }
         public List<Tag> Children { get; } = new List<Tag>();
 
         public string FullName => $"{(Parent == null ? string.Empty : Parent.FullName)}:{Name}";
@@ -53,9 +53,9 @@ namespace SortingHat.API.Models
         {
             if (tagString == null) return null;
             if (tagString.StartsWith(":") == false) return null;
-            if (tagString.Any(Char.IsWhiteSpace)) return null;
+            if (tagString.Any(char.IsWhiteSpace)) return null;
 
-            return TagFromList(tagString.Split(new Char[] { ':' }, StringSplitOptions.RemoveEmptyEntries));
+            return TagFromList(tagString.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries));
         }
 
         private static Tag TagFromList(IEnumerable<string> tagParts, Tag parent = null)
