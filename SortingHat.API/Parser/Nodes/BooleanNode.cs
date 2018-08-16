@@ -1,12 +1,12 @@
 ﻿namespace SortingHat.API.Parser.Nodes
 {
-    public class BooleanNode : IParseNode
+    public sealed class BooleanNode : IParseNode
     {
         internal BooleanNode(bool boolConstant)
         {
             BoolConstant = boolConstant;
         }
-        public virtual void Accept(INodeVisitor visitor)
+        public void Accept(INodeVisitor visitor)
         {
             visitor.Visit(this);
         }

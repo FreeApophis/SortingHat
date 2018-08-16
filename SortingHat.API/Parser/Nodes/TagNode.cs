@@ -1,12 +1,12 @@
 ﻿namespace SortingHat.API.Parser.Nodes
 {
-    public class TagNode : IParseNode
+    public sealed class TagNode : IParseNode
     {
         internal TagNode(string tag)
         {
             Tag = tag;
         }
-        public virtual void Accept(INodeVisitor visitor)
+        public void Accept(INodeVisitor visitor)
         {
             visitor.Visit(this);
         }

@@ -41,8 +41,6 @@ namespace SortingHat.API.Models
             return db.Tag.Rename(this, newName);
         }
 
-
-
         /// <summary>
         /// A tag always begins with a colon (:) and can have multiple parts, each part beginning with a colon (:)
         /// A tagpart can have no whitespace and has at least one character.
