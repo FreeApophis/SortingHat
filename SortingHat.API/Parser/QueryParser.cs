@@ -28,6 +28,8 @@ namespace SortingHat.API.Parser
         private TokenWalker _walker;
         private IParseNode _parseTree;
 
+        public bool IllegalExpression { get; private set; }
+
         public QueryParser(string expression)
         {
             _expression = expression;
@@ -35,17 +37,46 @@ namespace SortingHat.API.Parser
 
         public IParseNode Parse()
         {
-            if (string.IsNullOrWhiteSpace(_expression))
+            try
             {
-                _nextToken.Add(new TagToken(null));
-                _nextToken.Add(new NotToken());
+                return ParseThrowing();
+            }
+            catch (ExpectedTokenException e)
+            {
+                IllegalExpression = true;
+                if (e.ExpectedToken is OpenParenthesisToken && e.FoundToken is EpsilonToken)
+                {
+                    _nextToken.Add(new TagToken(null));
+                    _nextToken.Add(new NotToken());
+                    _nextToken.Add(new OpenParenthesisToken());
+                }
+
+                if (e.ExpectedToken is ClosedParenthesisToken && e.FoundToken is EpsilonToken)
+                {
+                    _nextToken.Add(new AndToken());
+                    _nextToken.Add(new OrToken());
+                    _nextToken.Add(new ClosedParenthesisToken());
+                }
+
                 return null;
             }
+            catch (Exception)
+            {
+                IllegalExpression = true;
+                return null;
+            }
+        }
 
+        private IParseNode ParseThrowing()
+        {
             var tokens = new Tokenizer().Scan(_expression);
             _walker = new TokenWalker(tokens);
 
             _parseTree = ParseExpression();
+
+            _nextToken.Add(new AndToken());
+            _nextToken.Add(new OrToken());
+
             return _parseTree;
         }
 
@@ -117,7 +148,7 @@ namespace SortingHat.API.Parser
         {
             if (!(NextIs<ClosedParenthesisToken>()))
             {
-                throw new Exception("Expecting ')' in expression, instead got: " + (PeekNext() != null ? PeekNext().ToString() : "End of expression"));
+                throw new ExpectedTokenException(new ClosedParenthesisToken(), PeekNext() ?? new EpsilonToken());
             }
             _walker.Pop();
         }
@@ -126,7 +157,7 @@ namespace SortingHat.API.Parser
         {
             if (!NextIs<OpenParenthesisToken>())
             {
-                throw new Exception("Expecting '(' in expression, instead got : " + (PeekNext() != null ? PeekNext().ToString() : "End of expression"));
+                throw new ExpectedTokenException(new OpenParenthesisToken(), PeekNext() ?? new EpsilonToken());
             }
             _walker.Pop();
         }

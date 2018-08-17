@@ -2,6 +2,7 @@
 using SortingHat.API.Parser;
 using SortingHat.API.Parser.Nodes;
 using System;
+using System.Linq;
 using SortingHat.API.Parser.Token;
 using Xunit;
 
@@ -12,10 +13,11 @@ namespace SortingHat.Test
         [Fact]
         public void EmptySearch()
         {
-            var parser = new QueryParser("");
-            var parseTree = parser.Parse();
+            var parser = new QueryParser(" ");
+            var ir = parser.Parse();
 
-            Assert.Null(parseTree);
+            Assert.True(parser.IllegalExpression);
+            Assert.Null(ir);
         }
 
         [Fact]
@@ -25,7 +27,7 @@ namespace SortingHat.Test
             var parseTree = parser.Parse();
 
             Assert.IsType<TagNode>(parseTree);
-
+            Assert.False(parser.IllegalExpression);
             Assert.Equal(":tax:2018", (parseTree as TagNode).Tag);
         }
 
@@ -39,6 +41,7 @@ namespace SortingHat.Test
 
             ir.Accept(visitor);
             Assert.Equal("(:test ∨ (true ∧ (:movie ∨ ¬:blue)))", visitor.Result);
+            Assert.False(parser.IllegalExpression);
         }
 
         [Fact]
@@ -96,8 +99,109 @@ namespace SortingHat.Test
             var ir = parser.Parse();
             var next = parser.NextToken();
 
+            Assert.Equal(3, next.Count());
             Assert.Contains(next, node => node is TagToken);
             Assert.Contains(next, node => node is NotToken);
+            Assert.Contains(next, node => node is OpenParenthesisToken);
+        }
+
+        [Fact]
+        public void TagNextNode()
+        {
+            var parser = new QueryParser(":tag");
+            var ir = parser.Parse();
+            var next = parser.NextToken();
+
+            Assert.Equal(2, next.Count());
+            Assert.Contains(next, node => node is AndToken);
+            Assert.Contains(next, node => node is OrToken);
+        }
+
+        [Fact]
+        public void TagOpenParanthesisNextNode()
+        {
+            var parser = new QueryParser("(:tag");
+            var ir = parser.Parse();
+            var next = parser.NextToken();
+
+            Assert.Equal(3, next.Count());
+            Assert.Contains(next, node => node is AndToken);
+            Assert.Contains(next, node => node is OrToken);
+            Assert.Contains(next, node => node is ClosedParenthesisToken);
+        }
+
+        [Fact]
+        public void TagAndNextNode()
+        {
+            var parser = new QueryParser("(:tag and ");
+            var ir = parser.Parse();
+            var next = parser.NextToken();
+
+            Assert.Equal(3, next.Count());
+            Assert.Contains(next, node => node is TagToken);
+            Assert.Contains(next, node => node is NotToken);
+            Assert.Contains(next, node => node is OpenParenthesisToken);
+        }
+
+        [Fact]
+        public void NotNextNode()
+        {
+            var parser = new QueryParser("not ");
+            var ir = parser.Parse();
+            var next = parser.NextToken();
+
+            Assert.Equal(3, next.Count());
+            Assert.Contains(next, node => node is TagToken);
+            Assert.Contains(next, node => node is NotToken);
+            Assert.Contains(next, node => node is OpenParenthesisToken);
+        }
+
+        [Fact]
+        public void OpenParentesisNotNextNode()
+        {
+            var parser = new QueryParser("(not ");
+            var ir = parser.Parse();
+            var next = parser.NextToken();
+
+            Assert.Equal(3, next.Count());
+            Assert.Contains(next, node => node is TagToken);
+            Assert.Contains(next, node => node is NotToken);
+            Assert.Contains(next, node => node is OpenParenthesisToken);
+        }
+
+        [Fact]
+        public void TagComplexNextNode()
+        {
+            var parser = new QueryParser("(:test or ((:tag or :bla and :fun) and :x");
+            var ir = parser.Parse();
+            var next = parser.NextToken();
+
+            Assert.Equal(3, next.Count());
+            Assert.Contains(next, node => node is AndToken);
+            Assert.Contains(next, node => node is OrToken);
+            Assert.Contains(next, node => node is ClosedParenthesisToken);
+        }
+
+        [Fact]
+        public void CompleteExpressionNextNode()
+        {
+            var parser = new QueryParser("(:tag and :fun)");
+            var ir = parser.Parse();
+            var next = parser.NextToken();
+
+            Assert.Equal(2, next.Count());
+            Assert.Contains(next, node => node is AndToken);
+            Assert.Contains(next, node => node is OrToken);
+        }
+
+        [Fact]
+        public void IllegalNextNode()
+        {
+            var parser = new QueryParser(")");
+            var ir = parser.Parse();
+            var next = parser.NextToken();
+
+            Assert.Empty(next);
         }
 
         [Fact]
