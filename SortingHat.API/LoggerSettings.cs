@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SortingHat.API
+﻿namespace SortingHat.API
 {
     public class LoggerSettings
     {
-        
+        public string FileName { get; set; } = "";
     }
 }

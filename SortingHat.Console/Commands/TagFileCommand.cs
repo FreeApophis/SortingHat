@@ -35,7 +35,7 @@ namespace SortingHat.CLI.Commands
 
             foreach (var file in files.FilePaths.Select(file => new API.Models.File(file, _hashService)))
             {
-                foreach (var tag in tags.Select(tag => API.Models.Tag.Parse(tag)))
+                foreach (var tag in tags.Select(API.Models.Tag.Parse))
                 {
                     _logger.LogInformation($"File {file.Path} tagged with {tag.Name}");
                     file.Tag(_db, tag);

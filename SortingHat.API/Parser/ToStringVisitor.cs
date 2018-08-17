@@ -7,37 +7,30 @@ namespace SortingHat.API.Parser
 
     public class ToStringVisitor : INodeVisitor
     {
-        public ToStringVisitor(OperatorType operatorType = OperatorType.Text)
+        public ToStringVisitor(IOperatorType operatorType)
         {
             _operatorType = operatorType;
         }
 
         public string Result => _resultBuilder.ToString();
-        private StringBuilder _resultBuilder = new StringBuilder();
-        readonly private OperatorType _operatorType;
+        private readonly StringBuilder _resultBuilder = new StringBuilder();
+        private readonly IOperatorType _operatorType;
 
         public void Visit(UnaryOperatorNode op)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public void Visit(BinaryOperatorNode op)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public void Visit(NotOperatorNode op)
         {
             _resultBuilder.Append(op.ToString(_operatorType));
-            if (_operatorType == OperatorType.Text)
-            {
-                _resultBuilder.Append("(");
-            }
             op.Operand.Accept(this);
-            if (_operatorType == OperatorType.Text)
-            {
-                _resultBuilder.Append(")");
-            }
+            _resultBuilder.Append(_operatorType.NotEnd);
         }
 
         public void Visit(AndOperatorNode op)
@@ -60,12 +53,12 @@ namespace SortingHat.API.Parser
 
         public void Visit(TagNode tag)
         {
-            _resultBuilder.Append(tag.ToString());
+            _resultBuilder.Append(tag);
         }
 
         public void Visit(BooleanNode boolean)
         {
-            _resultBuilder.Append(boolean.ToString());
+            _resultBuilder.Append(boolean);
         }
     }
 }

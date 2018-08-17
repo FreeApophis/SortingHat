@@ -13,19 +13,10 @@ namespace SortingHat.API.Parser.Nodes
             visitor.Visit(this);
         }
 
-        internal string ToString(OperatorType operatorType = OperatorType.Text)
+        internal object ToString(IOperatorType operatorType)
         {
-            switch (operatorType)
-            {
-                case OperatorType.Logical:
-                    return "¬";
-                case OperatorType.Text:
-                    return "not";
-                case OperatorType.Programming:
-                    return "!";
-            }
-
-            throw new NotImplementedException();
+            return operatorType.Not;
         }
+
     }
 }

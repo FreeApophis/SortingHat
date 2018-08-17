@@ -7,8 +7,8 @@
             LeftOperand = leftOperand;
             RightOperand = rightOperand;
         }
-        public IParseNode LeftOperand { get; set; }
-        public IParseNode RightOperand { get; set; }
+        public IParseNode LeftOperand { get; }
+        public IParseNode RightOperand { get; }
 
         public virtual void Accept(INodeVisitor visitor)
         {

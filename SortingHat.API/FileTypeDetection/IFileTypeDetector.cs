@@ -2,7 +2,7 @@
 
 namespace SortingHat.API.FileTypeDetection
 {
-    interface IFileTypeDetector
+    internal interface IFileTypeDetector
     {
         FileType Detect(Stream file);
     }

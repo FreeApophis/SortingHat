@@ -18,8 +18,8 @@ namespace SortingHat.UI
 
         public DataTemplate TokenTemplate
         {
-            get { return (DataTemplate)GetValue(TokenTemplateProperty); }
-            set { SetValue(TokenTemplateProperty, value); }
+            get => (DataTemplate)GetValue(TokenTemplateProperty);
+            set => SetValue(TokenTemplateProperty, value);
         }
 
         public Func<string, object> TokenMatcher { get; set; }
@@ -72,7 +72,7 @@ namespace SortingHat.UI
                 }
                 else // Split up
                 {
-                    var index = matchedRun.Text.IndexOf(inputText) + inputText.Length;
+                    var index = matchedRun.Text.IndexOf(inputText, StringComparison.Ordinal) + inputText.Length;
                     var tailEnd = new Run(matchedRun.Text.Substring(index));
                     para.Inlines.InsertAfter(matchedRun, tailEnd);
                     para.Inlines.Remove(matchedRun);

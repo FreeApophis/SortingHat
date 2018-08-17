@@ -15,7 +15,7 @@ namespace SortingHat.CLI.Commands
 
         public bool Execute(IEnumerable<string> arguments)
         {
-            if (arguments.Count() == 0)
+            if (arguments.Any() == false)
             {
                 _db.Setup();
             }

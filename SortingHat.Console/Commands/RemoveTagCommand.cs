@@ -2,7 +2,6 @@
 using SortingHat.API.DI;
 using SortingHat.API.Models;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace SortingHat.CLI.Commands
 {
@@ -23,7 +22,12 @@ namespace SortingHat.CLI.Commands
             {
                 var tag = Tag.Parse(tagString);
 
-                tag.Destroy(_db);
+                if (tag.Destroy(_db) == false)
+                {
+                    _logger.LogWarning("Remove tag failed");
+                }
+
+
             }
 
             return true;

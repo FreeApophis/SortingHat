@@ -8,7 +8,7 @@ namespace SortingHat.API.Models
     public class Tag
     {
         public string Name { get; set; }
-        public Tag Parent;
+        public Tag Parent { get; }
         public List<Tag> Children { get; } = new List<Tag>();
 
         public string FullName => $"{(Parent == null ? string.Empty : Parent.FullName)}:{Name}";
@@ -41,8 +41,6 @@ namespace SortingHat.API.Models
             return db.Tag.Rename(this, newName);
         }
 
-
-
         /// <summary>
         /// A tag always begins with a colon (:) and can have multiple parts, each part beginning with a colon (:)
         /// A tagpart can have no whitespace and has at least one character.
@@ -53,9 +51,9 @@ namespace SortingHat.API.Models
         {
             if (tagString == null) return null;
             if (tagString.StartsWith(":") == false) return null;
-            if (tagString.Any(Char.IsWhiteSpace)) return null;
+            if (tagString.Any(char.IsWhiteSpace)) return null;
 
-            return TagFromList(tagString.Split(new Char[] { ':' }, StringSplitOptions.RemoveEmptyEntries));
+            return TagFromList(tagString.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries));
         }
 
         private static Tag TagFromList(IEnumerable<string> tagParts, Tag parent = null)

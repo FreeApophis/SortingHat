@@ -1,38 +1,41 @@
 ﻿using System.Collections.Generic;
 using System;
+using System.IO;
 using System.Linq;
 using SortingHat.API.DI;
 
 namespace SortingHat.CLI.Commands
 {
-    class FileMoveCommand : ICommand
+    class MoveFilesCommand : ICommand
     {
-        private IDatabase _db;
+        private readonly IDatabase _db;
 
-        public FileMoveCommand(IDatabase db)
+        public MoveFilesCommand(IDatabase db)
         {
             _db = db;
         }
 
         public bool Execute(IEnumerable<string> arguments)
         {
-            var path = ".";
-            var search = string.Join(" ", arguments);
+            if (arguments.Count() != 2) throw new ArgumentOutOfRangeException(nameof(arguments));
+
+            var search = arguments.First();
+            var path = Path.Combine(Directory.GetCurrentDirectory(), arguments.Last());
+
             Console.WriteLine($"Find Files: {search}");
 
             var files = _db.File.Search(search);
 
             if (files.Any())
             {
-
                 foreach (var file in files)
                 {
-                    System.IO.File.Move(file.Path, path);
+                    File.Move(file.Path, Path.Combine(path, Path.GetFileName(file.Path)));
                 }
             }
             else
             {
-                Console.WriteLine($"No files found for your search query...");
+                Console.WriteLine("No files found for your search query...");
             }
 
             return true;

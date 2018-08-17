@@ -6,13 +6,9 @@
 
         private static string HumanSize(long size, int magnitude)
         {
-            if (size < 1000)
-            {
-                return $"{size,4} {SizeSuffixes[magnitude]}";
-            }
-
-            return HumanSize(size / 1000, magnitude + 1);
-
+            return size < 1000
+                ? $"{size,4} {SizeSuffixes[magnitude]}"
+                : HumanSize(size / 1000, magnitude + 1);
         }
         public static string FixedHumanSize(this long size)
         {

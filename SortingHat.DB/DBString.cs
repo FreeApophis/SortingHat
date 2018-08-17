@@ -1,29 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SortingHat.DB
+﻿namespace SortingHat.DB
 {
-    class DBString
+    internal static class DBString
     {
         public static string ToComparison(long? value)
         {
-            if (value.HasValue)
-            {
-                return $"= {value}";
-            }
-
-            return "IS NULL";
+            return value.HasValue
+                ? $"= {value}"
+                : "IS NULL";
         }
 
         public static string ToSQL(long? value)
         {
-            if (value.HasValue)
-            {
-                return value.ToString();
-            }
-
-            return "NULL";
+            return value.HasValue
+                ? value.ToString()
+                : "NULL";
         }
     }
 }

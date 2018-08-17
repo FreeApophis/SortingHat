@@ -16,19 +16,10 @@ namespace SortingHat.CLI.Commands
 
         public bool Execute(IEnumerable<string> arguments)
         {
-            bool result = true;
-
-            foreach (var tagString in arguments)
-            {
-                var tag = Tag.Parse(tagString);
-
-                result &= tag.Store(_db);
-            }
-
-            return result;
+            return arguments.Select(Tag.Parse).Aggregate(true, (result, tag) => result & tag.Store(_db));
         }
 
-        public string LongCommand => "add-tag";
+        public string LongCommand => "add-tags";
         public string ShortCommand => null;
         public string ShortHelp => "";
 

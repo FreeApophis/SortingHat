@@ -1,22 +1,17 @@
 ﻿using SortingHat.API.FileTypeDetection;
 using System.Collections.Generic;
-using System.Linq;
 using System;
 
 namespace SortingHat.CLI.Commands
 {
     internal class IdentifyCommand : ICommand
     {
-
-        public IdentifyCommand()
-        {
-        }
-
         public bool Execute(IEnumerable<string> arguments)
         {
             var detector = new FileTypeDetector();
+            var filePathExtractor = new FilePathExtractor(arguments);
 
-            foreach (var argument in arguments)
+            foreach (var argument in filePathExtractor.FilePaths)
             {
                 Console.WriteLine($"File: {argument}");
                 var fileType = detector.Identify(argument);
@@ -29,7 +24,7 @@ namespace SortingHat.CLI.Commands
                 }
                 else
                 {
-                    Console.WriteLine($"Unknown filetype");
+                    Console.WriteLine("Unknown filetype");
                 }
             }
             return true;

@@ -1,7 +1,7 @@
 ﻿using SortingHat.API.Parser.Nodes;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using SortingHat.API.Parser.Token;
 
 namespace SortingHat.API.Parser
 {
@@ -11,7 +11,7 @@ namespace SortingHat.API.Parser
     /// Expression   := Term { Or Term }
     /// Term         := Factor { And Factor }
     /// Factor       := Tag | BoolConstant | Not Factor | "(" Expression ") | Predicate
-    /// Predicate    :=  
+    /// Predicate    := TODO: not yet defined...
     /// Tag          := ":"  Any non whitespace { Any non whitespace }
     /// Or           := "or" | "||" | "∨"
     /// And          := "and" | "&&"| "∧"
@@ -23,8 +23,12 @@ namespace SortingHat.API.Parser
     public class QueryParser
     {
         private readonly string _expression;
+        private readonly List<IToken> _nextToken = new List<IToken>();
+
         private TokenWalker _walker;
         private IParseNode _parseTree;
+
+        public bool IllegalExpression { get; private set; }
 
         public QueryParser(string expression)
         {
@@ -33,28 +37,58 @@ namespace SortingHat.API.Parser
 
         public IParseNode Parse()
         {
-            if (string.IsNullOrEmpty(_expression))
+            try
             {
+                return ParseThrowing();
+            }
+            catch (ExpectedTokenException e)
+            {
+                IllegalExpression = true;
+                if (e.ExpectedToken is OpenParenthesisToken && e.FoundToken is EpsilonToken)
+                {
+                    _nextToken.Add(new TagToken(null));
+                    _nextToken.Add(new NotToken());
+                    _nextToken.Add(new OpenParenthesisToken());
+                }
+
+                if (e.ExpectedToken is ClosedParenthesisToken && e.FoundToken is EpsilonToken)
+                {
+                    _nextToken.Add(new AndToken());
+                    _nextToken.Add(new OrToken());
+                    _nextToken.Add(new ClosedParenthesisToken());
+                }
+
                 return null;
             }
+            catch (Exception)
+            {
+                IllegalExpression = true;
+                return null;
+            }
+        }
 
+        private IParseNode ParseThrowing()
+        {
             var tokens = new Tokenizer().Scan(_expression);
             _walker = new TokenWalker(tokens);
 
             _parseTree = ParseExpression();
+
+            _nextToken.Add(new AndToken());
+            _nextToken.Add(new OrToken());
+
             return _parseTree;
         }
 
-        public IEnumerable<IParseNode> NextNode()
+        public IEnumerable<IToken> NextToken()
         {
-            return Enumerable.Empty<IParseNode>();
+            return _nextToken;
         }
 
         // Expression := Term { Or Term }
-        public IParseNode ParseExpression()
+        private IParseNode ParseExpression()
         {
-            IParseNode result;
-            result = ParseTerm();
+            var result = ParseTerm();
             while (NextIs<OrToken>())
             {
                 var op = _walker.Pop();
@@ -114,7 +148,7 @@ namespace SortingHat.API.Parser
         {
             if (!(NextIs<ClosedParenthesisToken>()))
             {
-                throw new Exception("Expecting ')' in expression, instead got: " + (PeekNext() != null ? PeekNext().ToString() : "End of expression"));
+                throw new ExpectedTokenException(new ClosedParenthesisToken(), PeekNext() ?? new EpsilonToken());
             }
             _walker.Pop();
         }
@@ -123,28 +157,19 @@ namespace SortingHat.API.Parser
         {
             if (!NextIs<OpenParenthesisToken>())
             {
-                throw new Exception("Expecting '(' in expression, instead got : " + (PeekNext() != null ? PeekNext().ToString() : "End of expression"));
+                throw new ExpectedTokenException(new OpenParenthesisToken(), PeekNext() ?? new EpsilonToken());
             }
             _walker.Pop();
         }
 
-        private Token PeekNext()
+        private IToken PeekNext()
         {
             return _walker.ThereAreMoreTokens ? _walker.Peek() : null;
         }
 
-        private void Consume(Type type)
+        private bool NextIs<TType>()
         {
-            var token = _walker.Pop();
-            if (token.GetType() != type)
-            {
-                throw new Exception($"Expecting {type} but got {token.ToString()} ");
-            }
-        }
-
-        private bool NextIs<Type>()
-        {
-            return _walker.ThereAreMoreTokens && _walker.Peek() is Type;
+            return _walker.ThereAreMoreTokens && _walker.Peek() is TType;
         }
 
 

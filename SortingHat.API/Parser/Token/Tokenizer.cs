@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace SortingHat.API.Parser
+namespace SortingHat.API.Parser.Token
 {
     public class Tokenizer
     {
         private StringReader _reader;
 
-        public IEnumerable<Token> Scan(string expression)
+        public IEnumerable<IToken> Scan(string expression)
         {
             _reader = new StringReader(expression);
 
@@ -19,7 +18,6 @@ namespace SortingHat.API.Parser
                 if (char.IsWhiteSpace(c))
                 {
                     _reader.Read();
-                    continue;
                 }
                 else if (c == ':')
                 {

@@ -2,13 +2,14 @@
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace SortingHat.CLI.Commands
 {
     class HelpCommand : ICommand
     {
-        private const string Command = "help";
         private readonly ILogger<HelpCommand> _logger;
         private readonly IComponentContext _container;
 
@@ -20,6 +21,8 @@ namespace SortingHat.CLI.Commands
 
         public bool Execute(IEnumerable<string> arguments)
         {
+            _logger.LogTrace("Help Command executed");
+
             if (arguments.Any())
             {
                 foreach (var command in _container.Resolve<IEnumerable<ICommand>>())
@@ -32,17 +35,30 @@ namespace SortingHat.CLI.Commands
                 }
                 return false;
             }
-            else
-            {
-                PrintOverview();
-                return true;
-            }
+
+            PrintOverview();
+            return true;
 
         }
 
         private void PrintLongHelp(ICommand command)
         {
-            Console.WriteLine(command.ShortHelp);
+            using (var resourceStream = GetHelResourceStream(command))
+            using (var reader = new StreamReader(resourceStream))
+            {
+                Console.WriteLine(reader.ReadToEnd());
+            }
+
+        }
+
+        private static Stream GetHelResourceStream(ICommand command)
+        {
+            return Assembly.GetExecutingAssembly().GetManifestResourceStream(GetHelpResourceName(command));
+        }
+
+        private static string GetHelpResourceName(ICommand command)
+        {
+            return $"SortingHat.CLI.Help.{command.GetType().Name}.help";
         }
 
         private void PrintOverview()
@@ -58,7 +74,7 @@ namespace SortingHat.CLI.Commands
         }
 
         public string LongCommand => "help";
-        public string ShortCommand => null;
+        public string ShortCommand => "?";
 
         public string ShortHelp => "This is the help command, it shows a list of the available commands.";
 
