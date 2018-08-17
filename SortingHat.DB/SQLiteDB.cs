@@ -1,5 +1,4 @@
 ﻿using Microsoft.Data.Sqlite;
-using Microsoft.Extensions.Logging;
 using SortingHat.API;
 using SortingHat.API.DI;
 using System;
