@@ -1,7 +1,7 @@
 ﻿using SortingHat.API.Parser.Nodes;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using SortingHat.API.Parser.Token;
 
 namespace SortingHat.API.Parser
 {
@@ -23,6 +23,8 @@ namespace SortingHat.API.Parser
     public class QueryParser
     {
         private readonly string _expression;
+        private readonly List<IToken> _nextToken = new List<IToken>();
+
         private TokenWalker _walker;
         private IParseNode _parseTree;
 
@@ -33,8 +35,10 @@ namespace SortingHat.API.Parser
 
         public IParseNode Parse()
         {
-            if (string.IsNullOrEmpty(_expression))
+            if (string.IsNullOrWhiteSpace(_expression))
             {
+                _nextToken.Add(new TagToken(null));
+                _nextToken.Add(new NotToken());
                 return null;
             }
 
@@ -45,16 +49,15 @@ namespace SortingHat.API.Parser
             return _parseTree;
         }
 
-        public IEnumerable<IParseNode> NextNode()
+        public IEnumerable<IToken> NextToken()
         {
-            return Enumerable.Empty<IParseNode>();
+            return _nextToken;
         }
 
         // Expression := Term { Or Term }
-        public IParseNode ParseExpression()
+        private IParseNode ParseExpression()
         {
-            IParseNode result;
-            result = ParseTerm();
+            var result = ParseTerm();
             while (NextIs<OrToken>())
             {
                 var op = _walker.Pop();
@@ -128,23 +131,14 @@ namespace SortingHat.API.Parser
             _walker.Pop();
         }
 
-        private Token PeekNext()
+        private IToken PeekNext()
         {
             return _walker.ThereAreMoreTokens ? _walker.Peek() : null;
         }
 
-        private void Consume(Type type)
+        private bool NextIs<TType>()
         {
-            var token = _walker.Pop();
-            if (token.GetType() != type)
-            {
-                throw new Exception($"Expecting {type} but got {token.ToString()} ");
-            }
-        }
-
-        private bool NextIs<Type>()
-        {
-            return _walker.ThereAreMoreTokens && _walker.Peek() is Type;
+            return _walker.ThereAreMoreTokens && _walker.Peek() is TType;
         }
 
 

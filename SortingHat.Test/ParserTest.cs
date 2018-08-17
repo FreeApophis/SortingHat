@@ -2,7 +2,7 @@
 using SortingHat.API.Parser;
 using SortingHat.API.Parser.Nodes;
 using System;
-using System.Linq;
+using SortingHat.API.Parser.Token;
 using Xunit;
 
 namespace SortingHat.Test
@@ -94,10 +94,10 @@ namespace SortingHat.Test
         {
             var parser = new QueryParser("");
             var ir = parser.Parse();
-            var next = parser.NextNode();
+            var next = parser.NextToken();
 
-            Assert.Contains(next, node => node is TagNode);
-            Assert.Contains(next, node => node is NotOperatorNode);
+            Assert.Contains(next, node => node is TagToken);
+            Assert.Contains(next, node => node is NotToken);
         }
 
         [Fact]
