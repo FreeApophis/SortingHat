@@ -116,7 +116,7 @@ namespace SortingHat.API.Parser
             return result;
         }
 
-        // Factor       := Tag | BoolConstant | Not Factor | "(" Expression ") 
+        // Factor       := Tag | BoolConstant | Not Factor | "(" Expression ")
         private IParseNode ParseFactor()
         {
             if (NextIs<TagToken>())

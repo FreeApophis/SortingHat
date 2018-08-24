@@ -16,7 +16,6 @@ namespace SortingHat.Test
             List<string> movieRating = new List<string>() { "tags", "add", ":movie:bad", ":movie:average", ":movie:good", ":movie:great" };
 
             addTag.Execute(taxPeriods);
-
             addTag.Execute(movieRating);
         }
     }
