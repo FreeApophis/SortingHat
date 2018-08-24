@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using SortingHat.API.DI;
 using SortingHat.API.Parser.OperatorType;
 using SortingHat.API.Parser.Token;
 
@@ -21,7 +22,9 @@ namespace SortingHat.UI
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-        private SQLiteDB _db;
+
+        private readonly IDatabase _db;
+        private readonly Func<SearchQueryVisitor> _newSearchQueryVisitor;
 
         private string _searchString;
         public string SearchString
@@ -69,15 +72,14 @@ namespace SortingHat.UI
             }
         }
 
-        public MainWindow()
+        public MainWindow(IDatabase db, Func<SearchQueryVisitor> newSearchQueryVisitor)
         {
+            _db = db;
+            _newSearchQueryVisitor = newSearchQueryVisitor;
             InitializeComponent();
 
             DataContext = this;
-            DatabaseSettings databaseSettings = new DatabaseSettings { DBName = "hat", DBPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) };
-            //_db = new SQLiteDB(databaseSettings);
 
-            //InitializeTokenizer();
             LoadTags();
             LoadDrives();
         }
@@ -162,13 +164,13 @@ namespace SortingHat.UI
                 return "#ffcccc";
             }
 
-            //var visitor = new SearchQueryVisitor(_db);
-            //ir.Accept(visitor);
+            var visitor = _newSearchQueryVisitor();
+            ir.Accept(visitor);
 
-            //if (visitor.UnknownTag)
-            //{
-            //    return "#ffffcc";
-            //}
+            if (visitor.UnknownTag)
+            {
+                return "#ffffcc";
+            }
             return "#ccffcc";
         }
 
@@ -177,20 +179,6 @@ namespace SortingHat.UI
             DriveInfo[] drives = DriveInfo.GetDrives();
             foreach (DriveInfo driveInfo in drives)
                 FolderBrowser.Items.Add(CreateTreeItem(driveInfo));
-        }
-
-        private void InitializeTokenizer()
-        {
-            //Tokenizer.TokenMatcher = text =>
-            //{
-            //    if (text.EndsWith(";"))
-            //    {
-            //        // Remove the ';'
-            //        return text.Substring(0, text.Length - 1).Trim().ToUpper();
-            //    }
-
-            //    return null;
-            //};
         }
 
         private void LoadTags()
@@ -221,15 +209,21 @@ namespace SortingHat.UI
         private void FolderBrowser_Expanded(object sender, RoutedEventArgs e)
         {
             TreeViewItem item = e.Source as TreeViewItem;
-            if ((item.Items.Count == 1) && (item.Items[0] is string))
+            if (item.Items.Count == 1 && item.Items[0] is string)
             {
                 item.Items.Clear();
 
                 DirectoryInfo expandedDir = null;
-                if (item.Tag is DriveInfo)
-                    expandedDir = (item.Tag as DriveInfo).RootDirectory;
-                if (item.Tag is DirectoryInfo)
-                    expandedDir = (item.Tag as DirectoryInfo);
+                switch (item.Tag)
+                {
+                    case DriveInfo _:
+                        expandedDir = (item.Tag as DriveInfo).RootDirectory;
+                        break;
+                    case DirectoryInfo _:
+                        expandedDir = (item.Tag as DirectoryInfo);
+                        break;
+                }
+
                 try
                 {
                     foreach (DirectoryInfo subDir in expandedDir.GetDirectories())
@@ -241,9 +235,11 @@ namespace SortingHat.UI
 
         private TreeViewItem CreateTreeItem(object o)
         {
-            TreeViewItem item = new TreeViewItem();
-            item.Header = o.ToString();
-            item.Tag = o;
+            TreeViewItem item = new TreeViewItem
+            {
+                Header = o.ToString(),
+                Tag = o
+            };
             item.Items.Add("Loading...");
             return item;
         }

@@ -3,6 +3,7 @@ using SortingHat.API.Parser;
 using SortingHat.API.Parser.Nodes;
 using System;
 using System.Linq;
+using SortingHat.API.Models;
 using SortingHat.API.Parser.OperatorType;
 using SortingHat.API.Parser.Token;
 using Xunit;
@@ -205,17 +206,17 @@ namespace SortingHat.Test
             Assert.Empty(next);
         }
 
-        //[Fact]
-        //public void SQLQuery()
-        //{
-        //    var parser = new QueryParser(":tax:2016 || :cool && :audio:original");
-        //    var visitor = new DB.SearchQueryVisitor(new DB.SQLiteDB(new DatabaseSettings { DBName = "hat", DBPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) }));
+        [Fact]
+        public void SQLQuery()
+        {
+            var parser = new QueryParser(":tax:2016 || :cool && :audio:original");
+            var visitor = new DB.SearchQueryVisitor(new MockTagParser(), new MockDatabase());
 
-        //    var ir = parser.Parse();
+            var ir = parser.Parse();
 
-        //    ir.Accept(visitor);
+            ir.Accept(visitor);
 
-        //    //Assert.Equal("SELECT FilePaths.Path, Files.Hash, Files", visitor.Result);
-        //}
+            Assert.Equal("SELECT FilePaths.Path, Files.Hash, Files", visitor.Result);
+        }
     }
 }

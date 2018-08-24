@@ -42,7 +42,7 @@ namespace SortingHat.CLI
             builder.RegisterType<SQLiteFile>().As<IFile>().SingleInstance();
             builder.RegisterType<SQLiteTag>().As<ITag>().SingleInstance();
 
-            builder.RegisterType<API.Models.TagParser>().As<API.Models.TagParser>().SingleInstance();
+            builder.RegisterType<API.Models.TagParser>().As<API.Models.ITagParser>().SingleInstance();
             builder.RegisterType<API.Models.Tag>().As<API.Models.Tag>().InstancePerDependency();
             builder.RegisterType<API.Models.File>().As<API.Models.File>().InstancePerDependency();
 

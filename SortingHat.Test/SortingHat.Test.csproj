@@ -31,8 +31,4 @@
     <ProjectReference Include="..\SortingHat.UI\SortingHat.UI.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Mock\" />
-  </ItemGroup>
-
 </Project>

@@ -9,9 +9,9 @@ namespace SortingHat.CLI.Commands
     [UsedImplicitly]
     internal class AddTagCommand : ICommand
     {
-        private readonly TagParser _tagParser;
+        private readonly ITagParser _tagParser;
 
-        public AddTagCommand(TagParser tagParser)
+        public AddTagCommand(ITagParser tagParser)
         {
             _tagParser = tagParser;
         }

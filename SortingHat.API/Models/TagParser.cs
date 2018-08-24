@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 namespace SortingHat.API.Models
 {
     [UsedImplicitly]
-    public class TagParser
+    public class TagParser : ITagParser
     {
         private readonly Func<string, Tag, Tag> _newTag;
 

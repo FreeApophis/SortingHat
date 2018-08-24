@@ -15,16 +15,16 @@ namespace SortingHat.DB
         private readonly StringBuilder _selectBuilder = new StringBuilder();
         private readonly StringBuilder _whereBuilder = new StringBuilder();
         private const string GroupBy = "\nGROUP BY FilePaths.ID";
-        private readonly TagParser _tagParser;
         private readonly IDatabase _db;
+        private readonly ITagParser _tagParser;
         private int _fileTagCount;
 
         public bool UnknownTag { get; private set; }
 
-        public SearchQueryVisitor(TagParser tagParser, IDatabase db)
+        public SearchQueryVisitor(IDatabase db, ITagParser tagParser)
         {
-            _tagParser = tagParser;
             _db = db;
+            _tagParser = tagParser;
 
             _selectBuilder.AppendLine("SELECT FilePaths.Path, Files.Hash, Files.ID");
             _selectBuilder.AppendLine("FROM Files");
