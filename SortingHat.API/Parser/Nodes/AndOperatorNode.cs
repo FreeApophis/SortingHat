@@ -1,4 +1,5 @@
 ﻿using System;
+using SortingHat.API.Parser.OperatorType;
 
 namespace SortingHat.API.Parser.Nodes
 {

@@ -2,16 +2,20 @@
 using SortingHat.API.DI;
 using SortingHat.API.Models;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace SortingHat.CLI.Commands
 {
-    class RemoveTagCommand : ICommand
+    [UsedImplicitly]
+    internal class RemoveTagCommand : ICommand
     {
+        private readonly TagParser _tagParser;
         private readonly IDatabase _db;
         private readonly ILogger<RemoveTagCommand> _logger;
 
-        public RemoveTagCommand(IDatabase db, ILogger<RemoveTagCommand> logger)
+        public RemoveTagCommand(TagParser tagParser, IDatabase db, ILogger<RemoveTagCommand> logger)
         {
+            _tagParser = tagParser;
             _db = db;
             _logger = logger;
         }
@@ -20,9 +24,9 @@ namespace SortingHat.CLI.Commands
         {
             foreach (var tagString in arguments)
             {
-                var tag = Tag.Parse(tagString);
+                var tag = _tagParser.Parse(tagString);
 
-                if (tag.Destroy(_db) == false)
+                if (tag.Destroy() == false)
                 {
                     _logger.LogWarning("Remove tag failed");
                 }

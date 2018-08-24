@@ -2,11 +2,13 @@
 using System;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 using SortingHat.API.DI;
 
 namespace SortingHat.CLI.Commands
 {
-    class CopyFilesCommand : ICommand
+    [UsedImplicitly]
+    internal class CopyFilesCommand : ICommand
     {
         private readonly IDatabase _db;
 
@@ -30,7 +32,7 @@ namespace SortingHat.CLI.Commands
             {
                 foreach (var file in files)
                 {
-                    Console.WriteLine($"mv {file.Path} {Path.Combine(path, Path.GetFileName(file.Path))}");
+                    Console.WriteLine($"cp {file.Path} {Path.Combine(path, Path.GetFileName(file.Path))}");
                     File.Copy(file.Path, Path.Combine(path, Path.GetFileName(file.Path)));
                 }
             }
@@ -43,8 +45,8 @@ namespace SortingHat.CLI.Commands
         }
 
         public string LongCommand => "copy-files";
-        public string ShortCommand => null;
-        public string ShortHelp => "";
+        public string ShortCommand => "cp";
+        public string ShortHelp => "This command copies all files which match the search query to a specified folder location.";
 
     }
 }

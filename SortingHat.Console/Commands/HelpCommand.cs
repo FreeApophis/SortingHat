@@ -5,10 +5,12 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using JetBrains.Annotations;
 
 namespace SortingHat.CLI.Commands
 {
-    class HelpCommand : ICommand
+    [UsedImplicitly]
+    internal class HelpCommand : ICommand
     {
         private readonly ILogger<HelpCommand> _logger;
         private readonly IComponentContext _container;
@@ -41,7 +43,7 @@ namespace SortingHat.CLI.Commands
 
         }
 
-        private void PrintLongHelp(ICommand command)
+        private static void PrintLongHelp(ICommand command)
         {
             using (var resourceStream = GetHelResourceStream(command))
             using (var reader = new StreamReader(resourceStream))
@@ -63,14 +65,36 @@ namespace SortingHat.CLI.Commands
 
         private void PrintOverview()
         {
+            PrintHelpHeader();
+            PrintHelpCommands();
+            PrintHelpExamples();
+        }
+
+        private void PrintHelpExamples()
+        {
+            Console.WriteLine("");
+            Console.WriteLine("Examples:");
+            Console.WriteLine("");
+            Console.WriteLine("  hat.exe find (:tax:2018 or :tax:2017) and :bank");
+            Console.WriteLine("    This will output all files which are tagged as bank documents for tax in 2017 or 2018.");
+        }
+
+        private void PrintHelpCommands()
+        {
+            var commands = _container.Resolve<IEnumerable<ICommand>>();
+
+            foreach (var command in _container.Resolve<IEnumerable<ICommand>>())
+            {
+                Console.WriteLine($"  {command.LongCommand,-12} {command.ShortCommand,-4} {command.ShortHelp}");
+            }
+        }
+
+        private static void PrintHelpHeader()
+        {
             Console.WriteLine("Sortinghat <command> [arguments]:");
             Console.WriteLine("");
             Console.WriteLine("available commands:");
             Console.WriteLine("");
-            foreach (var command in _container.Resolve<IEnumerable<ICommand>>())
-            {
-                Console.WriteLine($"  {command.LongCommand,-12} {command.ShortCommand,-2} {command.ShortHelp}");
-            }
         }
 
         public string LongCommand => "help";

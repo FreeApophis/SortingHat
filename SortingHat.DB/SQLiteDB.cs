@@ -14,11 +14,16 @@ namespace SortingHat.DB
 
         internal SqliteConnection Connection { get; }
 
-        public IFile File { get; }
-        public ITag Tag { get; }
+        private readonly Func<IFile> _file;
+        public IFile File => _file();
 
-        public SQLiteDB(DatabaseSettings databaseSettings)
+        private readonly Func<ITag> _tag;
+        public ITag Tag => _tag();
+
+        public SQLiteDB(Func<IFile> file, Func<ITag> tag, DatabaseSettings databaseSettings)
         {
+            _file = file;
+            _tag = tag;
             _path = databaseSettings.DBPath == "#USERDOC" ? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) : databaseSettings.DBPath;
             _dbName = databaseSettings.DBName;
 
@@ -31,9 +36,6 @@ namespace SortingHat.DB
             {
                 ExecuteNonQuery("PRAGMA key='{_encryptionKey}';");
             }
-
-            File = new SQLiteFile(this);
-            Tag = new SQLiteTag(this);
         }
 
         private SqliteCommand CreateCommand(string commandText, params SqliteParameter[] parameters)

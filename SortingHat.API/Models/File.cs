@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System;
+using JetBrains.Annotations;
 
 namespace SortingHat.API.Models
 {
@@ -31,22 +32,22 @@ namespace SortingHat.API.Models
             }
         }
 
-        public File(string path, IHashService hashService)
-        {
-            FileInfo fileInfo = new FileInfo(Path = path);
-
-            Hash = hashService.GetHash(path);
-            Size = fileInfo.Length;
-            CreatedAt = fileInfo.CreationTimeUtc;
-        }
-
-
-        public File(IDatabase db, string path)
+        [UsedImplicitly]
+        public File(IDatabase db, IHashService hashService, string path, bool loadFromDB)
         {
             Path = path;
             _db = db;
 
-            Load();
+            if (loadFromDB) {
+                Load();
+            }
+            else {
+                FileInfo fileInfo = new FileInfo(Path);
+
+                Hash = hashService.GetHash(path);
+                Size = fileInfo.Length;
+                CreatedAt = fileInfo.CreationTimeUtc;
+            }
         }
 
         private void Load()
@@ -55,14 +56,14 @@ namespace SortingHat.API.Models
         }
 
 
-        public void Tag(IDatabase db, Tag tag)
+        public void Tag(Tag tag)
         {
-            db.File.Tag(this, tag);
+            _db.File.Tag(this, tag);
         }
 
-        public void Untag(IDatabase db, Tag tag)
+        public void Untag(Tag tag)
         {
-            db.File.Untag(this, tag);
+            _db.File.Untag(this, tag);
         }
 
         public IEnumerable<Tag> GetTags()

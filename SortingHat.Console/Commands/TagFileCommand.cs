@@ -1,21 +1,25 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System;
+using Microsoft.Extensions.Logging;
 using SortingHat.API.DI;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
+using SortingHat.API.Models;
 
 namespace SortingHat.CLI.Commands
 {
-    class TagFileCommand : ICommand
+    [UsedImplicitly]
+    internal class TagFileCommand : ICommand
     {
-        private readonly IDatabase _db;
         private readonly ILogger<TagFileCommand> _logger;
-        private readonly IHashService _hashService;
+        private readonly TagParser _tagParser;
+        private readonly Func<string, bool, File> _newFile;
 
-        public TagFileCommand(IDatabase db, ILogger<TagFileCommand> logger, IHashService hashService)
+        public TagFileCommand(ILogger<TagFileCommand> logger, TagParser tagParser, Func<string, bool, File> newFile)
         {
-            _db = db;
             _logger = logger;
-            _hashService = hashService;
+            _tagParser = tagParser;
+            _newFile = newFile;
         }
 
         private static bool IsTag(string value)
@@ -33,20 +37,20 @@ namespace SortingHat.CLI.Commands
             var tags = arguments.Where(IsTag);
             var files = new FilePathExtractor(arguments.Where(IsFile));
 
-            foreach (var file in files.FilePaths.Select(file => new API.Models.File(file, _hashService)))
+            foreach (var file in files.FilePaths.Select(file => _newFile(file, false)))
             {
-                foreach (var tag in tags.Select(API.Models.Tag.Parse))
+                foreach (var tag in tags.Select(_tagParser.Parse))
                 {
                     _logger.LogInformation($"File {file.Path} tagged with {tag.Name}");
-                    file.Tag(_db, tag);
+                    file.Tag(tag);
                 }
             }
             return true;
         }
 
         public string LongCommand => "tag-files";
-        public string ShortCommand => null;
+        public string ShortCommand => "tag";
 
-        public string ShortHelp => "";
+        public string ShortHelp => "Is tagging the files the given tags";
     }
 }

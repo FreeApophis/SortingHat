@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <NeutralLanguage>en-GB</NeutralLanguage>
+    <AssemblyName>hat</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -48,6 +49,7 @@
 
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.8.1" />
+    <PackageReference Include="JetBrains.Annotations" Version="10.2.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.1" />

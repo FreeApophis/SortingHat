@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using SortingHat.API.Parser.Nodes;
+using SortingHat.API.Parser.OperatorType;
 
 namespace SortingHat.API.Parser
 {
@@ -29,8 +30,9 @@ namespace SortingHat.API.Parser
         public void Visit(NotOperatorNode op)
         {
             _resultBuilder.Append(op.ToString(_operatorType));
+            _resultBuilder.Append(_operatorType.NotOpen);
             op.Operand.Accept(this);
-            _resultBuilder.Append(_operatorType.NotEnd);
+            _resultBuilder.Append(_operatorType.NotClose);
         }
 
         public void Visit(AndOperatorNode op)

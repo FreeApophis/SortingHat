@@ -24,6 +24,7 @@
 
             <MenuItem Header="_Views">
                 <MenuItem  Header="_Log" IsCheckable="true" IsChecked="{Binding LogViewVisible, Mode=TwoWay}" />
+                <MenuItem  Header="_Popup" IsCheckable="true" IsChecked="{Binding PopupVisible, Mode=TwoWay}" />
             </MenuItem>
         </Menu>
         <StatusBar DockPanel.Dock="Bottom">
@@ -48,16 +49,27 @@
         </StatusBar>
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200*"/>
+                <ColumnDefinition Width="50*"/>
+                <ColumnDefinition Width="15*"/>
+                <ColumnDefinition Width="250*"/>
                 <ColumnDefinition Width="5" />
-                <ColumnDefinition Width="300*" />
+                <ColumnDefinition Width="473*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="40" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <TextBox Name="SearchBox" Grid.Column="3" Margin="7" Text="{Binding SearchString, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Background="{Binding SearchBackground, Mode=OneWay}"></TextBox>
-            <TabControl Grid.RowSpan="2" >
+            <TextBox Name="SearchBox" Grid.Column="4" Margin="7.334,7,6.333,7" Text="{Binding SearchString, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Background="{Binding SearchBackground, Mode=OneWay}"></TextBox>
+            <Popup IsOpen="{Binding PopupVisible}" StaysOpen="False" AllowsTransparency="True" PopupAnimation="Fade" PlacementTarget="{Binding ElementName=SearchBox}"  Placement="Bottom" Grid.ColumnSpan="3" Margin="0,0,0.333,0">
+                <ListBox Name="IntelliSense">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Title}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Popup>
+            <TabControl Grid.RowSpan="2" Grid.ColumnSpan="3" Margin="0,0,0.333,-0.333" >
                 <TabItem Header="Tags">
                     <TreeView Name="TagHierarchy" Margin="7">
                         <TreeView.ItemContainerStyle>
@@ -83,8 +95,8 @@
                 </TabItem>
             </TabControl>
 
-            <GridSplitter Grid.Column="1" Grid.RowSpan="2" Width="5" HorizontalAlignment="Stretch" Margin="0,0,0.333,-0.333" />
-            <DataGrid Margin="7" Grid.Column="2" Grid.Row="2" x:Name="FileGrid" AlternatingRowBackground="#EEE" ItemsSource="{Binding Files}">
+            <GridSplitter Grid.Column="2" Grid.RowSpan="2" Width="5" HorizontalAlignment="Stretch" Margin="249.889,0,0.666,-0.333" Grid.ColumnSpan="2" />
+            <DataGrid Margin="7.334,7,7.333,6.667" Grid.Column="4" Grid.Row="1" x:Name="FileGrid" AlternatingRowBackground="#EEE" ItemsSource="{Binding Files}">
                 <DataGrid.RowDetailsTemplate>
                     <DataTemplate>
                         <DockPanel Background="GhostWhite">

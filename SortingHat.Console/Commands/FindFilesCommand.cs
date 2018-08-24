@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using JetBrains.Annotations;
 
 namespace SortingHat.CLI.Commands
 {
-    class FindFilesCommand : ICommand
+    [UsedImplicitly]
+    internal class FindFilesCommand : ICommand
     {
         private readonly IDatabase _db;
 
@@ -38,9 +40,9 @@ namespace SortingHat.CLI.Commands
         }
 
         public string LongCommand => "find-files";
-        public string ShortCommand => null;
+        public string ShortCommand => "ff";
 
-        public string ShortHelp => "";
+        public string ShortHelp => "Finds all files matching the search query";
 
     }
 }

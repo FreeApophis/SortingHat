@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System;
 using System.IO;
+using JetBrains.Annotations;
 using SortingHat.API.DI;
 
 namespace SortingHat.CLI.Commands
 {
+    [UsedImplicitly]
     internal class RepairCommand : ICommand
     {
         private readonly IDatabase _db;

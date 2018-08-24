@@ -1,10 +1,12 @@
 ﻿using SortingHat.API.DI;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 
 namespace SortingHat.CLI.Commands
 {
-    class InitCommand : ICommand
+    [UsedImplicitly]
+    internal class InitCommand : ICommand
     {
         private readonly IDatabase _db;
 
@@ -25,7 +27,7 @@ namespace SortingHat.CLI.Commands
 
         public string LongCommand => "init";
         public string ShortCommand => null;
-        public string ShortHelp => "";
+        public string ShortHelp => "Initializes the database, a new database is created";
 
     }
 }

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using JetBrains.Annotations;
 
 namespace SortingHat.CLI.Commands
 {
-    class VersionCommand : ICommand
+    [UsedImplicitly]
+    internal class VersionCommand : ICommand
     {
         public bool Execute(IEnumerable<string> arguments)
         {

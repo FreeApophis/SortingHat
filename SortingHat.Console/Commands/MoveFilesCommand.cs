@@ -2,11 +2,13 @@
 using System;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 using SortingHat.API.DI;
 
 namespace SortingHat.CLI.Commands
 {
-    class MoveFilesCommand : ICommand
+    [UsedImplicitly]
+    internal class MoveFilesCommand : ICommand
     {
         private readonly IDatabase _db;
 
@@ -42,8 +44,8 @@ namespace SortingHat.CLI.Commands
         }
 
         public string LongCommand => "move-files";
-        public string ShortCommand => null;
-        public string ShortHelp => "";
+        public string ShortCommand => "mv";
+        public string ShortHelp => "This moves all files which match the search query to a specified folder location";
 
     }
 }

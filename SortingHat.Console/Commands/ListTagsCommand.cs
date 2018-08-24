@@ -2,10 +2,12 @@
 using SortingHat.API.Models;
 using System.Collections.Generic;
 using System;
+using JetBrains.Annotations;
 
 namespace SortingHat.CLI.Commands
 {
-    class ListTagsCommand : ICommand
+    [UsedImplicitly]
+    internal class ListTagsCommand : ICommand
     {
         private readonly IDatabase _db;
 
@@ -19,14 +21,14 @@ namespace SortingHat.CLI.Commands
             Console.WriteLine("Used tags: ");
             foreach (var tag in Tag.List(_db))
             {
-                Console.WriteLine($"* {tag.FullName}");
+                Console.WriteLine($"* {tag.FullName}  ({tag.FileCount})");
             }
             return true;
         }
 
         public string LongCommand => "list-tags";
         public string ShortCommand => null;
-        public string ShortHelp => "";
+        public string ShortHelp => "Lists all avaialable tags in hierarchical form";
 
     }
 }

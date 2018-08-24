@@ -1,18 +1,23 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using System;
+using Microsoft.Data.Sqlite;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
 using SortingHat.API.Parser;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 
 namespace SortingHat.DB
 {
-    class SQLiteFile : IFile
+    [UsedImplicitly]
+    public class SQLiteFile : IFile
     {
+        private readonly Func<SearchQueryVisitor> _newSearchQueryVisitor;
         readonly SQLiteDB _db;
 
-        public SQLiteFile(SQLiteDB db)
+        public SQLiteFile(Func<SearchQueryVisitor> newSearchQueryVisitor, SQLiteDB db)
         {
+            _newSearchQueryVisitor = newSearchQueryVisitor;
             _db = db;
         }
 
@@ -109,7 +114,7 @@ namespace SortingHat.DB
             var parser = new QueryParser(query);
             var ir = parser.Parse();
 
-            var visitor = new SearchQueryVisitor(_db);
+            var visitor = _newSearchQueryVisitor();
             ir.Accept(visitor);
 
             return visitor.Result;

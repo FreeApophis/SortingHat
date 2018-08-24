@@ -2,26 +2,28 @@
 using SortingHat.API.Models;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 
 namespace SortingHat.CLI.Commands
 {
-    class AddTagCommand : ICommand
+    [UsedImplicitly]
+    internal class AddTagCommand : ICommand
     {
-        private readonly IDatabase _db;
+        private readonly TagParser _tagParser;
 
-        public AddTagCommand(IDatabase db)
+        public AddTagCommand(TagParser tagParser)
         {
-            _db = db;
+            _tagParser = tagParser;
         }
 
         public bool Execute(IEnumerable<string> arguments)
         {
-            return arguments.Select(Tag.Parse).Aggregate(true, (result, tag) => result & tag.Store(_db));
+            return arguments.Select(_tagParser.Parse).Aggregate(true, (result, tag) => result & tag.Store());
         }
 
         public string LongCommand => "add-tags";
         public string ShortCommand => null;
-        public string ShortHelp => "";
+        public string ShortHelp => "This adds a tag without any associated files to the db.";
 
     }
 }

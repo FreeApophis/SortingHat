@@ -1,8 +1,10 @@
-﻿namespace SortingHat.API.Parser {
+﻿namespace SortingHat.API.Parser.OperatorType
+{
     public interface IOperatorType
     {
         string Not { get; }
-        string NotEnd { get; }
+        string NotOpen { get; }
+        string NotClose { get; }
         string And { get; }
         string Or { get; }
     }

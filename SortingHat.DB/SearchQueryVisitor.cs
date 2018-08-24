@@ -3,20 +3,27 @@ using SortingHat.API.Parser.Nodes;
 using SortingHat.API.Parser;
 using System.Text;
 using System;
+using JetBrains.Annotations;
+using SortingHat.API.DI;
 
 namespace SortingHat.DB
 {
-    class SearchQueryVisitor : INodeVisitor
+    [UsedImplicitly]
+    public class SearchQueryVisitor : INodeVisitor
     {
         public string Result => _selectBuilder.ToString() + _whereBuilder + GroupBy;
         private readonly StringBuilder _selectBuilder = new StringBuilder();
         private readonly StringBuilder _whereBuilder = new StringBuilder();
         private const string GroupBy = "\nGROUP BY FilePaths.ID";
-        private readonly SQLiteDB _db;
+        private readonly TagParser _tagParser;
+        private readonly IDatabase _db;
         private int _fileTagCount;
 
-        public SearchQueryVisitor(SQLiteDB db)
+        public bool UnknownTag { get; private set; }
+
+        public SearchQueryVisitor(TagParser tagParser, IDatabase db)
         {
+            _tagParser = tagParser;
             _db = db;
 
             _selectBuilder.AppendLine("SELECT FilePaths.Path, Files.Hash, Files.ID");
@@ -73,6 +80,11 @@ namespace SortingHat.DB
             }
             else
             {
+                // this query includes  a tag which does not exist. 
+                // This is usally not useful, but the query can still have a result, 
+                // because this tag will not participate in the query.
+                UnknownTag = true;
+
                 // Emitting false because the tag does not exist in the database
                 _whereBuilder.Append(0);
             }
@@ -80,9 +92,11 @@ namespace SortingHat.DB
 
         private long? GetTagID(TagNode tagNode)
         {
-            var tag = Tag.Parse(tagNode.Tag);
+            var tag = _tagParser.Parse(tagNode.Tag);
 
-            return ((SQLiteTag)_db.Tag).Find(tag);
+            return tag == null
+                ? null
+                : ((SQLiteTag)_db.Tag).Find(tag);
         }
 
         public void Visit(BooleanNode boolean)

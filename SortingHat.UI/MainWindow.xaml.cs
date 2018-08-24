@@ -1,6 +1,6 @@
 ﻿using SortingHat.API;
-using SortingHat.API.DI;
 using SortingHat.API.Models;
+using SortingHat.API.Parser;
 using SortingHat.DB;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,8 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
+using SortingHat.API.Parser.OperatorType;
+using SortingHat.API.Parser.Token;
 
 namespace SortingHat.UI
 {
@@ -20,7 +21,7 @@ namespace SortingHat.UI
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-        private IDatabase _db;
+        private SQLiteDB _db;
 
         private string _searchString;
         public string SearchString
@@ -57,13 +58,24 @@ namespace SortingHat.UI
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
         }
 
+        private bool _popupVisible;
+        public bool PopupVisible
+        {
+            get { return _popupVisible; }
+            set
+            {
+                _popupVisible = value;
+                NotifyPropertyChanged(nameof(PopupVisible));
+            }
+        }
+
         public MainWindow()
         {
             InitializeComponent();
 
             DataContext = this;
             DatabaseSettings databaseSettings = new DatabaseSettings { DBName = "hat", DBPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) };
-            _db = new SQLiteDB(databaseSettings);
+            //_db = new SQLiteDB(databaseSettings);
 
             //InitializeTokenizer();
             LoadTags();
@@ -72,17 +84,92 @@ namespace SortingHat.UI
 
         private string RunSearch(string search)
         {
-            try
-            {
-                Files = _db.File.Search(search);
-                SearchBackground = "#ccffcc";
-            }
-            catch (Exception)
-            {
-                SearchBackground = "#ffcccc";
-            }
+            SearchBackground = BackgroundColor(search);
+            PossibleNextArguments(search);
+
+            Files = _db.File.Search(search);
 
             return search;
+        }
+
+        class IntellisenseItem
+        {
+            public string Title { get; set; }
+        }
+
+        private void PossibleNextArguments(string search)
+        {
+            var operatorType = new TextOperatorType();
+            IntelliSense.Items.Clear();
+
+            var parser = new QueryParser(search);
+            parser.Parse();
+
+            foreach (var token in parser.NextToken())
+            {
+                switch (token)
+                {
+                    case AndToken t:
+                        IntelliSense.Items.Add(new IntellisenseItem { Title = operatorType.And });
+                        break;
+                    case OrToken t:
+                        IntelliSense.Items.Add(new IntellisenseItem { Title = operatorType.Or });
+                        break;
+                    case NotToken t:
+                        IntelliSense.Items.Add(new IntellisenseItem { Title = operatorType.Not });
+                        break;
+                    case OpenParenthesisToken t:
+                        IntelliSense.Items.Add(new IntellisenseItem { Title = "(" });
+                        break;
+                    case ClosedParenthesisToken t:
+                        IntelliSense.Items.Add(new IntellisenseItem { Title = ")" });
+                        break;
+                    case TagToken t:
+                        SelectPossibleTokens(t);
+                        break;
+                    default:
+                        IntelliSense.Items.Add(new IntellisenseItem { Title = "???" });
+                        break;
+                }
+
+                PopupVisible = true;
+            }
+
+
+        }
+
+        private void SelectPossibleTokens(TagToken tagToken)
+        {
+            var partial = (tagToken == null ? string.Empty : tagToken.Value) ?? string.Empty;
+            foreach (var possibleTag in _db.Tag.GetTags().Select(t => t.FullName).Where(f => f.StartsWith(partial)))
+            {
+                IntelliSense.Items.Add(new IntellisenseItem { Title = possibleTag });
+                if (IntelliSense.Items.Count > 8)
+                {
+                    break;
+                }
+
+            }
+        }
+
+        private string BackgroundColor(string search)
+        {
+            var parser = new QueryParser(search);
+            var ir = parser.Parse();
+
+            if (parser.IllegalExpression)
+            {
+                return "#ffcccc";
+            }
+
+            //var visitor = new SearchQueryVisitor(_db);
+            //ir.Accept(visitor);
+
+            //if (visitor.UnknownTag)
+            //{
+            //    return "#ffffcc";
+            //}
+            return "#ccffcc";
         }
 
         private void LoadDrives()

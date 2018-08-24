@@ -13,7 +13,7 @@ namespace SortingHat.CLI
 {
 
     [ExcludeFromCodeCoverage]
-    class Program
+    static class Program
     {
         // Could be configurable
         const LogLevel MinLogLevel = LogLevel.Trace;
@@ -38,8 +38,15 @@ namespace SortingHat.CLI
             builder.RegisterType<Application>().AsSelf();
             builder.RegisterType<ArgumentParser>().AsSelf();
 
-            builder.RegisterType<SQLiteDB>().As<IDatabase>().SingleInstance();
-            builder.RegisterType<API.Models.File>().As<API.Models.File>().UsingConstructor(typeof(IDatabase), typeof(string)).InstancePerDependency();
+            builder.RegisterType<SQLiteDB>().As<IDatabase>().As<SQLiteDB>().SingleInstance();
+            builder.RegisterType<SQLiteFile>().As<IFile>().SingleInstance();
+            builder.RegisterType<SQLiteTag>().As<ITag>().SingleInstance();
+
+            builder.RegisterType<API.Models.TagParser>().As<API.Models.TagParser>().SingleInstance();
+            builder.RegisterType<API.Models.Tag>().As<API.Models.Tag>().InstancePerDependency();
+            builder.RegisterType<API.Models.File>().As<API.Models.File>().InstancePerDependency();
+
+            builder.RegisterType<SearchQueryVisitor>().As<SearchQueryVisitor>().InstancePerDependency();
 
 
             builder.Register(c => new HashService(SHA256.Create(), nameof(SHA256))).As<IHashService>().SingleInstance();
@@ -82,6 +89,8 @@ namespace SortingHat.CLI
             builder.RegisterType<ListTagsCommand>().As<ICommand>();
             builder.RegisterType<RemoveTagCommand>().As<ICommand>();
             builder.RegisterType<RenameTagCommand>().As<ICommand>();
+            builder.RegisterType<MoveTagCommand>().As<ICommand>();
+
 
             builder.RegisterType<TagFileCommand>().As<ICommand>();
             builder.RegisterType<UntagFileCommand>().As<ICommand>();

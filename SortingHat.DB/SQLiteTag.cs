@@ -6,12 +6,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using JetBrains.Annotations;
 
 namespace SortingHat.DB
 {
-    class SQLiteTag : ITag
+    [UsedImplicitly]
+    public class SQLiteTag : ITag
     {
-        private SQLiteDB _db;
+        private readonly SQLiteDB _db;
         public SQLiteTag(SQLiteDB db)
         {
             _db = db;
@@ -50,7 +52,14 @@ namespace SortingHat.DB
             return tagID.HasValue;
         }
 
-        private List<Tag> Ancestors(Tag tag)
+        public long FileCount(Tag tag)
+        {
+            var tagID = Find(tag);
+            var count = _db.ExecuteScalar("SELECT COUNT(*) FROM Tags JOIN FileTags ON FileTags.TagID = Tags.ID WHERE Tags.ID = @tagID", new SqliteParameter("@tagID", tagID)) as long?;
+            return count ?? 0;
+        }
+
+        private static List<Tag> Ancestors(Tag tag)
         {
             if (tag.Parent == null)
             {
@@ -64,7 +73,7 @@ namespace SortingHat.DB
 
         private string TagIDsQuery(Tag tag)
         {
-            var tags = Ancestors(tag).Select((t, ID) => new { ID, t.Name });
+            var tags = Ancestors(tag).Select((t, id) => new { ID = id, t.Name });
             var query = new StringBuilder();
 
             query.AppendLine($"SELECT {string.Join(", ", tags.Select(t => $"T{t.ID}.ID ID{t.ID}"))}");
@@ -80,7 +89,7 @@ namespace SortingHat.DB
             return query.ToString();
         }
 
-        internal List<long> TagIDs(Tag tag)
+        private List<long> TagIDs(Tag tag)
         {
             var reader = _db.ExecuteReader(TagIDsQuery(tag));
             var result = new List<long>();
@@ -155,11 +164,10 @@ SELECT id, parentid, name, level FROM tree;";
             // we iterate on the siblings on the same level
             while (reader.GetInt32(3) == level)
             {
-                var tag = new Tag(reader.GetString(2), parent);
+                var tag = new Tag(_db, reader.GetString(2), parent);
                 result.Add(tag);
                 if (reader.Read())
                 {
-                    var test = reader.IsDBNull(3);
                     var nextLevel = reader.GetInt32(3);
                     // A child has level + 1
                     if (nextLevel == level + 1)
@@ -187,20 +195,12 @@ SELECT id, parentid, name, level FROM tree;";
         {
             var reader = _db.ExecuteReader("SELECT ParentID, Name FROM Tags WHERE ID = @tagID", new SqliteParameter("@tagID", tagID));
 
-            if (reader.Read())
-            {
-                if (reader.IsDBNull(0))
-                {
-                    return new Tag(reader.GetString(1));
-                }
-                else
-                {
-                    return new Tag(reader.GetString(1), Load(reader.GetInt64(0)));
+            if (!reader.Read()) throw new NotSupportedException();
 
-                }
-            }
+            return reader.IsDBNull(0)
+                ? new Tag(_db, reader.GetString(1))
+                : new Tag(_db, reader.GetString(1), Load(reader.GetInt64(0)));
 
-            throw new NotSupportedException();
         }
     }
 }

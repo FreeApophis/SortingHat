@@ -1,14 +1,16 @@
 ﻿using System.Collections.Generic;
 using System;
+using JetBrains.Annotations;
 using SortingHat.API.Models;
 
 namespace SortingHat.CLI.Commands
 {
-    class FileInfoCommand : ICommand
+    [UsedImplicitly]
+    internal class FileInfoCommand : ICommand
     {
-        private readonly Func<string, File> _newFile;
+        private readonly Func<string, bool, File> _newFile;
 
-        public FileInfoCommand(Func<string, File> newFile)
+        public FileInfoCommand(Func<string, bool, File> newFile)
         {
             _newFile = newFile;
         }
@@ -22,7 +24,7 @@ namespace SortingHat.CLI.Commands
                 Console.WriteLine();
                 Console.WriteLine($"File: {filePath}");
 
-                var file = _newFile(filePath);
+                var file = _newFile(filePath, true);
 
                 if (string.IsNullOrEmpty(file.Hash))
                 {
@@ -55,7 +57,7 @@ namespace SortingHat.CLI.Commands
         }
 
         public string LongCommand => "file-info";
-        public string ShortCommand => null;
+        public string ShortCommand => "info";
         public string ShortHelp => "Shows all available information about the current file.";
     }
 }

@@ -1,9 +1,11 @@
 ﻿using SortingHat.API.FileTypeDetection;
 using System.Collections.Generic;
 using System;
+using JetBrains.Annotations;
 
 namespace SortingHat.CLI.Commands
 {
+    [UsedImplicitly]
     internal class IdentifyCommand : ICommand
     {
         public bool Execute(IEnumerable<string> arguments)
@@ -33,6 +35,6 @@ namespace SortingHat.CLI.Commands
         public string LongCommand => "identify";
         public string ShortCommand => "id";
 
-        public string ShortHelp => "";
+        public string ShortHelp => "This command identifies the real file type (ignoring the file-extension)";
     }
 }
