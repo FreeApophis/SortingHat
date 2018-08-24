@@ -24,6 +24,7 @@ namespace SortingHat.UI
         {
             var loggerFactory = container.Resolve<ILoggerFactory>();
             loggerFactory.AddDebug(LogLevel.Trace);
+            loggerFactory.AddProvider(new WindowLoggerProvider());
 
             return container;
         }
