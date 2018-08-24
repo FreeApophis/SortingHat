@@ -1,21 +1,23 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
 using SortingHat.CLI.Commands;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
 
 namespace SortingHat.CLI
 {
-
-    class ArgumentParser
+    [UsedImplicitly]
+    internal class ArgumentParser
     {
         private readonly Dictionary<string, ICommand> _commandTargets = new Dictionary<string, ICommand>();
         private readonly Lazy<ILogger<ArgumentParser>> _logger;
 
         public ArgumentParser(Lazy<ILogger<ArgumentParser>> logger, IEnumerable<ICommand> commands)
         {
-            AssignCommands(commands);
             _logger = logger;
+
+            AssignCommands(commands);
         }
 
         private void AssignCommands(IEnumerable<ICommand> commands)
@@ -32,17 +34,24 @@ namespace SortingHat.CLI
 
         internal void Execute(IEnumerable<string> arguments)
         {
-            if (_commandTargets.TryGetValue(arguments.First(), out var command))
+            if (arguments.Any())
             {
-                if (command.Execute(arguments.Skip(1)) == false)
+                if (_commandTargets.TryGetValue(arguments.First(), out var command))
                 {
-                    _logger.Value.LogWarning("Command Execution failed!");
+                    if (command.Execute(arguments.Skip(1)) == false)
+                    {
+                        _logger.Value.LogWarning("Command Execution failed!");
+                    }
+                }
+                else
+                {
+                    _logger.Value.LogWarning($"Unknown command: '{arguments.First()}' cannot be executed.");
+                    Console.WriteLine($"Unknown command: '{arguments.First()}'");
                 }
             }
             else
             {
-                _logger.Value.LogWarning($"Unknown command: '{arguments.First()}' cannot be executed.");
-                Console.WriteLine($"Unknown command: '{arguments.First()}'");
+                Console.WriteLine("Maybe run 'hat help'");
             }
 
         }
