@@ -9,11 +9,11 @@ namespace SortingHat.CLI.Commands
     [UsedImplicitly]
     internal class RemoveTagCommand : ICommand
     {
-        private readonly TagParser _tagParser;
+        private readonly ITagParser _tagParser;
         private readonly IDatabase _db;
         private readonly ILogger<RemoveTagCommand> _logger;
 
-        public RemoveTagCommand(TagParser tagParser, IDatabase db, ILogger<RemoveTagCommand> logger)
+        public RemoveTagCommand(ITagParser tagParser, IDatabase db, ILogger<RemoveTagCommand> logger)
         {
             _tagParser = tagParser;
             _db = db;

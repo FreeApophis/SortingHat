@@ -12,10 +12,10 @@ namespace SortingHat.CLI.Commands
     internal class TagFileCommand : ICommand
     {
         private readonly ILogger<TagFileCommand> _logger;
-        private readonly TagParser _tagParser;
+        private readonly ITagParser _tagParser;
         private readonly Func<string, bool, File> _newFile;
 
-        public TagFileCommand(ILogger<TagFileCommand> logger, TagParser tagParser, Func<string, bool, File> newFile)
+        public TagFileCommand(ILogger<TagFileCommand> logger, ITagParser tagParser, Func<string, bool, File> newFile)
         {
             _logger = logger;
             _tagParser = tagParser;

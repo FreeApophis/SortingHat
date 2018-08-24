@@ -12,10 +12,10 @@ namespace SortingHat.CLI.Commands
     internal class UntagFileCommand : ICommand
     {
         private readonly ILogger<TagFileCommand> _logger;
-        private readonly TagParser _tagParser;
+        private readonly ITagParser _tagParser;
         private readonly Func<string, bool, File> _newFile;
 
-        public UntagFileCommand(ILogger<TagFileCommand> logger, IHashService hashService, TagParser tagParser, Func<string, bool, File> newFile)
+        public UntagFileCommand(ILogger<TagFileCommand> logger, IHashService hashService, ITagParser tagParser, Func<string, bool, File> newFile)
         {
             _logger = logger;
             _tagParser = tagParser;

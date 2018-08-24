@@ -11,9 +11,9 @@ namespace SortingHat.CLI.Commands
     internal class RenameTagCommand : ICommand
     {
         private readonly ILogger<RenameTagCommand> _logger;
-        private readonly TagParser _tagParser;
+        private readonly ITagParser _tagParser;
 
-        public RenameTagCommand(ILogger<RenameTagCommand> logger, TagParser tagParser)
+        public RenameTagCommand(ILogger<RenameTagCommand> logger, ITagParser tagParser)
         {
             _logger = logger;
             _tagParser = tagParser;

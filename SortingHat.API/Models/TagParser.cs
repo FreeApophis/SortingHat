@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 namespace SortingHat.API.Models
 {
     [UsedImplicitly]
-    public class TagParser
+    public class TagParser : ITagParser
     {
         private readonly Func<string, Tag, Tag> _newTag;
 
@@ -32,14 +32,7 @@ namespace SortingHat.API.Models
 
         private Tag ToTag(IEnumerable<string> tagParts)
         {
-            Tag tag = null;
-
-            foreach (var tagPart in tagParts)
-            {
-                tag = _newTag(tagPart, tag);
-            }
-
-            return tag;
+            return tagParts.Aggregate<string, Tag>(null, (current, tagPart) => _newTag(tagPart, current));
         }
     }
 }
