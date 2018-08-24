@@ -1,4 +1,5 @@
-﻿using Autofac;
+﻿using System;
+using Autofac;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SortingHat.API.DI;
@@ -8,6 +9,7 @@ using SortingHat.DB;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Security.Cryptography;
+using Karambolo.Extensions.Logging.File;
 
 namespace SortingHat.CLI
 {
@@ -26,7 +28,14 @@ namespace SortingHat.CLI
         private static IContainer ConfigureLogger(IContainer container)
         {
             var loggerFactory = container.Resolve<ILoggerFactory>();
-            //loggerFactory.AddConsole(MinLogLevel);
+
+            // File Logger
+            var context = new FileLoggerContext(AppContext.BaseDirectory, "fallback.log");
+            var settings = new FileLoggerSettings();
+            loggerFactory.AddFile(context, settings);
+
+            // Console Logger
+            //loggerFactory.AddConsole();
 
             return container;
         }
