@@ -77,5 +77,13 @@ namespace SortingHat.Test
 
             Assert.Equal(referenceTag, parsedTag);
         }
+
+        [Fact]
+        public void ParseMultipleColon()
+        {
+            Tag parsedTag = _tagParser.Parse("::first:::last");
+
+            Assert.Equal(":first:last", parsedTag.FullName);
+        }
     }
 }

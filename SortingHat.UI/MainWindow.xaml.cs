@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.Extensions.Logging;
 using SortingHat.API.DI;
 using SortingHat.API.Parser.OperatorType;
 using SortingHat.API.Parser.Token;
@@ -24,6 +25,7 @@ namespace SortingHat.UI
         public event PropertyChangedEventHandler PropertyChanged;
 
         private readonly IDatabase _db;
+        private readonly ILogger<MainWindow> _logger;
         private readonly Func<SearchQueryVisitor> _newSearchQueryVisitor;
 
         private string _searchString;
@@ -33,14 +35,27 @@ namespace SortingHat.UI
             set { _searchString = RunSearch(value); }
         }
 
-        private string _searchBackground;
         public string SearchBackground
         {
-            get { return _searchBackground; }
-            set
+            get
             {
-                _searchBackground = value;
-                NotifyPropertyChanged(nameof(SearchBackground));
+                return "#ffffff";
+                //var parser = new QueryParser(_searchString);
+                //var ir = parser.Parse();
+
+                //if (parser.IllegalExpression)
+                //{
+                //    return "#ffcccc";
+                //}
+
+                //var visitor = _newSearchQueryVisitor();
+                //ir.Accept(visitor);
+
+                //if (visitor.UnknownTag)
+                //{
+                //    return "#ffffcc";
+                //}
+                //return "#ccffcc";
             }
         }
 
@@ -58,6 +73,8 @@ namespace SortingHat.UI
 
         public void NotifyPropertyChanged(string propName)
         {
+            _logger.LogTrace($"Property '{propName}' changed");
+
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
         }
 
@@ -72,9 +89,12 @@ namespace SortingHat.UI
             }
         }
 
-        public MainWindow(IDatabase db, Func<SearchQueryVisitor> newSearchQueryVisitor)
+        public MainWindow(IDatabase db, ILogger<MainWindow> logger, Func<SearchQueryVisitor> newSearchQueryVisitor)
         {
+            logger.LogTrace("Main Window created");
+
             _db = db;
+            _logger = logger;
             _newSearchQueryVisitor = newSearchQueryVisitor;
             InitializeComponent();
 
@@ -86,7 +106,8 @@ namespace SortingHat.UI
 
         private string RunSearch(string search)
         {
-            SearchBackground = BackgroundColor(search);
+            NotifyPropertyChanged(nameof(SearchBackground));
+
             PossibleNextArguments(search);
 
             Files = _db.File.Search(search);
@@ -152,26 +173,6 @@ namespace SortingHat.UI
                 }
 
             }
-        }
-
-        private string BackgroundColor(string search)
-        {
-            var parser = new QueryParser(search);
-            var ir = parser.Parse();
-
-            if (parser.IllegalExpression)
-            {
-                return "#ffcccc";
-            }
-
-            var visitor = _newSearchQueryVisitor();
-            ir.Accept(visitor);
-
-            if (visitor.UnknownTag)
-            {
-                return "#ffffcc";
-            }
-            return "#ccffcc";
         }
 
         private void LoadDrives()
