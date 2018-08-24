@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 namespace SortingHat.API.Models
 {
     [UsedImplicitly]
-    public class TagParser : ITagParser
+    public class TagParser
     {
         private readonly Func<string, Tag, Tag> _newTag;
 
@@ -27,30 +27,19 @@ namespace SortingHat.API.Models
             if (tagString.StartsWith(":") == false) return null;
             if (tagString.Any(char.IsWhiteSpace)) return null;
 
-            return TagFromList(tagString.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries));
+            return ToTag(tagString.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries));
         }
 
-        private Tag TagFromList(IEnumerable<string> tagParts)
+        private Tag ToTag(IEnumerable<string> tagParts)
         {
-            Tag parent = null;
+            Tag tag = null;
 
-            while (true)
+            foreach (var tagPart in tagParts)
             {
-                if (tagParts.Any() == false)
-                {
-                    return null;
-                }
-
-                var tag = _newTag(tagParts.First(), parent);
-
-                if (tagParts.Count() == 1)
-                {
-                    return tag;
-                }
-
-                tagParts = tagParts.Skip(1);
-                parent = tag;
+                tag = _newTag(tagPart, tag);
             }
+
+            return tag;
         }
     }
 }
