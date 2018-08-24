@@ -1,9 +1,6 @@
-﻿using SortingHat.API;
-using SortingHat.API.Parser;
+﻿using SortingHat.API.Parser;
 using SortingHat.API.Parser.Nodes;
-using System;
 using System.Linq;
-using SortingHat.API.Models;
 using SortingHat.API.Parser.OperatorType;
 using SortingHat.API.Parser.Token;
 using Xunit;
@@ -206,6 +203,12 @@ namespace SortingHat.Test
             Assert.Empty(next);
         }
 
+        private const string SelectStatement = @"SELECT FilePaths.Path, Files.Hash, Files.ID
+FROM Files
+JOIN FilePaths ON FilePaths.FileID = Files.ID
+WHERE (0 OR (0 AND 0))
+GROUP BY FilePaths.ID";
+
         [Fact]
         public void SQLQuery()
         {
@@ -216,7 +219,7 @@ namespace SortingHat.Test
 
             ir.Accept(visitor);
 
-            Assert.Equal("SELECT FilePaths.Path, Files.Hash, Files", visitor.Result);
+            Assert.Equal(SelectStatement, visitor.Result);
         }
     }
 }

@@ -3,6 +3,7 @@ using SortingHat.API.Parser.Nodes;
 using SortingHat.API.Parser;
 using System.Text;
 using System;
+using System.Xml;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
 
@@ -14,7 +15,7 @@ namespace SortingHat.DB
         public string Result => _selectBuilder.ToString() + _whereBuilder + GroupBy;
         private readonly StringBuilder _selectBuilder = new StringBuilder();
         private readonly StringBuilder _whereBuilder = new StringBuilder();
-        private const string GroupBy = "\nGROUP BY FilePaths.ID";
+        private const string GroupBy = "\r\nGROUP BY FilePaths.ID";
         private readonly IDatabase _db;
         private readonly ITagParser _tagParser;
         private int _fileTagCount;
