@@ -210,7 +210,7 @@ namespace SortingHat.Test
         public void SQLQuery()
         {
             var parser = new QueryParser(":tax:2016 || :cool && :audio:original");
-            var visitor = new DB.SearchQueryVisitor(new MockTagParser(), new MockDatabase());
+            var visitor = new DB.SearchQueryVisitor(new MockDatabase(), new MockTagParser());
 
             var ir = parser.Parse();
 
