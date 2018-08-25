@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SortingHat.Test", "SortingH
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SortingHat.UI", "SortingHat.UI\SortingHat.UI.csproj", "{8428DC74-8DEC-4D9E-8B24-40474A375040}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SortingHat.DB", "SortingHat.DB\SortingHat.DB.csproj", "{3D173578-8D94-4ACE-BE98-E2F235164604}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SortingHat.DB", "SortingHat.DB\SortingHat.DB.csproj", "{3D173578-8D94-4ACE-BE98-E2F235164604}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "SortingHat.Setup", "SortingHat.Setup\SortingHat.Setup.vdproj", "{94E6F396-1EF2-4C03-AACE-137A956C8DAF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,8 @@ Global
 		{3D173578-8D94-4ACE-BE98-E2F235164604}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D173578-8D94-4ACE-BE98-E2F235164604}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D173578-8D94-4ACE-BE98-E2F235164604}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94E6F396-1EF2-4C03-AACE-137A956C8DAF}.Debug|Any CPU.ActiveCfg = Debug
+		{94E6F396-1EF2-4C03-AACE-137A956C8DAF}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
