@@ -5,7 +5,7 @@ using SortingHat.API.Models;
 using SortingHat.API.Parser;
 using System.Collections.Generic;
 using JetBrains.Annotations;
-
+using System.Threading.Tasks;
 
 namespace SortingHat.DB
 {
@@ -31,7 +31,7 @@ namespace SortingHat.DB
 
         private long? Find(File file)
         {
-            return _db.ExecuteScalar("SELECT ID FROM Files WHERE Hash = @hash", new SqliteParameter("@hash", file.Hash)) as long?;
+            return _db.ExecuteScalar("SELECT ID FROM Files WHERE Hash = @hash", new SqliteParameter("@hash", file.Hash.Result)) as long?;
         }
 
         private long Create(File file)
@@ -46,7 +46,7 @@ namespace SortingHat.DB
 
         private long InsertFile(File file)
         {
-            var hash = new SqliteParameter("@hash", file.Hash);
+            var hash = new SqliteParameter("@hash", file.Hash.Result);
             var size = new SqliteParameter("@size", file.Size);
             var createdAt = new SqliteParameter("@createdAt", file.CreatedAt);
 
@@ -138,7 +138,7 @@ namespace SortingHat.DB
             if (reader.HasRows && reader.Read())
             {
                 file.CreatedAt = reader.GetDateTime(0);
-                file.Hash = reader.GetString(1);
+                file.Hash = Task.FromResult(reader.GetString(1));
                 file.Size = reader.GetInt64(2);
             }
 

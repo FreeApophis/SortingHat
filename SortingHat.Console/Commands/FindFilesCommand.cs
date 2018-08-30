@@ -28,7 +28,7 @@ namespace SortingHat.CLI.Commands
 
                 foreach (var file in files)
                 {
-                    Console.WriteLine($"{FormatHelper.ShortHash(file.Hash)} {file.Size.FixedHumanSize()} {file.Path}");
+                    Console.WriteLine($"{FormatHelper.ShortHash(file.Hash.Result)} {file.Size.FixedHumanSize()} {file.Path}");
                 }
             }
             else
