@@ -5,24 +5,35 @@ using System.Reflection;
 
 namespace SortingHat.API.Plugin
 {
-    class PluginLoader
+    public class PluginLoader
     {
-        void Load(string path)
+        public static void Load(string path)
         {
-            List<IPlugin> objects = new List<IPlugin>();
+            Console.WriteLine($"Load Plugins from: {path}");
+
+            List<IPlugin> plugins = new List<IPlugin>();
             DirectoryInfo dir = new DirectoryInfo(path);
 
-            foreach (FileInfo file in dir.GetFiles("*.dll"))
+            foreach (FileInfo file in dir.GetFiles("*Plugin.dll"))
             {
+                Console.WriteLine($"Plugin dll found: {file.Name}");
                 Assembly assembly = Assembly.LoadFrom(file.FullName);
                 foreach (Type type in assembly.GetTypes())
                 {
-                    if (type.IsSubclassOf(typeof(IPlugin)) && type.IsAbstract == false)
+                    if (type.GetInterface(nameof(IPlugin)) == typeof(IPlugin) && type.IsAbstract == false)
                     {
-                        IPlugin b = type.InvokeMember(null, BindingFlags.CreateInstance, null, null, null) as IPlugin;
-                        objects.Add(b);
+                        Console.WriteLine($"Create instance");
+                        IPlugin plugin = type.InvokeMember(null, BindingFlags.CreateInstance, null, null, null) as IPlugin;
+
+                        Console.WriteLine($"Plugin '{plugin.Name}' successfully loaded. ");
+                        plugins.Add(plugin);
                     }
                 }
+            }
+
+            foreach (var plugin in plugins)
+            {
+                plugin.Execute();
             }
         }
     }

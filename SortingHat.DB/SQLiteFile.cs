@@ -147,7 +147,7 @@ namespace SortingHat.DB
 
         private bool LoadByHash(File file)
         {
-            var reader = _db.ExecuteReader("SELECT Files.CreatedAt, Files.Hash, Files.Size FROM Files WHERE Files.Hash= @fileHash", new SqliteParameter("@fileHash", file.Hash));
+            var reader = _db.ExecuteReader("SELECT Files.CreatedAt, Files.Hash, Files.Size FROM Files WHERE Files.Hash= @fileHash", new SqliteParameter("@fileHash", file.Hash.Result));
 
             return LoadFileFromReader(reader, file);
         }
@@ -170,7 +170,7 @@ WHERE Files.Hash = @fileHash";
             var tags = new List<Tag>();
 
 
-            var reader = _db.ExecuteReader(AllFileTags, new SqliteParameter("@fileHash", file.Hash));
+            var reader = _db.ExecuteReader(AllFileTags, new SqliteParameter("@fileHash", file.Hash.Result));
 
             while (reader.Read())
             {
@@ -199,7 +199,7 @@ WHERE Files.Hash = @fileHash";
         {
             var paths = new List<string>();
 
-            var reader = _db.ExecuteReader("SELECT FilePaths.Path FROM FilePaths JOIN Files ON FilePaths.FileID = Files.ID WHERE Files.Hash = @fileHash", new SqliteParameter("@fileHash", file.Hash));
+            var reader = _db.ExecuteReader("SELECT FilePaths.Path FROM FilePaths JOIN Files ON FilePaths.FileID = Files.ID WHERE Files.Hash = @fileHash", new SqliteParameter("@fileHash", file.Hash.Result));
 
             while (reader.Read())
             {
@@ -213,7 +213,7 @@ WHERE Files.Hash = @fileHash";
         {
             var names = new List<string>();
 
-            var reader = _db.ExecuteReader("SELECT FileNames.Name FROM FileNames JOIN Files ON FileNames.FileID = Files.ID WHERE Files.Hash = @fileHash", new SqliteParameter("@fileHash", file.Hash));
+            var reader = _db.ExecuteReader("SELECT FileNames.Name FROM FileNames JOIN Files ON FileNames.FileID = Files.ID WHERE Files.Hash = @fileHash", new SqliteParameter("@fileHash", file.Hash.Result));
 
             while (reader.Read())
             {
@@ -221,6 +221,26 @@ WHERE Files.Hash = @fileHash";
             }
 
             return names;
+        }
+
+
+        const string DuplicateQuery = @"SELECT Files.ID, Files.Hash, COUNT(FilePaths.ID) AS DuplicateCount
+FROM FilePaths
+JOIN Files ON FilePaths.FileID = Files.ID
+GROUP BY FileID
+HAVING DuplicateCount > 1";
+
+        public IEnumerable<File> GetDuplicates()
+        {
+            var reader = _db.ExecuteReader(DuplicateQuery);
+            var files = new List<File>();
+
+            while (reader.Read())
+            {
+                files.Add(new File("*", reader.GetString(1)));
+            }
+
+            return files;
         }
     }
 }
