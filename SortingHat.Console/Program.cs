@@ -107,6 +107,8 @@ namespace SortingHat.CLI
             builder.RegisterType<FileInfoCommand>().As<ICommand>();
             builder.RegisterType<MoveFilesCommand>().As<ICommand>();
             builder.RegisterType<CopyFilesCommand>().As<ICommand>();
+            builder.RegisterType<DuplicateFileCommand>().As<ICommand>();
+            
 
 
             builder.RegisterType<RepairCommand>().As<ICommand>();

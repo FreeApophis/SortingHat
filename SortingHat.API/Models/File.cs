@@ -33,16 +33,23 @@ namespace SortingHat.API.Models
             }
         }
 
+        public static IEnumerable<File> Duplicates(IDatabase db)
+        {
+            return db.File.GetDuplicates();
+        }
+
         [UsedImplicitly]
         public File(IDatabase db, IHashService hashService, string path, bool loadFromDB)
         {
             Path = path;
             _db = db;
 
-            if (loadFromDB) {
+            if (loadFromDB)
+            {
                 Load();
             }
-            else {
+            else
+            {
                 FileInfo fileInfo = new FileInfo(Path);
 
                 Hash = hashService.GetHash(path);
