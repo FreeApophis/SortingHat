@@ -33,7 +33,7 @@ namespace SortingHat.CLI.Commands
                 {
                     Console.WriteLine($"CreatedAt (oldest): {file.CreatedAt}");
                     Console.WriteLine($"File Size: {file.Size}");
-                    Console.WriteLine($"File Hash: {file.Hash}");
+                    Console.WriteLine($"File Hash: {file.Hash.Result}");
 
                     foreach (var tag in file.GetTags())
                     {
