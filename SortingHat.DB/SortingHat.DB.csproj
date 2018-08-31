@@ -44,9 +44,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="JetBrains.Annotations.NetStandard">
-      <HintPath>..\..\..\..\Users\bruderer\.nuget\packages\jetbrains.annotations\10.2.1\lib\netstandard1.0\JetBrains.Annotations.NetStandard.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Extensions.Logging.Abstractions">
       <HintPath>..\..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.logging.abstractions\2.1.1\lib\netstandard2.0\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
     </Reference>

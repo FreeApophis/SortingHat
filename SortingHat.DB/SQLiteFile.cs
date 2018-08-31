@@ -13,11 +13,13 @@ namespace SortingHat.DB
     public class SQLiteFile : IFile
     {
         private readonly Func<SearchQueryVisitor> _newSearchQueryVisitor;
+        private readonly Func<File> _newFile;
         readonly SQLiteDB _db;
 
-        public SQLiteFile(Func<SearchQueryVisitor> newSearchQueryVisitor, SQLiteDB db)
+        public SQLiteFile(Func<SearchQueryVisitor> newSearchQueryVisitor, Func<File> newFile, SQLiteDB db)
         {
             _newSearchQueryVisitor = newSearchQueryVisitor;
+            _newFile = newFile;
             _db = db;
         }
 
@@ -103,7 +105,11 @@ namespace SortingHat.DB
 
             while (reader.Read())
             {
-                files.Add(new File(reader.GetString(0), reader.GetString(1)));
+                var file = _newFile();
+                file.Path = reader.GetString(0);
+                file.Hash = reader.GetString(1);
+
+                files.Add(file);
             }
 
             return files;
@@ -120,19 +126,6 @@ namespace SortingHat.DB
             return visitor.Result;
         }
 
-
-        public void Load(File file)
-        {
-            if (LoadByPath(file) == false)
-            {
-                //if (System.IO.File.Exists(file.Path))
-                //{
-                //    file.Hash = hashService.GetHash(file.Path);
-                //    LoadByHash(file);
-                //}
-            }
-        }
-
         private bool LoadFileFromReader(SqliteDataReader reader, File file)
         {
             if (reader.HasRows && reader.Read())
@@ -145,14 +138,14 @@ namespace SortingHat.DB
             return false;
         }
 
-        private bool LoadByHash(File file)
+        public bool LoadByHash(File file)
         {
             var reader = _db.ExecuteReader("SELECT Files.CreatedAt, Files.Hash, Files.Size FROM Files WHERE Files.Hash= @fileHash", new SqliteParameter("@fileHash", file.Hash));
 
             return LoadFileFromReader(reader, file);
         }
 
-        private bool LoadByPath(File file)
+        public bool LoadByPath(File file)
         {
             var reader = _db.ExecuteReader("SELECT Files.CreatedAt, Files.Hash, Files.Size FROM Files JOIN FilePaths ON FilePaths.FileID = Files.ID WHERE FilePaths.Path = @filePath", new SqliteParameter("@filePath", file.Path));
 

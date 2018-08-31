@@ -11,48 +11,37 @@ namespace SortingHat.API.Models
         public DateTime CreatedAt { get; set; }
         public long Size { get; set; }
         public string Hash { get; set; }
-        public string Path { get; }
+        public string Path { get; set; }
 
         private readonly IDatabase _db;
+        private readonly IHashService _hashService;
 
-        public File(string path, string hash)
+        [UsedImplicitly]
+        public File(IDatabase db, IHashService hashService)
         {
-            Hash = hash;
+            _db = db;
+            _hashService = hashService;
+        }
 
-            if (System.IO.File.Exists(path))
+        private void LoadByHash()
+        {
+        }
+
+        private void LoadByPath(bool loadFromDB)
+        {
+            if (loadFromDB)
             {
-                FileInfo fileInfo = new FileInfo(Path = path);
-
-                Size = fileInfo.Length;
-                CreatedAt = fileInfo.CreationTimeUtc;
+                _db.File.LoadByHash(this);
             }
             else
             {
-                Path = $"File does not exists: #{path}";
-            }
-        }
-
-        [UsedImplicitly]
-        public File(IDatabase db, IHashService hashService, string path, bool loadFromDB)
-        {
-            Path = path;
-            _db = db;
-
-            if (loadFromDB) {
-                Load();
-            }
-            else {
                 FileInfo fileInfo = new FileInfo(Path);
 
-                Hash = hashService.GetHash(path);
+                Hash = _hashService.GetHash(Path);
                 Size = fileInfo.Length;
                 CreatedAt = fileInfo.CreationTimeUtc;
             }
-        }
-
-        private void Load()
-        {
-            _db.File.Load(this);
+            _db.File.LoadByPath(this);
         }
 
 
