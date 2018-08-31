@@ -37,17 +37,17 @@ namespace SortingHat.CLI.Commands
                     Console.WriteLine($"File Size: {file.Size}");
                     Console.WriteLine($"File Hash: {file.Hash.Result}");
 
-                    foreach (var tag in file.GetTags())
+                    foreach (var tag in file.GetTags().Result)
                     {
                         Console.WriteLine($"Tag: {tag.FullName}");
                     }
 
-                    foreach (var name in file.GetNames())
+                    foreach (var name in file.GetNames().Result)
                     {
                         Console.WriteLine($"Name: {name}");
                     }
 
-                    foreach (var path in file.GetPaths())
+                    foreach (var path in file.GetPaths().Result)
                     {
                         Console.WriteLine($"Path: {path}");
                     }

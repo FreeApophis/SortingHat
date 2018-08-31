@@ -28,10 +28,10 @@ namespace SortingHat.CLI.Commands
                 Console.WriteLine("--- Duplicate ---");
                 Console.WriteLine($"CreatedAt (oldest): {file.CreatedAt}");
                 Console.WriteLine($"File Size: {file.Size}");
-                Console.WriteLine($"File Tags: {string.Join(", ", file.GetTags().Select(t => t.FullName))}");
+                Console.WriteLine($"File Tags: {string.Join(", ", file.GetTags().Result.Select(t => t.FullName))}");
 
                 var table = FileTable();
-                foreach (var path in file.GetPaths())
+                foreach (var path in file.GetPaths().Result)
                 {
                     var fileInfo = new FileInfo(path);
 

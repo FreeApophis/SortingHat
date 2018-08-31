@@ -42,11 +42,12 @@ namespace SortingHat.CLI.Commands
             return file;
         }
 
-        public Task<bool> ExecuteAsync(IEnumerable<string> arguments)
+        public async Task ExecuteAsync(IEnumerable<string> arguments)
         {
             var tags = arguments.Where(IsTag);
             var files = new FilePathExtractor(arguments.Where(IsFile));
 
+            var tasks = new List<Task>();
             foreach (var file in files.FilePaths.Select(FileFromPath))
             {
                 foreach (var tag in tags.Select(_tagParser.Parse))
@@ -54,15 +55,18 @@ namespace SortingHat.CLI.Commands
                     _logger.LogInformation($"File {file.Path} tagged with {tag.Name}");
 
                     Console.WriteLine($"File {file.Path} queued with tag {tag.Name}");
-                    file.Tag(tag);
+                    await file.Tag(tag);
+                    //tasks.Add(file.Tag(tag));
                 }
             }
-            return Task.FromResult(true);
+            //await Task.WhenAll(tasks);
         }
 
         public bool Execute(IEnumerable<string> arguments)
         {
-            return ExecuteAsync(arguments).Result;
+            ExecuteAsync(arguments).Wait();
+
+            return true;
         }
 
         public string LongCommand => "tag-files";

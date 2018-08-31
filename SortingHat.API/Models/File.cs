@@ -40,9 +40,9 @@ namespace SortingHat.API.Models
         }
 
 
-        public void Tag(Tag tag)
+        public async Task Tag(Tag tag)
         {
-            _db.File.Tag(this, tag);
+            await _db.File.Tag(this, tag);
         }
 
         public void Untag(Tag tag)
@@ -50,19 +50,19 @@ namespace SortingHat.API.Models
             _db.File.Untag(this, tag);
         }
 
-        public IEnumerable<Tag> GetTags()
+        public async Task<IEnumerable<Tag>> GetTags()
         {
-            return _db.File.GetTags(this);
+            return await _db.File.GetTags(this);
         }
 
-        public IEnumerable<string> GetPaths()
+        public async Task<IEnumerable<string>> GetPaths()
         {
-            return _db.File.GetPaths(this);
+            return await _db.File.GetPaths(this);
         }
 
-        public IEnumerable<string> GetNames()
+        public async Task<IEnumerable<string>> GetNames()
         {
-            return _db.File.GetNames(this);
+            return await _db.File.GetNames(this);
         }
     }
 }
