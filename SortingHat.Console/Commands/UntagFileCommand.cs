@@ -13,9 +13,9 @@ namespace SortingHat.CLI.Commands
     {
         private readonly ILogger<TagFileCommand> _logger;
         private readonly ITagParser _tagParser;
-        private readonly Func<string, bool, File> _newFile;
+        private readonly Func<File> _newFile;
 
-        public UntagFileCommand(ILogger<TagFileCommand> logger, IHashService hashService, ITagParser tagParser, Func<string, bool, File> newFile)
+        public UntagFileCommand(ILogger<TagFileCommand> logger, IHashService hashService, ITagParser tagParser, Func<File> newFile)
         {
             _logger = logger;
             _tagParser = tagParser;
@@ -32,12 +32,22 @@ namespace SortingHat.CLI.Commands
             return value.StartsWith(":") == false;
         }
 
+        private File FileFromPath(string filePath)
+        {
+            var file = _newFile();
+
+            file.Path = filePath;
+            file.LoadByPath(false);
+
+            return file;
+        }
+
         public bool Execute(IEnumerable<string> arguments)
         {
             var tags = arguments.Where(IsTag);
             var files = new FilePathExtractor(arguments.Where(IsFile));
 
-            foreach (var file in files.FilePaths.Select(file => _newFile(file, true)))
+            foreach (var file in files.FilePaths.Select(FileFromPath))
             {
                 foreach (var tag in tags.Select(_tagParser.Parse))
                 {

@@ -100,19 +100,38 @@ namespace SortingHat.DB
 
         public IEnumerable<File> Search(string query)
         {
-            var reader = _db.ExecuteReader(ParseQuery(query));
+            return MetaSearch(ParseQuery(query));
+        }
+
+        public IEnumerable<File> GetDuplicates()
+        {
+            return MetaSearch(DuplicateQuery);
+        }
+
+        private IEnumerable<File> MetaSearch(string search)
+        {
+            var reader = _db.ExecuteReader(search);
+
             var files = new List<File>();
 
-            while (reader.Read())
+            while (AddFileEntry(reader, files))
             {
-                var file = _newFile();
-                file.Path = reader.GetString(0);
-                file.Hash = reader.GetString(1);
-
-                files.Add(file);
             }
 
             return files;
+        }
+
+        private bool AddFileEntry(SqliteDataReader reader, List<File> files)
+        {
+            var file = _newFile();
+            var hasEntry = LoadFileFromReader(reader, file);
+
+            if (hasEntry)
+            {
+                files.Add(file);
+            }
+
+            return hasEntry;
         }
 
         private string ParseQuery(string query)
@@ -128,26 +147,29 @@ namespace SortingHat.DB
 
         private bool LoadFileFromReader(SqliteDataReader reader, File file)
         {
-            if (reader.HasRows && reader.Read())
+            var hasMore = reader.Read();
+
+            if (reader.HasRows && hasMore)
             {
                 file.CreatedAt = reader.GetDateTime(0);
                 file.Hash = Task.FromResult(reader.GetString(1));
                 file.Size = reader.GetInt64(2);
+                file.Path = reader.GetString(3);
             }
 
-            return false;
+            return hasMore;
         }
 
         public bool LoadByHash(File file)
         {
-            var reader = _db.ExecuteReader("SELECT Files.CreatedAt, Files.Hash, Files.Size FROM Files WHERE Files.Hash= @fileHash", new SqliteParameter("@fileHash", file.Hash.Result));
+            var reader = _db.ExecuteReader("SELECT Files.CreatedAt, Files.Hash, Files.Size, '' AS Path FROM Files WHERE Files.Hash= @fileHash", new SqliteParameter("@fileHash", file.Hash.Result));
 
             return LoadFileFromReader(reader, file);
         }
 
         public bool LoadByPath(File file)
         {
-            var reader = _db.ExecuteReader("SELECT Files.CreatedAt, Files.Hash, Files.Size FROM Files JOIN FilePaths ON FilePaths.FileID = Files.ID WHERE FilePaths.Path = @filePath", new SqliteParameter("@filePath", file.Path));
+            var reader = _db.ExecuteReader("SELECT Files.CreatedAt, Files.Hash, Files.Size, FilePaths.Path FROM Files JOIN FilePaths ON FilePaths.FileID = Files.ID WHERE FilePaths.Path = @filePath", new SqliteParameter("@filePath", file.Path));
 
             return LoadFileFromReader(reader, file);
         }
@@ -217,23 +239,11 @@ WHERE Files.Hash = @fileHash";
         }
 
 
-        const string DuplicateQuery = @"SELECT Files.ID, Files.Hash, COUNT(FilePaths.ID) AS DuplicateCount
+        const string DuplicateQuery = @"SELECT Files.CreatedAt, Files.Hash, Files.Size, FilePaths.Path, COUNT(FilePaths.ID) AS DuplicateCount
 FROM FilePaths
 JOIN Files ON FilePaths.FileID = Files.ID
 GROUP BY FileID
 HAVING DuplicateCount > 1";
 
-        public IEnumerable<File> GetDuplicates()
-        {
-            var reader = _db.ExecuteReader(DuplicateQuery);
-            var files = new List<File>();
-
-            while (reader.Read())
-            {
-                files.Add(new File("*", reader.GetString(1)));
-            }
-
-            return files;
-        }
     }
 }

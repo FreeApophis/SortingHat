@@ -8,9 +8,9 @@ namespace SortingHat.CLI.Commands
     [UsedImplicitly]
     internal class FileInfoCommand : ICommand
     {
-        private readonly Func<string, bool, File> _newFile;
+        private readonly Func<File> _newFile;
 
-        public FileInfoCommand(Func<string, bool, File> newFile)
+        public FileInfoCommand(Func<File> newFile)
         {
             _newFile = newFile;
         }
@@ -24,7 +24,9 @@ namespace SortingHat.CLI.Commands
                 Console.WriteLine();
                 Console.WriteLine($"File: {filePath}");
 
-                var file = _newFile(filePath, true);
+                var file = _newFile();
+                file.Path = filePath;
+                file.LoadByPath(true);
                 if (string.IsNullOrEmpty(file.Hash.Result))
                 {
                     Console.WriteLine("File not in index!");

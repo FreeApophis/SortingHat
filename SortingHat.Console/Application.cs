@@ -8,25 +8,26 @@ namespace SortingHat.CLI
 {
     class Application
     {
-        readonly ILogger<Application> _logger;
-        readonly ArgumentParser _argumentParser;
-        readonly ILoggerFactory _loggerFactory;
+        private readonly ILogger<Application> _logger;
+        private readonly ArgumentParser _argumentParser;
+        private readonly IPluginLoader _pluginLoader;
+        private readonly ILoggerFactory _loggerFactory;
 
-        public Application(ILogger<Application> logger, ArgumentParser argumentParser, ILoggerFactory loggerFactory)
+        public Application(ILogger<Application> logger, ILoggerFactory loggerFactory, ArgumentParser argumentParser, IPluginLoader pluginLoader)
         {
             _logger = logger;
-            _argumentParser = argumentParser;
             _loggerFactory = loggerFactory;
-
+            _argumentParser = argumentParser;
+            _pluginLoader = pluginLoader;
         }
 
         internal void Run(string[] args)
         {
             try
             {
-                _logger.Log(LogLevel.Trace, $"Running application instance with args: {string.Join(" ", args)}");
+                _logger.LogTrace($"Running application instance with args: {string.Join(" ", args)}");
 
-                PluginLoader.Load(AppContext.BaseDirectory);
+                _pluginLoader.Load(AppContext.BaseDirectory);
 
                 _argumentParser.Execute(args);
             }

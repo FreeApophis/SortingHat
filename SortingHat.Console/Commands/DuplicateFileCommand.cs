@@ -20,7 +20,7 @@ namespace SortingHat.CLI.Commands
 
         public bool Execute(IEnumerable<string> arguments)
         {
-            foreach (var file in File.Duplicates(_db))
+            foreach (var file in _db.File.GetDuplicates())
             {
                 Console.WriteLine($"Duplicate:");
                 Console.WriteLine($"CreatedAt (oldest): {file.CreatedAt}");

@@ -24,15 +24,16 @@ namespace SortingHat.API.Models
             _hashService = hashService;
         }
 
-        private void LoadByHash()
+        public void LoadByHash()
         {
+            _db.File.LoadByHash(this);
         }
 
-        private void LoadByPath(bool loadFromDB)
+        public void LoadByPath(bool loadFromDB)
         {
             if (loadFromDB)
             {
-                _db.File.LoadByHash(this);
+                _db.File.LoadByPath(this);
             }
             else
             {
@@ -42,7 +43,6 @@ namespace SortingHat.API.Models
                 Size = fileInfo.Length;
                 CreatedAt = fileInfo.CreationTimeUtc;
             }
-            _db.File.LoadByPath(this);
         }
 
 

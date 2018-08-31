@@ -27,7 +27,7 @@ namespace SortingHat.DB
             _db = db;
             _tagParser = tagParser;
 
-            _selectBuilder.AppendLine("SELECT FilePaths.Path, Files.Hash, Files.ID");
+            _selectBuilder.AppendLine("SELECT Files.CreatedAt, Files.Hash, Files.Size, FilePaths.Path");
             _selectBuilder.AppendLine("FROM Files");
             _selectBuilder.AppendLine("JOIN FilePaths ON FilePaths.FileID = Files.ID");
 

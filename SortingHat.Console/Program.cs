@@ -10,6 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Security.Cryptography;
 using Karambolo.Extensions.Logging.File;
+using SortingHat.API.Plugin;
 
 namespace SortingHat.CLI
 {
@@ -46,6 +47,7 @@ namespace SortingHat.CLI
 
             builder.RegisterType<Application>().AsSelf();
             builder.RegisterType<ArgumentParser>().AsSelf();
+            builder.RegisterType<PluginLoader>().As<IPluginLoader>();
 
             builder.RegisterType<SQLiteDB>().As<IDatabase>().As<SQLiteDB>().SingleInstance();
             builder.RegisterType<SQLiteFile>().As<IFile>().SingleInstance();
