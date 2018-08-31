@@ -1,6 +1,6 @@
-﻿namespace SortingHat.CLI
+﻿namespace SortingHat.CLI.Output
 {
-    static class FormatHelper
+    static class NumberFormatter
     {
         private static readonly string[] SizeSuffixes = { "B ", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
 
@@ -15,7 +15,7 @@
             return HumanSize(size, 0);
         }
 
-        public static string ShortHash(string hash)
+        public static string ShortHash(this string hash)
         {
             return hash.Split(':')[1].Substring(0, 8);
         }

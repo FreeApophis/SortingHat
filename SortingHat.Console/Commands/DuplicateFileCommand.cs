@@ -2,10 +2,13 @@
 using SortingHat.API.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using SortingHat.CLI.Output;
 
 namespace SortingHat.CLI.Commands
 {
-    class DuplicateFileCommand : ICommand
+    internal class DuplicateFileCommand : ICommand
     {
         private readonly IDatabase _db;
 
@@ -22,29 +25,44 @@ namespace SortingHat.CLI.Commands
         {
             foreach (var file in _db.File.GetDuplicates())
             {
-                Console.WriteLine($"Duplicate:");
+                Console.WriteLine("--- Duplicate ---");
                 Console.WriteLine($"CreatedAt (oldest): {file.CreatedAt}");
                 Console.WriteLine($"File Size: {file.Size}");
-                Console.WriteLine($"File Hash: {file.Hash.Result}");
+                Console.WriteLine($"File Tags: {string.Join(", ", file.GetTags().Select(t => t.FullName))}");
 
-                foreach (var tag in file.GetTags())
-                {
-                    Console.WriteLine($"Tag: {tag.FullName}");
-                }
-
-                foreach (var name in file.GetNames())
-                {
-                    Console.WriteLine($"Name: {name}");
-                }
-
+                var table = FileTable();
                 foreach (var path in file.GetPaths())
                 {
-                    Console.WriteLine($"Path: {path}");
+                    var fileInfo = new FileInfo(path);
+
+                    if (fileInfo.Exists)
+                    {
+                        table.Append(fileInfo.CreationTimeUtc, fileInfo.Length.FixedHumanSize(), fileInfo.Name, string.Empty, fileInfo.Directory.FullName);
+                    }
+                    else
+                    {
+                        table.Append(string.Empty, string.Empty, fileInfo.Name, "*", fileInfo.Directory.FullName);
+                    }
+
                 }
+                Console.WriteLine(table.ToString());
 
             }
 
             return true;
+        }
+
+        private ConsoleTable FileTable()
+        {
+            var table = new ConsoleTable();
+
+            table.Columns.Add(new ConsoleTableColumn());
+            table.Columns.Add(new ConsoleTableColumn());
+            table.Columns.Add(new ConsoleTableColumn());
+            table.Columns.Add(new ConsoleTableColumn());
+            table.Columns.Add(new ConsoleTableColumn());
+
+            return table;
         }
     }
 }

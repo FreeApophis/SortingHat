@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using JetBrains.Annotations;
+using SortingHat.CLI.Output;
 
 namespace SortingHat.CLI.Commands
 {
@@ -16,6 +17,18 @@ namespace SortingHat.CLI.Commands
             _db = db;
         }
 
+        private ConsoleTable FileTable()
+        {
+            var table = new ConsoleTable();
+
+            table.Columns.Add(new ConsoleTableColumn());
+            table.Columns.Add(new ConsoleTableColumn());
+            table.Columns.Add(new ConsoleTableColumn());
+            table.Columns.Add(new ConsoleTableColumn());
+
+            return table;
+        }
+
         public bool Execute(IEnumerable<string> arguments)
         {
             var search = string.Join(" ", arguments);
@@ -25,11 +38,12 @@ namespace SortingHat.CLI.Commands
 
             if (files.Any())
             {
-
+                var table = FileTable();
                 foreach (var file in files)
                 {
-                    Console.WriteLine($"{FormatHelper.ShortHash(file.Hash.Result)} {file.Size.FixedHumanSize()} {file.Path}");
+                    table.Append(file.Hash.Result.ShortHash(), file.CreatedAt, file.Size.FixedHumanSize(),  file.Path);
                 }
+                Console.WriteLine(table.ToString());
             }
             else
             {
