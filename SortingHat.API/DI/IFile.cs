@@ -5,7 +5,6 @@ namespace SortingHat.API.DI
 {
     public interface IFile
     {
-        bool LoadByHash(File file);
         bool LoadByPath(File file);
         void Tag(File file, Tag tag);
         void Untag(File file, Tag tag);

@@ -26,7 +26,7 @@ namespace SortingHat.CLI.Commands
 
                 var file = _newFile();
                 file.Path = filePath;
-                file.LoadByPath(true);
+                file.DBLoadByPath();
                 if (string.IsNullOrEmpty(file.Hash.Result))
                 {
                     Console.WriteLine("File not in index!");

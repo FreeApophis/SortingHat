@@ -160,13 +160,6 @@ namespace SortingHat.DB
             return hasMore;
         }
 
-        public bool LoadByHash(File file)
-        {
-            var reader = _db.ExecuteReader("SELECT Files.CreatedAt, Files.Hash, Files.Size, '' AS Path FROM Files WHERE Files.Hash= @fileHash", new SqliteParameter("@fileHash", file.Hash.Result));
-
-            return LoadFileFromReader(reader, file);
-        }
-
         public bool LoadByPath(File file)
         {
             var reader = _db.ExecuteReader("SELECT Files.CreatedAt, Files.Hash, Files.Size, FilePaths.Path FROM Files JOIN FilePaths ON FilePaths.FileID = Files.ID WHERE FilePaths.Path = @filePath", new SqliteParameter("@filePath", file.Path));

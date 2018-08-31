@@ -37,7 +37,7 @@ namespace SortingHat.CLI.Commands
             var file = _newFile();
 
             file.Path = filePath;
-            file.LoadByPath(false);
+            file.LoadByPath();
 
             return file;
         }
