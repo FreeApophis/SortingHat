@@ -1,7 +1,9 @@
-﻿namespace SortingHat.API.DI
+﻿using System.Threading.Tasks;
+
+namespace SortingHat.API.DI
 {
     public interface IHashService
     {
-        string GetHash(string path);
+        Task<string> GetHash(string path);
     }
 }

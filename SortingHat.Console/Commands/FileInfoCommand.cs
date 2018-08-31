@@ -25,8 +25,7 @@ namespace SortingHat.CLI.Commands
                 Console.WriteLine($"File: {filePath}");
 
                 var file = _newFile(filePath, true);
-
-                if (string.IsNullOrEmpty(file.Hash))
+                if (string.IsNullOrEmpty(file.Hash.Result))
                 {
                     Console.WriteLine("File not in index!");
                 }
@@ -34,7 +33,7 @@ namespace SortingHat.CLI.Commands
                 {
                     Console.WriteLine($"CreatedAt (oldest): {file.CreatedAt}");
                     Console.WriteLine($"File Size: {file.Size}");
-                    Console.WriteLine($"File Hash: {file.Hash}");
+                    Console.WriteLine($"File Hash: {file.Hash.Result}");
 
                     foreach (var tag in file.GetTags())
                     {

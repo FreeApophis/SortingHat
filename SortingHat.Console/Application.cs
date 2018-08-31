@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using SortingHat.API.Parser;
+using SortingHat.API.Plugin;
 using System;
 
 namespace SortingHat.CLI
@@ -16,6 +17,7 @@ namespace SortingHat.CLI
             _logger = logger;
             _argumentParser = argumentParser;
             _loggerFactory = loggerFactory;
+
         }
 
         internal void Run(string[] args)
@@ -23,6 +25,8 @@ namespace SortingHat.CLI
             try
             {
                 _logger.Log(LogLevel.Trace, $"Running application instance with args: {string.Join(" ", args)}");
+
+                PluginLoader.Load(AppContext.BaseDirectory);
 
                 _argumentParser.Execute(args);
             }

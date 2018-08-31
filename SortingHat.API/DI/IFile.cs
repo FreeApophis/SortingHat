@@ -15,5 +15,6 @@ namespace SortingHat.API.DI
         IEnumerable<string> GetPaths(File file);
         IEnumerable<string> GetNames(File file);
         IEnumerable<File> Search(string query);
+        IEnumerable<File> GetDuplicates();
     }
 }

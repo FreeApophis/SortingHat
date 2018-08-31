@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 
 namespace SortingHat.API.DI
 {
@@ -15,14 +16,18 @@ namespace SortingHat.API.DI
             _hashPrefix = hashPrefix.ToLower();
         }
 
-        public string GetHash(string path)
+        public Task<string> GetHash(string path)
         {
-            using (var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+            return Task.Run(() =>
             {
-                var hash = _hashAlgorithm.ComputeHash(fileStream);
-
-                return $"{_hashPrefix}:{ToHex(hash)}";
-            }
+                using (var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    System.Console.WriteLine($"Hashing: '{path}'");
+                    var hash = _hashAlgorithm.ComputeHash(fileStream);
+                    System.Console.WriteLine($"End Hashing: '{path}'");
+                    return $"{_hashPrefix}:{ToHex(hash)}";
+                }
+            });
         }
 
         private static string ToHex(byte[] hash)

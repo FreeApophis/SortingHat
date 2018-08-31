@@ -1,10 +1,10 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
-using SortingHat.API.DI;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using SortingHat.API.Models;
+using System.Threading.Tasks;
 
 namespace SortingHat.CLI.Commands
 {
@@ -32,7 +32,7 @@ namespace SortingHat.CLI.Commands
             return value.StartsWith(":") == false;
         }
 
-        public bool Execute(IEnumerable<string> arguments)
+        public Task<bool> ExecuteAsync(IEnumerable<string> arguments)
         {
             var tags = arguments.Where(IsTag);
             var files = new FilePathExtractor(arguments.Where(IsFile));
@@ -42,10 +42,17 @@ namespace SortingHat.CLI.Commands
                 foreach (var tag in tags.Select(_tagParser.Parse))
                 {
                     _logger.LogInformation($"File {file.Path} tagged with {tag.Name}");
+
+                    Console.WriteLine($"File {file.Path} queued with tag {tag.Name}");
                     file.Tag(tag);
                 }
             }
-            return true;
+            return Task.FromResult(true);
+        }
+
+        public bool Execute(IEnumerable<string> arguments)
+        {
+            return ExecuteAsync(arguments).Result;
         }
 
         public string LongCommand => "tag-files";

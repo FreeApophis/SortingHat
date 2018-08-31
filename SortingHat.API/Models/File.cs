@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System;
 using JetBrains.Annotations;
+using System.Threading.Tasks;
 
 namespace SortingHat.API.Models
 {
@@ -10,7 +11,7 @@ namespace SortingHat.API.Models
     {
         public DateTime CreatedAt { get; set; }
         public long Size { get; set; }
-        public string Hash { get; set; }
+        public Task<string> Hash { get; set; }
         public string Path { get; set; }
 
         private readonly IDatabase _db;
