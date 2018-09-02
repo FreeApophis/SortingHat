@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
+using SortingHat.CLI.Output;
 
 namespace SortingHat.CLI.Commands
 {
@@ -79,14 +80,28 @@ namespace SortingHat.CLI.Commands
             Console.WriteLine("    This will output all files which are tagged as bank documents for tax in 2017 or 2018.");
         }
 
+        private ConsoleTable HelpTable()
+        {
+            var table = new ConsoleTable();
+
+            table.Columns.Add(new ConsoleTableColumn());
+            table.Columns.Add(new ConsoleTableColumn());
+            table.Columns.Add(new ConsoleTableColumn());
+
+            return table;
+        }
+
         private void PrintHelpCommands()
         {
             var commands = _container.Resolve<IEnumerable<ICommand>>();
 
+            var table = HelpTable();
             foreach (var command in _container.Resolve<IEnumerable<ICommand>>())
             {
                 Console.WriteLine($"  {command.LongCommand,-12} {command.ShortCommand,-4} {command.ShortHelp}");
+                //table.Append(command.LongCommand, command.ShortCommand, command.ShortHelp);
             }
+            //Console.WriteLine(table.ToString());
         }
 
         private static void PrintHelpHeader()
