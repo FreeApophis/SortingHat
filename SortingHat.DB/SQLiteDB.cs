@@ -2,7 +2,9 @@
 using SortingHat.API;
 using SortingHat.API.DI;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace SortingHat.DB
 {
@@ -79,6 +81,40 @@ namespace SortingHat.DB
             throw new NotImplementedException();
         }
 
+        private string PerTableStatisticsQuery(string table)
+        {
+            return $"SELECT '{table}', Count(ID) FROM {table}";
+        }
+
+        private string StatisticsQuery()
+        {
+            var tables = new List<string>() { "Files", "FilePaths", "FileNames", "Tags", "FileTags" };
+
+            return string.Join(" UNION ", tables.Select(PerTableStatisticsQuery));
+        }
+
+        public Dictionary<string, long> GetStatistics()
+        {
+            return TransformStatistics(ExecuteReader(StatisticsQuery()));
+        }
+
+        private static Dictionary<string, long> TransformStatistics(SqliteDataReader reader)
+        {
+            var statistics = new Dictionary<string, long>();
+
+            while (reader.Read())
+            {
+                ReadStatisticsLine(reader, statistics);
+            }
+
+            return statistics;
+        }
+
+        private static void ReadStatisticsLine(SqliteDataReader reader, Dictionary<string, long> statistics)
+        {
+            statistics[reader.GetString(0)] = reader.GetInt64(1);
+        }
+
         private string DBPath()
         {
             string result = Path.Combine(_path, ".hat");
@@ -117,6 +153,8 @@ namespace SortingHat.DB
         {
             Dispose(true);
         }
+
+
         #endregion
     }
 }

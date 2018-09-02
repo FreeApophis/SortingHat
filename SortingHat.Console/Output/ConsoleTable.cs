@@ -41,7 +41,7 @@ namespace SortingHat.CLI.Output
             var stringBuilder = new StringBuilder();
             foreach (var (column, index) in Columns.WithIndex())
             {
-                stringBuilder.Append(string.Format(AlignmentFormat(column), index, MaxColumnLength(index) + 2));
+                stringBuilder.Append(string.Format(AlignmentFormat(column), index, MaxColumnLength(index)));
             }
 
 

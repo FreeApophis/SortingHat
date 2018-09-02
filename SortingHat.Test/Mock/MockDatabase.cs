@@ -1,4 +1,5 @@
-﻿using SortingHat.API.DI;
+﻿using System.Collections.Generic;
+using SortingHat.API.DI;
 
 namespace SortingHat.Test
 {
@@ -12,6 +13,11 @@ namespace SortingHat.Test
         public void TearDown()
         {
 
+        }
+
+        public Dictionary<string, long> GetStatistics()
+        {
+            throw new System.NotImplementedException();
         }
 
         public IFile File { get; }

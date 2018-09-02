@@ -102,7 +102,6 @@ namespace SortingHat.CLI
             builder.RegisterType<RenameTagCommand>().As<ICommand>();
             builder.RegisterType<MoveTagCommand>().As<ICommand>();
 
-
             builder.RegisterType<TagFileCommand>().As<ICommand>();
             builder.RegisterType<UntagFileCommand>().As<ICommand>();
             builder.RegisterType<FindFilesCommand>().As<ICommand>();
@@ -110,9 +109,8 @@ namespace SortingHat.CLI
             builder.RegisterType<MoveFilesCommand>().As<ICommand>();
             builder.RegisterType<CopyFilesCommand>().As<ICommand>();
             builder.RegisterType<DuplicateFileCommand>().As<ICommand>();
-            
 
-
+            builder.RegisterType<StatisticCommand>().As<ICommand>();
             builder.RegisterType<RepairCommand>().As<ICommand>();
             builder.RegisterType<IdentifyCommand>().As<ICommand>();
         }

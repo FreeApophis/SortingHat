@@ -113,9 +113,7 @@ namespace SortingHat.DB
 
             var files = new List<File>();
 
-            while (AddFileEntry(reader, files))
-            {
-            }
+            while (AddFileEntry(reader, files)) ;
 
             return files;
         }

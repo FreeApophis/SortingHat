@@ -15,6 +15,8 @@ namespace SortingHat.API.DI
         /// </summary>
         void TearDown();
 
+        Dictionary<string, long> GetStatistics();
+
         IFile File { get; }
         ITag Tag { get; }
     }

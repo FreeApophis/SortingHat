@@ -2,7 +2,9 @@
 using Microsoft.Extensions.Logging;
 using SortingHat.API.Parser;
 using SortingHat.API.Plugin;
+using SortingHat.CLI.Output;
 using System;
+using System.ComponentModel;
 
 namespace SortingHat.CLI
 {
@@ -28,6 +30,8 @@ namespace SortingHat.CLI
                 _logger.LogTrace($"Running application instance with args: {string.Join(" ", args)}");
 
                 _pluginLoader.Load(AppContext.BaseDirectory);
+
+                _pluginLoader.Plugins.Each(plugin => plugin.Register());
 
                 _argumentParser.Execute(args);
             }

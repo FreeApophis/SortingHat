@@ -2,12 +2,20 @@
 using SortingHat.API.Plugin;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace ExifTaggerPlugin
 {
     public class ExifTagger : IPlugin
     {
         public string Name => "Exif Tagger";
+
+        public bool Register()
+        {
+            Console.WriteLine("Registration here...");
+
+            return true;
+        }
 
         public bool Execute()
         {
@@ -22,5 +30,6 @@ namespace ExifTaggerPlugin
 
             return true;
         }
+
     }
 }
