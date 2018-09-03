@@ -75,8 +75,8 @@ namespace SortingHat.CLI
 
         private string PluginDirectory()
         {
-            return Path.Combine(AppContext.BaseDirectory, "plugins");
-
+            //return Path.Combine(AppContext.BaseDirectory, "plugins");
+            return Path.Combine(AppContext.BaseDirectory);
         }
     }
 }

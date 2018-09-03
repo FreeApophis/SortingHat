@@ -27,6 +27,11 @@ namespace SortingHat.API.Plugin
 
             var directoryInfo = new DirectoryInfo(path);
 
+            if (directoryInfo.Exists == false)
+            {
+                return;
+            }
+
             foreach (var file in directoryInfo.GetFiles("*Plugin.dll"))
             {
                 _logger.LogTrace($"Plugin dll found: {file.Name}");
