@@ -38,6 +38,11 @@ namespace SortingHat.API.Models
             return _db.Tag.Rename(this, newName);
         }
 
+        public bool Move(Tag destinationTag)
+        {
+            return _db.Tag.Move(this, destinationTag);
+        }
+
         public static bool operator ==(Tag lhs, Tag rhs)
         {
             if (lhs is null)
@@ -74,5 +79,5 @@ namespace SortingHat.API.Models
             return db.Tag.GetTags();
         }
     }
-
 }
+

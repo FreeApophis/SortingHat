@@ -47,7 +47,7 @@ namespace SortingHat.CLI
 
             builder.RegisterType<Application>().AsSelf();
             builder.RegisterType<ArgumentParser>().AsSelf();
-            builder.RegisterType<PluginLoader>().As<IPluginLoader>();
+            builder.RegisterType<PluginLoader>().As<IPluginLoader>().SingleInstance();
 
             builder.RegisterType<SQLiteDB>().As<IDatabase>().As<SQLiteDB>().SingleInstance();
             builder.RegisterType<SQLiteFile>().As<IFile>().SingleInstance();
@@ -113,6 +113,7 @@ namespace SortingHat.CLI
             builder.RegisterType<StatisticCommand>().As<ICommand>();
             builder.RegisterType<RepairCommand>().As<ICommand>();
             builder.RegisterType<IdentifyCommand>().As<ICommand>();
+            builder.RegisterType<PluginsCommand>().As<ICommand>();
         }
     }
 }

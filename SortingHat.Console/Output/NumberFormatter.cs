@@ -1,18 +1,20 @@
 ﻿namespace SortingHat.CLI.Output
 {
-    static class NumberFormatter
+    public static class NumberFormatter
     {
         private static readonly string[] SizeSuffixes = { "B ", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
 
-        private static string HumanSize(long size, int magnitude)
+        public static string HumanSize(this long size)
         {
-            return size < 1000
-                ? $"{size,4} {SizeSuffixes[magnitude]}"
-                : HumanSize(size / 1000, magnitude + 1);
-        }
-        public static string FixedHumanSize(this long size)
-        {
-            return HumanSize(size, 0);
+            var magnitude = 0;
+
+            while (size >= 1000)
+            {
+                size = size / 1000;
+                magnitude = magnitude + 1;
+            }
+
+            return $"{size} {SizeSuffixes[magnitude]}";
         }
 
         public static string ShortHash(this string hash)

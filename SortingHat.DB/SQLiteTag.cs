@@ -27,7 +27,7 @@ namespace SortingHat.DB
 
         public bool Destroy(Tag tag)
         {
-            long? tagID = Find(tag);
+            var tagID = Find(tag);
             if (tagID.HasValue)
             {
                 var tagIDParameter = new SqliteParameter("@tagID", tagID);
@@ -40,16 +40,45 @@ namespace SortingHat.DB
 
         public bool Rename(Tag tag, string newName)
         {
-            long? tagID = Find(tag);
+            var tagID = Find(tag);
             if (tagID.HasValue)
             {
                 var tagIDParameter = new SqliteParameter("@tagID", tagID);
                 var tagNameParameter = new SqliteParameter("@tagName", newName);
 
-                _db.ExecuteNonQuery("UPDATE FROM Tags SET Name = @tagName WHERE TagID = @tagID", tagIDParameter, tagNameParameter);
+                _db.ExecuteNonQuery("UPDATE Tags SET Name = @tagName WHERE ID = @tagID", tagIDParameter, tagNameParameter);
             }
 
             return tagID.HasValue;
+        }
+
+        public bool Move(Tag tag, Tag destinationTag)
+        {
+            var tagID = Find(tag);
+
+            if (tagID.HasValue)
+            {
+                var tagIDParameter = new SqliteParameter("@tagID", tagID);
+                if (destinationTag == null)
+                {
+                    return ExecuteMoveQuery(tagIDParameter, new SqliteParameter("@destinationTagID", DBNull.Value));
+                }
+
+                var destinationTagID = Find(destinationTag);
+                if (destinationTagID.HasValue)
+                {
+                    return ExecuteMoveQuery(tagIDParameter, new SqliteParameter("@destinationTagID", destinationTagID));
+                }
+            }
+
+            return false;
+        }
+
+        private bool ExecuteMoveQuery(SqliteParameter tagIDParameter, SqliteParameter destinationTagIDParameter)
+        {
+            _db.ExecuteNonQuery("UPDATE Tags SET ParentID = @destinationTagID WHERE ID = @tagID", tagIDParameter, destinationTagIDParameter);
+
+            return true;
         }
 
         public long FileCount(Tag tag)
