@@ -3,12 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using JetBrains.Annotations;
+using SortingHat.API.DI;
 
 namespace SortingHat.API.Plugin
 {
+    [UsedImplicitly]
     public class PluginLoader : IPluginLoader
     {
         public List<IPlugin> Plugins { get; } = new List<IPlugin>();
+        public List<ICommand> Commands { get; } = new List<ICommand>();
 
         private readonly ILogger<PluginLoader> _logger;
 
@@ -21,9 +25,9 @@ namespace SortingHat.API.Plugin
         {
             _logger.LogTrace($"Load Plugins from: {path}");
 
-            DirectoryInfo dir = new DirectoryInfo(path);
+            var directoryInfo = new DirectoryInfo(path);
 
-            foreach (FileInfo file in dir.GetFiles("*Plugin.dll"))
+            foreach (var file in directoryInfo.GetFiles("*Plugin.dll"))
             {
                 _logger.LogTrace($"Plugin dll found: {file.Name}");
 
@@ -33,7 +37,7 @@ namespace SortingHat.API.Plugin
                     if (type.GetInterface(nameof(IPlugin)) == typeof(IPlugin) && type.IsAbstract == false)
                     {
                         IPlugin plugin = type.InvokeMember(null, BindingFlags.CreateInstance, null, null, null) as IPlugin;
-                        Console.WriteLine($"Plugin '{plugin.Name}' successfully loaded. ");
+                        _logger.LogInformation($"Plugin '{plugin.Name}' successfully loaded. ");
                         Plugins.Add(plugin);
                     }
                 }

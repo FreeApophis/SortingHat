@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
+using SortingHat.API.DI;
+using SortingHat.API.Plugin;
 using SortingHat.CLI.Output;
 
 namespace SortingHat.CLI.Commands
@@ -14,11 +16,13 @@ namespace SortingHat.CLI.Commands
     internal class HelpCommand : ICommand
     {
         private readonly ILogger<HelpCommand> _logger;
+        private readonly IPluginLoader _pluginLoader;
         private readonly IComponentContext _container;
 
-        public HelpCommand(ILogger<HelpCommand> logger, IComponentContext container)
+        public HelpCommand(ILogger<HelpCommand> logger, IPluginLoader pluginLoader, IComponentContext container)
         {
             _logger = logger;
+            _pluginLoader = pluginLoader;
             _container = container;
         }
 
@@ -28,20 +32,27 @@ namespace SortingHat.CLI.Commands
 
             if (arguments.Any())
             {
-                foreach (var command in _container.Resolve<IEnumerable<ICommand>>())
-                {
-                    if (command.LongCommand == arguments.First())
-                    {
-                        PrintLongHelp(command);
-                        return true;
-                    }
-                }
-                return false;
+                return FindCommand(arguments, _container.Resolve<IEnumerable<ICommand>>()) &&
+                       FindCommand(arguments, _pluginLoader.Commands);
             }
 
             PrintOverview();
             return true;
 
+        }
+
+        private bool FindCommand(IEnumerable<string> arguments, IEnumerable<ICommand> commands)
+        {
+            foreach (var command in commands)
+            {
+                if (command.LongCommand == arguments.First())
+                {
+                    PrintLongHelp(command);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static void PrintLongHelp(ICommand command)
@@ -67,49 +78,49 @@ namespace SortingHat.CLI.Commands
         private void PrintOverview()
         {
             PrintHelpHeader();
-            PrintHelpCommands();
+            PrintHelpCommands(_container.Resolve<IEnumerable<ICommand>>(), "Available commands");
+            PrintHelpCommands(_pluginLoader.Commands, "Plugin commands:");
             PrintHelpExamples();
         }
 
         private void PrintHelpExamples()
         {
-            Console.WriteLine("");
+            Console.WriteLine();
             Console.WriteLine("Examples:");
-            Console.WriteLine("");
+            Console.WriteLine();
             Console.WriteLine("  hat.exe find (:tax:2018 or :tax:2017) and :bank");
             Console.WriteLine("    This will output all files which are tagged as bank documents for tax in 2017 or 2018.");
         }
 
         private ConsoleTable HelpTable()
         {
-            var table = new ConsoleTable();
+            var table = new ConsoleTable(3);
 
-            table.Columns.Add(new ConsoleTableColumn());
-            table.Columns.Add(new ConsoleTableColumn());
-            table.Columns.Add(new ConsoleTableColumn());
+            table.Columns[0].PaddingLeft = 2;
 
             return table;
         }
 
-        private void PrintHelpCommands()
+        private void PrintHelpCommands(IEnumerable<ICommand> commands, string title)
         {
-            var commands = _container.Resolve<IEnumerable<ICommand>>();
-
-            var table = HelpTable();
-            foreach (var command in _container.Resolve<IEnumerable<ICommand>>())
+            if (commands.Any())
             {
-                Console.WriteLine($"  {command.LongCommand,-12} {command.ShortCommand,-4} {command.ShortHelp}");
-                //table.Append(command.LongCommand, command.ShortCommand, command.ShortHelp);
+                Console.WriteLine();
+                Console.WriteLine(title);
+                Console.WriteLine();
+
+                var table = HelpTable();
+                foreach (var command in commands)
+                {
+                    table.Append(command.LongCommand, command.ShortCommand, command.ShortHelp);
+                }
+                Console.WriteLine(table.ToString());
             }
-            //Console.WriteLine(table.ToString());
         }
 
         private static void PrintHelpHeader()
         {
             Console.WriteLine("Sortinghat <command> [arguments]:");
-            Console.WriteLine("");
-            Console.WriteLine("available commands:");
-            Console.WriteLine("");
         }
 
         public string LongCommand => "help";

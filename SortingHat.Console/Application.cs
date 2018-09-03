@@ -1,13 +1,15 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using JetBrains.Annotations;
+using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using SortingHat.API.Parser;
 using SortingHat.API.Plugin;
 using SortingHat.CLI.Output;
+using System.IO;
 using System;
-using System.ComponentModel;
 
 namespace SortingHat.CLI
 {
+    [UsedImplicitly]
     class Application
     {
         private readonly ILogger<Application> _logger;
@@ -29,9 +31,7 @@ namespace SortingHat.CLI
             {
                 _logger.LogTrace($"Running application instance with args: {string.Join(" ", args)}");
 
-                _pluginLoader.Load(AppContext.BaseDirectory);
-
-                _pluginLoader.Plugins.Each(plugin => plugin.Register());
+                LoadPlugins();
 
                 _argumentParser.Execute(args);
             }
@@ -63,6 +63,20 @@ namespace SortingHat.CLI
 
             //Flush the logger
             _loggerFactory.Dispose();
+        }
+
+        private void LoadPlugins()
+        {
+            _pluginLoader.Load(PluginDirectory());
+            _pluginLoader.Plugins.Each(plugin => plugin.Register(_pluginLoader.Commands));
+
+            _argumentParser.RegisterCommands(_pluginLoader.Commands);
+        }
+
+        private string PluginDirectory()
+        {
+            return Path.Combine(AppContext.BaseDirectory, "plugins");
+
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System;
 using JetBrains.Annotations;
+using SortingHat.API.DI;
 
 namespace SortingHat.CLI.Commands
 {

@@ -1,9 +1,9 @@
 ﻿using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
-using SortingHat.CLI.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SortingHat.API.DI;
 
 namespace SortingHat.CLI
 {
@@ -17,10 +17,10 @@ namespace SortingHat.CLI
         {
             _logger = logger;
 
-            AssignCommands(commands);
+            RegisterCommands(commands);
         }
 
-        private void AssignCommands(IEnumerable<ICommand> commands)
+        public void RegisterCommands(IEnumerable<ICommand> commands)
         {
             foreach (var command in commands)
             {
