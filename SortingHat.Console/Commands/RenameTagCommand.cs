@@ -1,9 +1,10 @@
-﻿using SortingHat.API.DI;
-using SortingHat.API.Models;
+﻿using SortingHat.API.Models;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
+using SortingHat.API;
+using SortingHat.API.DI;
 
 namespace SortingHat.CLI.Commands
 {
@@ -21,14 +22,56 @@ namespace SortingHat.CLI.Commands
 
         public bool Execute(IEnumerable<string> arguments)
         {
+            var result = false;
+
             if (arguments.Count() == 2)
             {
-                var tag = _tagParser.Parse(arguments.First());
+                result = RenameTag(arguments);
+            }
+            else
+            {
+                _logger.LogWarning("rename tag has exactly two arguments, the tag to rename, and a new name: hat rename-tag :tag new_name");
+                System.Console.WriteLine("rename tag has exactly two arguments, the tag to rename, and a new name: hat rename-tag :tag new_name");
+            }
 
-                if (tag.Rename(arguments.Skip(1).First()) == false)
-                {
-                    _logger.LogWarning("Remove tag failed");
-                }
+            if (result == false)
+            {
+                _logger.LogWarning("Rename failed");
+            }
+
+            return result;
+        }
+
+        private bool RenameTag(IEnumerable<string> arguments)
+        {
+            var tagString = arguments.First();
+            var newName = arguments.Last();
+
+            if (CheckArguments(tagString, newName))
+            {
+                var tag = _tagParser.Parse(tagString);
+                return tag.Rename(newName);
+            }
+
+            return false;
+        }
+
+        private bool CheckArguments(string tagString, string newName)
+        {
+            if (tagString.IsTag() == false)
+            {
+                _logger.LogWarning($"First Argument '{tagString}' must be a tag");
+                System.Console.WriteLine($"First Argument '{tagString}' must be a tag");
+
+                return false;
+            }
+
+            if (newName.IsTag())
+            {
+                _logger.LogWarning($"Second Argument '{newName}' cannot be a tag");
+                System.Console.WriteLine($"Second Argument '{newName}' cannot be a tag");
+
+                return false;
             }
 
             return true;
