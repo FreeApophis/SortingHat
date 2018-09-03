@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System;
 using JetBrains.Annotations;
+using SortingHat.API.DI;
 using SortingHat.API.Models;
 
 namespace SortingHat.CLI.Commands

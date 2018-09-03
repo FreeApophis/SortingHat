@@ -2,10 +2,12 @@
 using SortingHat.CLI.Output;
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace SortingHat.CLI.Commands
 {
-    class StatisticCommand : ICommand
+    [UsedImplicitly]
+    internal class StatisticCommand : ICommand
     {
         private readonly IDatabase _db;
 
@@ -24,18 +26,18 @@ namespace SortingHat.CLI.Commands
             }
 
             Console.WriteLine("Statistics:");
+            Console.WriteLine();
             Console.WriteLine(table.ToString());
 
             return true;
         }
 
-        private ConsoleTable StatisticsTable()
+        private static ConsoleTable StatisticsTable()
         {
-            var table = new ConsoleTable();
+            var table = new ConsoleTable(3);
 
-            table.Columns.Add(new ConsoleTableColumn() { Alignment = ConsoleTableColumnAlignment.Right});
-            table.Columns.Add(new ConsoleTableColumn());
-            table.Columns.Add(new ConsoleTableColumn());
+            table.Columns[0].Alignment = ConsoleTableColumnAlignment.Right;
+            table.Columns[0].PaddingLeft = 2;
 
             return table;
         }

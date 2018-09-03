@@ -5,6 +5,8 @@ using System.Linq;
 using JetBrains.Annotations;
 using SortingHat.API.Models;
 using System.Threading.Tasks;
+using SortingHat.API;
+using SortingHat.API.DI;
 
 namespace SortingHat.CLI.Commands
 {
@@ -20,11 +22,6 @@ namespace SortingHat.CLI.Commands
             _logger = logger;
             _tagParser = tagParser;
             _newFile = newFile;
-        }
-
-        private static bool IsTag(string value)
-        {
-            return value.StartsWith(":");
         }
 
         private static bool IsFile(string value)
@@ -44,7 +41,7 @@ namespace SortingHat.CLI.Commands
 
         public async Task ExecuteAsync(IEnumerable<string> arguments)
         {
-            var tags = arguments.Where(IsTag);
+            var tags = arguments.Where(a => a.IsTag());
             var files = new FilePathExtractor(arguments.Where(IsFile));
 
             var tasks = new List<Task>();

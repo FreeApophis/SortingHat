@@ -19,12 +19,7 @@ namespace SortingHat.CLI.Commands
 
         private ConsoleTable FileTable()
         {
-            var table = new ConsoleTable();
-
-            table.Columns.Add(new ConsoleTableColumn());
-            table.Columns.Add(new ConsoleTableColumn());
-            table.Columns.Add(new ConsoleTableColumn());
-            table.Columns.Add(new ConsoleTableColumn());
+            var table = new ConsoleTable(4);
 
             return table;
         }
@@ -41,7 +36,7 @@ namespace SortingHat.CLI.Commands
                 var table = FileTable();
                 foreach (var file in files)
                 {
-                    table.Append(file.Hash.Result.ShortHash(), file.CreatedAt, file.Size.FixedHumanSize(),  file.Path);
+                    table.Append(file.Hash.Result.ShortHash(), file.CreatedAt, file.Size.HumanSize(),  file.Path);
                 }
                 Console.WriteLine(table.ToString());
             }

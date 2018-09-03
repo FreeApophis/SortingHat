@@ -1,13 +1,14 @@
 ﻿using SortingHat.API.DI;
-using SortingHat.API.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 using SortingHat.CLI.Output;
 
 namespace SortingHat.CLI.Commands
 {
+    [UsedImplicitly]
     internal class DuplicateFileCommand : ICommand
     {
         private readonly IDatabase _db;
@@ -37,7 +38,7 @@ namespace SortingHat.CLI.Commands
 
                     if (fileInfo.Exists)
                     {
-                        table.Append(fileInfo.CreationTimeUtc, fileInfo.Length.FixedHumanSize(), fileInfo.Name, string.Empty, fileInfo.Directory.FullName);
+                        table.Append(fileInfo.CreationTimeUtc, fileInfo.Length.HumanSize(), fileInfo.Name, string.Empty, fileInfo.Directory.FullName);
                     }
                     else
                     {
@@ -54,13 +55,7 @@ namespace SortingHat.CLI.Commands
 
         private ConsoleTable FileTable()
         {
-            var table = new ConsoleTable();
-
-            table.Columns.Add(new ConsoleTableColumn());
-            table.Columns.Add(new ConsoleTableColumn());
-            table.Columns.Add(new ConsoleTableColumn());
-            table.Columns.Add(new ConsoleTableColumn());
-            table.Columns.Add(new ConsoleTableColumn());
+            var table = new ConsoleTable(5);
 
             return table;
         }

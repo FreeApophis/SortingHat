@@ -4,6 +4,7 @@ using SortingHat.API.DI;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using SortingHat.API;
 using SortingHat.API.Models;
 
 namespace SortingHat.CLI.Commands
@@ -20,11 +21,6 @@ namespace SortingHat.CLI.Commands
             _logger = logger;
             _tagParser = tagParser;
             _newFile = newFile;
-        }
-
-        private static bool IsTag(string value)
-        {
-            return value.StartsWith(":");
         }
 
         private static bool IsFile(string value)
@@ -44,7 +40,7 @@ namespace SortingHat.CLI.Commands
 
         public bool Execute(IEnumerable<string> arguments)
         {
-            var tags = arguments.Where(IsTag);
+            var tags = arguments.Where(a => a.IsTag());
             var files = new FilePathExtractor(arguments.Where(IsFile));
 
             foreach (var file in files.FilePaths.Select(FileFromPath))
