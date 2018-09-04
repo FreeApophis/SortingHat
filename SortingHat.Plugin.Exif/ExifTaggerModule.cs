@@ -3,8 +3,9 @@ using SortingHat.API.DI;
 using SortingHat.API.Plugin;
 using System.Reflection;
 using System;
+using SortingHat.API.Tagging;
 
-namespace ExifTaggerPlugin
+namespace SortingHat.Plugin.Exif
 {
     class ExifTaggerModule : Autofac.Module, IPlugin
     {
@@ -12,14 +13,11 @@ namespace ExifTaggerPlugin
         public Version Version => Assembly.GetExecutingAssembly().GetName().Version;
         public string Description => "This plugin can automatically tag files according to their exif tags.";
 
-        public bool Execute()
-        {
-            return true;
-        }
-
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterType<ExifTaggerCommand>().As<ICommand>();
+
+            builder.RegisterType<CameraTag>().As<IAutoTag>();
         }
     }
 }

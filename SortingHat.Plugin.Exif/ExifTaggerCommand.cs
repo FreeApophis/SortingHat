@@ -8,7 +8,7 @@ using SortingHat.API;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
 
-namespace ExifTaggerPlugin
+namespace SortingHat.Plugin.Exif
 {
     class ExifTaggerCommand : ICommand
     {

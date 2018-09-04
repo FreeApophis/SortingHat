@@ -86,6 +86,9 @@ namespace SortingHat.CLI.Commands
             Console.WriteLine();
             Console.WriteLine("  hat.exe find (:tax:2018 or :tax:2017) and :bank");
             Console.WriteLine("    This will output all files which are tagged as bank documents for tax in 2017 or 2018.");
+            Console.WriteLine();
+            Console.WriteLine("  auto-tag :Files:{FileType.Category}:{CameraMake} :Taken:{Taken.Year} *");
+            Console.WriteLine("    This will tag all files in the current directory, the possible automatic tags depend on your plugins.");
         }
 
         private ConsoleTable HelpTable()
