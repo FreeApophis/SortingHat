@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SortingHat.API.FileTypeDetection
+namespace SortingHat.Plugin.FileType
 {
     public class FileType
     {

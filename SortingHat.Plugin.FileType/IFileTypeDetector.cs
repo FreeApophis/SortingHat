@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace SortingHat.API.FileTypeDetection
+namespace SortingHat.Plugin.FileType
 {
     internal interface IFileTypeDetector
     {

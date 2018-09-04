@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace SortingHat.API.FileTypeDetection
+namespace SortingHat.Plugin.FileType
 {
     class BasicFileTypeDetector : IFileTypeDetector
     {

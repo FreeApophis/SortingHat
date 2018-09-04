@@ -1,4 +1,4 @@
-﻿using SortingHat.API.FileTypeDetection;
+﻿using SortingHat.Plugin.FileType;
 using System;
 using System.Collections.Generic;
 using System.IO;

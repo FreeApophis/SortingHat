@@ -131,7 +131,6 @@ namespace SortingHat.CLI
 
             builder.RegisterType<StatisticCommand>().As<ICommand>();
             builder.RegisterType<RepairCommand>().As<ICommand>();
-            builder.RegisterType<IdentifyCommand>().As<ICommand>();
             builder.RegisterType<PluginsCommand>().As<ICommand>();
         }
     }

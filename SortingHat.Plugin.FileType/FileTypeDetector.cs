@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace SortingHat.API.FileTypeDetection
+namespace SortingHat.Plugin.FileType
 {
 
     public class FileTypeDetector
@@ -11,7 +11,7 @@ namespace SortingHat.API.FileTypeDetection
         private readonly List<IFileTypeDetector> _detectors = new List<IFileTypeDetector>();
         private string SignatureResource()
         {
-            return "SortingHat.API.Resources.FileSignatures.csv";
+            return "SortingHat.Plugin.FileType.Resources.FileSignatures.csv";
         }
 
         private Stream SignatureStream()

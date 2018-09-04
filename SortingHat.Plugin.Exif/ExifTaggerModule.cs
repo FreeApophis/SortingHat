@@ -19,7 +19,6 @@ namespace ExifTaggerPlugin
 
         protected override void Load(ContainerBuilder builder)
         {
-            Console.WriteLine("Exif Tagger Module Loading...");
             builder.RegisterType<ExifTaggerCommand>().As<ICommand>();
         }
     }

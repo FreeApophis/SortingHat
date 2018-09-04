@@ -1,11 +1,10 @@
 ﻿using JetBrains.Annotations;
 using SortingHat.API.DI;
-using SortingHat.API.FileTypeDetection;
 using SortingHat.API;
 using System.Collections.Generic;
 using System;
 
-namespace SortingHat.CLI.Commands
+namespace SortingHat.Plugin.FileType
 {
     [UsedImplicitly]
     internal class IdentifyCommand : ICommand
