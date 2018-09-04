@@ -102,13 +102,17 @@ namespace SortingHat.CLI.Commands
             if (commands.Any())
             {
                 Console.WriteLine();
-                Console.WriteLine("TODO: Grouping");
+                Console.WriteLine("Commands");
                 Console.WriteLine();
 
                 var table = HelpTable();
-                foreach (var command in commands)
+                foreach (CommandGrouping commandGrouping in Enum.GetValues(typeof(CommandGrouping)))
                 {
-                    table.Append(command.LongCommand, command.ShortCommand, command.ShortHelp);
+                    foreach (var command in commands.Where(c => c.CommandGrouping == commandGrouping))
+                    {
+                        table.Append(command.LongCommand, command.ShortCommand, command.ShortHelp);
+                    }
+                    table.AppendSeperator();
                 }
                 Console.WriteLine(table.ToString());
             }

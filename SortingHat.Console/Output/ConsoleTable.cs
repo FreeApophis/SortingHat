@@ -33,6 +33,11 @@ namespace SortingHat.CLI.Output
             _rows.Add(args);
         }
 
+        public void AppendSeperator()
+        {
+            _rows.Add(new string[Columns.Count]);
+        }
+
         private int MaxColumnLength(int columnIndex)
         {
             return _rows.Max(row => ToTableString(row[columnIndex]).Length);
