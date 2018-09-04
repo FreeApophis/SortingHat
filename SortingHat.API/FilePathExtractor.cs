@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace SortingHat.CLI
+namespace SortingHat.API
 {
-    class FilePathExtractor
+    public class FilePathExtractor
     {
         private readonly List<string> _filePaths = new List<string>();
         public IEnumerable<string> FilePaths => _filePaths;
