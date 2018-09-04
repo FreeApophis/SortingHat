@@ -25,9 +25,8 @@ namespace SortingHat.API.Models
         {
             if (tagString == null) return null;
             if (tagString.StartsWith(":") == false) return null;
-            if (tagString.Any(char.IsWhiteSpace)) return null;
 
-            return ToTag(tagString.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries));
+            return ToTag(tagString.Split(new[] { ':' }).Select(s => s.Trim()).Where(s => s.Length > 0));
         }
 
         private Tag ToTag(IEnumerable<string> tagParts)

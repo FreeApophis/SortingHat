@@ -72,8 +72,8 @@ namespace SortingHat.Test
         [Fact]
         public void ParseTagWhitespace()
         {
-            Tag referenceTag = null;
-            Tag parsedTag = _tagParser.Parse("grand father:father:child with whitespace");
+            var referenceTag = new Tag(_db, "child with whitespace", new Tag(_db, "father", new Tag(_db, "grand father")));
+            Tag parsedTag = _tagParser.Parse(":grand father:father:child with whitespace");
 
             Assert.Equal(referenceTag, parsedTag);
         }
