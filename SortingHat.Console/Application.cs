@@ -4,8 +4,6 @@ using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using SortingHat.API.Parser;
 using SortingHat.API.Plugin;
-using SortingHat.CLI.Output;
-using System.IO;
 using System;
 
 namespace SortingHat.CLI
@@ -33,8 +31,6 @@ namespace SortingHat.CLI
             try
             {
                 _logger.LogTrace($"Running application instance with args: {string.Join(" ", args)}");
-
-                LoadPlugins();
 
                 _argumentParser.Execute(args);
             }
@@ -67,19 +63,6 @@ namespace SortingHat.CLI
 
             //Flush the logger
             _loggerFactory.Dispose();
-        }
-
-        private void LoadPlugins()
-        {
-            _pluginLoader.Load(PluginDirectory());
-            _pluginLoader.Plugins.Each(plugin => plugin.Register(_container, _pluginLoader.Commands));
-
-            _argumentParser.RegisterCommands(_pluginLoader.Commands);
-        }
-
-        private string PluginDirectory()
-        {
-            return Path.Combine(AppContext.BaseDirectory, "plugins");
         }
     }
 }

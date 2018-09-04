@@ -1,10 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using Autofac.Core;
+using Autofac;
+using JetBrains.Annotations;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
-using JetBrains.Annotations;
-using SortingHat.API.DI;
+using System;
 
 namespace SortingHat.API.Plugin
 {
@@ -12,41 +13,42 @@ namespace SortingHat.API.Plugin
     public class PluginLoader : IPluginLoader
     {
         public List<IPlugin> Plugins { get; } = new List<IPlugin>();
-        public List<ICommand> Commands { get; } = new List<ICommand>();
 
-        private readonly ILogger<PluginLoader> _logger;
+        private string PluginDirectory => Path.Combine(AppContext.BaseDirectory, "plugins");
+        private string PluginFilePattern => "*Plugin.dll";
 
-        public PluginLoader(ILogger<PluginLoader> logger)
+        public void RegisterModules(ContainerBuilder builder)
         {
-            _logger = logger;
-        }
-
-        public void Load(string path)
-        {
-            _logger.LogTrace($"Load Plugins from: {path}");
-
-            var directoryInfo = new DirectoryInfo(path);
-
-            if (directoryInfo.Exists == false)
+            foreach (var assembly in GetPluginAssemblies())
             {
-                return;
-            }
+                //  Gets the all modules from each assembly to be registered.
+                //  Make sure that each module **MUST** have a parameterless constructor.
+                var modules = assembly.GetTypes()
+                    .Where(p => typeof(IModule).IsAssignableFrom(p) && !p.IsAbstract)
+                    .Select(p => (IModule)Activator.CreateInstance(p));
 
-            foreach (var file in directoryInfo.GetFiles("*Plugin.dll"))
-            {
-                _logger.LogTrace($"Plugin dll found: {file.Name}");
-
-                Assembly assembly = Assembly.LoadFrom(file.FullName);
-                foreach (Type type in assembly.GetTypes())
+                //  Regsiters each module.
+                foreach (var module in modules)
                 {
-                    if (type.GetInterface(nameof(IPlugin)) == typeof(IPlugin) && type.IsAbstract == false)
-                    {
-                        IPlugin plugin = type.InvokeMember(null, BindingFlags.CreateInstance, null, null, null) as IPlugin;
-                        _logger.LogInformation($"Plugin '{plugin.Name}' successfully loaded. ");
-                        Plugins.Add(plugin);
-                    }
+                    RegisterModule(builder, module);
                 }
             }
+        }
+
+        private void RegisterModule(ContainerBuilder builder, IModule module)
+        {
+            // A plugin module must also implement the IPlugin interface
+            if (module is IPlugin plugin)
+            {
+                builder.RegisterModule(module);
+                Plugins.Add(plugin);
+            }
+        }
+
+        private IEnumerable<Assembly> GetPluginAssemblies()
+        {
+            return Directory.GetFiles(PluginDirectory, PluginFilePattern, SearchOption.TopDirectoryOnly)
+                .Select(Assembly.LoadFrom);
         }
     }
 }

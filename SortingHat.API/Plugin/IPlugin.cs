@@ -10,7 +10,5 @@ namespace SortingHat.API.Plugin
         string Name { get; }
         Version Version { get; }
         string Description { get; }
-
-        void Register(IComponentContext container, List<ICommand> pluginCommands);
     }
 }

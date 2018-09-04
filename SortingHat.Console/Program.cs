@@ -1,16 +1,19 @@
-﻿using System;
-using Autofac;
+﻿using Autofac;
+using Karambolo.Extensions.Logging.File;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SortingHat.API.DI;
+using SortingHat.API.Plugin;
 using SortingHat.API;
 using SortingHat.CLI.Commands;
 using SortingHat.DB;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
-using Karambolo.Extensions.Logging.File;
-using SortingHat.API.Plugin;
+using System;
+using Autofac.Core;
 
 namespace SortingHat.CLI
 {
@@ -47,7 +50,6 @@ namespace SortingHat.CLI
 
             builder.RegisterType<Application>().AsSelf();
             builder.RegisterType<ArgumentParser>().AsSelf();
-            builder.RegisterType<PluginLoader>().As<IPluginLoader>().SingleInstance();
 
             builder.RegisterType<SQLiteDB>().As<IDatabase>().As<SQLiteDB>().SingleInstance();
             builder.RegisterType<SQLiteFile>().As<IFile>().SingleInstance();
@@ -66,13 +68,26 @@ namespace SortingHat.CLI
             RegisterConfiguration(builder);
 
             RegisterCommands(builder);
+            RegisterPlugins(builder);
 
             return ConfigureLogger(builder.Build());
         }
 
+        private static void RegisterPlugins(ContainerBuilder builder)
+        {
+            // Instantiate the plugin loader
+            IPluginLoader pluginLoader = new PluginLoader();
+
+            // Make the plugin loader available in the IoC container
+            builder.RegisterInstance(pluginLoader).As<IPluginLoader>().SingleInstance();
+
+            // Register plugin modules
+            pluginLoader.RegisterModules(builder);
+        }
+
         private static string ConfigurationPath()
         {
-            return Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+            return Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
         }
 
         private static void RegisterConfiguration(ContainerBuilder builder)

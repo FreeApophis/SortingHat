@@ -16,13 +16,11 @@ namespace SortingHat.CLI.Commands
     internal class HelpCommand : ICommand
     {
         private readonly ILogger<HelpCommand> _logger;
-        private readonly IPluginLoader _pluginLoader;
         private readonly IComponentContext _container;
 
-        public HelpCommand(ILogger<HelpCommand> logger, IPluginLoader pluginLoader, IComponentContext container)
+        public HelpCommand(ILogger<HelpCommand> logger, IComponentContext container)
         {
             _logger = logger;
-            _pluginLoader = pluginLoader;
             _container = container;
         }
 
@@ -32,8 +30,7 @@ namespace SortingHat.CLI.Commands
 
             if (arguments.Any())
             {
-                return FindCommand(arguments, _container.Resolve<IEnumerable<ICommand>>()) &&
-                       FindCommand(arguments, _pluginLoader.Commands);
+                return FindCommand(arguments, _container.Resolve<IEnumerable<ICommand>>());
             }
 
             PrintOverview();
@@ -78,8 +75,7 @@ namespace SortingHat.CLI.Commands
         private void PrintOverview()
         {
             PrintHelpHeader();
-            PrintHelpCommands(_container.Resolve<IEnumerable<ICommand>>(), "Available commands");
-            PrintHelpCommands(_pluginLoader.Commands, "Plugin commands:");
+            PrintHelpCommands(_container.Resolve<IEnumerable<ICommand>>());
             PrintHelpExamples();
         }
 
@@ -101,12 +97,12 @@ namespace SortingHat.CLI.Commands
             return table;
         }
 
-        private void PrintHelpCommands(IEnumerable<ICommand> commands, string title)
+        private void PrintHelpCommands(IEnumerable<ICommand> commands)
         {
             if (commands.Any())
             {
                 Console.WriteLine();
-                Console.WriteLine(title);
+                Console.WriteLine("TODO: Grouping");
                 Console.WriteLine();
 
                 var table = HelpTable();
