@@ -9,11 +9,9 @@ using SortingHat.CLI.Commands;
 using SortingHat.DB;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System;
-using Autofac.Core;
 
 namespace SortingHat.CLI
 {
@@ -26,22 +24,11 @@ namespace SortingHat.CLI
 
         static void Main(string[] args)
         {
-            CompositionRoot().Resolve<Application>().Run(args);
-        }
+            var container = CompositionRoot();
 
-        private static IContainer ConfigureLogger(IContainer container)
-        {
-            var loggerFactory = container.Resolve<ILoggerFactory>();
+            ConfigureLogger(container);
 
-            // File Logger
-            var context = new FileLoggerContext(AppContext.BaseDirectory, "fallback.log");
-            var settings = new FileLoggerSettings();
-            loggerFactory.AddFile(context, settings);
-
-            // Console Logger
-            //loggerFactory.AddConsole();
-
-            return container;
+            container.Resolve<Application>().Run(args);
         }
 
         private static IContainer CompositionRoot()
@@ -61,17 +48,34 @@ namespace SortingHat.CLI
 
             builder.RegisterType<SearchQueryVisitor>().As<SearchQueryVisitor>().InstancePerDependency();
 
-
             builder.Register(c => new HashService(SHA256.Create(), nameof(SHA256))).As<IHashService>().SingleInstance();
             builder.RegisterType<LoggerFactory>().As<ILoggerFactory>().SingleInstance();
             builder.RegisterGeneric(typeof(Logger<>)).As(typeof(ILogger<>)).SingleInstance();
-            RegisterConfiguration(builder);
 
+            RegisterConfiguration(builder);
             RegisterCommands(builder);
             RegisterPlugins(builder);
 
-            return ConfigureLogger(builder.Build());
+            return builder.Build();
         }
+
+        private static IContainer ConfigureLogger(IContainer container)
+        {
+            // https://stackoverflow.com/questions/41414796/how-to-get-microsoft-extensions-loggingt-in-console-application-using-serilog
+            var loggerFactory = container.Resolve<ILoggerFactory>();
+
+            // File Logger
+            var context = new FileLoggerContext(AppContext.BaseDirectory, "fallback.log");
+            var settings = new FileLoggerSettings();
+            loggerFactory.AddFile(context, settings);
+
+            // Console Logger
+            //loggerFactory.AddConsole();
+
+            return container;
+        }
+
+
 
         private static void RegisterPlugins(ContainerBuilder builder)
         {
