@@ -13,9 +13,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SortingHat.UI", "SortingHat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SortingHat.DB", "SortingHat.DB\SortingHat.DB.csproj", "{3D173578-8D94-4ACE-BE98-E2F235164604}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "SortingHat.Setup", "SortingHat.Setup\SortingHat.Setup.vdproj", "{94E6F396-1EF2-4C03-AACE-137A956C8DAF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExifTaggerPlugin", "ExifTaggerPlugin\ExifTaggerPlugin.csproj", "{5FB6982A-D25B-46E3-8E00-C48FCA7E4C87}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExifTaggerPlugin", "ExifTaggerPlugin\ExifTaggerPlugin.csproj", "{5FB6982A-D25B-46E3-8E00-C48FCA7E4C87}"
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "SortingHat.Setup", "SortingHat.Setup\SortingHat.Setup.wixproj", "{0869C0DC-A177-42ED-A25E-8A7FC8CB4045}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,13 +43,12 @@ Global
 		{3D173578-8D94-4ACE-BE98-E2F235164604}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D173578-8D94-4ACE-BE98-E2F235164604}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D173578-8D94-4ACE-BE98-E2F235164604}.Release|Any CPU.Build.0 = Release|Any CPU
-		{94E6F396-1EF2-4C03-AACE-137A956C8DAF}.Debug|Any CPU.ActiveCfg = Debug
-		{94E6F396-1EF2-4C03-AACE-137A956C8DAF}.Release|Any CPU.ActiveCfg = Release
-		{94E6F396-1EF2-4C03-AACE-137A956C8DAF}.Release|Any CPU.Build.0 = Release
 		{5FB6982A-D25B-46E3-8E00-C48FCA7E4C87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5FB6982A-D25B-46E3-8E00-C48FCA7E4C87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5FB6982A-D25B-46E3-8E00-C48FCA7E4C87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5FB6982A-D25B-46E3-8E00-C48FCA7E4C87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0869C0DC-A177-42ED-A25E-8A7FC8CB4045}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{0869C0DC-A177-42ED-A25E-8A7FC8CB4045}.Release|Any CPU.ActiveCfg = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
