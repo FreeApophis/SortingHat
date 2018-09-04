@@ -47,8 +47,13 @@ namespace SortingHat.API.Plugin
 
         private IEnumerable<Assembly> GetPluginAssemblies()
         {
-            return Directory.GetFiles(PluginDirectory, PluginFilePattern, SearchOption.TopDirectoryOnly)
-                .Select(Assembly.LoadFrom);
+            if (Directory.Exists(PluginDirectory))
+            {
+                return Directory.GetFiles(PluginDirectory, PluginFilePattern, SearchOption.TopDirectoryOnly)
+                    .Select(Assembly.LoadFrom);
+            }
+
+            return Enumerable.Empty<Assembly>();
         }
     }
 }
