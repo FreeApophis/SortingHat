@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+using Autofac;
 using SortingHat.API.DI;
 
 namespace SortingHat.API.Plugin
@@ -11,6 +11,6 @@ namespace SortingHat.API.Plugin
         Version Version { get; }
         string Description { get; }
 
-        void Register(List<ICommand> pluginCommands);
+        void Register(IComponentContext container, List<ICommand> pluginCommands);
     }
 }

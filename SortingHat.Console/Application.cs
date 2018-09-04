@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using Autofac;
+using JetBrains.Annotations;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using SortingHat.API.Parser;
@@ -12,13 +13,15 @@ namespace SortingHat.CLI
     [UsedImplicitly]
     class Application
     {
+        private readonly IComponentContext _container;
         private readonly ILogger<Application> _logger;
         private readonly ArgumentParser _argumentParser;
         private readonly IPluginLoader _pluginLoader;
         private readonly ILoggerFactory _loggerFactory;
 
-        public Application(ILogger<Application> logger, ILoggerFactory loggerFactory, ArgumentParser argumentParser, IPluginLoader pluginLoader)
+        public Application(IComponentContext container, ILogger<Application> logger, ILoggerFactory loggerFactory, ArgumentParser argumentParser, IPluginLoader pluginLoader)
         {
+            _container = container;
             _logger = logger;
             _loggerFactory = loggerFactory;
             _argumentParser = argumentParser;
@@ -58,6 +61,7 @@ namespace SortingHat.CLI
 
                 _logger.LogError(e.Message);
                 Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace.ToString());
                 Environment.Exit(-1);
             }
 
@@ -68,15 +72,14 @@ namespace SortingHat.CLI
         private void LoadPlugins()
         {
             _pluginLoader.Load(PluginDirectory());
-            _pluginLoader.Plugins.Each(plugin => plugin.Register(_pluginLoader.Commands));
+            _pluginLoader.Plugins.Each(plugin => plugin.Register(_container, _pluginLoader.Commands));
 
             _argumentParser.RegisterCommands(_pluginLoader.Commands);
         }
 
         private string PluginDirectory()
         {
-            //return Path.Combine(AppContext.BaseDirectory, "plugins");
-            return Path.Combine(AppContext.BaseDirectory);
+            return Path.Combine(AppContext.BaseDirectory, "plugins");
         }
     }
 }

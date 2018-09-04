@@ -1,8 +1,9 @@
-﻿using SortingHat.API.FileTypeDetection;
+﻿using JetBrains.Annotations;
+using SortingHat.API.DI;
+using SortingHat.API.FileTypeDetection;
+using SortingHat.API;
 using System.Collections.Generic;
 using System;
-using JetBrains.Annotations;
-using SortingHat.API.DI;
 
 namespace SortingHat.CLI.Commands
 {

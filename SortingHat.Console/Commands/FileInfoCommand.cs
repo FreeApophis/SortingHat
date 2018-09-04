@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
-using System;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
+using SortingHat.API;
+using System.Collections.Generic;
+using System;
 
 namespace SortingHat.CLI.Commands
 {

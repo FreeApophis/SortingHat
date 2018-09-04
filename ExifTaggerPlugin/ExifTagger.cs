@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
+using Autofac;
 
 namespace ExifTaggerPlugin
 {
@@ -15,11 +16,9 @@ namespace ExifTaggerPlugin
         public Version Version => Assembly.GetExecutingAssembly().GetName().Version;
         public string Description => "This plugin can automatically tag files according to their exif tags.";
 
-        private readonly ICommand _exifTaggerCommand = new ExifTaggerCommand();
-
-        public void Register(List<ICommand> pluginCommands)
+        public void Register(IComponentContext container, List<ICommand> pluginCommands)
         {
-            pluginCommands.Add(_exifTaggerCommand);
+            pluginCommands.Add(new ExifTaggerCommand(container));
         }
 
         public bool Execute()
