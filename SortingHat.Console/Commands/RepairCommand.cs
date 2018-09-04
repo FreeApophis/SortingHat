@@ -31,7 +31,7 @@ namespace SortingHat.CLI.Commands
 
         public string LongCommand => "repair";
         public string ShortCommand => null;
-
         public string ShortHelp => "Check each path locked in the database if the file still exists and is not corrupted / changed";
+        public CommandGrouping CommandGrouping => CommandGrouping.General;
     }
 }

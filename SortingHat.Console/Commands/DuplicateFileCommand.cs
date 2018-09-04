@@ -13,10 +13,6 @@ namespace SortingHat.CLI.Commands
     {
         private readonly IDatabase _db;
 
-        public string LongCommand => "duplicate";
-        public string ShortCommand => "d";
-        public string ShortHelp => "Find duplicate files in your dms";
-
         public DuplicateFileCommand(IDatabase db)
         {
             _db = db;
@@ -59,5 +55,10 @@ namespace SortingHat.CLI.Commands
 
             return table;
         }
+
+        public string LongCommand => "duplicate";
+        public string ShortCommand => "d";
+        public string ShortHelp => "Find duplicate files in your dms";
+        public CommandGrouping CommandGrouping => CommandGrouping.File;
     }
 }

@@ -105,8 +105,10 @@ namespace ExifTaggerPlugin
             }
         }
 
-        public string LongCommand => "exif-auto-tag";
+        public string LongCommand => "exif-tag";
         public string ShortCommand => null;
         public string ShortHelp => "Tag files automatically according to their exif tags.";
+
+        public CommandGrouping CommandGrouping => CommandGrouping.AutoTagging;
     }
 }

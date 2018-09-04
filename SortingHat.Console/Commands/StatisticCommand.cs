@@ -43,10 +43,9 @@ namespace SortingHat.CLI.Commands
         }
 
         public string LongCommand => "statistics";
-
         public string ShortCommand => "stat";
-
         public string ShortHelp => "Shows global statistics";
+        public CommandGrouping CommandGrouping => CommandGrouping.General;
 
     }
 }

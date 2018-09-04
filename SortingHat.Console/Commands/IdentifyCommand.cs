@@ -36,7 +36,8 @@ namespace SortingHat.CLI.Commands
 
         public string LongCommand => "identify";
         public string ShortCommand => "id";
-
         public string ShortHelp => "This command identifies the real file type (ignoring the file-extension)";
+        public CommandGrouping CommandGrouping => CommandGrouping.General;
+
     }
 }

@@ -68,7 +68,7 @@ namespace SortingHat.CLI.Commands
 
         public string LongCommand => "tag-files";
         public string ShortCommand => "tag";
-
         public string ShortHelp => "Is tagging the files the given tags";
+        public CommandGrouping CommandGrouping => CommandGrouping.File;
     }
 }

@@ -24,6 +24,6 @@ namespace SortingHat.CLI.Commands
         public string LongCommand => "add-tags";
         public string ShortCommand => null;
         public string ShortHelp => "This adds a tag without any associated files to the db.";
-
+        public CommandGrouping CommandGrouping => CommandGrouping.Tag;
     }
 }

@@ -50,8 +50,7 @@ namespace SortingHat.CLI.Commands
 
         public string LongCommand => "find-files";
         public string ShortCommand => "ff";
-
-        public string ShortHelp => "Finds all files matching the search query";
-
+        public string ShortHelp => "Finds all files matching the search query";     
+        public CommandGrouping CommandGrouping => CommandGrouping.File;
     }
 }

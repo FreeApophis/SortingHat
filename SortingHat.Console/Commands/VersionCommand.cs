@@ -37,5 +37,6 @@ namespace SortingHat.CLI.Commands
         public string LongCommand => "version";
         public string ShortCommand => "v";
         public string ShortHelp => "Shows the current Version of this program";
+        public CommandGrouping CommandGrouping => CommandGrouping.General;
     }
 }

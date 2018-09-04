@@ -79,7 +79,7 @@ namespace SortingHat.CLI.Commands
 
         public string LongCommand => "rename-tag";
         public string ShortCommand => null;
-
         public string ShortHelp => "Renames a tag from database";
+        public CommandGrouping CommandGrouping => CommandGrouping.Tag;
     }
 }

@@ -46,6 +46,7 @@ namespace SortingHat.CLI.Commands
         public string LongCommand => "move-files";
         public string ShortCommand => "mv";
         public string ShortHelp => "This moves all files which match the search query to a specified folder location";
+        public CommandGrouping CommandGrouping => CommandGrouping.File;
 
     }
 }

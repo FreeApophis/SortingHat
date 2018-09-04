@@ -47,6 +47,6 @@ namespace SortingHat.CLI.Commands
         public string LongCommand => "copy-files";
         public string ShortCommand => "cp";
         public string ShortHelp => "This command copies all files which match the search query to a specified folder location.";
-
+        public CommandGrouping CommandGrouping => CommandGrouping.File;
     }
 }

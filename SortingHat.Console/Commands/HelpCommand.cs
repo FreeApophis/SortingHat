@@ -127,6 +127,7 @@ namespace SortingHat.CLI.Commands
         public string ShortCommand => "?";
 
         public string ShortHelp => "This is the help command, it shows a list of the available commands.";
+        public CommandGrouping CommandGrouping => CommandGrouping.General;
 
     }
 }

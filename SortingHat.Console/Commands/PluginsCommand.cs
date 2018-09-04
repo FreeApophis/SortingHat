@@ -32,5 +32,6 @@ namespace SortingHat.CLI.Commands
         public string LongCommand => "plugins";
         public string ShortCommand => null;
         public string ShortHelp => "Lists the loaded plugins";
+        public CommandGrouping CommandGrouping => CommandGrouping.General;
     }
 }

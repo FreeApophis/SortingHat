@@ -62,5 +62,7 @@ namespace SortingHat.CLI.Commands
         public string LongCommand => "file-info";
         public string ShortCommand => "info";
         public string ShortHelp => "Shows all available information about the current file.";
+        public CommandGrouping CommandGrouping => CommandGrouping.File;
+
     }
 }

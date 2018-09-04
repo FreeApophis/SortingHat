@@ -6,6 +6,8 @@ namespace SortingHat.API.DI
     {
         bool Execute(IEnumerable<string> arguments);
 
+        CommandGrouping CommandGrouping { get; }
+
         string LongCommand { get; }
 
         /// <summary>

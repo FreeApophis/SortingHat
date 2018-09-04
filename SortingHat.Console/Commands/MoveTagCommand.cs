@@ -57,5 +57,7 @@ namespace SortingHat.CLI.Commands
         public string LongCommand => "move-tags";
         public string ShortCommand => null;
         public string ShortHelp => "this moves a tag to another parent tag, if you want to move it to the root, use the empty tag ':'";
+        public CommandGrouping CommandGrouping => CommandGrouping.Tag;
+
     }
 }

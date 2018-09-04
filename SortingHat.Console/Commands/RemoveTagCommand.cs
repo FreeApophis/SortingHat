@@ -40,6 +40,6 @@ namespace SortingHat.CLI.Commands
         public string LongCommand => "remove-tags";
         public string ShortCommand => null;
         public string ShortHelp => "Removes a tag from database";
-
+        public CommandGrouping CommandGrouping => CommandGrouping.Tag;
     }
 }

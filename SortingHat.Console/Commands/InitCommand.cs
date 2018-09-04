@@ -28,6 +28,7 @@ namespace SortingHat.CLI.Commands
         public string LongCommand => "init";
         public string ShortCommand => null;
         public string ShortHelp => "Initializes the database, a new database is created";
+        public CommandGrouping CommandGrouping => CommandGrouping.General;
 
     }
 }
