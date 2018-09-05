@@ -9,7 +9,7 @@ namespace SortingHat.Plugin.FileType
     {
         private readonly IEnumerable<IFileTypeDetector> _detectors;
 
-        FileTypeFinder(IEnumerable<IFileTypeDetector> detectors)
+        public FileTypeFinder(IEnumerable<IFileTypeDetector> detectors)
         {
             _detectors = detectors;
         }

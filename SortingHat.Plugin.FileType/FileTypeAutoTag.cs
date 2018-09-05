@@ -15,7 +15,7 @@ namespace SortingHat.Plugin.FileType
 
         private IFileTypeFinder _fileTypeDetector;
 
-        FileTypeAutoTag(IFileTypeFinder fileTypeDetector)
+        public FileTypeAutoTag(IFileTypeFinder fileTypeDetector)
         {
             _fileTypeDetector = fileTypeDetector;
         }

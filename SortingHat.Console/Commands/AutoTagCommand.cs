@@ -19,7 +19,7 @@ namespace SortingHat.CLI.Commands
         private readonly IEnumerable<IAutoTag> _autoTags;
         private readonly Func<File> _newFile;
 
-        internal AutoTagCommand(ILogger<TagFileCommand> logger, ITagParser tagParser, IEnumerable<IAutoTag> autoTags, Func<File> newFile)
+        public AutoTagCommand(ILogger<TagFileCommand> logger, ITagParser tagParser, IEnumerable<IAutoTag> autoTags, Func<File> newFile)
         {
             _logger = logger;
             _tagParser = tagParser;
@@ -49,16 +49,17 @@ namespace SortingHat.CLI.Commands
 
         private string ReplaceVariable(string name, string filePath)
         {
+            var variable = RemoveFirstAndLastCharacter(name);
+
             foreach (var autoTag in _autoTags)
             {
-                var variable = RemoveFirstAndLastCharacter(name);
                 if (autoTag.PossibleAutoTags.Any(t => t == variable))
                 {
                     return autoTag.HandleTag(variable, filePath);
                 }
             }
 
-            throw new Exception("Unknown Variable");
+            throw new Exception($"Unknown Variable: '{variable}'");
         }
 
         private string ReplaceVariables(string tagPattern, string filePath)
@@ -69,9 +70,10 @@ namespace SortingHat.CLI.Commands
 
             foreach (Match match in matches)
             {
-                tagPattern = tagPattern.Replace(match.Name, ReplaceVariable(match.Name, filePath));
+                tagPattern = tagPattern.Replace(match.Value, ReplaceVariable(match.Value, filePath));
             }
 
+            Console.WriteLine(tagPattern);
             return tagPattern;
         }
 
@@ -82,11 +84,13 @@ namespace SortingHat.CLI.Commands
 
         private bool ListTagVariables()
         {
+            Console.WriteLine("Possible Tag Variables:");
+            Console.WriteLine();
             foreach (var autoTag in _autoTags)
             {
-                foreach(var tags in autoTag.PossibleAutoTags)
+                foreach (var tags in autoTag.PossibleAutoTags)
                 {
-                    Console.WriteLine($"{tags}");
+                    Console.WriteLine($"* {tags}");
                 }
             }
 
@@ -124,6 +128,6 @@ namespace SortingHat.CLI.Commands
         public string LongCommand => "auto-tag";
         public string ShortCommand => "auto";
         public string ShortHelp => "Automatically tags stuff ...";
-        public CommandGrouping CommandGrouping => CommandGrouping;
+        public CommandGrouping CommandGrouping => CommandGrouping.AutoTagging;
     }
 }

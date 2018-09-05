@@ -4,6 +4,7 @@ using SortingHat.API.Plugin;
 using System.IO;
 using System.Reflection;
 using System;
+using SortingHat.API.Tagging;
 
 namespace SortingHat.Plugin.FileType
 {
@@ -22,10 +23,12 @@ namespace SortingHat.Plugin.FileType
 
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<IdentifyCommand>().As<ICommand>();
-            builder.RegisterType<FileTypeTaggerCommand>().As<ICommand>();
             builder.RegisterType<FileTypeFinder>().As<IFileTypeFinder>().SingleInstance();
-            
+
+            builder.RegisterType<IdentifyCommand>().As<ICommand>();
+
+            builder.RegisterType<FileTypeAutoTag>().As<IAutoTag>().SingleInstance();
+
             LoadDetectors(builder);
         }
 

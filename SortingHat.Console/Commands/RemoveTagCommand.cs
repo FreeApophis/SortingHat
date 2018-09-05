@@ -30,8 +30,6 @@ namespace SortingHat.CLI.Commands
                 {
                     _logger.LogWarning("Remove tag failed");
                 }
-
-
             }
 
             return true;
