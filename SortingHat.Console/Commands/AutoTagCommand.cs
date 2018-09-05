@@ -82,7 +82,15 @@ namespace SortingHat.CLI.Commands
 
         private bool ListTagVariables()
         {
-            throw new NotImplementedException();
+            foreach (var autoTag in _autoTags)
+            {
+                foreach(var tags in autoTag.PossibleAutoTags)
+                {
+                    Console.WriteLine($"{tags}");
+                }
+            }
+
+            return true;
         }
 
         private bool TagFiles(IEnumerable<string> arguments)
