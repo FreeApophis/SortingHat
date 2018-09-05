@@ -15,9 +15,9 @@ namespace SortingHat.Plugin.Exif
 
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<ExifTaggerCommand>().As<ICommand>();
+            builder.RegisterType<ExifCommand>().As<ICommand>();
 
-            builder.RegisterType<CameraTag>().As<IAutoTag>();
+            //builder.RegisterType<ExifStringTags>().As<IAutoTag>();
         }
     }
 }

@@ -9,15 +9,21 @@ namespace SortingHat.Plugin.FileType
     [UsedImplicitly]
     internal class IdentifyCommand : ICommand
     {
+        private readonly IFileTypeFinder _fileTypeFinder;
+
+        public IdentifyCommand(IFileTypeFinder fileTypeFinder)
+        {
+            _fileTypeFinder = fileTypeFinder;
+        }
+
         public bool Execute(IEnumerable<string> arguments)
         {
-            var detector = new FileTypeDetector();
             var filePathExtractor = new FilePathExtractor(arguments);
 
             foreach (var argument in filePathExtractor.FilePaths)
             {
                 Console.WriteLine($"File: {argument}");
-                var fileType = detector.Identify(argument);
+                var fileType = _fileTypeFinder.Identify(argument);
 
                 if (fileType != null)
                 {

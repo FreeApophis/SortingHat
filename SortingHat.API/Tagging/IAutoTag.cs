@@ -4,6 +4,7 @@ namespace SortingHat.API.Tagging
 {
     public interface IAutoTag
     {
-        IEnumerable<string> HandledTags { get; }
+        IEnumerable<string> PossibleAutoTags { get; }
+        string HandleTag(string autoTag, string fileName);
     }
 }
