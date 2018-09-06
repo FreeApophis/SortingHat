@@ -1,32 +1,26 @@
 ﻿using MetadataExtractor.Formats.Exif;
 using MetadataExtractor;
 using SortingHat.API.Tagging;
+using static SortingHat.Plugin.Exif.SupportedTags;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace SortingHat.Plugin.Exif
 {
-    public abstract class ExifAutoTag : IAutoTag
+    public class ExifAutoTag : IAutoTag
     {
-        public abstract IEnumerable<string> PossibleAutoTags { get; }
-        public abstract string HandleTag(string fileName, string autoTag);
+        private Dictionary<string, ExifTag> _supportedTags = GetSupportedTags();
+        public IEnumerable<string> PossibleAutoTags => _supportedTags.Select(t => t.Key);
 
-        protected IEnumerable<Directory> ReadMetaData(string fileName)
+        public string HandleTag(string fileName, string autoTag)
         {
-            return ImageMetadataReader.ReadMetadata(fileName);
+            if (_supportedTags.TryGetValue(autoTag, out var exifTag))
+            {
+                exifTag.GetTag.ReadString(fileName, exifTag.DirectoryEntryID);
+            }
 
-        }
-
-        protected string ReadString<Type>(IEnumerable<Directory> directories)
-        {
-            // obtain the Exif SubIFD directory
-            var directory = directories.OfType<ExifIfd0Directory>().FirstOrDefault();
-
-            if (directory == null)
-                return null;
-
-            // query the tag's value
-            return directory.GetString(ExifDirectoryBase.TagModel);
+            throw new NotImplementedException();
         }
 
         //DateTime? GetTakenDateTime(IEnumerable<Directory> directories)

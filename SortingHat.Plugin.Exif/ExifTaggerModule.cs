@@ -17,7 +17,7 @@ namespace SortingHat.Plugin.Exif
         {
             builder.RegisterType<ExifCommand>().As<ICommand>();
 
-            //builder.RegisterType<ExifStringTags>().As<IAutoTag>();
+            builder.RegisterType<ExifAutoTag>().As<IAutoTag>().SingleInstance();
         }
     }
 }
