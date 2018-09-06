@@ -1,38 +1,30 @@
-﻿using System;
+﻿using SortingHat.API.DI;
+using SortingHat.API;
 using System.Collections.Generic;
-using Autofac;
-using SortingHat.API.DI;
+using System;
 
 namespace SortingHat.Plugin.Exif
 {
+    using MetadataExtractor;
+    using static MetadataExtractor.ImageMetadataReader;
+
     class ExifCommand : ICommand
     {
-        private IComponentContext _container;
-
-        public ExifCommand(IComponentContext container)
-        {
-            _container = container;
-        }
-
-
-
-        private static API.Models.Tag TagFromDate(IDatabase db, DateTime? taken)
-        {
-            if (taken.HasValue)
-            {
-                var root = new API.Models.Tag(db, "Taken");
-                var year = new API.Models.Tag(db, taken.Value.Year.ToString(), root);
-                var month = new API.Models.Tag(db, taken.Value.Month.ToString(), year);
-                var day = new API.Models.Tag(db, taken.Value.Day.ToString(), month);
-
-                return day;
-            }
-
-            return null;
-        }
-
         public bool Execute(IEnumerable<string> arguments)
         {
+            var filePaths = new FilePathExtractor(arguments);
+
+            foreach (var filePath in filePaths.FilePaths)
+            {
+                IEnumerable<Directory> directories = ReadMetadata(filePath);
+                foreach (var directory in directories)
+                {
+                    foreach (var tag in directory.Tags)
+                    {
+                        Console.WriteLine($"{directory.Name} - {tag.Name} = {tag.Description}");
+                    }
+                }
+            }
             return true;
         }
 

@@ -27,7 +27,7 @@ namespace SortingHat.CLI.Commands
         }
 
         public string LongCommand => "list-tags";
-        public string ShortCommand => null;
+        public string ShortCommand => "tags";
         public string ShortHelp => "Lists all avaialable tags in hierarchical form";
         public CommandGrouping CommandGrouping => CommandGrouping.Tag;
 

@@ -1,4 +1,4 @@
-﻿using System;
+﻿using SortingHat.Plugin.Exif.TagTransformer;
 
 namespace SortingHat.Plugin.Exif
 {
@@ -6,6 +6,6 @@ namespace SortingHat.Plugin.Exif
     {
         public string Name { get; set; }
         public int DirectoryEntryID { get; set; }
-        public IMetaDataReader GetTag { get; set; }
+        public ITagTransformer GetTag { get; set; }
     }
 }

@@ -17,27 +17,10 @@ namespace SortingHat.Plugin.Exif
         {
             if (_supportedTags.TryGetValue(autoTag, out var exifTag))
             {
-                exifTag.GetTag.ReadString(fileName, exifTag.DirectoryEntryID);
+                exifTag.GetTag.TransformTag(fileName, exifTag.DirectoryEntryID);
             }
 
             throw new NotImplementedException();
         }
-
-        //DateTime? GetTakenDateTime(IEnumerable<Directory> directories)
-        //{
-        //    // obtain the Exif SubIFD directory
-        //    var directory = directories.OfType<ExifSubIfdDirectory>().FirstOrDefault();
-
-        //    if (directory == null)
-        //        return null;
-
-        //    // query the tag's value
-        //    if (directory.TryGetDateTime(ExifDirectoryBase.TagDateTimeOriginal, out var dateTime))
-        //        return dateTime;
-
-        //    return null;
-        //}
-
-
     }
 }
