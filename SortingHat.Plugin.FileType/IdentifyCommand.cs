@@ -1,6 +1,5 @@
 ﻿using JetBrains.Annotations;
 using SortingHat.API.DI;
-using SortingHat.API;
 using System.Collections.Generic;
 using System;
 
@@ -10,26 +9,26 @@ namespace SortingHat.Plugin.FileType
     internal class IdentifyCommand : ICommand
     {
         private readonly IFileTypeFinder _fileTypeFinder;
+        private readonly IFilePathExtractor _filePathExtractor;
 
-        public IdentifyCommand(IFileTypeFinder fileTypeFinder)
+        public IdentifyCommand(IFileTypeFinder fileTypeFinder, IFilePathExtractor filePathExtractor)
         {
             _fileTypeFinder = fileTypeFinder;
+            _filePathExtractor = filePathExtractor;
         }
 
         public bool Execute(IEnumerable<string> arguments)
         {
-            var filePathExtractor = new FilePathExtractor(arguments);
-
-            foreach (var argument in filePathExtractor.FilePaths)
+            foreach (var argument in _filePathExtractor.FromFilePatterns(arguments))
             {
                 Console.WriteLine($"File: {argument}");
                 var fileType = _fileTypeFinder.Identify(argument);
 
                 if (fileType != null)
                 {
-                    Console.WriteLine($"C: {fileType.Category}");
-                    Console.WriteLine($"N: {fileType.Name}");
-                    Console.WriteLine($"E: {string.Join(",", fileType.Extensions)}");
+                    Console.WriteLine($"Category : {fileType.Category}");
+                    Console.WriteLine($"Name     : {fileType.Name}");
+                    Console.WriteLine($"Extension: {string.Join(",", fileType.Extensions)}");
                 }
                 else
                 {

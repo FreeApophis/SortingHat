@@ -10,11 +10,16 @@ namespace SortingHat.Plugin.Exif
 
     class ExifCommand : ICommand
     {
+        private readonly IFilePathExtractor _filePathExtractor;
+
+        public ExifCommand(IFilePathExtractor filePathExtractor)
+        {
+            _filePathExtractor = filePathExtractor;
+        }
+
         public bool Execute(IEnumerable<string> arguments)
         {
-            var filePaths = new FilePathExtractor(arguments);
-
-            foreach (var filePath in filePaths.FilePaths)
+            foreach (var filePath in _filePathExtractor.FromFilePatterns(arguments))
             {
                 IEnumerable<Directory> directories = ReadMetadata(filePath);
                 foreach (var directory in directories)

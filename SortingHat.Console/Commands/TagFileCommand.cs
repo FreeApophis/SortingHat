@@ -15,12 +15,14 @@ namespace SortingHat.CLI.Commands
     {
         private readonly ILogger<TagFileCommand> _logger;
         private readonly ITagParser _tagParser;
+        private readonly IFilePathExtractor _filePathExtractor;
         private readonly Func<File> _newFile;
 
-        public TagFileCommand(ILogger<TagFileCommand> logger, ITagParser tagParser, Func<File> newFile)
+        public TagFileCommand(ILogger<TagFileCommand> logger, ITagParser tagParser, IFilePathExtractor filePathExtractor, Func<File> newFile)
         {
             _logger = logger;
             _tagParser = tagParser;
+            _filePathExtractor = filePathExtractor;
             _newFile = newFile;
         }
 
@@ -42,10 +44,10 @@ namespace SortingHat.CLI.Commands
         public async Task ExecuteAsync(IEnumerable<string> arguments)
         {
             var tags = arguments.Where(a => a.IsTag());
-            var files = new FilePathExtractor(arguments.Where(IsFile));
+            var files = arguments.Where(IsFile);
 
             var tasks = new List<Task>();
-            foreach (var file in files.FilePaths.Select(FileFromPath))
+            foreach (var file in _filePathExtractor.FromFilePatterns(files).Select(FileFromPath))
             {
                 foreach (var tag in tags.Select(_tagParser.Parse))
                 {

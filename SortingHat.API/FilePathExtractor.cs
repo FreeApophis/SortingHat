@@ -1,20 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using SortingHat.API.DI;
+using System.Collections.Generic;
 using System.IO;
 
 namespace SortingHat.API
 {
-    public class FilePathExtractor
+    public class FilePathExtractor : IFilePathExtractor
     {
         private readonly List<string> _filePaths = new List<string>();
-        public IEnumerable<string> FilePaths => _filePaths;
 
-        public FilePathExtractor(IEnumerable<string> filePatterns)
+        public List<string> FromFilePatterns(IEnumerable<string> filePatterns)
         {
-            GetFilePaths(filePatterns);
-        }
+            _filePaths.Clear();
 
-        private void GetFilePaths(IEnumerable<string> filePatterns)
-        {
             foreach (var filePattern in filePatterns)
             {
                 if (filePattern.Contains("*") || filePattern.Contains("?"))
@@ -30,6 +27,8 @@ namespace SortingHat.API
                     AddExistingFiles(absolutePath);
                 }
             }
+
+            return _filePaths;
         }
 
         private void AddExistingFiles(string filePath)

@@ -15,13 +15,15 @@ namespace SortingHat.CLI.Commands
     internal class AutoTagCommand : ICommand
     {
         private readonly ILogger<TagFileCommand> _logger;
+        private readonly IFilePathExtractor _filePathExtractor;
         private readonly ITagParser _tagParser;
         private readonly IEnumerable<IAutoTag> _autoTags;
         private readonly Func<File> _newFile;
 
-        public AutoTagCommand(ILogger<TagFileCommand> logger, ITagParser tagParser, IEnumerable<IAutoTag> autoTags, Func<File> newFile)
+        public AutoTagCommand(ILogger<TagFileCommand> logger, IFilePathExtractor filePathExtractor, ITagParser tagParser, IEnumerable<IAutoTag> autoTags, Func<File> newFile)
         {
             _logger = logger;
+            _filePathExtractor = filePathExtractor;
             _tagParser = tagParser;
             _autoTags = autoTags;
             _newFile = newFile;
@@ -100,9 +102,9 @@ namespace SortingHat.CLI.Commands
         private bool TagFiles(IEnumerable<string> arguments)
         {
             var tags = arguments.Where(a => a.IsTag());
-            var files = new FilePathExtractor(arguments.Where(IsFile));
+            var files = arguments.Where(IsFile);
 
-            foreach (var file in files.FilePaths.Select(FileFromPath))
+            foreach (var file in _filePathExtractor.FromFilePatterns(files).Select(FileFromPath))
             {
                 foreach (var tag in tags.Select(t => TagFromPattern(t, file.Path)))
                 {

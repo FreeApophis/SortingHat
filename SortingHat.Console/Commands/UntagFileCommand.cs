@@ -13,12 +13,14 @@ namespace SortingHat.CLI.Commands
     internal class UntagFileCommand : ICommand
     {
         private readonly ILogger<TagFileCommand> _logger;
+        private readonly IFilePathExtractor _filePathExtractor;
         private readonly ITagParser _tagParser;
         private readonly Func<File> _newFile;
 
-        public UntagFileCommand(ILogger<TagFileCommand> logger, IHashService hashService, ITagParser tagParser, Func<File> newFile)
+        public UntagFileCommand(ILogger<TagFileCommand> logger, IFilePathExtractor filePathExtractor, IHashService hashService, ITagParser tagParser, Func<File> newFile)
         {
             _logger = logger;
+            _filePathExtractor = filePathExtractor;
             _tagParser = tagParser;
             _newFile = newFile;
         }
@@ -41,9 +43,9 @@ namespace SortingHat.CLI.Commands
         public bool Execute(IEnumerable<string> arguments)
         {
             var tags = arguments.Where(a => a.IsTag());
-            var files = new FilePathExtractor(arguments.Where(IsFile));
+            var files = arguments.Where(IsFile);
 
-            foreach (var file in files.FilePaths.Select(FileFromPath))
+            foreach (var file in _filePathExtractor.FromFilePatterns(files).Select(FileFromPath))
             {
                 foreach (var tag in tags.Select(_tagParser.Parse))
                 {

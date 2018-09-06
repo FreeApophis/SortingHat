@@ -10,18 +10,18 @@ namespace SortingHat.CLI.Commands
     [UsedImplicitly]
     internal class FileInfoCommand : ICommand
     {
+        private readonly IFilePathExtractor _filePathExtractor;
         private readonly Func<File> _newFile;
 
-        public FileInfoCommand(Func<File> newFile)
+        public FileInfoCommand(IFilePathExtractor filePathExtractor, Func<File> newFile)
         {
+            _filePathExtractor = filePathExtractor;
             _newFile = newFile;
         }
 
         public bool Execute(IEnumerable<string> arguments)
         {
-            var filePaths = new FilePathExtractor(arguments);
-
-            foreach (var filePath in filePaths.FilePaths)
+            foreach (var filePath in _filePathExtractor.FromFilePatterns(arguments))
             {
                 Console.WriteLine();
                 Console.WriteLine($"File: {filePath}");
