@@ -1,14 +1,15 @@
-﻿using SortingHat.API.DI;
-using SortingHat.API;
-using System.Collections.Generic;
+﻿using JetBrains.Annotations;
+using MetadataExtractor;
+using SortingHat.API.DI;
 using System;
+using System.Collections.Generic;
 
 namespace SortingHat.Plugin.Exif
 {
-    using MetadataExtractor;
-    using static MetadataExtractor.ImageMetadataReader;
+    using static ImageMetadataReader;
 
-    class ExifCommand : ICommand
+    [UsedImplicitly]
+    internal class ExifCommand : ICommand
     {
         private readonly IFilePathExtractor _filePathExtractor;
 

@@ -1,13 +1,14 @@
 ﻿using Autofac;
+using JetBrains.Annotations;
 using SortingHat.API.DI;
 using SortingHat.API.Plugin;
-using System.Reflection;
 using System;
-using SortingHat.API.Tagging;
+using System.Reflection;
 
 namespace SortingHat.Plugin.Exif
 {
-    class ExifTaggerModule : Autofac.Module, IPlugin
+    [UsedImplicitly]
+    internal class ExifTaggerModule : Autofac.Module, IPlugin
     {
         public string Name => "Exif Tagger";
         public Version Version => Assembly.GetExecutingAssembly().GetName().Version;

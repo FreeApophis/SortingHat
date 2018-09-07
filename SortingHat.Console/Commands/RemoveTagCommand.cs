@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 
 namespace SortingHat.CLI.Commands
 {

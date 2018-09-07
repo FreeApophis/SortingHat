@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace SortingHat.Plugin.FileType
+namespace SortingHat.Plugin.FileType.Detectors
 {
     class BasicFileTypeDetector : IFileTypeDetector
     {
@@ -44,7 +44,7 @@ namespace SortingHat.Plugin.FileType
             }
         }
 
-        private bool EqualWithJoker(string lhs, string rhs)
+        private static bool EqualWithJoker(string lhs, string rhs)
         {
             return lhs
                 .Zip(rhs, Tuple.Create)

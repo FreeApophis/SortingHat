@@ -1,8 +1,8 @@
 ﻿using System.IO;
 
-namespace SortingHat.Plugin.FileType
+namespace SortingHat.Plugin.FileType.Detectors
 {
-    class TransportStreamDetector : BasicFileTypeDetector
+    internal class TransportStreamDetector : BasicFileTypeDetector
     {
         private const long Intervall = 188;
 

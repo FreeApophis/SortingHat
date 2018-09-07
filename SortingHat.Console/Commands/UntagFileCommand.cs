@@ -1,11 +1,11 @@
-﻿using System;
+﻿using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
+using SortingHat.API;
 using SortingHat.API.DI;
+using SortingHat.API.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
-using SortingHat.API;
-using SortingHat.API.Models;
 
 namespace SortingHat.CLI.Commands
 {

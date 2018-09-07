@@ -1,4 +1,4 @@
-﻿namespace SortingHat.Plugin.FileType
+﻿namespace SortingHat.Plugin.FileType.Detectors
 {
     internal static class FileTypeDetectorFactory
     {

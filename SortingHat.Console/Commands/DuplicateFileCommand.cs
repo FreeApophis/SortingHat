@@ -1,10 +1,10 @@
-﻿using SortingHat.API.DI;
+﻿using JetBrains.Annotations;
+using SortingHat.API.DI;
+using SortingHat.CLI.Output;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using JetBrains.Annotations;
-using SortingHat.CLI.Output;
 
 namespace SortingHat.CLI.Commands
 {

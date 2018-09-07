@@ -1,26 +1,23 @@
-﻿using MetadataExtractor.Formats.Exif;
-using MetadataExtractor;
-using SortingHat.API.Tagging;
-using static SortingHat.Plugin.Exif.SupportedTags;
+﻿using JetBrains.Annotations;
+using SortingHat.API.DI;
 using System.Collections.Generic;
 using System.Linq;
-using System;
 
 namespace SortingHat.Plugin.Exif
 {
+    using static SupportedTags;
+
+    [UsedImplicitly]
     public class ExifAutoTag : IAutoTag
     {
-        private Dictionary<string, ExifTag> _supportedTags = GetSupportedTags();
+        private readonly Dictionary<string, ExifTag> _supportedTags = GetSupportedTags();
         public IEnumerable<string> PossibleAutoTags => _supportedTags.Select(t => t.Key);
 
-        public string HandleTag(string fileName, string autoTag)
+        public string HandleTag(string autoTag, string fileName)
         {
-            if (_supportedTags.TryGetValue(autoTag, out var exifTag))
-            {
-                exifTag.GetTag.TransformTag(fileName, exifTag.DirectoryEntryID);
-            }
-
-            throw new NotImplementedException();
+            return _supportedTags.TryGetValue(autoTag, out var exifTag)
+                ? exifTag.GetTag.TransformTag(fileName, exifTag.DirectoryEntryID)
+                : null;
         }
     }
 }

@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using JetBrains.Annotations;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace SortingHat.Plugin.FileType
+namespace SortingHat.Plugin.FileType.Detectors
 {
-
+    [UsedImplicitly]
     public class FileTypeFinder : IFileTypeFinder
     {
         private readonly IEnumerable<IFileTypeDetector> _detectors;

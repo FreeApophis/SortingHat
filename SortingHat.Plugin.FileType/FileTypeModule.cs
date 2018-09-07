@@ -4,10 +4,12 @@ using SortingHat.API.Plugin;
 using System.IO;
 using System.Reflection;
 using System;
-using SortingHat.API.Tagging;
+using JetBrains.Annotations;
+using SortingHat.Plugin.FileType.Detectors;
 
 namespace SortingHat.Plugin.FileType
 {
+    [UsedImplicitly]
     class FileTypeModule : Autofac.Module, IPlugin
     {
         private const string SignatureResource = "SortingHat.Plugin.FileType.Resources.FileSignatures.csv";
@@ -15,11 +17,6 @@ namespace SortingHat.Plugin.FileType
         public string Name => "File Type Plugin";
         public Version Version => Assembly.GetExecutingAssembly().GetName().Version;
         public string Description => "This plugin can automatically can identify file type accoridng to their content, and als create automatically tags on file type.";
-
-        public bool Execute()
-        {
-            return true;
-        }
 
         protected override void Load(ContainerBuilder builder)
         {
@@ -32,7 +29,7 @@ namespace SortingHat.Plugin.FileType
             LoadDetectors(builder);
         }
 
-        private Stream SignatureStream()
+        private static Stream SignatureStream()
         {
             return Assembly.GetExecutingAssembly().GetManifestResourceStream(SignatureResource);
         }

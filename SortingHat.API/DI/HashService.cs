@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
@@ -7,8 +8,8 @@ namespace SortingHat.API.DI
 {
     public class HashService : IHashService
     {
-        readonly HashAlgorithm _hashAlgorithm;
-        readonly string _hashPrefix;
+        private readonly HashAlgorithm _hashAlgorithm;
+        private readonly string _hashPrefix;
 
         public HashService(HashAlgorithm hashAlgorithm, string hashPrefix)
         {
@@ -30,7 +31,7 @@ namespace SortingHat.API.DI
             });
         }
 
-        private static string ToHex(byte[] hash)
+        private static string ToHex(IEnumerable<byte> hash)
         {
             return string.Concat(hash.Select(x => x.ToString("x2")));
         }

@@ -1,12 +1,13 @@
-﻿using static System.Linq.Enumerable;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
-using System;
 
 namespace SortingHat.CLI.Output
 {
+    using static Enumerable;
+
     internal class ConsoleTable
     {
         private const char Space = ' ';

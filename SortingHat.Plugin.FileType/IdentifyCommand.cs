@@ -1,7 +1,8 @@
 ﻿using JetBrains.Annotations;
 using SortingHat.API.DI;
-using System.Collections.Generic;
+using SortingHat.Plugin.FileType.Detectors;
 using System;
+using System.Collections.Generic;
 
 namespace SortingHat.Plugin.FileType
 {

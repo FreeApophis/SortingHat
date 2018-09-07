@@ -1,11 +1,11 @@
-﻿using Autofac.Core;
-using Autofac;
+﻿using Autofac;
+using Autofac.Core;
 using JetBrains.Annotations;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System;
 
 namespace SortingHat.API.Plugin
 {
@@ -14,8 +14,8 @@ namespace SortingHat.API.Plugin
     {
         public List<IPlugin> Plugins { get; } = new List<IPlugin>();
 
-        private string PluginDirectory => Path.Combine(AppContext.BaseDirectory, "plugins");
-        private string PluginFilePattern => "*.dll";
+        private static string PluginDirectory => Path.Combine(AppContext.BaseDirectory, "plugins");
+        private static string PluginFilePattern => "*.dll";
 
         public void RegisterModules(ContainerBuilder builder)
         {
@@ -45,7 +45,7 @@ namespace SortingHat.API.Plugin
             }
         }
 
-        private IEnumerable<Assembly> GetPluginAssemblies()
+        private static IEnumerable<Assembly> GetPluginAssemblies()
         {
             if (Directory.Exists(PluginDirectory))
             {

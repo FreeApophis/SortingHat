@@ -1,19 +1,22 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+using SortingHat.API.DI;
+using SortingHat.Plugin.FileType.Detectors;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using SortingHat.API.Tagging;
 
 namespace SortingHat.Plugin.FileType
 {
+    [UsedImplicitly]
     internal class FileTypeAutoTag : IAutoTag
     {
-        const string FileTypeCategory = "FileType.Category";
-        const string FileTypeType = "FileType.Type";
-        const string FileTypeExtension = "FileType.Extension";
+        private const string FileTypeCategory = "FileType.Category";
+        private const string FileTypeType = "FileType.Type";
+        private const string FileTypeExtension = "FileType.Extension";
 
-        public IEnumerable<string> PossibleAutoTags => new List<string>() { FileTypeCategory, FileTypeType, FileTypeExtension };
+        public IEnumerable<string> PossibleAutoTags => new List<string> { FileTypeCategory, FileTypeType, FileTypeExtension };
 
-        private IFileTypeFinder _fileTypeDetector;
+        private readonly IFileTypeFinder _fileTypeDetector;
 
         public FileTypeAutoTag(IFileTypeFinder fileTypeDetector)
         {
@@ -23,6 +26,11 @@ namespace SortingHat.Plugin.FileType
         public string HandleTag(string autoTag, string fileName)
         {
             var fileType = _fileTypeDetector.Identify(fileName);
+
+            if (fileType == null)
+            {
+                return null;
+            }
 
             switch (autoTag)
             {

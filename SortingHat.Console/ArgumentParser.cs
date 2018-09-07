@@ -20,7 +20,7 @@ namespace SortingHat.CLI
             RegisterCommands(commands);
         }
 
-        public void RegisterCommands(IEnumerable<ICommand> commands)
+        private void RegisterCommands(IEnumerable<ICommand> commands)
         {
             foreach (var command in commands)
             {

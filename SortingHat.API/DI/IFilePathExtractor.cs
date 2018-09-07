@@ -4,6 +4,6 @@ namespace SortingHat.API.DI
 {
     public interface IFilePathExtractor
     {
-        List<string> FromFilePatterns(IEnumerable<string> filePatterns);
+        IEnumerable<string> FromFilePatterns(IEnumerable<string> filePatterns);
     }
 }

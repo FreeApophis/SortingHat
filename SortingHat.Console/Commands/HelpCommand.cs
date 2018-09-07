@@ -1,14 +1,13 @@
 ﻿using Autofac;
+using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
+using SortingHat.API.DI;
+using SortingHat.CLI.Output;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using JetBrains.Annotations;
-using SortingHat.API.DI;
-using SortingHat.API.Plugin;
-using SortingHat.CLI.Output;
 
 namespace SortingHat.CLI.Commands
 {

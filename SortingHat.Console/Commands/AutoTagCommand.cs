@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using SortingHat.API;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
-using SortingHat.API.Tagging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace SortingHat.CLI.Commands
 {
@@ -44,7 +43,7 @@ namespace SortingHat.CLI.Commands
             return file;
         }
 
-        private string RemoveFirstAndLastCharacter(string bracedString)
+        private static string RemoveFirstAndLastCharacter(string bracedString)
         {
             return bracedString.Substring(1, bracedString.Length - 2);
         }
@@ -68,11 +67,13 @@ namespace SortingHat.CLI.Commands
         {
             var variableRegex = new Regex("{.*?}");
 
-            MatchCollection matches = variableRegex.Matches(tagPattern);
+            var matches = variableRegex.Matches(tagPattern);
 
             foreach (Match match in matches)
             {
-                tagPattern = tagPattern.Replace(match.Value, ReplaceVariable(match.Value, filePath));
+                var replaceVariable = ReplaceVariable(match.Value, filePath);
+                if (replaceVariable == null) { return null; }
+                tagPattern = tagPattern.Replace(match.Value, replaceVariable);
             }
 
             Console.WriteLine(tagPattern);
@@ -81,7 +82,15 @@ namespace SortingHat.CLI.Commands
 
         private Tag TagFromPattern(string tagPattern, string filePath)
         {
-            return _tagParser.Parse(ReplaceVariables(tagPattern, filePath));
+            var tag = ReplaceVariables(tagPattern, filePath);
+            if (tag == null)
+            {
+                Console.WriteLine($"Failed Variable Replacment: {tagPattern}, {filePath} ");
+                _logger.LogWarning("failed tag ...");
+                return null;
+
+            }
+            return _tagParser.Parse(tag);
         }
 
         private bool ListTagVariables()
@@ -106,8 +115,9 @@ namespace SortingHat.CLI.Commands
 
             foreach (var file in _filePathExtractor.FromFilePatterns(files).Select(FileFromPath))
             {
-                foreach (var tag in tags.Select(t => TagFromPattern(t, file.Path)))
+                foreach (var tag in tags.Select(t => TagFromPattern(t, file.Path)).Where(t => t != null))
                 {
+                    Console.WriteLine($"Tag '{file.Path}' with '{tag.FullName}'");
                     file.Tag(tag).Wait();
                 }
             }
@@ -117,14 +127,9 @@ namespace SortingHat.CLI.Commands
 
         public bool Execute(IEnumerable<string> arguments)
         {
-            if (arguments.Any() == false)
-            {
-                return ListTagVariables();
-            }
-            else
-            {
-                return TagFiles(arguments);
-            }
+            return arguments.Any()
+                ? TagFiles(arguments)
+                : ListTagVariables();
         }
 
         public string LongCommand => "auto-tag";

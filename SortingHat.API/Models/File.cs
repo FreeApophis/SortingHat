@@ -1,8 +1,8 @@
-﻿using SortingHat.API.DI;
+﻿using JetBrains.Annotations;
+using SortingHat.API.DI;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System;
-using JetBrains.Annotations;
 using System.Threading.Tasks;
 
 namespace SortingHat.API.Models
@@ -32,7 +32,7 @@ namespace SortingHat.API.Models
 
         public void LoadByPath()
         {
-            FileInfo fileInfo = new FileInfo(Path);
+            var fileInfo = new FileInfo(Path);
 
             Hash = _hashService.GetHash(Path);
             Size = fileInfo.Length;

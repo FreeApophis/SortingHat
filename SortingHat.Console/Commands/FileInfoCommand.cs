@@ -1,9 +1,8 @@
 ﻿using JetBrains.Annotations;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
-using SortingHat.API;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 
 namespace SortingHat.CLI.Commands
 {
@@ -29,7 +28,7 @@ namespace SortingHat.CLI.Commands
                 var file = _newFile();
                 file.Path = filePath;
                 file.DBLoadByPath();
-                if (string.IsNullOrEmpty(file.Hash.Result))
+                if (file.Hash == null)
                 {
                     Console.WriteLine("File not in index!");
                 }

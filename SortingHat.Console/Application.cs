@@ -1,29 +1,23 @@
-﻿using Autofac;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using SortingHat.API.Parser;
-using SortingHat.API.Plugin;
 using System;
 
 namespace SortingHat.CLI
 {
     [UsedImplicitly]
-    class Application
+    internal class Application
     {
-        private readonly IComponentContext _container;
         private readonly ILogger<Application> _logger;
         private readonly ArgumentParser _argumentParser;
-        private readonly IPluginLoader _pluginLoader;
         private readonly ILoggerFactory _loggerFactory;
 
-        public Application(IComponentContext container, ILogger<Application> logger, ILoggerFactory loggerFactory, ArgumentParser argumentParser, IPluginLoader pluginLoader)
+        public Application(ILogger<Application> logger, ILoggerFactory loggerFactory, ArgumentParser argumentParser)
         {
-            _container = container;
             _logger = logger;
             _loggerFactory = loggerFactory;
             _argumentParser = argumentParser;
-            _pluginLoader = pluginLoader;
         }
 
         internal void Run(string[] args)
@@ -57,7 +51,7 @@ namespace SortingHat.CLI
 
                 _logger.LogError(e.Message);
                 Console.WriteLine(e.Message);
-                Console.WriteLine(e.StackTrace.ToString());
+                Console.WriteLine(e.StackTrace);
                 Environment.Exit(-1);
             }
 

@@ -97,7 +97,7 @@ namespace SortingHat.CLI
 
         private static void RegisterConfiguration(ContainerBuilder builder)
         {
-            IConfigurationRoot configuration = ConfigurationRoot();
+            var configuration = ConfigurationRoot();
 
             builder.Register(c => configuration.GetSection("Database").Get<DatabaseSettings>()).As<DatabaseSettings>();
         }

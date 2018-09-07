@@ -1,7 +1,7 @@
-﻿using SortingHat.API.DI;
+﻿using JetBrains.Annotations;
+using SortingHat.API.DI;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 
 namespace SortingHat.CLI.Commands
 {
