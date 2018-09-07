@@ -33,7 +33,7 @@ namespace SortingHat.Plugin.Exif
 
         public bool Execute(IEnumerable<string> arguments)
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         public string LongCommand => "exif";

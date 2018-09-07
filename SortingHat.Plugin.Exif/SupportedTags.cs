@@ -12,12 +12,9 @@ namespace SortingHat.Plugin.Exif
 
             var result = new List<ExifTag>()
             {
-                new ExifTag() {
-                    Name = "Camera.Make",
-                    DirectoryEntryID = ExifDirectoryBase.TagModel,
-                    GetTag = exifDirectory
-        }
-    };
+                new ExifTag() { Name = "Camera.Make", DirectoryEntryID = ExifDirectoryBase.TagMake, GetTag = exifDirectory },
+                new ExifTag() { Name = "Camera.Model", DirectoryEntryID = ExifDirectoryBase.TagModel, GetTag = exifDirectory }
+            };
 
             return result.ToDictionary(tag => tag.Name, tag => tag);
         }
