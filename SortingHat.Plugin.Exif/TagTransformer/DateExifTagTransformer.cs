@@ -1,6 +1,7 @@
 ﻿using MetadataExtractor;
 using System.Linq;
 using System;
+using SortingHat.API.AutoTag;
 
 namespace SortingHat.Plugin.Exif.TagTransformer
 {
@@ -8,7 +9,7 @@ namespace SortingHat.Plugin.Exif.TagTransformer
 
     internal class DateExifTagTransformer<TDirectory, TDateChooser> : ITagTransformer
         where TDirectory : Directory
-        where TDateChooser : IDatePart, new()
+        where TDateChooser : IDateTagPart, new()
     {
         public string TransformTag(string fileName, int directoryEntryID)
         {
@@ -16,7 +17,6 @@ namespace SortingHat.Plugin.Exif.TagTransformer
 
             // obtain the Exif SubIFD directory
             var directory = directories.OfType<TDirectory>().FirstOrDefault();
-
 
             if (directory != null && directory.TryGetDateTime(directoryEntryID, out var dateTime))
             {

@@ -1,4 +1,5 @@
 ﻿using MetadataExtractor.Formats.Exif;
+using SortingHat.API.AutoTag;
 using SortingHat.Plugin.Exif.TagTransformer;
 using System.Collections.Generic;
 using System.Linq;
