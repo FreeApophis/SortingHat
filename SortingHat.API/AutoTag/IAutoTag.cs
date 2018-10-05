@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SortingHat.API.DI
+namespace SortingHat.API.AutoTag
 {
     public interface IAutoTag
     {
