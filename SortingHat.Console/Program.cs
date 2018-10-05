@@ -12,6 +12,7 @@ using System.IO;
 using System.Reflection;
 using System.Security.Cryptography;
 using System;
+using SortingHat.API.AutoTag;
 
 namespace SortingHat.CLI
 {
@@ -55,9 +56,16 @@ namespace SortingHat.CLI
 
             RegisterConfiguration(builder);
             RegisterCommands(builder);
+            RegisterAutoTags(builder);
             RegisterPlugins(builder);
 
             return builder.Build();
+        }
+
+        private static void RegisterAutoTags(ContainerBuilder builder)
+        {
+            builder.RegisterType<CreatedAtAutoTag>().As<IAutoTag>().SingleInstance();
+
         }
 
         private static IContainer ConfigureLogger(IContainer container)
