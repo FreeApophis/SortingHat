@@ -65,7 +65,7 @@ namespace SortingHat.CLI
         private static void RegisterAutoTags(ContainerBuilder builder)
         {
             builder.RegisterType<CreatedAtAutoTag>().As<IAutoTag>().SingleInstance();
-
+            builder.RegisterType<FilePathAutoTag>().As<IAutoTag>().SingleInstance();
         }
 
         private static IContainer ConfigureLogger(IContainer container)

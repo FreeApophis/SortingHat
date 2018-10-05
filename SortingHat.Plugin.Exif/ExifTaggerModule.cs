@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using JetBrains.Annotations;
+using SortingHat.API.AutoTag;
 using SortingHat.API.DI;
 using SortingHat.API.Plugin;
 using System;

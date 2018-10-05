@@ -6,6 +6,7 @@ using System.Reflection;
 using System;
 using JetBrains.Annotations;
 using SortingHat.Plugin.FileType.Detectors;
+using SortingHat.API.AutoTag;
 
 namespace SortingHat.Plugin.FileType
 {

@@ -1,6 +1,7 @@
 ﻿using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using SortingHat.API;
+using SortingHat.API.AutoTag;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
 using System;
@@ -48,9 +49,12 @@ namespace SortingHat.CLI.Commands
             return bracedString.Substring(1, bracedString.Length - 2);
         }
 
+        private IEnumerable<string> AllPossibleAutoTags() => _autoTags.SelectMany(autoTag => autoTag.PossibleAutoTags);
+
         private string ReplaceVariable(string name, string filePath)
         {
             var variable = RemoveFirstAndLastCharacter(name);
+
 
             foreach (var autoTag in _autoTags)
             {
@@ -85,7 +89,7 @@ namespace SortingHat.CLI.Commands
             var tag = ReplaceVariables(tagPattern, filePath);
             if (tag == null)
             {
-                Console.WriteLine($"Failed Variable Replacment: {tagPattern}, {filePath} ");
+                Console.WriteLine($"Failed Variable Replacement: {tagPattern}, {filePath} ");
                 _logger.LogWarning("failed tag ...");
                 return null;
 
@@ -97,12 +101,9 @@ namespace SortingHat.CLI.Commands
         {
             Console.WriteLine("Possible Tag Variables:");
             Console.WriteLine();
-            foreach (var autoTag in _autoTags)
+            foreach (var tag in AllPossibleAutoTags().OrderBy(tag => tag))
             {
-                foreach (var tags in autoTag.PossibleAutoTags)
-                {
-                    Console.WriteLine($"* {tags}");
-                }
+                Console.WriteLine($"* {tag}");
             }
 
             return true;

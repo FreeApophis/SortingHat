@@ -3,7 +3,9 @@ using SortingHat.API.DI;
 using SortingHat.CLI.Output;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using SortingHat.API;
 
 namespace SortingHat.CLI.Commands
 {
@@ -36,7 +38,8 @@ namespace SortingHat.CLI.Commands
                 var table = FileTable();
                 foreach (var file in files)
                 {
-                    table.Append(file.Hash.Result.ShortHash(), file.CreatedAt, file.Size.HumanSize(),  file.Path);
+                    FileHelper.OpenWithAssociatedProgram(file.Path);
+                    table.Append(file.Hash.Result.ShortHash(), file.CreatedAt, file.Size.HumanSize(), file.Path);
                 }
                 Console.WriteLine(table.ToString());
             }
@@ -48,9 +51,11 @@ namespace SortingHat.CLI.Commands
             return true;
         }
 
+
+
         public string LongCommand => "find-files";
         public string ShortCommand => "ff";
-        public string ShortHelp => "Finds all files matching the search query";     
+        public string ShortHelp => "Finds all files matching the search query";
         public CommandGrouping CommandGrouping => CommandGrouping.File;
     }
 }

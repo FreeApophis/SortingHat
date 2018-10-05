@@ -1,5 +1,5 @@
 ﻿using JetBrains.Annotations;
-using SortingHat.API.DI;
+using SortingHat.API.AutoTag;
 using SortingHat.Plugin.FileType.Detectors;
 using System;
 using System.Collections.Generic;
