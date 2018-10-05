@@ -5,6 +5,6 @@ namespace SortingHat.API.AutoTag
     public class MonthPart : IDateTagPart
     {
         public string Key => nameof(DateTime.Month);
-        public string Select(DateTime dateTime) => string.Format("{0}", dateTime.Month);
+        public string Select(DateTime dateTime) => $"{dateTime.Month}";
     }
 }
