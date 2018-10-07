@@ -8,7 +8,7 @@ namespace SortingHat.API.AutoTag
     [UsedImplicitly]
     public class CreatedAtAutoTag : IAutoTag
     {
-        private readonly List<IDateTagPart> _dateParts = new List<IDateTagPart>() { new YearPart(), new MonthPart(), new DayPart(), new HourPart() };
+        private readonly List<IDateTagPart> _dateParts = new List<IDateTagPart> { new YearPart(), new MonthPart(), new DayPart(), new HourPart() };
         private const string TagName = "CreatedAt";
 
         private readonly List<string> _possibleAutoTags = new List<string>();

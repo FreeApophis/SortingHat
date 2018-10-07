@@ -14,7 +14,7 @@ namespace SortingHat.DB
     {
         private readonly Func<SearchQueryVisitor> _newSearchQueryVisitor;
         private readonly Func<File> _newFile;
-        readonly SQLiteDB _db;
+        private readonly SQLiteDB _db;
 
         public SQLiteFile(Func<SearchQueryVisitor> newSearchQueryVisitor, Func<File> newFile, SQLiteDB db)
         {
@@ -164,7 +164,7 @@ namespace SortingHat.DB
             return LoadFileFromReader(reader, file);
         }
 
-        const string AllFileTags = @"SELECT Tags.ID
+        private const string AllFileTags = @"SELECT Tags.ID
 FROM Tags
 JOIN FileTags ON FileTags.TagID = Tags.ID
 JOIN Files ON FileTags.FileID = Files.ID
@@ -229,7 +229,7 @@ WHERE Files.Hash = @fileHash";
         }
 
 
-        const string DuplicateQuery = @"SELECT Files.CreatedAt, Files.Hash, Files.Size, FilePaths.Path, COUNT(FilePaths.ID) AS DuplicateCount
+        private const string DuplicateQuery = @"SELECT Files.CreatedAt, Files.Hash, Files.Size, FilePaths.Path, COUNT(FilePaths.ID) AS DuplicateCount
 FROM FilePaths
 JOIN Files ON FilePaths.FileID = Files.ID
 GROUP BY FileID

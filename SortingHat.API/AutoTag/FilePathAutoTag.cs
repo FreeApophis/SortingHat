@@ -11,11 +11,16 @@ namespace SortingHat.API.AutoTag
         private readonly List<string> _possibleAutoTags = new List<string>();
         public IEnumerable<string> PossibleAutoTags => _possibleAutoTags;
 
+        private const int SelectionPart = 1;
+        private const int NumberPart = 2;
         public FilePathAutoTag()
         {
-            _possibleAutoTags.Add("Path.Recursive");
-            _possibleAutoTags.Add("Path.Left");
-            _possibleAutoTags.Add("Path.Right");
+            _possibleAutoTags.Add("Path.Left.0");
+            _possibleAutoTags.Add("Path.Left.1");
+            _possibleAutoTags.Add("Path.Left.2");
+            _possibleAutoTags.Add("Path.Right.0");
+            _possibleAutoTags.Add("Path.Right.1");
+            _possibleAutoTags.Add("Path.Right.2");
         }
 
         public string HandleTag(string autoTag, string fileName)
@@ -23,8 +28,18 @@ namespace SortingHat.API.AutoTag
             var fileInfo = new FileInfo(fileName);
 
             var pathElements = PathHelper.PathElements(fileInfo.Directory);
+            var keyParts = autoTag.Split('.');
+            int.TryParse(keyParts[NumberPart], out var index);
 
-            return null;
+            switch (keyParts[SelectionPart])
+            {
+                case "Left":
+                    return pathElements[pathElements.Count - index - 1];
+                case "Right":
+                    return pathElements[index];
+                default:
+                    throw new NotImplementedException();
+            }
         }
 
 
