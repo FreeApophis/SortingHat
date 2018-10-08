@@ -7,11 +7,13 @@ namespace SortingHat.API
     {
         public static List<string> PathElements(DirectoryInfo directory)
         {
-            var result = new List<string>();
-            do
+            var result = new List<string> { directory.Name };
+
+            while ((directory = directory.Parent) != null)
             {
                 result.Add(directory.Name);
-            } while ((directory = directory.Parent) != null);
+            }
+
             return result;
         }
     }

@@ -15,9 +15,9 @@ namespace SortingHat.Plugin.FileType.Detectors
             _detectors = detectors;
         }
 
-        public FileType Identify(string path)
+        public FileType Identify(FileInfo file)
         {
-            using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (var stream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 return Identify(stream);
             }

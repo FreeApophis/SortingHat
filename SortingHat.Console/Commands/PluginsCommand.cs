@@ -16,7 +16,7 @@ namespace SortingHat.CLI.Commands
         {
             _pluginLoader = pluginLoader;
         }
-        public bool Execute(IEnumerable<string> arguments)
+        public bool Execute(IEnumerable<string> arguments, IOptions options)
         {
             if (_pluginLoader.Plugins.Any())
             {

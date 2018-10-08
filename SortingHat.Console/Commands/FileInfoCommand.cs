@@ -18,7 +18,7 @@ namespace SortingHat.CLI.Commands
             _newFile = newFile;
         }
 
-        public bool Execute(IEnumerable<string> arguments)
+        public bool Execute(IEnumerable<string> arguments, IOptions options)
         {
             foreach (var filePath in _filePathExtractor.FromFilePatterns(arguments))
             {

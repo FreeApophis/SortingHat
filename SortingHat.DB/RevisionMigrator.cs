@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace SortingHat.DB
 {
-    class RevisionMigrator
+    internal class RevisionMigrator
     {
         private const string CreateRevisionTableCommand = @"CREATE TABLE IF NOT EXISTS [Revisions] ([ID] INTEGER  NOT NULL PRIMARY KEY AUTOINCREMENT, [Name] VARCHAR(255)  UNIQUE NOT NULL, [MigratedAt] DATETIME DEFAULT CURRENT_TIME NOT NULL);";
         private readonly SQLiteDB _db;

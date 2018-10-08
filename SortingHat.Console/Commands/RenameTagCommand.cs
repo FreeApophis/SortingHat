@@ -20,7 +20,7 @@ namespace SortingHat.CLI.Commands
             _tagParser = tagParser;
         }
 
-        public bool Execute(IEnumerable<string> arguments)
+        public bool Execute(IEnumerable<string> arguments, IOptions options)
         {
             var result = false;
 

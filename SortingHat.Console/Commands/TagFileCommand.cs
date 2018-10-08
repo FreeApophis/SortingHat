@@ -61,7 +61,7 @@ namespace SortingHat.CLI.Commands
             //await Task.WhenAll(tasks);
         }
 
-        public bool Execute(IEnumerable<string> arguments)
+        public bool Execute(IEnumerable<string> arguments, IOptions options)
         {
             ExecuteAsync(arguments).Wait();
 

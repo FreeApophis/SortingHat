@@ -40,7 +40,7 @@ namespace SortingHat.CLI.Commands
             return file;
         }
 
-        public bool Execute(IEnumerable<string> arguments)
+        public bool Execute(IEnumerable<string> arguments, IOptions options)
         {
             var tags = arguments.Where(a => a.IsTag());
             var files = arguments.Where(IsFile);

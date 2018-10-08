@@ -17,7 +17,7 @@ namespace SortingHat.CLI.Commands
             _db = db;
         }
 
-        public bool Execute(IEnumerable<string> arguments)
+        public bool Execute(IEnumerable<string> arguments, IOptions options)
         {
             if (arguments.Count() != 2) throw new ArgumentOutOfRangeException(nameof(arguments));
 

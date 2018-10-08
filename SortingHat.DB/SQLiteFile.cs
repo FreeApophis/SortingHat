@@ -4,6 +4,7 @@ using SortingHat.API.DI;
 using SortingHat.API.Models;
 using SortingHat.API.Parser;
 using System.Collections.Generic;
+using System.Data.Common;
 using JetBrains.Annotations;
 using System.Threading.Tasks;
 
@@ -113,7 +114,7 @@ namespace SortingHat.DB
 
             var files = new List<File>();
 
-            while (AddFileEntry(reader, files)) ;
+            while (AddFileEntry(reader, files)) { }
 
             return files;
         }
@@ -142,7 +143,7 @@ namespace SortingHat.DB
             return visitor.Result;
         }
 
-        private bool LoadFileFromReader(SqliteDataReader reader, File file)
+        private static bool LoadFileFromReader(DbDataReader reader, File file)
         {
             var hasMore = reader.Read();
 

@@ -14,7 +14,8 @@ namespace SortingHat.API
         {
             _filePaths.Clear();
 
-            foreach (var filePattern in filePatterns) {
+            foreach (var filePattern in filePatterns)
+            {
                 FromFilePattern(filePattern);
             }
 
@@ -23,12 +24,15 @@ namespace SortingHat.API
 
         private void FromFilePattern(string filePattern)
         {
-            if (filePattern.Contains("*") || filePattern.Contains("?")) {
-                foreach (var filePath in Directory.GetFiles(Directory.GetCurrentDirectory(), filePattern)) {
+            if (filePattern.Contains("*") || filePattern.Contains("?"))
+            {
+                foreach (var filePath in Directory.GetFiles(Directory.GetCurrentDirectory(), filePattern))
+                {
                     AddExistingFiles(filePath);
                 }
             }
-            else {
+            else
+            {
                 var absolutePath = Path.Combine(Directory.GetCurrentDirectory(), filePattern);
                 AddExistingFiles(absolutePath);
             }

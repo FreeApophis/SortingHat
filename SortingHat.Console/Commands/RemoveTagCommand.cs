@@ -20,7 +20,7 @@ namespace SortingHat.CLI.Commands
             _logger = logger;
         }
 
-        public bool Execute(IEnumerable<string> arguments)
+        public bool Execute(IEnumerable<string> arguments, IOptions options)
         {
             foreach (var tagString in arguments)
             {

@@ -3,7 +3,6 @@ using SortingHat.API.Parser.Nodes;
 using SortingHat.API.Parser;
 using System.Text;
 using System;
-using System.Xml;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
 
@@ -81,8 +80,8 @@ namespace SortingHat.DB
             }
             else
             {
-                // this query includes  a tag which does not exist. 
-                // This is usally not useful, but the query can still have a result, 
+                // this query includes  a tag which does not exist.
+                // This is usally not useful, but the query can still have a result,
                 // because this tag will not participate in the query.
                 UnknownTag = true;
 

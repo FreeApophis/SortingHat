@@ -38,7 +38,8 @@ namespace SortingHat.CLI
             {
                 if (_commandTargets.TryGetValue(arguments.First(), out var command))
                 {
-                    if (command.Execute(arguments.Skip(1)) == false)
+
+                    if (command.Execute(TagAndFileArguments(arguments), new Options(OptionArguments(arguments))) == false)
                     {
                         _logger.Value.LogWarning("Command Execution failed!");
                     }
@@ -54,6 +55,16 @@ namespace SortingHat.CLI
                 Console.WriteLine("Maybe run 'hat help'");
             }
 
+        }
+
+        private static IEnumerable<string> TagAndFileArguments(IEnumerable<string> arguments)
+        {
+            return arguments.Skip(1).Where(s => s.StartsWith("-") == false);
+        }
+
+        private static IEnumerable<string> OptionArguments(IEnumerable<string> arguments)
+        {
+            return arguments.Skip(1).Where(s => s.StartsWith("-"));
         }
     }
 }

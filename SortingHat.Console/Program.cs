@@ -44,6 +44,8 @@ namespace SortingHat.CLI
             builder.RegisterType<SQLiteTag>().As<ITag>().SingleInstance();
 
             builder.RegisterType<API.Models.TagParser>().As<API.Models.ITagParser>();
+            builder.RegisterType<AutoTagHandler>().As<IAutoTagHandler>();
+
             builder.RegisterType<FilePathExtractor>().As<IFilePathExtractor>().SingleInstance();
             builder.RegisterType<API.Models.Tag>().As<API.Models.Tag>().InstancePerDependency();
             builder.RegisterType<API.Models.File>().As<API.Models.File>().InstancePerDependency();
@@ -65,7 +67,7 @@ namespace SortingHat.CLI
         private static void RegisterAutoTags(ContainerBuilder builder)
         {
             builder.RegisterType<CreatedAtAutoTag>().As<IAutoTag>().SingleInstance();
-            builder.RegisterType<FilePathAutoTag>().As<IAutoTag>().SingleInstance();
+            builder.RegisterType<FolderFromRootAutoTag>().As<IAutoTag>().SingleInstance();
         }
 
         private static IContainer ConfigureLogger(IContainer container)

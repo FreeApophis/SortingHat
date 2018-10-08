@@ -5,16 +5,18 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 
 namespace SortingHat.DB
 {
+    [UsedImplicitly]
     public sealed class SQLiteDB : IDatabase, IDisposable
     {
         private readonly string _path;
         private readonly string _dbName;
         private readonly string _encryptionKey = "Encrypted";
 
-        internal SqliteConnection Connection { get; }
+        private SqliteConnection Connection { get; }
 
         private readonly Func<IFile> _file;
         public IFile File => _file();
@@ -81,14 +83,14 @@ namespace SortingHat.DB
             throw new NotImplementedException();
         }
 
-        private string PerTableStatisticsQuery(string table)
+        private static string PerTableStatisticsQuery(string table)
         {
             return $"SELECT '{table}', Count(ID) FROM {table}";
         }
 
         private string StatisticsQuery()
         {
-            var tables = new List<string>() { "Files", "FilePaths", "FileNames", "Tags", "FileTags" };
+            var tables = new List<string> { "Files", "FilePaths", "FileNames", "Tags", "FileTags" };
 
             return string.Join(" UNION ", tables.Select(PerTableStatisticsQuery));
         }

@@ -5,6 +5,6 @@ namespace SortingHat.Plugin.FileType.Detectors
     public interface IFileTypeFinder
     {
         FileType Identify(Stream stream);
-        FileType Identify(string path);
+        FileType Identify(FileInfo file);
     }
 }

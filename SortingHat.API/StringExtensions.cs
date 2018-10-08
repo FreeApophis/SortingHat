@@ -6,5 +6,10 @@
         {
             return value.StartsWith(":");
         }
+
+        public static bool IsFile(this string value)
+        {
+            return value.StartsWith(":") == false;
+        }
     }
 }

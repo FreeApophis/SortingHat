@@ -6,6 +6,7 @@ using System.Reflection;
 using System;
 using JetBrains.Annotations;
 using SortingHat.Plugin.FileType.Detectors;
+using SortingHat.Plugin.FileType.AutoTag;
 using SortingHat.API.AutoTag;
 
 namespace SortingHat.Plugin.FileType
@@ -25,7 +26,9 @@ namespace SortingHat.Plugin.FileType
 
             builder.RegisterType<IdentifyCommand>().As<ICommand>();
 
+            builder.RegisterType<FileTypeCategoryAutoTag>().As<IAutoTag>().SingleInstance();
             builder.RegisterType<FileTypeAutoTag>().As<IAutoTag>().SingleInstance();
+            builder.RegisterType<FileTypeExtensionAutoTag>().As<IAutoTag>().SingleInstance();
 
             LoadDetectors(builder);
         }

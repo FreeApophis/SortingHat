@@ -18,12 +18,14 @@ namespace SortingHat.Plugin.FileType
             _filePathExtractor = filePathExtractor;
         }
 
-        public bool Execute(IEnumerable<string> arguments)
+        private FileType FileType(string argument) => _fileTypeFinder.Identify(new System.IO.FileInfo(argument));
+
+        public bool Execute(IEnumerable<string> arguments, IOptions options)
         {
             foreach (var argument in _filePathExtractor.FromFilePatterns(arguments))
             {
                 Console.WriteLine($"File: {argument}");
-                var fileType = _fileTypeFinder.Identify(argument);
+                var fileType = FileType(argument);
 
                 if (fileType != null)
                 {
@@ -36,6 +38,7 @@ namespace SortingHat.Plugin.FileType
                     Console.WriteLine("Unknown filetype");
                 }
             }
+
             return true;
         }
 

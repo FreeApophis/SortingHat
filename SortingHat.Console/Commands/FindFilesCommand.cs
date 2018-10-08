@@ -26,7 +26,7 @@ namespace SortingHat.CLI.Commands
             return table;
         }
 
-        public bool Execute(IEnumerable<string> arguments)
+        public bool Execute(IEnumerable<string> arguments, IOptions options)
         {
             var search = string.Join(" ", arguments);
             Console.WriteLine($"Find Files: {search}");

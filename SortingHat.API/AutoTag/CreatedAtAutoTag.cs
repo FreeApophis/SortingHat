@@ -1,34 +1,17 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using JetBrains.Annotations;
 
 namespace SortingHat.API.AutoTag
 {
     [UsedImplicitly]
-    public class CreatedAtAutoTag : IAutoTag
+    public class CreatedAtAutoTag : DateAutoTag
     {
-        private readonly List<IDateTagPart> _dateParts = new List<IDateTagPart> { new YearPart(), new MonthPart(), new DayPart(), new HourPart() };
-        private const string TagName = "CreatedAt";
+        public override string AutoTagKey => "CreatedAt.<>";
+        public override string Description => "The date and time of the creation of the file.";
 
-        private readonly List<string> _possibleAutoTags = new List<string>();
-        public IEnumerable<string> PossibleAutoTags => _possibleAutoTags;
-
-        public CreatedAtAutoTag()
+        protected override string HandleTag(FileInfo file, IDateTagPart tagPart)
         {
-            _possibleAutoTags.InsertRange(0, _dateParts.Select(TagNameWithDatePart));
-        }
-
-        private string TagNameWithDatePart(IDateTagPart datePart)
-        {
-            return $"{TagName}.{datePart.Key}";
-        }
-
-        public string HandleTag(string autoTag, string fileName)
-        {
-            var fileInfo = new FileInfo(fileName);
-
-            return _dateParts.First(datePart => TagNameWithDatePart(datePart) == autoTag).Select(fileInfo.CreationTime);
+            return tagPart.Select(file.CreationTime);
         }
     }
 }

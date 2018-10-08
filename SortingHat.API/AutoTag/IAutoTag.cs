@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System.IO;
 
 namespace SortingHat.API.AutoTag
 {
     public interface IAutoTag
     {
-        IEnumerable<string> PossibleAutoTags { get; }
-        string HandleTag(string autoTag, string fileName);
+        string AutoTagKey { get; }
+        string Description { get; }
+        string HumanReadableAutoTagsKey { get; }
+        string FindMatch(string value);
+        string HandleTag(FileInfo file, string tagMatch);
     }
 }

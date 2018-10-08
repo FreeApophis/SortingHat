@@ -4,8 +4,6 @@ namespace SortingHat.API.DI
 {
     public interface ICommand
     {
-        bool Execute(IEnumerable<string> arguments);
-
         CommandGrouping CommandGrouping { get; }
 
         string LongCommand { get; }
@@ -20,5 +18,7 @@ namespace SortingHat.API.DI
         /// </summary>
         /// <returns></returns>
         string ShortHelp { get; }
+
+        bool Execute(IEnumerable<string> arguments, IOptions options);
     }
 }

@@ -23,7 +23,7 @@ namespace SortingHat.CLI.Commands
             _container = container;
         }
 
-        public bool Execute(IEnumerable<string> arguments)
+        public bool Execute(IEnumerable<string> arguments, IOptions options)
         {
             _logger.LogTrace("Help Command executed");
 

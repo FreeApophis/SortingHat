@@ -11,7 +11,7 @@ namespace SortingHat.CLI.Commands
     [UsedImplicitly]
     internal class VersionCommand : ICommand
     {
-        public bool Execute(IEnumerable<string> arguments)
+        public bool Execute(IEnumerable<string> arguments, IOptions options)
         {
             var version = GetVersion();
 

@@ -1,10 +1,12 @@
 ﻿using Autofac;
 using JetBrains.Annotations;
-using SortingHat.API.AutoTag;
 using SortingHat.API.DI;
 using SortingHat.API.Plugin;
 using System;
 using System.Reflection;
+using MetadataExtractor.Formats.Exif;
+using SortingHat.API.AutoTag;
+using SortingHat.Plugin.Exif.AutoTag;
 
 namespace SortingHat.Plugin.Exif
 {
@@ -19,7 +21,14 @@ namespace SortingHat.Plugin.Exif
         {
             builder.RegisterType<ExifCommand>().As<ICommand>();
 
-            builder.RegisterType<ExifAutoTag>().As<IAutoTag>().SingleInstance();
+            RegisterSupportedTags(builder);
+        }
+
+        private static void RegisterSupportedTags(ContainerBuilder builder)
+        {
+            builder.Register(c => new ConstantExifAutoTag<ExifIfd0Directory>(ExifDirectoryBase.TagMake, "Camera.Make", "TODO")).As<IAutoTag>();
+            builder.Register(c => new ConstantExifAutoTag<ExifIfd0Directory>(ExifDirectoryBase.TagModel, "Camera.Model", "TODO")).As<IAutoTag>();
+            builder.Register(c => new DateExifAutoTag<ExifSubIfdDirectory>(ExifDirectoryBase.TagDateTimeOriginal, "Camera.Taken", "TODO")).As<IAutoTag>();
         }
     }
 }

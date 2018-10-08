@@ -18,7 +18,7 @@ namespace SortingHat.Plugin.Exif
             _filePathExtractor = filePathExtractor;
         }
 
-        public bool Execute(IEnumerable<string> arguments)
+        public bool Execute(IEnumerable<string> arguments, IOptions options)
         {
             foreach (var filePath in _filePathExtractor.FromFilePatterns(arguments))
             {
@@ -27,7 +27,7 @@ namespace SortingHat.Plugin.Exif
                 {
                     foreach (var tag in directory.Tags)
                     {
-                        Console.WriteLine($"{directory.Name} - {tag.Name} = {tag.Description}");
+                        Console.WriteLine($"{directory.Name} - {tag.Name} ({tag.Type}) = {tag.Description}");
                     }
                 }
             }
