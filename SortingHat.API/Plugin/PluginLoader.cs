@@ -27,7 +27,7 @@ namespace SortingHat.API.Plugin
                     .Where(p => typeof(IModule).IsAssignableFrom(p) && !p.IsAbstract)
                     .Select(p => (IModule)Activator.CreateInstance(p));
 
-                //  Regsiters each module.
+                //  Registers each module.
                 foreach (var module in modules)
                 {
                     RegisterModule(builder, module);
