@@ -33,18 +33,17 @@ namespace SortingHat.CLI.Commands
 
             var files = _db.File.Search(search);
 
-            if (files.Any())
-            {
+            if (files.Any()) {
                 var table = FileTable();
-                foreach (var file in files)
-                {
-                    FileHelper.OpenWithAssociatedProgram(file.Path);
+                foreach (var file in files) {
+                    if (options.HasOption(null, "open")) {
+                        FileHelper.OpenWithAssociatedProgram(file.Path);
+                    }
+
                     table.Append(file.Hash.Result.ShortHash(), file.CreatedAt, file.Size.HumanSize(), file.Path);
                 }
                 Console.WriteLine(table.ToString());
-            }
-            else
-            {
+            } else {
                 Console.WriteLine("No files found for your search query...");
             }
 
