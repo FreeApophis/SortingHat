@@ -203,7 +203,7 @@ namespace SortingHat.Test
             Assert.Empty(next);
         }
 
-        private const string SelectStatement = @"SELECT FilePaths.Path, Files.Hash, Files.ID
+        private const string SelectStatement = @"SELECT Files.CreatedAt, Files.Hash, Files.Size, FilePaths.Path
 FROM Files
 JOIN FilePaths ON FilePaths.FileID = Files.ID
 WHERE (0 OR (0 AND 0))
