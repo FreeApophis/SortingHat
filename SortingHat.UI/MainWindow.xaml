@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         xmlns:local="clr-namespace:SortingHat.UI"
         xmlns:models="clr-namespace:SortingHat.API.Models;assembly=SortingHat.API"
         mc:Ignorable="d"
@@ -22,16 +23,55 @@
             </Setter>
         </Style>
 
+        <Style TargetType="ListView" x:Key="ListStyle">
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility">
+                <Setter.Value>Auto</Setter.Value>
+            </Setter>
+            <Setter Property="View">
+                <Setter.Value>
+                    <GridView>
+                        <GridViewColumn Header="Size" DisplayMemberBinding="{Binding Size}" />
+                        <GridViewColumn Header="Path" DisplayMemberBinding="{Binding Path}" />
+                    </GridView>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <DataTemplate x:Key="TileTemplate" DataType="{x:Type models:File}">
             <StackPanel Margin="2,0" VerticalAlignment="Center">
                 <Image Height="160" Width="240" Stretch="Uniform" Source="{Binding Path}" />
                 <TextBlock Text="{Binding Size}" />
             </StackPanel>
         </DataTemplate>
+
+        <DataTemplate x:Key="ListTemplate" DataType="{x:Type models:File}">
+        </DataTemplate>
     </Window.Resources>
 
+    <controls:MetroWindow.RightWindowCommands>
+        <controls:WindowCommands>
+            <Button>
+                <iconPacks:PackIconMaterial Width="16" Height="16" Kind="Settings" />
+            </Button>
+        </controls:WindowCommands>
+    </controls:MetroWindow.RightWindowCommands>
+
     <DockPanel>
-        <Menu DockPanel.Dock="Top">
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+            <Button Style="{DynamicResource SquareButtonStyle}" Width="50" Height="50" Click="OnListView">
+                <StackPanel>
+                    <iconPacks:PackIconMaterial Width="24" Height="24" Kind="ViewList" HorizontalAlignment="Center"/>
+                    <TextBlock>Details</TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Style="{DynamicResource SquareButtonStyle}"  Width="50" Height="50" Click="OnTileView">
+                <StackPanel>
+                    <iconPacks:PackIconMaterial Width="24" Height="24" Kind="ViewGrid" HorizontalAlignment="Center"/>
+                    <TextBlock>Thumbs</TextBlock>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+        <!--<Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
                 <MenuItem Header="_New DB" />
                 <MenuItem Header="_Open DB" />
@@ -42,12 +82,14 @@
                 <MenuItem Header="_Exit" Click="ExitClick" />
             </MenuItem>
 
-            <MenuItem Header="_Views">
+            <MenuItem Header="_Views" >
                 <MenuItem  Header="_Log" IsCheckable="true" IsChecked="{Binding LogViewVisible, Mode=TwoWay}" />
+                <MenuItem  Header="_Settings" Click="OnMenuSettings"  />
                 <MenuItem  Header="_Popup" IsCheckable="true" IsChecked="{Binding PopupVisible, Mode=TwoWay}" />
                 <MenuItem  Header="_Test" Click="TestOnClick" />
             </MenuItem>
-        </Menu>
+
+        </Menu>-->
         <StatusBar DockPanel.Dock="Bottom">
             <StatusBar.ItemsPanel>
                 <ItemsPanelTemplate>

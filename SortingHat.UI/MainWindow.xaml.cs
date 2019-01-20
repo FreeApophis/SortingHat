@@ -251,6 +251,22 @@ namespace SortingHat.UI
 
         private void TestOnClick(object sender, RoutedEventArgs e)
         {
+        }
+
+        private void OnMenuSettings(object sender, RoutedEventArgs e)
+        {
+            var settingsWindow = new SettingsWindow();
+            settingsWindow.Show();
+        }
+
+        private void OnListView(object sender, RoutedEventArgs e)
+        {
+            FileList.ItemTemplate = (DataTemplate)FindResource("ListTemplate");
+            FileList.Style = (Style)FindResource("ListStyle");
+        }
+
+        private void OnTileView(object sender, RoutedEventArgs e)
+        {
             FileList.ItemTemplate = (DataTemplate)FindResource("TileTemplate");
             FileList.Style = (Style)FindResource("TiledStyle");
         }
