@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using MahApps.Metro.Controls;
 using Microsoft.Extensions.Logging;
 using SortingHat.API.DI;
 using SortingHat.API.Parser.OperatorType;
@@ -20,7 +21,7 @@ namespace SortingHat.UI
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window, INotifyPropertyChanged
+    public partial class MainWindow : MetroWindow, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -31,8 +32,8 @@ namespace SortingHat.UI
         private string _searchString;
         public string SearchString
         {
-            get { return _searchString; }
-            set { _searchString = RunSearch(value); }
+            get => _searchString;
+            set => _searchString = RunSearch(value);
         }
 
         public string SearchBackground
@@ -62,7 +63,7 @@ namespace SortingHat.UI
         IEnumerable<API.Models.File> _files;
         public IEnumerable<API.Models.File> Files
         {
-            get { return _files; }
+            get => _files;
             set
             {
                 _files = value;
@@ -71,7 +72,7 @@ namespace SortingHat.UI
             }
         }
 
-        public void NotifyPropertyChanged(string propName)
+        private void NotifyPropertyChanged(string propName)
         {
             _logger.LogTrace($"Property '{propName}' changed");
 
@@ -81,7 +82,7 @@ namespace SortingHat.UI
         private bool _popupVisible;
         public bool PopupVisible
         {
-            get { return _popupVisible; }
+            get => _popupVisible;
             set
             {
                 _popupVisible = value;
@@ -128,10 +129,8 @@ namespace SortingHat.UI
             var parser = new QueryParser(search);
             parser.Parse();
 
-            foreach (var token in parser.NextToken())
-            {
-                switch (token)
-                {
+            foreach (var token in parser.NextToken()) {
+                switch (token) {
                     case AndToken t:
                         IntelliSense.Items.Add(new IntellisenseItem { Title = operatorType.And });
                         break;
@@ -164,11 +163,9 @@ namespace SortingHat.UI
         private void SelectPossibleTokens(TagToken tagToken)
         {
             var partial = (tagToken == null ? string.Empty : tagToken.Value) ?? string.Empty;
-            foreach (var possibleTag in _db.Tag.GetTags().Select(t => t.FullName).Where(f => f.StartsWith(partial)))
-            {
+            foreach (var possibleTag in _db.Tag.GetTags().Select(t => t.FullName).Where(f => f.StartsWith(partial))) {
                 IntelliSense.Items.Add(new IntellisenseItem { Title = possibleTag });
-                if (IntelliSense.Items.Count > 8)
-                {
+                if (IntelliSense.Items.Count > 8) {
                     break;
                 }
 
@@ -177,19 +174,17 @@ namespace SortingHat.UI
 
         private void LoadDrives()
         {
-            DriveInfo[] drives = DriveInfo.GetDrives();
-            foreach (DriveInfo driveInfo in drives)
+            foreach (var driveInfo in DriveInfo.GetDrives()) {
                 FolderBrowser.Items.Add(CreateTreeItem(driveInfo));
+            }
         }
 
         private void LoadTags()
         {
             var tags = API.Models.Tag.List(_db);
 
-            foreach (var tag in tags)
-            {
-                if (tag.Parent == null)
-                {
+            foreach (var tag in tags) {
+                if (tag.Parent == null) {
                     var tagItem = new TagItem(tag);
                     TagHierarchy.Items.Add(tagItem);
                     BuildTagTree(tagItem.Items, tag.Children);
@@ -199,8 +194,7 @@ namespace SortingHat.UI
 
         private void BuildTagTree(ObservableCollection<TagItem> items, List<Tag> children)
         {
-            foreach (var tag in children)
-            {
+            foreach (var tag in children) {
                 var tagItem = new TagItem(tag);
                 items.Add(tagItem);
                 BuildTagTree(tagItem.Items, tag.Children);
@@ -210,13 +204,11 @@ namespace SortingHat.UI
         private void FolderBrowser_Expanded(object sender, RoutedEventArgs e)
         {
             TreeViewItem item = e.Source as TreeViewItem;
-            if (item.Items.Count == 1 && item.Items[0] is string)
-            {
+            if (item.Items.Count == 1 && item.Items[0] is string) {
                 item.Items.Clear();
 
                 DirectoryInfo expandedDir = null;
-                switch (item.Tag)
-                {
+                switch (item.Tag) {
                     case DriveInfo _:
                         expandedDir = (item.Tag as DriveInfo).RootDirectory;
                         break;
@@ -225,18 +217,16 @@ namespace SortingHat.UI
                         break;
                 }
 
-                try
-                {
+                try {
                     foreach (DirectoryInfo subDir in expandedDir.GetDirectories())
                         item.Items.Add(CreateTreeItem(subDir));
-                }
-                catch { }
+                } catch { }
             }
         }
 
         private TreeViewItem CreateTreeItem(object o)
         {
-            TreeViewItem item = new TreeViewItem
+            var item = new TreeViewItem
             {
                 Header = o.ToString(),
                 Tag = o
@@ -247,9 +237,7 @@ namespace SortingHat.UI
 
         private void OnItemMouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            var treeViewItem = sender as TreeViewItem;
-            if (treeViewItem != null && treeViewItem.IsSelected)
-            {
+            if (sender is TreeViewItem treeViewItem && treeViewItem.IsSelected) {
                 var tagItem = treeViewItem.DataContext as TagItem;
                 SearchBox.Text = tagItem.Tag.FullName;
                 e.Handled = true;
@@ -259,6 +247,12 @@ namespace SortingHat.UI
         private void ExitClick(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void TestOnClick(object sender, RoutedEventArgs e)
+        {
+            FileList.ItemTemplate = (DataTemplate)FindResource("TileTemplate");
+            FileList.Style = (Style)FindResource("TiledStyle");
         }
     }
 }
