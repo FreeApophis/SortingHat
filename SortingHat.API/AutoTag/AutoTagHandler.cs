@@ -1,5 +1,4 @@
 ﻿using SortingHat.API.Models;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -29,13 +28,10 @@ namespace SortingHat.API.AutoTag
 
         private string ReplaceMask(string tagMask, FileInfo file)
         {
-            foreach (Match match in _variableRegex.Matches(tagMask))
-            {
-                tagMask = ReplaceMatch(tagMask, file, match);
-            }
-
-            Console.WriteLine(tagMask);
-            return tagMask;
+            return _variableRegex
+                .Matches(tagMask)
+                .Cast<Match>()
+                .Aggregate(tagMask, (t, match) => ReplaceMatch(t, file, match));
         }
 
         private string ReplaceMatch(string tagMask, FileInfo file, Capture match)
