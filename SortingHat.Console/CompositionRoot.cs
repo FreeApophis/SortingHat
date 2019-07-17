@@ -45,10 +45,7 @@ namespace SortingHat.CLI
             RegisterAutoTags(builder);
             RegisterPlugins(builder);
 
-            var container = builder.Build();
-            ConfigureLogger(container);
-
-            return container;
+            return ConfigureLogger(builder.Build());
         }
 
         private void RegisterAutoTags(ContainerBuilder builder)
