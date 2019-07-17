@@ -16,7 +16,7 @@ namespace SortingHat.CLI
 {
     internal class CompositionRoot
     {
-        public CompositionRoot Build()
+        public IContainer Build()
         {
             var builder = new ContainerBuilder();
 
@@ -54,7 +54,7 @@ namespace SortingHat.CLI
             builder.RegisterType<FolderFromRootAutoTag>().As<IAutoTag>().SingleInstance();
         }
 
-        public CompositionRoot ConfigureLogger(IContainer container)
+        public IContainer ConfigureLogger(IContainer container)
         {
             // https://stackoverflow.com/questions/41414796/how-to-get-microsoft-extensions-loggingt-in-console-application-using-serilog
             var loggerFactory = container.Resolve<ILoggerFactory>();
@@ -67,7 +67,7 @@ namespace SortingHat.CLI
             // Console Logger
             //loggerFactory.AddConsole();
 
-            return this;
+            return container;
         }
 
         private void RegisterPlugins(ContainerBuilder builder)
