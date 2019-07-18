@@ -41,7 +41,7 @@ namespace SortingHat.UI
         private IContainer ConfigureLogger(IContainer container)
         {
             var loggerFactory = container.Resolve<ILoggerFactory>();
-            loggerFactory.AddDebug(MinLogLevel);
+            //loggerFactory.AddDebug(MinLogLevel);
             loggerFactory.AddProvider(new WindowLoggerProvider());
 
             return container;

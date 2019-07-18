@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SortingHat.CLI", "SortingHa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SortingHat.Test", "SortingHat.Test\SortingHat.Test.csproj", "{F4216D64-CF15-4EA3-9F17-49496FD299C3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SortingHat.UI", "SortingHat.UI\SortingHat.UI.csproj", "{8428DC74-8DEC-4D9E-8B24-40474A375040}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SortingHat.DB", "SortingHat.DB\SortingHat.DB.csproj", "{3D173578-8D94-4ACE-BE98-E2F235164604}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SortingHat.Plugin.Exif", "SortingHat.Plugin.Exif\SortingHat.Plugin.Exif.csproj", "{5FB6982A-D25B-46E3-8E00-C48FCA7E4C87}"
@@ -18,6 +16,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SortingHat.Plugin.FileType", "SortingHat.Plugin.FileType\SortingHat.Plugin.FileType.csproj", "{0CA7BCD1-0BDF-42E8-A2FF-BB56B3DA59CD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SortingHat.Plugin.ExtractRelevant", "SortingHat.Plugin.ExtractRelevant\SortingHat.Plugin.ExtractRelevant.csproj", "{242268B0-8E53-43AE-9E9B-CDE7B6AE7618}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SortingHat.UI", "SortingHat.UI\SortingHat.UI.csproj", "{10BE8D55-CF9A-49C3-A0F6-6171131016E8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,10 +37,6 @@ Global
 		{F4216D64-CF15-4EA3-9F17-49496FD299C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4216D64-CF15-4EA3-9F17-49496FD299C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F4216D64-CF15-4EA3-9F17-49496FD299C3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8428DC74-8DEC-4D9E-8B24-40474A375040}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8428DC74-8DEC-4D9E-8B24-40474A375040}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8428DC74-8DEC-4D9E-8B24-40474A375040}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8428DC74-8DEC-4D9E-8B24-40474A375040}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3D173578-8D94-4ACE-BE98-E2F235164604}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3D173578-8D94-4ACE-BE98-E2F235164604}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D173578-8D94-4ACE-BE98-E2F235164604}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -57,6 +53,10 @@ Global
 		{242268B0-8E53-43AE-9E9B-CDE7B6AE7618}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{242268B0-8E53-43AE-9E9B-CDE7B6AE7618}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{242268B0-8E53-43AE-9E9B-CDE7B6AE7618}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10BE8D55-CF9A-49C3-A0F6-6171131016E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10BE8D55-CF9A-49C3-A0F6-6171131016E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10BE8D55-CF9A-49C3-A0F6-6171131016E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10BE8D55-CF9A-49C3-A0F6-6171131016E8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
