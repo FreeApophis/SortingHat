@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2026
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29111.141
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SortingHat.API", "SortingHat.API\SortingHat.API.csproj", "{1D2BC864-8B8E-4963-B82A-75AD562684DC}"
 EndProject
@@ -15,9 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SortingHat.DB", "SortingHat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SortingHat.Plugin.Exif", "SortingHat.Plugin.Exif\SortingHat.Plugin.Exif.csproj", "{5FB6982A-D25B-46E3-8E00-C48FCA7E4C87}"
 EndProject
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "SortingHat.Setup", "SortingHat.Setup\SortingHat.Setup.wixproj", "{0869C0DC-A177-42ED-A25E-8A7FC8CB4045}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SortingHat.Plugin.FileType", "SortingHat.Plugin.FileType\SortingHat.Plugin.FileType.csproj", "{0CA7BCD1-0BDF-42E8-A2FF-BB56B3DA59CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SortingHat.Plugin.FileType", "SortingHat.Plugin.FileType\SortingHat.Plugin.FileType.csproj", "{0CA7BCD1-0BDF-42E8-A2FF-BB56B3DA59CD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,8 +47,6 @@ Global
 		{5FB6982A-D25B-46E3-8E00-C48FCA7E4C87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5FB6982A-D25B-46E3-8E00-C48FCA7E4C87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5FB6982A-D25B-46E3-8E00-C48FCA7E4C87}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0869C0DC-A177-42ED-A25E-8A7FC8CB4045}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{0869C0DC-A177-42ED-A25E-8A7FC8CB4045}.Release|Any CPU.ActiveCfg = Release|x86
 		{0CA7BCD1-0BDF-42E8-A2FF-BB56B3DA59CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0CA7BCD1-0BDF-42E8-A2FF-BB56B3DA59CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0CA7BCD1-0BDF-42E8-A2FF-BB56B3DA59CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
