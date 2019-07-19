@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using apophis.Lexer;
 using SortingHat.API.Parser.Token;
 
@@ -8,7 +9,8 @@ namespace SortingHat.API.Parser
     {
         public IEnumerable<ILexerRule> GetRules()
         {
-            yield return new LexerRule(char.IsWhiteSpace, ScanWhiteSpace);
+            yield return new LexerRule(char.IsWhiteSpace, ConsumeWhiteSpace);
+            yield return new LexerRule(c => c == ':', ConsumeTag);
             yield return new SimpleLexerRule<OrToken>("∨");
             yield return new SimpleLexerRule<OrToken>("||");
             yield return new SimpleLexerRule<OrToken>("or");
@@ -26,7 +28,30 @@ namespace SortingHat.API.Parser
             yield return new SimpleLexerRule<ClosedParenthesisToken>(")");
         }
 
-        private static Lexem ScanWhiteSpace(ILexerReader reader)
+        private bool IsLegalCharacter(char currentCharacter)
+        {
+            return char.IsLetter(currentCharacter)
+                   || char.IsNumber(currentCharacter)
+                   || currentCharacter == '-'
+                   || currentCharacter == '_'
+                   || currentCharacter == ':';
+        }
+
+        private Lexem ConsumeTag(ILexerReader reader)
+        {
+            var startPosition = reader.Position;
+
+            StringBuilder stringBuilder = new StringBuilder();
+
+            while (reader.Peek().Match(false, IsLegalCharacter))
+            {
+                reader.Read().Match(none: stringBuilder, some: c => stringBuilder.Append(c));
+            }
+
+            return new Lexem(new TagToken(stringBuilder.ToString()), new Position(startPosition, reader.Position - startPosition));
+        }
+
+        private static Lexem ConsumeWhiteSpace(ILexerReader reader)
         {
             var startPosition = reader.Position;
 
@@ -37,7 +62,6 @@ namespace SortingHat.API.Parser
             }
 
             return new Lexem(new WhiteSpaceToken(), new Position(startPosition, reader.Position - startPosition));
-
         }
     }
 }

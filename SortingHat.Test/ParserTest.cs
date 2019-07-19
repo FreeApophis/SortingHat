@@ -1,6 +1,7 @@
 ﻿using SortingHat.API.Parser;
 using SortingHat.API.Parser.Nodes;
 using System.Linq;
+using apophis.Lexer;
 using SortingHat.API.Parser.OperatorType;
 using SortingHat.API.Parser.Token;
 using Xunit;
@@ -15,7 +16,6 @@ namespace SortingHat.Test
         public void EmptySearch()
         {
             var root = _parser.Parse(" ");
-
 
             Assert.True(_parser.IllegalExpression);
             Assert.Null(root);
