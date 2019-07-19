@@ -126,8 +126,8 @@ namespace SortingHat.UI
             var operatorType = new TextOperatorType();
             IntelliSense.Items.Clear();
 
-            var parser = new QueryParser(search);
-            parser.Parse();
+            var parser = Parser.Create();
+            parser.Parse(search);
 
             foreach (var token in parser.NextToken()) {
                 switch (token) {

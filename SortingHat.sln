@@ -15,9 +15,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SortingHat.Plugin.Exif", "S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SortingHat.Plugin.FileType", "SortingHat.Plugin.FileType\SortingHat.Plugin.FileType.csproj", "{0CA7BCD1-0BDF-42E8-A2FF-BB56B3DA59CD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SortingHat.Plugin.ExtractRelevant", "SortingHat.Plugin.ExtractRelevant\SortingHat.Plugin.ExtractRelevant.csproj", "{242268B0-8E53-43AE-9E9B-CDE7B6AE7618}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SortingHat.UI", "SortingHat.UI\SortingHat.UI.csproj", "{10BE8D55-CF9A-49C3-A0F6-6171131016E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SortingHat.UI", "SortingHat.UI\SortingHat.UI.csproj", "{10BE8D55-CF9A-49C3-A0F6-6171131016E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SortingHat.Plugin.ExtractRelevantText", "SortingHat.Plugin.ExtractRelevantText\SortingHat.Plugin.ExtractRelevantText.csproj", "{A4ADFFD2-8700-45E4-A302-24CCFFCEE2EA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,14 +49,14 @@ Global
 		{0CA7BCD1-0BDF-42E8-A2FF-BB56B3DA59CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0CA7BCD1-0BDF-42E8-A2FF-BB56B3DA59CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0CA7BCD1-0BDF-42E8-A2FF-BB56B3DA59CD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{242268B0-8E53-43AE-9E9B-CDE7B6AE7618}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{242268B0-8E53-43AE-9E9B-CDE7B6AE7618}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{242268B0-8E53-43AE-9E9B-CDE7B6AE7618}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{242268B0-8E53-43AE-9E9B-CDE7B6AE7618}.Release|Any CPU.Build.0 = Release|Any CPU
 		{10BE8D55-CF9A-49C3-A0F6-6171131016E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{10BE8D55-CF9A-49C3-A0F6-6171131016E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{10BE8D55-CF9A-49C3-A0F6-6171131016E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{10BE8D55-CF9A-49C3-A0F6-6171131016E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4ADFFD2-8700-45E4-A302-24CCFFCEE2EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4ADFFD2-8700-45E4-A302-24CCFFCEE2EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4ADFFD2-8700-45E4-A302-24CCFFCEE2EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4ADFFD2-8700-45E4-A302-24CCFFCEE2EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

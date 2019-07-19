@@ -1,4 +1,5 @@
 ﻿using System;
+using apophis.Lexer.Tokens;
 using SortingHat.API.Parser.Token;
 
 namespace SortingHat.API.Parser

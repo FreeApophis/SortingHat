@@ -8,13 +8,13 @@ namespace SortingHat.API.Models
         private readonly IDatabase _db;
 
         public string Name { get; set; }
-        public Tag Parent { get; }
+        public Tag? Parent { get; }
         public List<Tag> Children { get; } = new List<Tag>();
         public long FileCount => _db.Tag.FileCount(this);
 
         public string FullName => $"{(Parent == null ? string.Empty : Parent.FullName)}:{Name}";
 
-        public Tag(IDatabase db, string name, Tag parent = null)
+        public Tag(IDatabase db, string name, Tag? parent = null)
         {
             _db = db;
             Name = name;

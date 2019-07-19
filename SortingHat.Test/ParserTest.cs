@@ -9,94 +9,84 @@ namespace SortingHat.Test
 {
     public class ParserTest
     {
+        private Parser _parser = Parser.Create();
+
         [Fact]
         public void EmptySearch()
         {
-            var parser = new QueryParser(" ");
-            var ir = parser.Parse();
+            var root = _parser.Parse(" ");
 
-            Assert.True(parser.IllegalExpression);
-            Assert.Null(ir);
+
+            Assert.True(_parser.IllegalExpression);
+            Assert.Null(root);
         }
 
         [Fact]
         public void SingleTag()
         {
-            var parser = new QueryParser(":tax:2018");
-            var parseTree = parser.Parse();
+            var root = _parser.Parse(":tax:2018");
 
-            Assert.IsType<TagNode>(parseTree);
-            Assert.False(parser.IllegalExpression);
-            Assert.Equal(":tax:2018", (parseTree as TagNode).Tag);
+            Assert.IsType<TagNode>(root);
+            Assert.False(_parser.IllegalExpression);
+            Assert.Equal(":tax:2018", (root as TagNode)?.Tag);
         }
 
         [Fact]
         public void SimpleQuery()
         {
-            var parser = new QueryParser(":test or true and (:movie or not :blue)");
+            var root = _parser.Parse(":test or true and (:movie or not :blue)");
             var visitor = new ToStringVisitor(new LogicalOperatorType());
 
-            var ir = parser.Parse();
-
-            ir.Accept(visitor);
+            root.Accept(visitor);
             Assert.Equal("(:test ∨ (true ∧ (:movie ∨ ¬:blue)))", visitor.Result);
-            Assert.False(parser.IllegalExpression);
+            Assert.False(_parser.IllegalExpression);
         }
 
         [Fact]
         public void PrecedenceTest()
         {
-            var parser = new QueryParser(":A || :B && :C");
+            var root = _parser.Parse(":A || :B && :C");
             var visitor = new ToStringVisitor(new LogicalOperatorType());
 
-            var ir = parser.Parse();
-
-            ir.Accept(visitor);
+            root.Accept(visitor);
             Assert.Equal("(:A ∨ (:B ∧ :C))", visitor.Result);
         }
 
         [Fact]
         public void OrAssociativityTest()
         {
-            var parser = new QueryParser(":A || :B || :C || :D");
+            var root = _parser.Parse(":A || :B || :C || :D");
             var visitor = new ToStringVisitor(new ProgrammingOperatorType());
 
-            var ir = parser.Parse();
-
-            ir.Accept(visitor);
+            root.Accept(visitor);
             Assert.Equal("(((:A || :B) || :C) || :D)", visitor.Result);
         }
 
         [Fact]
         public void AndAssociativityTest()
         {
-            var parser = new QueryParser(":A && :B && :C && :D");
+            var root = _parser.Parse(":A && :B && :C && :D");
             var visitor = new ToStringVisitor(new ProgrammingOperatorType());
 
-            var ir = parser.Parse();
-
-            ir.Accept(visitor);
+            root.Accept(visitor);
             Assert.Equal("(((:A && :B) && :C) && :D)", visitor.Result);
         }
 
         [Fact]
         public void MultipleNotTest()
         {
-            var parser = new QueryParser("!!!:A && !!:B");
+            var root = _parser.Parse("!!!:A && !!:B");
             var visitor = new ToStringVisitor(new TextOperatorType());
 
-            var ir = parser.Parse();
-
-            ir.Accept(visitor);
+            root.Accept(visitor);
             Assert.Equal("(not(not(not(:A))) and not(not(:B)))", visitor.Result);
         }
 
         [Fact]
         public void EmptyStringNextNode()
         {
-            var parser = new QueryParser("");
-            var ir = parser.Parse();
-            var next = parser.NextToken();
+            var root = _parser.Parse("");
+            var next = _parser.NextToken();
 
             Assert.Equal(3, next.Count());
             Assert.Contains(next, node => node is TagToken);
@@ -107,9 +97,8 @@ namespace SortingHat.Test
         [Fact]
         public void TagNextNode()
         {
-            var parser = new QueryParser(":tag");
-            var ir = parser.Parse();
-            var next = parser.NextToken();
+            var root = _parser.Parse(":tag");
+            var next = _parser.NextToken();
 
             Assert.Equal(2, next.Count());
             Assert.Contains(next, node => node is AndToken);
@@ -119,9 +108,8 @@ namespace SortingHat.Test
         [Fact]
         public void TagOpenParanthesisNextNode()
         {
-            var parser = new QueryParser("(:tag");
-            var ir = parser.Parse();
-            var next = parser.NextToken();
+            var root = _parser.Parse("(:tag");
+            var next = _parser.NextToken();
 
             Assert.Equal(3, next.Count());
             Assert.Contains(next, node => node is AndToken);
@@ -132,9 +120,8 @@ namespace SortingHat.Test
         [Fact]
         public void TagAndNextNode()
         {
-            var parser = new QueryParser("(:tag and ");
-            var ir = parser.Parse();
-            var next = parser.NextToken();
+            var root = _parser.Parse("(:tag and ");
+            var next = _parser.NextToken();
 
             Assert.Equal(3, next.Count());
             Assert.Contains(next, node => node is TagToken);
@@ -145,9 +132,8 @@ namespace SortingHat.Test
         [Fact]
         public void NotNextNode()
         {
-            var parser = new QueryParser("not ");
-            var ir = parser.Parse();
-            var next = parser.NextToken();
+            var root = _parser.Parse("not ");
+            var next = _parser.NextToken();
 
             Assert.Equal(3, next.Count());
             Assert.Contains(next, node => node is TagToken);
@@ -158,9 +144,8 @@ namespace SortingHat.Test
         [Fact]
         public void OpenParentesisNotNextNode()
         {
-            var parser = new QueryParser("(not ");
-            var ir = parser.Parse();
-            var next = parser.NextToken();
+            var root = _parser.Parse("(not ");
+            var next = _parser.NextToken();
 
             Assert.Equal(3, next.Count());
             Assert.Contains(next, node => node is TagToken);
@@ -171,9 +156,8 @@ namespace SortingHat.Test
         [Fact]
         public void TagComplexNextNode()
         {
-            var parser = new QueryParser("(:test or ((:tag or :bla and :fun) and :x");
-            var ir = parser.Parse();
-            var next = parser.NextToken();
+            var root = _parser.Parse("(:test or ((:tag or :bla and :fun) and :x");
+            var next = _parser.NextToken();
 
             Assert.Equal(3, next.Count());
             Assert.Contains(next, node => node is AndToken);
@@ -184,9 +168,8 @@ namespace SortingHat.Test
         [Fact]
         public void CompleteExpressionNextNode()
         {
-            var parser = new QueryParser("(:tag and :fun)");
-            var ir = parser.Parse();
-            var next = parser.NextToken();
+            var root = _parser.Parse("(:tag and :fun)");
+            var next = _parser.NextToken();
 
             Assert.Equal(2, next.Count());
             Assert.Contains(next, node => node is AndToken);
@@ -196,9 +179,8 @@ namespace SortingHat.Test
         [Fact]
         public void IllegalNextNode()
         {
-            var parser = new QueryParser(")");
-            var ir = parser.Parse();
-            var next = parser.NextToken();
+            var root = _parser.Parse(")");
+            var next = _parser.NextToken();
 
             Assert.Empty(next);
         }
@@ -212,13 +194,10 @@ GROUP BY FilePaths.ID";
         [Fact]
         public void SQLQuery()
         {
-            var parser = new QueryParser(":tax:2016 || :cool && :audio:original");
+            var root = _parser.Parse(":tax:2016 || :cool && :audio:original");
             var visitor = new DB.SearchQueryVisitor(new MockDatabase(), new MockTagParser());
 
-            var ir = parser.Parse();
-
-            ir.Accept(visitor);
-
+            root.Accept(visitor);
             Assert.Equal(SelectStatement, visitor.Result);
         }
     }

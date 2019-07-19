@@ -14,7 +14,13 @@ namespace SortingHat.API.Plugin
     {
         public List<IPlugin> Plugins { get; } = new List<IPlugin>();
 
-        private static string PluginDirectory => Path.Combine(AppContext.BaseDirectory, "plugins");
+        private static string PluginDirectory => Path.Combine(PathToExecutable(), "plugins");
+
+        private static string PathToExecutable()
+        {
+            return Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
+        }
+
         private static string PluginFilePattern => "*.dll";
 
         public void RegisterModules(ContainerBuilder builder)

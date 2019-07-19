@@ -2,6 +2,6 @@
 {
     public interface ITagParser
     {
-        Tag Parse(string tagString);
+        Tag? Parse(string tagString);
     }
 }

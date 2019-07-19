@@ -16,7 +16,7 @@ namespace SortingHat.API.AutoTag
 
         protected abstract string HandleTag(FileInfo file);
 
-        public string FindMatch(string value)
+        public string? FindMatch(string value)
         {
             return value == AutoTagKey ? value : null;
         }

@@ -21,9 +21,9 @@ namespace SortingHat.API.AutoTag
             _tagParser = tagParser;
         }
 
-        public Tag TagFromMask(string tagMask, FileInfo file)
+        public Tag? TagFromMask(string tagMask, FileInfo file)
         {
-            return _tagParser?.Parse(ReplaceMask(tagMask, file));
+            return _tagParser.Parse(ReplaceMask(tagMask, file));
         }
 
         private string ReplaceMask(string tagMask, FileInfo file)

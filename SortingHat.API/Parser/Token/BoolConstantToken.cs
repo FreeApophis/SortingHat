@@ -1,4 +1,6 @@
-﻿namespace SortingHat.API.Parser.Token
+﻿using apophis.Lexer.Tokens;
+
+namespace SortingHat.API.Parser.Token
 {
     public class BoolConstantToken : IToken
     {
@@ -11,4 +13,19 @@
 
         public override string ToString() => $"Bool Value: {Value}";
     }
+
+    public class TrueConstantToken : BoolConstantToken
+    {
+        public TrueConstantToken() : base(true)
+        {
+        }
+    }
+
+    public class FalseConstantToken : BoolConstantToken
+    {
+        public FalseConstantToken() : base(false)
+        {
+        }
+    }
+
 }

@@ -21,7 +21,7 @@ namespace SortingHat.API.Models
         /// </summary>
         /// <param name="tagString"></param>
         /// <returns>The list is empty in case of an illegal tag string</returns>
-        public Tag Parse(string tagString)
+        public Tag? Parse(string tagString)
         {
             if (tagString == null) return null;
             if (tagString.StartsWith(":") == false) return null;

@@ -134,8 +134,8 @@ namespace SortingHat.DB
 
         private string ParseQuery(string query)
         {
-            var parser = new QueryParser(query);
-            var ir = parser.Parse();
+            var parser = Parser.Create();
+            var ir = parser.Parse(query);
 
             var visitor = _newSearchQueryVisitor();
             ir.Accept(visitor);

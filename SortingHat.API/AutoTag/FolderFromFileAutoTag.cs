@@ -11,7 +11,7 @@ namespace SortingHat.API.AutoTag
         public override string Description =>
             @"Path element counted from the right: C:\User\File.ext 0 => File.ext, 1 => User, 2 => C:";
 
-        protected override string HandleTag(FileInfo file, int index)
+        protected override string? HandleTag(FileInfo file, int index)
         {
             var pathElements = PathHelper.PathElements(file.Directory);
 
