@@ -8,9 +8,9 @@ namespace SortingHat.API.Parser
     {
         public static void ExpectClosingParenthesis(this TokenWalker walker)
         {
-            if (!(walker.NextIs<ClosedParenthesisToken>()))
+            if (!walker.NextIs<ClosedParenthesisToken>())
             {
-                throw new Exception("Expecting ')' in expression, instead got: " + (walker.Peek() != null ? walker.Peek().ToString() : "End of expression"));
+                throw new ExpectedTokenException(new ClosedParenthesisToken(), walker.Peek().Token ?? new EpsilonToken());
             }
             walker.Pop();
         }
@@ -19,7 +19,7 @@ namespace SortingHat.API.Parser
         {
             if (!walker.NextIs<OpenParenthesisToken>())
             {
-                throw new Exception("Expecting Real number or '(' in expression, instead got : " + (walker.Peek() != null ? walker.Peek().ToString() : "End of expression"));
+                throw new ExpectedTokenException(new OpenParenthesisToken(), walker.Peek().Token ?? new EpsilonToken());
             }
             walker.Pop();
         }

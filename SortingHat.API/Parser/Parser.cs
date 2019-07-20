@@ -66,7 +66,7 @@ namespace SortingHat.API.Parser
             try
             {
                 _tokenWalker.Scan(expression, lexems => lexems.Where(t => t.Token.GetType() != typeof(WhiteSpaceToken)));
-                var ast = Parse(expression);
+                var ast = Parse(_tokenWalker);
                 _nextToken.Add(new AndToken());
                 _nextToken.Add(new OrToken());
                 return ast;
