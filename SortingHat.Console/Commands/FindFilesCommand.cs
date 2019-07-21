@@ -44,7 +44,7 @@ namespace SortingHat.CLI.Commands
 
                     table.Append(file.Hash.Result.ShortHash(), file.CreatedAt, file.Size.HumanSize(), file.Path);
                 }
-                _consoleWriter.WriteLine(table.ToString());
+                table.WriteTo(_consoleWriter);
             } else {
                 _consoleWriter.WriteLine("No files found for your search query...");
             }
