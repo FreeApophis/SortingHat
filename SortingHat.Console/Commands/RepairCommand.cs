@@ -3,6 +3,7 @@ using SortingHat.API.DI;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Funcky.Monads;
 
 namespace SortingHat.CLI.Commands
 {
@@ -30,7 +31,7 @@ namespace SortingHat.CLI.Commands
         }
 
         public string LongCommand => "repair";
-        public string ShortCommand => null;
+        public Option<string> ShortCommand => Option<string>.None();
         public string ShortHelp => "Check each path locked in the database if the file still exists and is not corrupted / changed";
         public CommandGrouping CommandGrouping => CommandGrouping.General;
     }

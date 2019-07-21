@@ -77,8 +77,6 @@ namespace SortingHat.CLI.Output
             return stringBuilder.ToString();
         }
 
-
-
         public override string ToString()
         {
             return string.Join(Environment.NewLine, _rows.Select(row => string.Format(GetFormat(), row)));

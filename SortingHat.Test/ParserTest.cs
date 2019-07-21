@@ -209,7 +209,7 @@ GROUP BY FilePaths.ID";
         public void SQLQuery()
         {
             var root = _parser.Parse(":tax:2016 || :cool && :audio:original");
-            var visitor = new DB.SearchQueryVisitor(new MockDatabase(), new MockTagParser());
+            var visitor = new DB.SearchQueryVisitor(MockDatabase.Create(), new MockTagParser());
 
             root.Accept(visitor);
             Assert.Equal(SelectStatement, visitor.Result);

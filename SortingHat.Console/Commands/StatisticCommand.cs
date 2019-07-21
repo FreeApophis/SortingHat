@@ -3,6 +3,7 @@ using SortingHat.API.DI;
 using SortingHat.CLI.Output;
 using System;
 using System.Collections.Generic;
+using Funcky.Monads;
 
 namespace SortingHat.CLI.Commands
 {
@@ -43,7 +44,7 @@ namespace SortingHat.CLI.Commands
         }
 
         public string LongCommand => "statistics";
-        public string ShortCommand => "stat";
+        public Option<string> ShortCommand => Option.Some("stat");
         public string ShortHelp => "Shows global statistics";
         public CommandGrouping CommandGrouping => CommandGrouping.General;
 

@@ -5,6 +5,7 @@ using SortingHat.API.DI;
 using SortingHat.API.Models;
 using System.Collections.Generic;
 using System.Linq;
+using Funcky.Monads;
 
 namespace SortingHat.CLI.Commands
 {
@@ -78,7 +79,7 @@ namespace SortingHat.CLI.Commands
         }
 
         public string LongCommand => "rename-tag";
-        public string ShortCommand => null;
+        public Option<string> ShortCommand => Option<string>.None();
         public string ShortHelp => "Renames a tag from database";
         public CommandGrouping CommandGrouping => CommandGrouping.Tag;
     }

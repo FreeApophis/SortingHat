@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Funcky.Monads;
 using SortingHat.API;
 
 namespace SortingHat.CLI.Commands
@@ -53,7 +54,7 @@ namespace SortingHat.CLI.Commands
 
 
         public string LongCommand => "find-files";
-        public string ShortCommand => "ff";
+        public Option<string> ShortCommand => Option.Some("ff");
         public string ShortHelp => "Finds all files matching the search query";
         public CommandGrouping CommandGrouping => CommandGrouping.File;
     }

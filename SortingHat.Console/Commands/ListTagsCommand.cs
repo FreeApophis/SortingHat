@@ -3,6 +3,7 @@ using SortingHat.API.DI;
 using SortingHat.API.Models;
 using System;
 using System.Collections.Generic;
+using Funcky.Monads;
 
 namespace SortingHat.CLI.Commands
 {
@@ -27,7 +28,7 @@ namespace SortingHat.CLI.Commands
         }
 
         public string LongCommand => "list-tags";
-        public string ShortCommand => "tags";
+        public Option<string> ShortCommand => Option.Some("tags");
         public string ShortHelp => "Lists all avaialable tags in hierarchical form";
         public CommandGrouping CommandGrouping => CommandGrouping.Tag;
 

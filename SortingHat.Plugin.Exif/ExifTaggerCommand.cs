@@ -3,6 +3,7 @@ using MetadataExtractor;
 using SortingHat.API.DI;
 using System;
 using System.Collections.Generic;
+using Funcky.Monads;
 
 namespace SortingHat.Plugin.Exif
 {
@@ -35,7 +36,7 @@ namespace SortingHat.Plugin.Exif
         }
 
         public string LongCommand => "exif";
-        public string ShortCommand => null;
+        public Option<string> ShortCommand => Option<string>.None();
         public string ShortHelp => "Reads exif information from files.";
 
         public CommandGrouping CommandGrouping => CommandGrouping.General;

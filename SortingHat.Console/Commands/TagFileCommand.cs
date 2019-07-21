@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Funcky.Monads;
 
 namespace SortingHat.CLI.Commands
 {
@@ -69,7 +70,7 @@ namespace SortingHat.CLI.Commands
         }
 
         public string LongCommand => "tag-files";
-        public string ShortCommand => "tag";
+        public Option<string> ShortCommand => Option.Some("tag");
         public string ShortHelp => "Is tagging the files the given tags";
         public CommandGrouping CommandGrouping => CommandGrouping.File;
     }

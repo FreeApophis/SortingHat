@@ -3,6 +3,7 @@ using SortingHat.API.DI;
 using SortingHat.Plugin.FileType.Detectors;
 using System;
 using System.Collections.Generic;
+using Funcky.Monads;
 
 namespace SortingHat.Plugin.FileType
 {
@@ -32,8 +33,7 @@ namespace SortingHat.Plugin.FileType
                     Console.WriteLine($"Category : {fileType.Category}");
                     Console.WriteLine($"Name     : {fileType.Name}");
                     Console.WriteLine($"Extension: {string.Join(",", fileType.Extensions)}");
-                }
-                else
+                } else
                 {
                     Console.WriteLine("Unknown filetype");
                 }
@@ -43,7 +43,7 @@ namespace SortingHat.Plugin.FileType
         }
 
         public string LongCommand => "identify";
-        public string ShortCommand => "id";
+        public Option<string> ShortCommand => Option.Some("id");
         public string ShortHelp => "This command identifies the real file type (ignoring the file-extension)";
         public CommandGrouping CommandGrouping => CommandGrouping.General;
 

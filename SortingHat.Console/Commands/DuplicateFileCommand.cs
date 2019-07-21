@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Funcky.Monads;
 
 namespace SortingHat.CLI.Commands
 {
@@ -57,7 +58,7 @@ namespace SortingHat.CLI.Commands
         }
 
         public string LongCommand => "duplicate";
-        public string ShortCommand => "d";
+        public Option<string> ShortCommand => Option.Some("d");
         public string ShortHelp => "Find duplicate files in your dms";
         public CommandGrouping CommandGrouping => CommandGrouping.File;
     }

@@ -7,6 +7,7 @@ using SortingHat.API.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Funcky.Monads;
 
 namespace SortingHat.CLI.Commands
 {
@@ -101,7 +102,7 @@ namespace SortingHat.CLI.Commands
         }
 
         public string LongCommand => "auto-tag";
-        public string ShortCommand => "auto";
+        public Option<string> ShortCommand => Option.Some("auto");
         public string ShortHelp => "Automatically tags stuff ...";
         public CommandGrouping CommandGrouping => CommandGrouping.AutoTagging;
     }

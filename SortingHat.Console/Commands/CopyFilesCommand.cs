@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Funcky.Monads;
 
 namespace SortingHat.CLI.Commands
 {
@@ -35,8 +36,7 @@ namespace SortingHat.CLI.Commands
                     Console.WriteLine($"cp {file.Path} {Path.Combine(path, Path.GetFileName(file.Path))}");
                     File.Copy(file.Path, Path.Combine(path, Path.GetFileName(file.Path)));
                 }
-            }
-            else
+            } else
             {
                 Console.WriteLine("No files found for your search query...");
             }
@@ -45,7 +45,7 @@ namespace SortingHat.CLI.Commands
         }
 
         public string LongCommand => "copy-files";
-        public string ShortCommand => "cp";
+        public Option<string> ShortCommand => Option.Some("cp");
         public string ShortHelp => "This command copies all files which match the search query to a specified folder location.";
         public CommandGrouping CommandGrouping => CommandGrouping.File;
     }

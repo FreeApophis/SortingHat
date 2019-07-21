@@ -4,6 +4,7 @@ using SortingHat.API.Plugin;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Funcky.Monads;
 
 namespace SortingHat.CLI.Commands
 {
@@ -38,7 +39,7 @@ namespace SortingHat.CLI.Commands
         }
 
         public string LongCommand => "plugins";
-        public string ShortCommand => null;
+        public Option<string> ShortCommand => Option<string>.None();
         public string ShortHelp => "Lists the loaded plugins";
         public CommandGrouping CommandGrouping => CommandGrouping.General;
     }

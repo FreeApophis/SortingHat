@@ -3,6 +3,7 @@ using SortingHat.API.DI;
 using SortingHat.API.Models;
 using System;
 using System.Collections.Generic;
+using Funcky.Monads;
 
 namespace SortingHat.CLI.Commands
 {
@@ -59,7 +60,7 @@ namespace SortingHat.CLI.Commands
         }
 
         public string LongCommand => "file-info";
-        public string ShortCommand => "info";
+        public Option<string> ShortCommand => Option.Some("info");
         public string ShortHelp => "Shows all available information about the current file.";
         public CommandGrouping CommandGrouping => CommandGrouping.File;
 

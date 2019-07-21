@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Funcky.Monads;
 
 namespace SortingHat.CLI.Commands
 {
@@ -112,7 +113,8 @@ namespace SortingHat.CLI.Commands
                 {
                     foreach (var command in commands.Where(c => c.CommandGrouping == commandGrouping))
                     {
-                        table.Append(command.LongCommand, command.ShortCommand, command.ShortHelp);
+                        var shortCommand = command.ShortCommand.Match("", c => c);
+                        table.Append(command.LongCommand, shortCommand, command.ShortHelp);
                     }
                     table.AppendSeperator();
                 }
@@ -126,7 +128,7 @@ namespace SortingHat.CLI.Commands
         }
 
         public string LongCommand => "help";
-        public string ShortCommand => "?";
+        public Option<string> ShortCommand => Option.Some("?");
 
         public string ShortHelp => "This is the help command, it shows a list of the available commands.";
         public CommandGrouping CommandGrouping => CommandGrouping.General;
