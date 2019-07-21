@@ -1,8 +1,12 @@
 ﻿namespace SortingHat.ConsoleWriter
 {
-    class NullConsoleWriter : IConsoleWriter
+    public class NullWriter : IConsoleWriter
     {
         public void WriteLine(string line)
+        {
+        }
+
+        public void WriteLine()
         {
         }
     }

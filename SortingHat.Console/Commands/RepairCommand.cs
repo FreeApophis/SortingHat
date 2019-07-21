@@ -1,9 +1,9 @@
 ﻿using JetBrains.Annotations;
 using SortingHat.API.DI;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using Funcky.Monads;
+using SortingHat.ConsoleWriter;
 
 namespace SortingHat.CLI.Commands
 {
@@ -11,10 +11,12 @@ namespace SortingHat.CLI.Commands
     internal class RepairCommand : ICommand
     {
         private readonly IDatabase _db;
+        private readonly IConsoleWriter _consoleWriter;
 
-        public RepairCommand(IDatabase db)
+        public RepairCommand(IDatabase db, IConsoleWriter consoleWriter)
         {
             _db = db;
+            _consoleWriter = consoleWriter;
         }
 
         public bool Execute(IEnumerable<string> arguments, IOptions options)
@@ -23,7 +25,7 @@ namespace SortingHat.CLI.Commands
             {
                 if (File.Exists(path) == false)
                 {
-                    Console.WriteLine($"File '{path}' does not exist, removed from index");
+                    _consoleWriter.WriteLine($"File '{path}' does not exist, removed from index");
                 }
             }
 

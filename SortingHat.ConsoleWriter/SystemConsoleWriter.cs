@@ -8,5 +8,10 @@ namespace SortingHat.ConsoleWriter
         {
             Console.WriteLine(line);
         }
+
+        public void WriteLine()
+        {
+            Console.WriteLine();
+        }
     }
 }

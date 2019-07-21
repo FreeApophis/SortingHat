@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Funcky.Monads;
+using SortingHat.ConsoleWriter;
 
 namespace SortingHat.CLI.Commands
 {
@@ -12,10 +13,12 @@ namespace SortingHat.CLI.Commands
     internal class CopyFilesCommand : ICommand
     {
         private readonly IDatabase _db;
+        private readonly IConsoleWriter _consoleWriter;
 
-        public CopyFilesCommand(IDatabase db)
+        public CopyFilesCommand(IDatabase db, IConsoleWriter consoleWriter)
         {
             _db = db;
+            _consoleWriter = consoleWriter;
         }
 
         public bool Execute(IEnumerable<string> arguments, IOptions options)
@@ -25,7 +28,7 @@ namespace SortingHat.CLI.Commands
             var search = arguments.First();
             var path = Path.Combine(Directory.GetCurrentDirectory(), arguments.Last());
 
-            Console.WriteLine($"Find Files: {search}");
+            _consoleWriter.WriteLine($"Find Files: {search}");
 
             var files = _db.File.Search(search);
 
@@ -33,12 +36,12 @@ namespace SortingHat.CLI.Commands
             {
                 foreach (var file in files)
                 {
-                    Console.WriteLine($"cp {file.Path} {Path.Combine(path, Path.GetFileName(file.Path))}");
+                    _consoleWriter.WriteLine($"cp {file.Path} {Path.Combine(path, Path.GetFileName(file.Path))}");
                     File.Copy(file.Path, Path.Combine(path, Path.GetFileName(file.Path)));
                 }
             } else
             {
-                Console.WriteLine("No files found for your search query...");
+                _consoleWriter.WriteLine("No files found for your search query...");
             }
 
             return true;

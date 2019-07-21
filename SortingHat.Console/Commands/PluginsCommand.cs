@@ -1,38 +1,39 @@
 ﻿using JetBrains.Annotations;
 using SortingHat.API.DI;
 using SortingHat.API.Plugin;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Funcky.Monads;
+using SortingHat.ConsoleWriter;
 
 namespace SortingHat.CLI.Commands
 {
     [UsedImplicitly]
     internal class PluginsCommand : ICommand
     {
+        private readonly IConsoleWriter _consoleWriter;
         private readonly IPluginLoader _pluginLoader;
 
-        public PluginsCommand(IPluginLoader pluginLoader)
+        public PluginsCommand(IConsoleWriter consoleWriter, IPluginLoader pluginLoader)
         {
+            _consoleWriter = consoleWriter;
             _pluginLoader = pluginLoader;
         }
         public bool Execute(IEnumerable<string> arguments, IOptions options)
         {
             if (_pluginLoader.Plugins.Any())
             {
-                Console.WriteLine("Loaded Plugins:");
+                _consoleWriter.WriteLine("Loaded Plugins:");
                 foreach (var plugin in _pluginLoader.Plugins)
                 {
-                    Console.WriteLine($"{plugin.Name} v{plugin.Version}");
-                    Console.WriteLine();
-                    Console.WriteLine($"  {plugin.Description}");
-                    Console.WriteLine();
+                    _consoleWriter.WriteLine($"{plugin.Name} v{plugin.Version}");
+                    _consoleWriter.WriteLine();
+                    _consoleWriter.WriteLine($"  {plugin.Description}");
+                    _consoleWriter.WriteLine();
                 }
-            }
-            else
+            } else
             {
-                Console.WriteLine("No plugins loaded");
+                _consoleWriter.WriteLine("No plugins loaded");
             }
 
             return true;

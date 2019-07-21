@@ -6,6 +6,7 @@ using SortingHat.API.Models;
 using System.Collections.Generic;
 using System.Linq;
 using Funcky.Monads;
+using SortingHat.ConsoleWriter;
 
 namespace SortingHat.CLI.Commands
 {
@@ -13,11 +14,13 @@ namespace SortingHat.CLI.Commands
     internal class RenameTagCommand : ICommand
     {
         private readonly ILogger<RenameTagCommand> _logger;
+        private readonly IConsoleWriter _consoleWriter;
         private readonly ITagParser _tagParser;
 
-        public RenameTagCommand(ILogger<RenameTagCommand> logger, ITagParser tagParser)
+        public RenameTagCommand(ILogger<RenameTagCommand> logger, IConsoleWriter consoleWriter, ITagParser tagParser)
         {
             _logger = logger;
+            _consoleWriter = consoleWriter;
             _tagParser = tagParser;
         }
 
@@ -32,7 +35,7 @@ namespace SortingHat.CLI.Commands
             else
             {
                 _logger.LogWarning("rename tag has exactly two arguments, the tag to rename, and a new name: hat rename-tag :tag new_name");
-                System.Console.WriteLine("rename tag has exactly two arguments, the tag to rename, and a new name: hat rename-tag :tag new_name");
+                _consoleWriter.WriteLine("rename tag has exactly two arguments, the tag to rename, and a new name: hat rename-tag :tag new_name");
             }
 
             if (result == false)
@@ -62,7 +65,7 @@ namespace SortingHat.CLI.Commands
             if (tagString.IsTag() == false)
             {
                 _logger.LogWarning($"First Argument '{tagString}' must be a tag");
-                System.Console.WriteLine($"First Argument '{tagString}' must be a tag");
+                _consoleWriter.WriteLine($"First Argument '{tagString}' must be a tag");
 
                 return false;
             }
@@ -70,7 +73,7 @@ namespace SortingHat.CLI.Commands
             if (newName.IsTag())
             {
                 _logger.LogWarning($"Second Argument '{newName}' cannot be a tag");
-                System.Console.WriteLine($"Second Argument '{newName}' cannot be a tag");
+                _consoleWriter.WriteLine($"Second Argument '{newName}' cannot be a tag");
 
                 return false;
             }

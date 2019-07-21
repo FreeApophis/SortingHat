@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SortingHat.API.DI;
 using Funcky.Extensions;
+using SortingHat.ConsoleWriter;
 
 namespace SortingHat.CLI
 {
@@ -13,10 +14,12 @@ namespace SortingHat.CLI
     {
         private readonly Dictionary<string, ICommand> _commandTargets = new Dictionary<string, ICommand>();
         private readonly Lazy<ILogger<ArgumentParser>> _logger;
+        private readonly IConsoleWriter _consoleWriter;
 
-        public ArgumentParser(Lazy<ILogger<ArgumentParser>> logger, IEnumerable<ICommand> commands)
+        public ArgumentParser(Lazy<ILogger<ArgumentParser>> logger, IConsoleWriter consoleWriter, IEnumerable<ICommand> commands)
         {
             _logger = logger;
+            _consoleWriter = consoleWriter;
 
             RegisterCommands(commands);
         }
@@ -45,7 +48,7 @@ namespace SortingHat.CLI
 
             } else
             {
-                Console.WriteLine("Maybe run 'hat help'");
+                _consoleWriter.WriteLine("Maybe run 'hat help'");
             }
         }
 
@@ -60,7 +63,7 @@ namespace SortingHat.CLI
         private void UnknownCommandError(string commandName)
         {
             _logger.Value.LogWarning($"Unknown command: '{commandName}' cannot be executed.");
-            Console.WriteLine($"Unknown command: '{commandName}'");
+            _consoleWriter.WriteLine($"Unknown command: '{commandName}'");
         }
 
         private static IEnumerable<string> TagAndFileArguments(IEnumerable<string> arguments)

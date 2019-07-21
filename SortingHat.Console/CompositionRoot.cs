@@ -14,6 +14,7 @@ using apophis.Lexer;
 using SortingHat.API.AutoTag;
 using SortingHat.API.Parser;
 using SortingHat.API.Parser.Token;
+using SortingHat.ConsoleWriter;
 
 namespace SortingHat.CLI
 {
@@ -41,9 +42,10 @@ namespace SortingHat.CLI
 
             builder.RegisterType<SearchQueryVisitor>().As<SearchQueryVisitor>().InstancePerDependency();
 
-            builder.Register(c => new HashService(SHA256.Create(), nameof(SHA256))).As<IHashService>().SingleInstance();
+            builder.Register(c => new HashService(SHA256.Create(), nameof(SHA256), c.Resolve<IConsoleWriter>())).As<IHashService>().SingleInstance();
             builder.RegisterType<LoggerFactory>().As<ILoggerFactory>().SingleInstance();
             builder.RegisterGeneric(typeof(Logger<>)).As(typeof(ILogger<>)).SingleInstance();
+            builder.RegisterType<SystemConsoleWriter>().As<IConsoleWriter>();
 
             RegisterConfiguration(builder);
             RegisterCommands(builder);

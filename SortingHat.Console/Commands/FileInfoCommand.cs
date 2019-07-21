@@ -4,17 +4,20 @@ using SortingHat.API.Models;
 using System;
 using System.Collections.Generic;
 using Funcky.Monads;
+using SortingHat.ConsoleWriter;
 
 namespace SortingHat.CLI.Commands
 {
     [UsedImplicitly]
     internal class FileInfoCommand : ICommand
     {
+        private readonly IConsoleWriter _consoleWriter;
         private readonly IFilePathExtractor _filePathExtractor;
         private readonly Func<File> _newFile;
 
-        public FileInfoCommand(IFilePathExtractor filePathExtractor, Func<File> newFile)
+        public FileInfoCommand(IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor, Func<File> newFile)
         {
+            _consoleWriter = consoleWriter;
             _filePathExtractor = filePathExtractor;
             _newFile = newFile;
         }
@@ -23,35 +26,35 @@ namespace SortingHat.CLI.Commands
         {
             foreach (var filePath in _filePathExtractor.FromFilePatterns(arguments))
             {
-                Console.WriteLine();
-                Console.WriteLine($"File: {filePath}");
+                _consoleWriter.WriteLine();
+                _consoleWriter.WriteLine($"File: {filePath}");
 
                 var file = _newFile();
                 file.Path = filePath;
                 file.DBLoadByPath();
                 if (file.Hash == null)
                 {
-                    Console.WriteLine("File not in index!");
+                    _consoleWriter.WriteLine("File not in index!");
                 }
                 else
                 {
-                    Console.WriteLine($"CreatedAt (oldest): {file.CreatedAt}");
-                    Console.WriteLine($"File Size: {file.Size}");
-                    Console.WriteLine($"File Hash: {file.Hash.Result}");
+                    _consoleWriter.WriteLine($"CreatedAt (oldest): {file.CreatedAt}");
+                    _consoleWriter.WriteLine($"File Size: {file.Size}");
+                    _consoleWriter.WriteLine($"File Hash: {file.Hash.Result}");
 
                     foreach (var tag in file.GetTags().Result)
                     {
-                        Console.WriteLine($"Tag: {tag.FullName}");
+                        _consoleWriter.WriteLine($"Tag: {tag.FullName}");
                     }
 
                     foreach (var name in file.GetNames().Result)
                     {
-                        Console.WriteLine($"Name: {name}");
+                        _consoleWriter.WriteLine($"Name: {name}");
                     }
 
                     foreach (var path in file.GetPaths().Result)
                     {
-                        Console.WriteLine($"Path: {path}");
+                        _consoleWriter.WriteLine($"Path: {path}");
                     }
                 }
             }

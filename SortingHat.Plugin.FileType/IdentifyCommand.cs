@@ -1,20 +1,22 @@
 ﻿using JetBrains.Annotations;
 using SortingHat.API.DI;
 using SortingHat.Plugin.FileType.Detectors;
-using System;
 using System.Collections.Generic;
 using Funcky.Monads;
+using SortingHat.ConsoleWriter;
 
 namespace SortingHat.Plugin.FileType
 {
     [UsedImplicitly]
     internal class IdentifyCommand : ICommand
     {
+        private readonly IConsoleWriter _consoleWriter;
         private readonly IFileTypeFinder _fileTypeFinder;
         private readonly IFilePathExtractor _filePathExtractor;
 
-        public IdentifyCommand(IFileTypeFinder fileTypeFinder, IFilePathExtractor filePathExtractor)
+        public IdentifyCommand(IConsoleWriter consoleWriter, IFileTypeFinder fileTypeFinder, IFilePathExtractor filePathExtractor)
         {
+            _consoleWriter = consoleWriter;
             _fileTypeFinder = fileTypeFinder;
             _filePathExtractor = filePathExtractor;
         }
@@ -25,17 +27,17 @@ namespace SortingHat.Plugin.FileType
         {
             foreach (var argument in _filePathExtractor.FromFilePatterns(arguments))
             {
-                Console.WriteLine($"File: {argument}");
+                _consoleWriter.WriteLine($"File: {argument}");
                 var fileType = FileType(argument);
 
                 if (fileType != null)
                 {
-                    Console.WriteLine($"Category : {fileType.Category}");
-                    Console.WriteLine($"Name     : {fileType.Name}");
-                    Console.WriteLine($"Extension: {string.Join(",", fileType.Extensions)}");
+                    _consoleWriter.WriteLine($"Category : {fileType.Category}");
+                    _consoleWriter.WriteLine($"Name     : {fileType.Name}");
+                    _consoleWriter.WriteLine($"Extension: {string.Join(",", fileType.Extensions)}");
                 } else
                 {
-                    Console.WriteLine("Unknown filetype");
+                    _consoleWriter.WriteLine("Unknown filetype");
                 }
             }
 

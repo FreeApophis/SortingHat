@@ -1,19 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
+using SortingHat.ConsoleWriter;
 
-namespace SortingHat.Plugin.ExtractRelevant
+namespace SortingHat.Plugin.ExtractRelevantText
 {
     public class FolderScanner
     {
+        private readonly IConsoleWriter _consoleWriter;
+
+        FolderScanner(IConsoleWriter consoleWriter)
+        {
+            _consoleWriter = consoleWriter;
+        }
+
         internal bool Scan(IEnumerable<string> folders)
         {
-            Console.WriteLine("Scanning...");
+            _consoleWriter.WriteLine("Scanning...");
             foreach (var folder in folders)
             {
                 foreach (string file in Directory.EnumerateFiles(folder, "*.txt", SearchOption.AllDirectories))
                 {
-                    Console.WriteLine(file);
+                    _consoleWriter.WriteLine(file);
                 }
             }
 

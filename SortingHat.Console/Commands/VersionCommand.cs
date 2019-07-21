@@ -1,23 +1,31 @@
 ﻿using JetBrains.Annotations;
 using SortingHat.API.DI;
 using SortingHat.CLI.Output;
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
 using Funcky.Monads;
+using SortingHat.ConsoleWriter;
 
 namespace SortingHat.CLI.Commands
 {
     [UsedImplicitly]
     internal class VersionCommand : ICommand
     {
+        private readonly IConsoleWriter _consoleWriter;
+
+        [UsedImplicitly]
+        public VersionCommand(IConsoleWriter consoleWriter)
+        {
+            _consoleWriter = consoleWriter;
+        }
+
         public bool Execute(IEnumerable<string> arguments, IOptions options)
         {
             var version = GetVersion();
 
-            Console.WriteLine($"{nameof(SortingHat)} {version.Version}");
-            Console.WriteLine();
+            _consoleWriter.WriteLine($"{nameof(SortingHat)} {version.Version}");
+            _consoleWriter.WriteLine();
 
             var table = new ConsoleTable(2);
 
@@ -26,7 +34,7 @@ namespace SortingHat.CLI.Commands
             table.Append("Culture:", version.CultureName);
             table.Append("Current Culture:", CultureInfo.CurrentCulture);
 
-            Console.WriteLine(table.ToString());
+            _consoleWriter.WriteLine(table.ToString());
             return true;
         }
 

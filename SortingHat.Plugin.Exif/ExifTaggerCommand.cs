@@ -4,6 +4,7 @@ using SortingHat.API.DI;
 using System;
 using System.Collections.Generic;
 using Funcky.Monads;
+using SortingHat.ConsoleWriter;
 
 namespace SortingHat.Plugin.Exif
 {
@@ -12,10 +13,12 @@ namespace SortingHat.Plugin.Exif
     [UsedImplicitly]
     internal class ExifCommand : ICommand
     {
+        private readonly IConsoleWriter _consoleWriter;
         private readonly IFilePathExtractor _filePathExtractor;
 
-        public ExifCommand(IFilePathExtractor filePathExtractor)
+        public ExifCommand(IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor)
         {
+            _consoleWriter = consoleWriter;
             _filePathExtractor = filePathExtractor;
         }
 
@@ -28,7 +31,7 @@ namespace SortingHat.Plugin.Exif
                 {
                     foreach (var tag in directory.Tags)
                     {
-                        Console.WriteLine($"{directory.Name} - {tag.Name} ({tag.Type}) = {tag.Description}");
+                        _consoleWriter.WriteLine($"{directory.Name} - {tag.Name} ({tag.Type}) = {tag.Description}");
                     }
                 }
             }

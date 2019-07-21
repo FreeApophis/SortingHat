@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Funcky.Monads;
+using SortingHat.ConsoleWriter;
 
 namespace SortingHat.CLI.Commands
 {
@@ -15,14 +16,16 @@ namespace SortingHat.CLI.Commands
     internal class AutoTagCommand : ICommand
     {
         private readonly ILogger<TagFileCommand> _logger;
+        private readonly IConsoleWriter _consoleWriter;
         private readonly IFilePathExtractor _filePathExtractor;
         private readonly IAutoTagHandler _autoTagHandler;
         private readonly Func<File> _newFile;
         private IOptions _options;
 
-        public AutoTagCommand(ILogger<TagFileCommand> logger, IFilePathExtractor filePathExtractor, IAutoTagHandler autoTagHandler, Func<File> newFile)
+        public AutoTagCommand(ILogger<TagFileCommand> logger, IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor, IAutoTagHandler autoTagHandler, Func<File> newFile)
         {
             _logger = logger;
+            _consoleWriter = consoleWriter;
             _filePathExtractor = filePathExtractor;
             _autoTagHandler = autoTagHandler;
             _newFile = newFile;
@@ -39,15 +42,15 @@ namespace SortingHat.CLI.Commands
         }
         private bool ListTagVariables()
         {
-            Console.WriteLine("Possible Tag Variables:");
-            Console.WriteLine();
+            _consoleWriter.WriteLine("Possible Tag Variables:");
+            _consoleWriter.WriteLine();
             foreach (var tag in _autoTagHandler.AutoTags.OrderBy(tag => tag.AutoTagKey))
             {
-                Console.WriteLine($"* {tag.HumanReadableAutoTagsKey}");
+                _consoleWriter.WriteLine($"* {tag.HumanReadableAutoTagsKey}");
                 if (_options.HasOption("v", "verbose"))
                 {
-                    Console.WriteLine($"=>  {tag.Description}");
-                    Console.WriteLine();
+                    _consoleWriter.WriteLine($"=>  {tag.Description}");
+                    _consoleWriter.WriteLine();
                 }
             }
 
@@ -63,7 +66,7 @@ namespace SortingHat.CLI.Commands
             {
                 foreach (var tag in ReplacedTags(tags, file))
                 {
-                    Console.WriteLine($"Tag '{file.Path}' with '{tag.FullName}'");
+                    _consoleWriter.WriteLine($"Tag '{file.Path}' with '{tag.FullName}'");
 
                     if (_options.HasOption(null, "dry-run"))
                     {

@@ -2,7 +2,7 @@
 using Funcky.Monads;
 using SortingHat.API.DI;
 
-namespace SortingHat.Plugin.ExtractRelevant
+namespace SortingHat.Plugin.ExtractRelevantText
 {
     internal class ScanCommand : ICommand
     {
