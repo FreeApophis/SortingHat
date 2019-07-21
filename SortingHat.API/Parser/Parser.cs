@@ -48,23 +48,11 @@ namespace SortingHat.API.Parser
             return _nextToken;
         }
 
-        public static Parser Create()
-        {
-            // Create the object tree without DI Framework
-            var expressionParser = new ExpressionParser();
-            var factorParser = new FactorParser(expressionParser);
-            var termParser = new TermParser(factorParser);
-            expressionParser.TermParser = termParser;
-            var lexerRules = new LexerRules();
-            var tokenizer = new Tokenizer(lexerRules, s => new LexerReader(s));
-            var tokenWalker = new TokenWalker(tokenizer, () => new EpsilonToken());
-            return new Parser(tokenWalker, expressionParser);
-        }
-
         public IParseNode? Parse(string expression)
         {
             try
             {
+                _nextToken.Clear();
                 _tokenWalker.Scan(expression, lexems => lexems.Where(t => t.Token.GetType() != typeof(WhiteSpaceToken)));
                 var ast = Parse(_tokenWalker);
                 _nextToken.Add(new AndToken());

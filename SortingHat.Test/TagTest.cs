@@ -11,7 +11,7 @@ namespace SortingHat.Test
         private readonly TagParser _tagParser = new TagParser((name, parent) => new Tag(new MockDatabase(), name, parent));
 
         [Fact]
-        public void TagEquivalence()
+        public void GivenTwoTagsWithTheSameValueTheyTheyShouldBeEqual()
         {
 
             var tag1 = new Tag(_db, "2018", new Tag(_db, "created"));
@@ -23,7 +23,7 @@ namespace SortingHat.Test
         }
 
         [Fact]
-        public void ParseSimpleTag()
+        public void GivenAStringRepresentingATagThenTagParseShouldReturnATagWithTheRightValue()
         {
             var referenceTag = new Tag(_db, "tag");
             Tag parsedTag = _tagParser.Parse(":tag");
