@@ -119,7 +119,7 @@ namespace SortingHat.CLI.Commands
                     }
                     table.AppendSeperator();
                 }
-                _consoleWriter.WriteLine(table.ToString());
+                table.WriteTo(_consoleWriter);
             }
         }
 

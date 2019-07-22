@@ -34,7 +34,7 @@ namespace SortingHat.CLI.Commands
             table.Append("Culture:", version.CultureName);
             table.Append("Current Culture:", CultureInfo.CurrentCulture);
 
-            _consoleWriter.WriteLine(table.ToString());
+            table.WriteTo(_consoleWriter);
             return true;
         }
 

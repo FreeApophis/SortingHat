@@ -30,7 +30,7 @@ namespace SortingHat.CLI.Commands
 
             _consoleWriter.WriteLine("Statistics:");
             _consoleWriter.WriteLine();
-            _consoleWriter.WriteLine(table.ToString());
+            table.WriteTo(_consoleWriter);
 
             return true;
         }
