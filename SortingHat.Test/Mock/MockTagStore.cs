@@ -19,12 +19,12 @@ namespace SortingHat.Test.Mock
 
         public long FileCount(Tag tag)
         {
-            throw new System.NotImplementedException();
+            return 0;
         }
 
         public IEnumerable<Tag> GetTags()
         {
-            throw new System.NotImplementedException();
+            return Tags;
         }
 
         public bool Move(Tag tag, Tag destinationTag)

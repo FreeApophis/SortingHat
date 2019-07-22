@@ -4,6 +4,8 @@ using SortingHat.API.Models;
 using Moq;
 using SortingHat.API.DI;
 using Xunit;
+using SortingHat.ConsoleWriter;
+using System.Linq;
 
 namespace SortingHat.Test
 {
@@ -14,14 +16,14 @@ namespace SortingHat.Test
         {
             var db = MockDatabase.Create();
             var tagParser = new TagParser((name, parent) => new Tag(db, name, parent));
-            var addTag = new AddTagCommand(tagParser);
+            ICommand addTag = new AddTagCommand(tagParser);
 
             List<string> taxPeriods = new List<string> { ":tax_period:2016", ":tax_period:2017", ":tax_period:2018", ":tax_period:2019" };
             List<string> movieRating = new List<string> { ":movie:bad", ":movie:average", ":movie:good", ":movie:great" };
 
             var mockOptions = new Mock<IOptions>();
 
-            mockOptions.Setup(o => o.HasOption("", "")).Returns(false);
+            mockOptions.Setup(o => o.HasOption(It.IsAny<string>(), It.IsAny<string>())).Returns(false);
 
             addTag.Execute(taxPeriods, mockOptions.Object);
             addTag.Execute(movieRating, mockOptions.Object);
@@ -35,6 +37,15 @@ namespace SortingHat.Test
                 item => Assert.Equal("movie", item.Parent?.Name),
                 item => Assert.Equal(movieRating[2], item.FullName),
                 item => Assert.Equal(movieRating[3], item.FullName)
+                );
+
+            var console = new MemoryConsoleWriter();
+            ICommand listTags = new ListTagsCommand(db, console);
+
+            listTags.Execute(Enumerable.Empty<string>(), mockOptions.Object);
+
+            Assert.Collection(console.Lines,
+                line => Assert.Equal("", line)
                 );
 
         }
