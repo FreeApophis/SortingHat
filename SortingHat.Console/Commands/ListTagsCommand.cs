@@ -2,7 +2,10 @@
 using SortingHat.API.DI;
 using SortingHat.API.Models;
 using System.Collections.Generic;
+using System.Linq;
 using Funcky.Monads;
+using SortingHat.API;
+using SortingHat.CLI.Output;
 using SortingHat.ConsoleWriter;
 
 namespace SortingHat.CLI.Commands
@@ -21,12 +24,30 @@ namespace SortingHat.CLI.Commands
 
         public bool Execute(IEnumerable<string> arguments, IOptions options)
         {
-            _consoleWriter.WriteLine("Used tags: ");
-            foreach (var tag in Tag.List(_db))
+            var tags = Tag.List(_db).ToList();
+            if (tags.Any())
             {
-                _consoleWriter.WriteLine($"* {tag.FullName}  ({tag.FileCount})");
+                _consoleWriter.WriteLine("Used tags: ");
+
+                var table = TagsTable();
+                foreach (var tag in tags)
+                {
+                    table.Append($"* {tag.FullName}", $"({tag.FileCount})");
+                }
+                table.WriteTo(_consoleWriter);
+            } else
+            {
+                _consoleWriter.WriteLine("There are currently no tags in the database.");
             }
+
             return true;
+        }
+
+        private ConsoleTable TagsTable()
+        {
+            var table = new ConsoleTable(2);
+
+            return table;
         }
 
         public string LongCommand => "list-tags";

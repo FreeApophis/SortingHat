@@ -105,14 +105,17 @@ namespace SortingHat.CLI
 
         private static string ConfigurationPath()
         {
-            return Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            return Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location);
         }
 
         private void RegisterConfiguration(ContainerBuilder builder)
         {
+            // https://github.com/dotnet/cli/issues/11545
             var configuration = ConfigurationRoot();
 
             builder.Register(c => configuration.GetSection("Database").Get<DatabaseSettings>()).As<DatabaseSettings>();
+
+            //builder.Register(c => new DatabaseSettings { DBType = "sqlite", DBName = "hat", DBPath = "#USERDOC" }).As<DatabaseSettings>();
         }
 
         private static IConfigurationRoot ConfigurationRoot()

@@ -45,7 +45,15 @@ namespace SortingHat.Test
             listTags.Execute(Enumerable.Empty<string>(), mockOptions.Object);
 
             Assert.Collection(console.Lines,
-                line => Assert.Equal("", line)
+                line => Assert.Equal("Used tags: ", line),
+                line => Assert.Equal("* :tax_period:2016 (0) ", line),
+                line => Assert.Equal("* :tax_period:2017 (0) ", line),
+                line => Assert.Equal("* :tax_period:2018 (0) ", line),
+                line => Assert.Equal("* :tax_period:2019 (0) ", line),
+                line => Assert.Equal("* :movie:bad       (0) ", line),
+                line => Assert.Equal("* :movie:average   (0) ", line),
+                line => Assert.Equal("* :movie:good      (0) ", line),
+                line => Assert.Equal("* :movie:great     (0) ", line)
                 );
 
         }

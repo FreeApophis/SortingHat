@@ -31,13 +31,12 @@ namespace SortingHat.DB
 
         private void Migrate(string migration)
         {
-            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(migration))
-            using (var reader = new StreamReader(stream))
-            {
-                _db.ExecuteNonQuery(reader.ReadToEnd());
+            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(migration);
+            using var reader = new StreamReader(stream);
 
-                SetMigrated(migration);
-            }
+            _db.ExecuteNonQuery(reader.ReadToEnd());
+
+            SetMigrated(migration);
         }
 
         private void SetMigrated(string migration)

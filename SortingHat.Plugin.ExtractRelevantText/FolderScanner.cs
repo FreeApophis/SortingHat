@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Threading;
 using apophis.Lexer;
+using apophis.Lexer.Tokens;
 using JetBrains.Annotations;
 using SortingHat.ConsoleWriter;
 using SortingHat.Plugin.ExtractRelevantText.Token;
@@ -11,6 +14,7 @@ namespace SortingHat.Plugin.ExtractRelevantText
     {
         private readonly IConsoleWriter _consoleWriter;
         private TokenWalker _tokenWalker;
+        private Dictionary<string, int> _wordCount;
 
         [UsedImplicitly]
         public FolderScanner(IConsoleWriter consoleWriter)
@@ -19,6 +23,7 @@ namespace SortingHat.Plugin.ExtractRelevantText
             var lexerRules = new LexerRules();
             var tokenizer = new Tokenizer(lexerRules, e => new LexerReader(e));
             _tokenWalker = new TokenWalker(tokenizer, () => new EpsilonToken());
+            _wordCount = new Dictionary<string, int>();
         }
 
         internal bool Scan(IEnumerable<string> folders)
@@ -43,9 +48,40 @@ namespace SortingHat.Plugin.ExtractRelevantText
 
             while (!(_tokenWalker.Peek().Token is EpsilonToken))
             {
-                _consoleWriter.WriteLine(_tokenWalker.Pop().Token.ToString());
+                var lexem = _tokenWalker.Pop();
+
+                Count(lexem.Token);
             }
 
+            PrintSignificant();
+
+        }
+
+        private void PrintSignificant()
+        {
+            var signifcantWords = _wordCount
+                .OrderByDescending(w => w.Value)
+                .Select(w => w.Key)
+                .Take(500);
+            _consoleWriter.WriteLine($"Words: {_wordCount.Count}");
+            foreach (var signifcantWord in signifcantWords)
+            {
+                _consoleWriter.WriteLine(signifcantWord);
+            }
+        }
+
+        private void Count(IToken token)
+        {
+            if (token is WordToken word)
+            {
+                if (_wordCount.TryGetValue(word.Word, out var count))
+                {
+                    _wordCount[word.Word] = count + 1;
+                } else
+                {
+                    _wordCount[word.Word] = 1;
+                }
+            }
         }
     }
 

@@ -10,8 +10,33 @@ namespace SortingHat.Plugin.ExtractRelevantText
     {
         public IEnumerable<ILexerRule> GetRules()
         {
-            yield return new LexerRule(char.IsWhiteSpace, ConsumeWhiteSpace);
-            yield return new LexerRule(char.IsLetter, ConsumeWord);
+            yield return new LexerRule(char.IsWhiteSpace, ConsumeWhiteSpace, 1);
+            yield return new LexerRule(char.IsLetter, ConsumeWord, 1);
+            yield return new SimpleLexerRule<PeriodToken>(".");
+            yield return new SimpleLexerRule<QuestionMarkToken>("?");
+            yield return new SimpleLexerRule<ExclamationMarkToken>("!");
+            yield return new SimpleLexerRule<ColonToken>(":");
+            yield return new SimpleLexerRule<SemiColonToken>(";");
+            yield return new SimpleLexerRule<CommaToken>(",");
+            yield return new LexerRule(NotWhiteSpace, ConsumeRest);
+        }
+
+        private Lexem ConsumeRest(ILexerReader reader)
+        {
+            var startPosition = reader.Position;
+            var unmatchedText = new StringBuilder();
+
+            while (reader.Peek().Match(false, NotWhiteSpace))
+            {
+                reader.Read().AndThen(c => unmatchedText.Append(c));
+            }
+
+            return new Lexem(new UnmatchedToken(unmatchedText.ToString()), new Position(startPosition, reader.Position - startPosition));
+        }
+
+        private bool NotWhiteSpace(char character)
+        {
+            return char.IsWhiteSpace(character) == false;
         }
 
         private Lexem ConsumeWord(ILexerReader reader)
@@ -21,8 +46,7 @@ namespace SortingHat.Plugin.ExtractRelevantText
 
             while (reader.Peek().Match(false, char.IsLetter))
             {
-                // we are not interested in what kind of whitespace, so we just discard the result
-                word.Append(reader.Read());
+                reader.Read().AndThen(c => word.Append(c));
             }
 
             return new Lexem(new WordToken(word.ToString()), new Position(startPosition, reader.Position - startPosition));
