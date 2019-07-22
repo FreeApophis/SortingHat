@@ -10,7 +10,11 @@ using System.IO;
 using System.Reflection;
 using System.Security.Cryptography;
 using System;
+using apophis.Lexer;
 using SortingHat.API.AutoTag;
+using SortingHat.API.Parser;
+using SortingHat.API.Parser.Token;
+using SortingHat.ConsoleWriter;
 
 namespace SortingHat.CLI
 {
@@ -19,6 +23,8 @@ namespace SortingHat.CLI
         public IContainer Build()
         {
             var builder = new ContainerBuilder();
+
+            RegisterParser(builder);
 
             builder.RegisterType<Application>().AsSelf();
             builder.RegisterType<ArgumentParser>().AsSelf();
@@ -36,9 +42,10 @@ namespace SortingHat.CLI
 
             builder.RegisterType<SearchQueryVisitor>().As<SearchQueryVisitor>().InstancePerDependency();
 
-            builder.Register(c => new HashService(SHA256.Create(), nameof(SHA256))).As<IHashService>().SingleInstance();
+            builder.Register(c => new HashService(SHA256.Create(), nameof(SHA256), c.Resolve<IConsoleWriter>())).As<IHashService>().SingleInstance();
             builder.RegisterType<LoggerFactory>().As<ILoggerFactory>().SingleInstance();
             builder.RegisterGeneric(typeof(Logger<>)).As(typeof(ILogger<>)).SingleInstance();
+            builder.RegisterType<SystemConsoleWriter>().As<IConsoleWriter>();
 
             RegisterConfiguration(builder);
             RegisterCommands(builder);
@@ -47,6 +54,19 @@ namespace SortingHat.CLI
 
             return ConfigureLogger(builder.Build());
         }
+
+        private void RegisterParser(ContainerBuilder builder)
+        {
+            builder.RegisterType<ExpressionParser>().PropertiesAutowired(PropertyWiringOptions.AllowCircularDependencies).InstancePerLifetimeScope().AsSelf();
+            builder.RegisterType<FactorParser>().AsSelf();
+            builder.RegisterType<TermParser>().AsSelf();
+            builder.RegisterType<LexerRules>().As<ILexerRules>();
+            builder.RegisterType<LexerReader>().As<ILexerReader>();
+            builder.RegisterType<Tokenizer>().AsSelf();
+            builder.Register(c => new TokenWalker(c.Resolve<Tokenizer>(), () => new EpsilonToken())).As<TokenWalker>();
+            builder.RegisterType<Parser>().AsSelf();
+        }
+
 
         private void RegisterAutoTags(ContainerBuilder builder)
         {

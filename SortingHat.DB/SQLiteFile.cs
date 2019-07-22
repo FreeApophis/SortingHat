@@ -16,12 +16,14 @@ namespace SortingHat.DB
         private readonly Func<SearchQueryVisitor> _newSearchQueryVisitor;
         private readonly Func<File> _newFile;
         private readonly SQLiteDB _db;
+        private readonly Parser _parser;
 
-        public SQLiteFile(Func<SearchQueryVisitor> newSearchQueryVisitor, Func<File> newFile, SQLiteDB db)
+        public SQLiteFile(Func<SearchQueryVisitor> newSearchQueryVisitor, Func<File> newFile, SQLiteDB db, Parser parser)
         {
             _newSearchQueryVisitor = newSearchQueryVisitor;
             _newFile = newFile;
             _db = db;
+            _parser = parser;
         }
 
         public async Task Tag(File file, Tag tag)
@@ -134,8 +136,7 @@ namespace SortingHat.DB
 
         private string ParseQuery(string query)
         {
-            var parser = Parser.Create();
-            var ir = parser.Parse(query);
+            var ir = _parser.Parse(query);
 
             var visitor = _newSearchQueryVisitor();
             ir.Accept(visitor);

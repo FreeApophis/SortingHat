@@ -10,7 +10,21 @@ namespace SortingHat.Test
 {
     public class ParserTest
     {
-        private Parser _parser = Parser.Create();
+        private Parser _parser = CreateParser();
+
+        private static Parser CreateParser()
+        {
+            // Create the object tree without DI Framework
+            var expressionParser = new ExpressionParser();
+            var factorParser = new FactorParser(expressionParser);
+            var termParser = new TermParser(factorParser);
+            expressionParser.TermParser = termParser;
+            var lexerRules = new LexerRules();
+            var tokenizer = new Tokenizer(lexerRules, s => new LexerReader(s));
+            var tokenWalker = new TokenWalker(tokenizer, () => new EpsilonToken());
+
+            return new Parser(tokenWalker, expressionParser);
+        }
 
         [Fact]
         public void EmptySearch()
@@ -195,7 +209,7 @@ GROUP BY FilePaths.ID";
         public void SQLQuery()
         {
             var root = _parser.Parse(":tax:2016 || :cool && :audio:original");
-            var visitor = new DB.SearchQueryVisitor(new MockDatabase(), new MockTagParser());
+            var visitor = new DB.SearchQueryVisitor(MockDatabase.Create(), new MockTagParser());
 
             root.Accept(visitor);
             Assert.Equal(SelectStatement, visitor.Result);

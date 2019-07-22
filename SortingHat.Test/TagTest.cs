@@ -7,11 +7,18 @@ namespace SortingHat.Test
 {
     public class TagTest
     {
-        private readonly IDatabase _db = new MockDatabase();
-        private readonly TagParser _tagParser = new TagParser((name, parent) => new Tag(new MockDatabase(), name, parent));
+        private readonly IDatabase _db;
+        private readonly TagParser _tagParser;
+
+
+        public TagTest()
+        {
+            _db = MockDatabase.Create();
+            _tagParser = new TagParser((name, parent) => new Tag(_db, name, parent));
+        }
 
         [Fact]
-        public void TagEquivalence()
+        public void GivenTwoTagsWithTheSameValueTheyTheyShouldBeEqual()
         {
 
             var tag1 = new Tag(_db, "2018", new Tag(_db, "created"));
@@ -23,7 +30,7 @@ namespace SortingHat.Test
         }
 
         [Fact]
-        public void ParseSimpleTag()
+        public void GivenAStringRepresentingATagThenTagParseShouldReturnATagWithTheRightValue()
         {
             var referenceTag = new Tag(_db, "tag");
             Tag parsedTag = _tagParser.Parse(":tag");

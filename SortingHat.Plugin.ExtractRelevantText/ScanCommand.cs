@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
+using Funcky.Monads;
 using SortingHat.API.DI;
 
-namespace SortingHat.Plugin.ExtractRelevant
+namespace SortingHat.Plugin.ExtractRelevantText
 {
     internal class ScanCommand : ICommand
     {
@@ -16,7 +17,7 @@ namespace SortingHat.Plugin.ExtractRelevant
 
         public string LongCommand => "scan";
 
-        public string ShortCommand => "s";
+        public Option<string> ShortCommand => Option.Some("s");
 
         public string ShortHelp => "scans a folder and its content";
 

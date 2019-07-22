@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using SortingHat.ConsoleWriter;
 
 namespace SortingHat.CLI.Output
 {
@@ -77,11 +78,12 @@ namespace SortingHat.CLI.Output
             return stringBuilder.ToString();
         }
 
-
-
-        public override string ToString()
+        public void WriteTo(IConsoleWriter consoleWriter)
         {
-            return string.Join(Environment.NewLine, _rows.Select(row => string.Format(GetFormat(), row)));
+            foreach (var line in _rows.Select(row => string.Format(GetFormat(), row)))
+            {
+                consoleWriter.WriteLine(line);
+            }
         }
     }
 }

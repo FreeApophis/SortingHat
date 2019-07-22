@@ -5,6 +5,7 @@ using SortingHat.API.DI;
 using SortingHat.API.Models;
 using System.Collections.Generic;
 using System.Linq;
+using Funcky.Monads;
 
 namespace SortingHat.CLI.Commands
 {
@@ -55,7 +56,7 @@ namespace SortingHat.CLI.Commands
         }
 
         public string LongCommand => "move-tags";
-        public string ShortCommand => null;
+        public Option<string> ShortCommand => Option<string>.None();
         public string ShortHelp => "this moves a tag to another parent tag, if you want to move it to the root, use the empty tag ':'";
         public CommandGrouping CommandGrouping => CommandGrouping.Tag;
 

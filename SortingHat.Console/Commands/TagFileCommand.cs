@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Funcky.Monads;
+using SortingHat.ConsoleWriter;
 
 namespace SortingHat.CLI.Commands
 {
@@ -14,13 +16,15 @@ namespace SortingHat.CLI.Commands
     internal class TagFileCommand : ICommand
     {
         private readonly ILogger<TagFileCommand> _logger;
+        private readonly IConsoleWriter _consoleWriter;
         private readonly ITagParser _tagParser;
         private readonly IFilePathExtractor _filePathExtractor;
         private readonly Func<File> _newFile;
 
-        public TagFileCommand(ILogger<TagFileCommand> logger, ITagParser tagParser, IFilePathExtractor filePathExtractor, Func<File> newFile)
+        public TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter consoleWriter, ITagParser tagParser, IFilePathExtractor filePathExtractor, Func<File> newFile)
         {
             _logger = logger;
+            _consoleWriter = consoleWriter;
             _tagParser = tagParser;
             _filePathExtractor = filePathExtractor;
             _newFile = newFile;
@@ -53,7 +57,7 @@ namespace SortingHat.CLI.Commands
                 {
                     _logger.LogInformation($"File {file.Path} tagged with {tag.Name}");
 
-                    Console.WriteLine($"File {file.Path} queued with tag {tag.Name}");
+                    _consoleWriter.WriteLine($"File {file.Path} queued with tag {tag.Name}");
                     await file.Tag(tag);
                     //tasks.Add(file.Tag(tag));
                 }
@@ -69,7 +73,7 @@ namespace SortingHat.CLI.Commands
         }
 
         public string LongCommand => "tag-files";
-        public string ShortCommand => "tag";
+        public Option<string> ShortCommand => Option.Some("tag");
         public string ShortHelp => "Is tagging the files the given tags";
         public CommandGrouping CommandGrouping => CommandGrouping.File;
     }

@@ -3,6 +3,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using SortingHat.API.Parser;
 using System;
+using SortingHat.ConsoleWriter;
 
 namespace SortingHat.CLI
 {
@@ -12,11 +13,13 @@ namespace SortingHat.CLI
         private readonly ILogger<Application> _logger;
         private readonly ArgumentParser _argumentParser;
         private readonly ILoggerFactory _loggerFactory;
+        private readonly IConsoleWriter _consoleWriter;
 
-        public Application(ILogger<Application> logger, ILoggerFactory loggerFactory, ArgumentParser argumentParser)
+        public Application(ILogger<Application> logger, ILoggerFactory loggerFactory, IConsoleWriter consoleWriter, ArgumentParser argumentParser)
         {
             _logger = logger;
             _loggerFactory = loggerFactory;
+            _consoleWriter = consoleWriter;
             _argumentParser = argumentParser;
         }
 
@@ -30,8 +33,8 @@ namespace SortingHat.CLI
             }
             catch (ParseException e)
             {
-                Console.WriteLine("Parser is not happy with your input, maybe find a ravenclaw...");
-                Console.WriteLine(e.Message);
+                _consoleWriter.WriteLine("Parser is not happy with your input, maybe find a ravenclaw...");
+                _consoleWriter.WriteLine(e.Message);
                 Environment.Exit(-1);
 
             }
@@ -39,7 +42,7 @@ namespace SortingHat.CLI
             {
                 _logger.LogWarning("The database is throwing an exception...");
                 _logger.LogWarning(e.Message);
-                Console.WriteLine(e.Message);
+                _consoleWriter.WriteLine(e.Message);
                 Environment.Exit(-1);
             }
             catch (Exception e)
@@ -50,8 +53,8 @@ namespace SortingHat.CLI
                 }
 
                 _logger.LogError(e.Message);
-                Console.WriteLine(e.Message);
-                Console.WriteLine(e.StackTrace);
+                _consoleWriter.WriteLine(e.Message);
+                _consoleWriter.WriteLine(e.StackTrace);
                 Environment.Exit(-1);
             }
 

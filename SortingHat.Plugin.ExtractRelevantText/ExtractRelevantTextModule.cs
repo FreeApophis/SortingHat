@@ -5,6 +5,7 @@ using SortingHat.API.Plugin;
 using System;
 using System.Reflection;
 using SortingHat.API.AutoTag;
+using SortingHat.Plugin.ExtractRelevantText;
 
 namespace SortingHat.Plugin.ExtractRelevant
 {

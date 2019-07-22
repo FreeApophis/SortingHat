@@ -20,9 +20,14 @@
   <ItemGroup>
     <PackageReference Include="apophis.Lexer" Version="1.0.1" />
     <PackageReference Include="Autofac" Version="4.8.1" />
+    <PackageReference Include="Funcky" Version="1.2.0" />
     <PackageReference Include="JetBrains.Annotations" Version="2018.2.1" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="2.2.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SortingHat.ConsoleWriter\SortingHat.ConsoleWriter.csproj" />
   </ItemGroup>
 
 </Project>

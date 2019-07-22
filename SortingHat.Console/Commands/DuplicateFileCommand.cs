@@ -1,10 +1,11 @@
 ﻿using JetBrains.Annotations;
 using SortingHat.API.DI;
 using SortingHat.CLI.Output;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Funcky.Monads;
+using SortingHat.ConsoleWriter;
 
 namespace SortingHat.CLI.Commands
 {
@@ -12,20 +13,22 @@ namespace SortingHat.CLI.Commands
     internal class DuplicateFileCommand : ICommand
     {
         private readonly IDatabase _db;
+        private readonly IConsoleWriter _consoleWriter;
 
-        public DuplicateFileCommand(IDatabase db)
+        public DuplicateFileCommand(IDatabase db, IConsoleWriter consoleWriter)
         {
             _db = db;
+            _consoleWriter = consoleWriter;
         }
 
         public bool Execute(IEnumerable<string> arguments, IOptions options)
         {
             foreach (var file in _db.File.GetDuplicates())
             {
-                Console.WriteLine("--- Duplicate ---");
-                Console.WriteLine($"CreatedAt (oldest): {file.CreatedAt}");
-                Console.WriteLine($"File Size: {file.Size}");
-                Console.WriteLine($"File Tags: {string.Join(", ", file.GetTags().Result.Select(t => t.FullName))}");
+                _consoleWriter.WriteLine("--- Duplicate ---");
+                _consoleWriter.WriteLine($"CreatedAt (oldest): {file.CreatedAt}");
+                _consoleWriter.WriteLine($"File Size: {file.Size}");
+                _consoleWriter.WriteLine($"File Tags: {string.Join(", ", file.GetTags().Result.Select(t => t.FullName))}");
 
                 var table = FileTable();
                 foreach (var path in file.GetPaths().Result)
@@ -42,9 +45,12 @@ namespace SortingHat.CLI.Commands
                     }
 
                 }
-                Console.WriteLine(table.ToString());
 
+                table.WriteTo(_consoleWriter);
+                _consoleWriter.WriteLine();
             }
+
+            _consoleWriter.WriteLine("Files with an asterix (*) are in the database, but at the given path they seem to be deleted.");
 
             return true;
         }
@@ -57,7 +63,7 @@ namespace SortingHat.CLI.Commands
         }
 
         public string LongCommand => "duplicate";
-        public string ShortCommand => "d";
+        public Option<string> ShortCommand => Option.Some("d");
         public string ShortHelp => "Find duplicate files in your dms";
         public CommandGrouping CommandGrouping => CommandGrouping.File;
     }

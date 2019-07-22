@@ -1,11 +1,11 @@
 ﻿using JetBrains.Annotations;
 using SortingHat.API.DI;
 using SortingHat.CLI.Output;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using Funcky.Monads;
 using SortingHat.API;
+using SortingHat.ConsoleWriter;
 
 namespace SortingHat.CLI.Commands
 {
@@ -13,10 +13,12 @@ namespace SortingHat.CLI.Commands
     internal class FindFilesCommand : ICommand
     {
         private readonly IDatabase _db;
+        private readonly IConsoleWriter _consoleWriter;
 
-        public FindFilesCommand(IDatabase db)
+        public FindFilesCommand(IDatabase db, IConsoleWriter consoleWriter)
         {
             _db = db;
+            _consoleWriter = consoleWriter;
         }
 
         private ConsoleTable FileTable()
@@ -29,7 +31,7 @@ namespace SortingHat.CLI.Commands
         public bool Execute(IEnumerable<string> arguments, IOptions options)
         {
             var search = string.Join(" ", arguments);
-            Console.WriteLine($"Find Files: {search}");
+            _consoleWriter.WriteLine($"Find Files: {search}");
 
             var files = _db.File.Search(search);
 
@@ -42,9 +44,9 @@ namespace SortingHat.CLI.Commands
 
                     table.Append(file.Hash.Result.ShortHash(), file.CreatedAt, file.Size.HumanSize(), file.Path);
                 }
-                Console.WriteLine(table.ToString());
+                table.WriteTo(_consoleWriter);
             } else {
-                Console.WriteLine("No files found for your search query...");
+                _consoleWriter.WriteLine("No files found for your search query...");
             }
 
             return true;
@@ -53,7 +55,7 @@ namespace SortingHat.CLI.Commands
 
 
         public string LongCommand => "find-files";
-        public string ShortCommand => "ff";
+        public Option<string> ShortCommand => Option.Some("ff");
         public string ShortHelp => "Finds all files matching the search query";
         public CommandGrouping CommandGrouping => CommandGrouping.File;
     }

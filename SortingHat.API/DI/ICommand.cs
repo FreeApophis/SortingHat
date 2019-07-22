@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Funcky.Monads;
 
 namespace SortingHat.API.DI
 {
@@ -11,7 +12,7 @@ namespace SortingHat.API.DI
         /// <summary>
         /// Can be null
         /// </summary>
-        string ShortCommand { get; }
+        Option<string> ShortCommand { get; }
 
         /// <summary>
         /// Should return a single line description

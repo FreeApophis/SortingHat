@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using SortingHat.API.DI;
+using Funcky.Extensions;
+using SortingHat.ConsoleWriter;
 
 namespace SortingHat.CLI
 {
@@ -12,10 +14,12 @@ namespace SortingHat.CLI
     {
         private readonly Dictionary<string, ICommand> _commandTargets = new Dictionary<string, ICommand>();
         private readonly Lazy<ILogger<ArgumentParser>> _logger;
+        private readonly IConsoleWriter _consoleWriter;
 
-        public ArgumentParser(Lazy<ILogger<ArgumentParser>> logger, IEnumerable<ICommand> commands)
+        public ArgumentParser(Lazy<ILogger<ArgumentParser>> logger, IConsoleWriter consoleWriter, IEnumerable<ICommand> commands)
         {
             _logger = logger;
+            _consoleWriter = consoleWriter;
 
             RegisterCommands(commands);
         }
@@ -25,36 +29,41 @@ namespace SortingHat.CLI
             foreach (var command in commands)
             {
                 _commandTargets[command.LongCommand] = command;
-                if (command.ShortCommand != null)
-                {
-                    _commandTargets[command.ShortCommand] = command;
-                }
+
+                // Register short command, if there is one
+                command.ShortCommand.AndThen(shortCommand => _commandTargets[shortCommand] = command);
             }
         }
 
-        internal void Execute(IEnumerable<string> arguments)
+        internal void Execute(IEnumerable<string> lazyArguments)
         {
+            var arguments = lazyArguments.ToList();
             if (arguments.Any())
             {
-                if (_commandTargets.TryGetValue(arguments.First(), out var command))
-                {
+                _commandTargets
+                    .TryGetValue(key: arguments.First())
+                    .Match(
+                        none: () => UnknownCommandError(arguments.First()),
+                        some: c => ExecuteCommand(c, arguments));
 
-                    if (command.Execute(TagAndFileArguments(arguments), new Options(OptionArguments(arguments))) == false)
-                    {
-                        _logger.Value.LogWarning("Command Execution failed!");
-                    }
-                }
-                else
-                {
-                    _logger.Value.LogWarning($"Unknown command: '{arguments.First()}' cannot be executed.");
-                    Console.WriteLine($"Unknown command: '{arguments.First()}'");
-                }
-            }
-            else
+            } else
             {
-                Console.WriteLine("Maybe run 'hat help'");
+                _consoleWriter.WriteLine("Maybe run 'hat help'");
             }
+        }
 
+        private void ExecuteCommand(ICommand command, List<string> arguments)
+        {
+            if (command.Execute(TagAndFileArguments(arguments), new Options(OptionArguments(arguments))) == false)
+            {
+                _logger.Value.LogWarning("Command Execution failed!");
+            }
+        }
+
+        private void UnknownCommandError(string commandName)
+        {
+            _logger.Value.LogWarning($"Unknown command: '{commandName}' cannot be executed.");
+            _consoleWriter.WriteLine($"Unknown command: '{commandName}'");
         }
 
         private static IEnumerable<string> TagAndFileArguments(IEnumerable<string> arguments)

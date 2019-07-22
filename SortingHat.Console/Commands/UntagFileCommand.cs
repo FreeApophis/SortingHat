@@ -6,6 +6,7 @@ using SortingHat.API.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Funcky.Monads;
 
 namespace SortingHat.CLI.Commands
 {
@@ -59,7 +60,7 @@ namespace SortingHat.CLI.Commands
         }
 
         public string LongCommand => "untag-files";
-        public string ShortCommand => null;
+        public Option<string> ShortCommand => Option<string>.None();
         public string ShortHelp => "Remove tags from the indicated files";
         public CommandGrouping CommandGrouping => CommandGrouping.File;
     }

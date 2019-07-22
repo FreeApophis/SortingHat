@@ -2,6 +2,7 @@
 using SortingHat.API.DI;
 using System.Collections.Generic;
 using System.Linq;
+using Funcky.Monads;
 
 namespace SortingHat.CLI.Commands
 {
@@ -26,7 +27,7 @@ namespace SortingHat.CLI.Commands
         }
 
         public string LongCommand => "init";
-        public string ShortCommand => null;
+        public Option<string> ShortCommand => Option<string>.None();
         public string ShortHelp => "Initializes the database, a new database is created";
         public CommandGrouping CommandGrouping => CommandGrouping.General;
 

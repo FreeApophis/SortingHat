@@ -28,6 +28,7 @@ namespace SortingHat.UI
         private readonly IDatabase _db;
         private readonly ILogger<MainWindow> _logger;
         private readonly Func<SearchQueryVisitor> _newSearchQueryVisitor;
+        private readonly Parser _parser;
 
         private string _searchString;
         public string SearchString
@@ -90,13 +91,14 @@ namespace SortingHat.UI
             }
         }
 
-        public MainWindow(IDatabase db, ILogger<MainWindow> logger, Func<SearchQueryVisitor> newSearchQueryVisitor)
+        public MainWindow(IDatabase db, ILogger<MainWindow> logger, Func<SearchQueryVisitor> newSearchQueryVisitor, Parser parser)
         {
             logger.LogTrace("Main Window created");
 
             _db = db;
             _logger = logger;
             _newSearchQueryVisitor = newSearchQueryVisitor;
+            _parser = parser;
             InitializeComponent();
 
             DataContext = this;
@@ -126,10 +128,9 @@ namespace SortingHat.UI
             var operatorType = new TextOperatorType();
             IntelliSense.Items.Clear();
 
-            var parser = Parser.Create();
-            parser.Parse(search);
+            _parser.Parse(search);
 
-            foreach (var token in parser.NextToken()) {
+            foreach (var token in _parser.NextToken()) {
                 switch (token) {
                     case AndToken t:
                         IntelliSense.Items.Add(new IntellisenseItem { Title = operatorType.And });
