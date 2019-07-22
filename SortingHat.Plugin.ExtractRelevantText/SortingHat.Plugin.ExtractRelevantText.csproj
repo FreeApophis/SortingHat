@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="apophis.Lexer" Version="1.0.1" />
+    <PackageReference Include="apophis.Lexer" Version="1.1.1" />
   </ItemGroup>
 
   <ItemGroup>

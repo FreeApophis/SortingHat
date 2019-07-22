@@ -18,12 +18,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="apophis.Lexer" Version="1.0.1" />
-    <PackageReference Include="Autofac" Version="4.8.1" />
+    <PackageReference Include="apophis.Lexer" Version="1.1.1" />
+    <PackageReference Include="Autofac" Version="4.9.3" />
     <PackageReference Include="Funcky" Version="1.2.0" />
-    <PackageReference Include="JetBrains.Annotations" Version="2018.2.1" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="2.2.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.2.0" />
+    <PackageReference Include="JetBrains.Annotations" Version="2019.1.3" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="3.0.0-preview7.19362.6" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.0.0-preview7.19362.4" />
   </ItemGroup>
 
   <ItemGroup>
