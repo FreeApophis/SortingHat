@@ -1,13 +1,11 @@
-﻿using Autofac;
+﻿using System;
+using System.Reflection;
+using Autofac;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
 using SortingHat.API.Plugin;
-using System;
-using System.Reflection;
-using SortingHat.API.AutoTag;
-using SortingHat.Plugin.ExtractRelevantText;
 
-namespace SortingHat.Plugin.ExtractRelevant
+namespace SortingHat.Plugin.ExtractRelevantText
 {
     [UsedImplicitly]
     internal class RelevantInformationModule : Autofac.Module, IPlugin

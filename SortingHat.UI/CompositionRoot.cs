@@ -1,6 +1,6 @@
-﻿using System;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using apophis.Lexer;
+using apophis.Lexer.Rules;
 using Autofac;
 using Microsoft.Extensions.Logging;
 using SortingHat.API;

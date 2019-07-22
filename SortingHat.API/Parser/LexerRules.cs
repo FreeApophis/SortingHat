@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using apophis.Lexer;
+using apophis.Lexer.Rules;
 using SortingHat.API.Parser.Token;
 
 namespace SortingHat.API.Parser

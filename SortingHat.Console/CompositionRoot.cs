@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System;
 using apophis.Lexer;
+using apophis.Lexer.Rules;
 using SortingHat.API.AutoTag;
 using SortingHat.API.Parser;
 using SortingHat.API.Parser.Token;
