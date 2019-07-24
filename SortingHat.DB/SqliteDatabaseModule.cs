@@ -24,9 +24,9 @@ namespace SortingHat.DB
         {
             return context =>
             {
-
+                var safeContext = context.Resolve<IComponentContext>();
                 var db = new SQLiteMainDatabase(
-                    () => context.Resolve<ISettings>(), 
+                    () => safeContext.Resolve<ISettings>(), 
                     projectName => context.Resolve<IProjectDatabase>(new NamedParameter("projectName", projectName)),
                     context.Resolve<DatabaseSettings>()
                     );
@@ -41,9 +41,10 @@ namespace SortingHat.DB
         {
             return (context, parameters) =>
             {
+                var safeContext = context.Resolve<IComponentContext>();
                 var db = new SQLiteProjectDatabase(
-                    context.Resolve<IFile>, 
-                    context.Resolve<ITag>, 
+                    () => safeContext.Resolve<IFile>(), 
+                    () => safeContext.Resolve<ITag>(), 
                     context.Resolve<DatabaseSettings>(),
                     parameters.Named<string>("projectName"));
 
