@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using SortingHat.API.DI;
 
 namespace SortingHat.DB
 {
     internal class RevisionMigrator
     {
         private const string CreateRevisionTableCommand = @"CREATE TABLE IF NOT EXISTS [Revisions] ([ID] INTEGER  NOT NULL PRIMARY KEY AUTOINCREMENT, [Name] VARCHAR(255)  UNIQUE NOT NULL, [MigratedAt] DATETIME DEFAULT CURRENT_TIME NOT NULL);";
-        private readonly ISQLiteDatabase _db;
+        private readonly SQLiteDatabase _db;
 
-        public RevisionMigrator(ISQLiteDatabase db)
+        public RevisionMigrator(SQLiteDatabase db)
         {
             _db = db;
         }
@@ -26,11 +25,11 @@ namespace SortingHat.DB
                     continue;
                 }
 
-                Migrate(migration);
+                RunMigration(migration);
             }
         }
 
-        private void Migrate(string migration)
+        private void RunMigration(string migration)
         {
             using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(migration);
             using var reader = new StreamReader(stream);
@@ -42,8 +41,7 @@ namespace SortingHat.DB
 
         private void SetMigrated(string migration)
         {
-
-            _db.ExecuteNonQuery("INSERT INTO Revisions (Name, MigratedAt) VALUES ('@migration',  datetime('now'))", new SqliteParameter("@migration", migration));
+            _db.ExecuteNonQuery("INSERT INTO Revisions (Name, MigratedAt) VALUES (@migration,  datetime('now'))", new SqliteParameter("@migration", migration));
         }
 
         private bool HasMigrated(string migration)
@@ -54,9 +52,12 @@ namespace SortingHat.DB
 
         private IEnumerable<string> Migrations()
         {
-            return Assembly.GetExecutingAssembly().GetManifestResourceNames().Where(res => res.StartsWith("SortingHat.DB.Migrations"));
+            return Assembly.GetExecutingAssembly().GetManifestResourceNames().Where(res => res.StartsWith($"SortingHat.DB.Migrations.{_db.MigrationType}"));
         }
 
+        /// <summary>
+        /// Initialized the Migrations Table, this call is idempotent and can be called at any time.
+        /// </summary>
         public void Initialize()
         {
             _db.ExecuteNonQuery(CreateRevisionTableCommand);

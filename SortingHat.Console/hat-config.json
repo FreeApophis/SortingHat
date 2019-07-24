@@ -1,7 +1,8 @@
 ﻿{
   "Database": {
-    "DBType": "sqlite",
-    "DBName": "hat",
-    "DBPath": "#USERDOC"
+    "Type": "sqlite",
+    "Name": "hat",
+    "Path": "#USERDOC",
+    "DefaultProject":  "Default" 
   }
 }

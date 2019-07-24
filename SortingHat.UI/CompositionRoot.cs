@@ -37,7 +37,7 @@ namespace SortingHat.UI
             builder.RegisterGeneric(typeof(Logger<>)).As(typeof(ILogger<>)).SingleInstance();
             builder.RegisterType<NullWriter>().As<IConsoleWriter>();
 
-            builder.Register(c => new DatabaseSettings { DBType = "sqlite", DBName = "hat", DBPath = "#USERDOC" });
+            builder.Register(c => new DatabaseSettings { Type = "sqlite", Name = "hat", Path = "#USERDOC", DefaultProject = "Default" });
 
             return ConfigureLogger(builder.Build());
         }

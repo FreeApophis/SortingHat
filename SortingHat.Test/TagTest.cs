@@ -1,6 +1,7 @@
 ﻿
 using SortingHat.API.DI;
 using SortingHat.API.Models;
+using SortingHat.Test.Mock;
 using Xunit;
 
 namespace SortingHat.Test

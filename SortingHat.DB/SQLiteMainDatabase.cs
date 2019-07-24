@@ -1,54 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.Data.Sqlite;
+using System.Linq;
+using SortingHat.API;
 using SortingHat.API.DI;
 
 namespace SortingHat.DB
 {
-    public class SQLiteMainDatabase : IMainDatabase, ISQLiteDatabase, IDisposable
+    public class SQLiteMainDatabase : SQLiteDatabase, IMainDatabase
     {
-        public SQLiteMainDatabase(IProjectDatabase projectDatabase)
+        public SQLiteMainDatabase(Func<ISettings> settings, Func<string, IProjectDatabase> projectDatabase, DatabaseSettings databaseSettings) :
+            base(databaseSettings, databaseSettings.Name)
         {
-            ProjectDatabase = projectDatabase;
+            _settings = settings;
+            ProjectDatabase = projectDatabase(ProjectDatabaseName);
         }
+
+        public string ProjectDatabaseName => "Default";
+
 
         public IProjectDatabase ProjectDatabase { get; }
-        public IReadOnlyCollection<string> ProjectDatabases { get; }
-        public ISettings Settings { get; }
+        public IEnumerable<string> ProjectDatabases => Enumerable.Empty<string>();
 
-        public void Setup()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void TearDown()
-        {
-            throw new System.NotImplementedException();
-        }
+        private readonly Func<ISettings> _settings;
+        public ISettings Settings => _settings();
 
         public Dictionary<string, long> GetStatistics()
         {
             throw new System.NotImplementedException();
         }
 
-        public void ExecuteNonQuery(string commandText, params SqliteParameter[] parameters)
-        {
-            throw new NotImplementedException();
-        }
-
-        public object ExecuteScalar(string commandText, params SqliteParameter[] parameters)
-        {
-            throw new NotImplementedException();
-        }
-
-        public SqliteDataReader ExecuteReader(string commandText, params SqliteParameter[] parameters)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
+        internal override MigrationType MigrationType => MigrationType.Main;
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using SortingHat.API.DI;
 
-namespace SortingHat.Test
+namespace SortingHat.Test.Mock
 {
     public class MockMainDatabase : IMainDatabase
     {
@@ -26,7 +26,7 @@ namespace SortingHat.Test
         }
 
         public IProjectDatabase ProjectDatabase { get; }
-        public IReadOnlyCollection<string> ProjectDatabases { get; }
+        public IEnumerable<string> ProjectDatabases { get; }
         public ISettings Settings { get; }
 
         public static MockMainDatabase Create()

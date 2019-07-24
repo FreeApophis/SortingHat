@@ -98,8 +98,6 @@ namespace SortingHat.CLI
             var configuration = ConfigurationRoot();
 
             builder.Register(c => configuration.GetSection("Database").Get<DatabaseSettings>()).As<DatabaseSettings>();
-
-            //builder.Register(c => new DatabaseSettings { DBType = "sqlite", DBName = "hat", DBPath = "#USERDOC" }).As<DatabaseSettings>();
         }
 
         private static IConfigurationRoot ConfigurationRoot()

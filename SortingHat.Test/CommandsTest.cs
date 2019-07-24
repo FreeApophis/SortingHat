@@ -6,6 +6,7 @@ using SortingHat.API.DI;
 using Xunit;
 using SortingHat.ConsoleWriter;
 using System.Linq;
+using SortingHat.Test.Mock;
 
 namespace SortingHat.Test
 {

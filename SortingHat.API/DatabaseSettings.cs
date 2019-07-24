@@ -5,8 +5,9 @@ namespace SortingHat.API
     [UsedImplicitly]
     public class DatabaseSettings
     {
-        public string DBType { get; set; } = "";
-        public string DBName { get; set; } = "";
-        public string DBPath { get; set; } = "";
+        public string Type { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string Path { get; set; } = "";
+        public string DefaultProject { get; set; } = "";
     }
 }

@@ -6,7 +6,7 @@ namespace SortingHat.API.DI
     {
         IProjectDatabase ProjectDatabase { get; }
 
-        IReadOnlyCollection<string> ProjectDatabases { get; }
+        IEnumerable<string> ProjectDatabases { get; }
 
         ISettings Settings { get; }
     }

@@ -10,10 +10,10 @@ namespace SortingHat.CLI.Commands
     [UsedImplicitly]
     internal class StatisticCommand : ICommand
     {
-        private readonly IDatabase _db;
+        private readonly IMainDatabase _db;
         private readonly IConsoleWriter _consoleWriter;
 
-        public StatisticCommand(IDatabase db, IConsoleWriter consoleWriter)
+        public StatisticCommand(IMainDatabase db, IConsoleWriter consoleWriter)
         {
             _db = db;
             _consoleWriter = consoleWriter;
