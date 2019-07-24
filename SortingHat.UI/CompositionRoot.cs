@@ -21,13 +21,10 @@ namespace SortingHat.UI
         {
             var builder = new ContainerBuilder();
 
-            RegisterParser(builder);
+            builder.RegisterModule(new ParserModule());
+            builder.RegisterModule(new SqliteDatabaseModule());
 
             builder.RegisterType<MainWindow>().AsSelf();
-
-            builder.RegisterType<SQLiteMainDatabase>().As<IMainDatabase>().AsSelf().SingleInstance();
-            builder.RegisterType<SQLiteFile>().As<IFile>().SingleInstance();
-            builder.RegisterType<SQLiteTag>().As<ITag>().SingleInstance();
 
             builder.RegisterType<API.Models.TagParser>().As<API.Models.ITagParser>().SingleInstance();
             builder.RegisterType<API.Models.Tag>().As<API.Models.Tag>().InstancePerDependency();
@@ -43,18 +40,6 @@ namespace SortingHat.UI
             builder.Register(c => new DatabaseSettings { DBType = "sqlite", DBName = "hat", DBPath = "#USERDOC" });
 
             return ConfigureLogger(builder.Build());
-        }
-
-        private void RegisterParser(ContainerBuilder builder)
-        {
-            builder.RegisterType<ExpressionParser>().PropertiesAutowired(PropertyWiringOptions.AllowCircularDependencies).InstancePerLifetimeScope().AsSelf();
-            builder.RegisterType<FactorParser>().AsSelf();
-            builder.RegisterType<TermParser>().AsSelf();
-            builder.RegisterType<LexerRules>().As<ILexerRules>();
-            builder.RegisterType<LexerReader>().As<ILexerReader>();
-            builder.RegisterType<Tokenizer>().AsSelf();
-            builder.Register(c => new TokenWalker(c.Resolve<Tokenizer>(), () => new EpsilonToken())).As<TokenWalker>();
-            builder.RegisterType<Parser>().AsSelf();
         }
 
         private IContainer ConfigureLogger(IContainer container)

@@ -25,14 +25,11 @@ namespace SortingHat.CLI
         {
             var builder = new ContainerBuilder();
 
-            RegisterParser(builder);
+            builder.RegisterModule(new ParserModule());
+            builder.RegisterModule(new SqliteDatabaseModule());
 
             builder.RegisterType<Application>().AsSelf();
             builder.RegisterType<ArgumentParser>().AsSelf();
-
-            builder.RegisterType<SQLiteMainDatabase>().As<IMainDatabase>().As<SQLiteMainDatabase>().SingleInstance();
-            builder.RegisterType<SQLiteFile>().As<IFile>().SingleInstance();
-            builder.RegisterType<SQLiteTag>().As<ITag>().SingleInstance();
 
             builder.RegisterType<API.Models.TagParser>().As<API.Models.ITagParser>();
             builder.RegisterType<AutoTagHandler>().As<IAutoTagHandler>();
@@ -55,19 +52,6 @@ namespace SortingHat.CLI
 
             return ConfigureLogger(builder.Build());
         }
-
-        private void RegisterParser(ContainerBuilder builder)
-        {
-            builder.RegisterType<ExpressionParser>().PropertiesAutowired(PropertyWiringOptions.AllowCircularDependencies).InstancePerLifetimeScope().AsSelf();
-            builder.RegisterType<FactorParser>().AsSelf();
-            builder.RegisterType<TermParser>().AsSelf();
-            builder.RegisterType<LexerRules>().As<ILexerRules>();
-            builder.RegisterType<LexerReader>().As<ILexerReader>();
-            builder.RegisterType<Tokenizer>().AsSelf();
-            builder.Register(c => new TokenWalker(c.Resolve<Tokenizer>(), () => new EpsilonToken())).As<TokenWalker>();
-            builder.RegisterType<Parser>().AsSelf();
-        }
-
 
         private void RegisterAutoTags(ContainerBuilder builder)
         {
