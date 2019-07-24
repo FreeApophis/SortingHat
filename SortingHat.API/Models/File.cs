@@ -14,11 +14,11 @@ namespace SortingHat.API.Models
         public Task<string> Hash { get; set; }
         public string Path { get; set; }
 
-        private readonly IDatabase _db;
+        private readonly IProjectDatabase _db;
         private readonly IHashService _hashService;
 
         [UsedImplicitly]
-        public File(IDatabase db, IHashService hashService)
+        public File(IProjectDatabase db, IHashService hashService)
         {
             _db = db;
             _hashService = hashService;

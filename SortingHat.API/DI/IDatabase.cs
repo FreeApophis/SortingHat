@@ -16,7 +16,5 @@ namespace SortingHat.API.DI
 
         Dictionary<string, long> GetStatistics();
 
-        IFile File { get; }
-        ITag Tag { get; }
     }
 }

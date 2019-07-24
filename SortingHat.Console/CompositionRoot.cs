@@ -30,7 +30,7 @@ namespace SortingHat.CLI
             builder.RegisterType<Application>().AsSelf();
             builder.RegisterType<ArgumentParser>().AsSelf();
 
-            builder.RegisterType<SQLiteDB>().As<IDatabase>().As<SQLiteDB>().SingleInstance();
+            builder.RegisterType<SQLiteMainDatabase>().As<IMainDatabase>().As<SQLiteMainDatabase>().SingleInstance();
             builder.RegisterType<SQLiteFile>().As<IFile>().SingleInstance();
             builder.RegisterType<SQLiteTag>().As<ITag>().SingleInstance();
 

@@ -13,8 +13,8 @@ namespace SortingHat.DB
     [UsedImplicitly]
     public class SQLiteTag : ITag
     {
-        private readonly SQLiteDB _db;
-        public SQLiteTag(SQLiteDB db)
+        private readonly SQLiteProjectDatabase _db;
+        public SQLiteTag(SQLiteProjectDatabase db)
         {
             _db = db;
         }

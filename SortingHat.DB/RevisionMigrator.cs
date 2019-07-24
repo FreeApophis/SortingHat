@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using SortingHat.API.DI;
 
 namespace SortingHat.DB
 {
     internal class RevisionMigrator
     {
         private const string CreateRevisionTableCommand = @"CREATE TABLE IF NOT EXISTS [Revisions] ([ID] INTEGER  NOT NULL PRIMARY KEY AUTOINCREMENT, [Name] VARCHAR(255)  UNIQUE NOT NULL, [MigratedAt] DATETIME DEFAULT CURRENT_TIME NOT NULL);";
-        private readonly SQLiteDB _db;
+        private readonly ISQLiteDatabase _db;
 
-        public RevisionMigrator(SQLiteDB db)
+        public RevisionMigrator(ISQLiteDatabase db)
         {
             _db = db;
         }

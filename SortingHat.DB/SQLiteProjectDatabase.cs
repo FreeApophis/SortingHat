@@ -10,7 +10,7 @@ using JetBrains.Annotations;
 namespace SortingHat.DB
 {
     [UsedImplicitly]
-    public sealed class SQLiteDB : IDatabase, IDisposable
+    public sealed class SQLiteProjectDatabase : IProjectDatabase, ISQLiteDatabase, IDisposable
     {
         private readonly string _path;
         private readonly string _dbName;
@@ -24,7 +24,7 @@ namespace SortingHat.DB
         private readonly Func<ITag> _tag;
         public ITag Tag => _tag();
 
-        public SQLiteDB(Func<IFile> file, Func<ITag> tag, DatabaseSettings databaseSettings)
+        public SQLiteProjectDatabase(Func<IFile> file, Func<ITag> tag, DatabaseSettings databaseSettings)
         {
             _file = file;
             _tag = tag;

@@ -12,10 +12,10 @@ namespace SortingHat.CLI.Commands
     [UsedImplicitly]
     internal class FindFilesCommand : ICommand
     {
-        private readonly IDatabase _db;
+        private readonly IMainDatabase _db;
         private readonly IConsoleWriter _consoleWriter;
 
-        public FindFilesCommand(IDatabase db, IConsoleWriter consoleWriter)
+        public FindFilesCommand(IMainDatabase db, IConsoleWriter consoleWriter)
         {
             _db = db;
             _consoleWriter = consoleWriter;
@@ -33,7 +33,7 @@ namespace SortingHat.CLI.Commands
             var search = string.Join(" ", arguments);
             _consoleWriter.WriteLine($"Find Files: {search}");
 
-            var files = _db.File.Search(search);
+            var files = _db.ProjectDatabase.File.Search(search);
 
             if (files.Any()) {
                 var table = FileTable();

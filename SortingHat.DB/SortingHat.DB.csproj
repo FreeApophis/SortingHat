@@ -17,25 +17,29 @@
     <None Remove="Migrations\20180802-1820-CreateSettings.migration" />
     <None Remove="Migrations\20180802-1830-CreateFileNames.migration" />
     <None Remove="Migrations\20180802-2030-CreateFilePaths.migration" />
+    <None Remove="Migrations\Main\20190724-1820-CreateProjects.migration" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\20180625-1915-CreateFiles.migration">
+    <EmbeddedResource Include="Migrations\Main\20190724-1820-CreateProjects.migration">
       <CustomToolNamespace>Migrations</CustomToolNamespace>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\20180625-1920-CreateTags.migration">
+    <EmbeddedResource Include="Migrations\Project\20180625-1915-CreateFiles.migration">
       <CustomToolNamespace>Migrations</CustomToolNamespace>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\20180625-1925-CreateFileTags.migration">
+    <EmbeddedResource Include="Migrations\Project\20180625-1920-CreateTags.migration">
       <CustomToolNamespace>Migrations</CustomToolNamespace>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\20180802-1820-CreateSettings.migration">
+    <EmbeddedResource Include="Migrations\Project\20180625-1925-CreateFileTags.migration">
       <CustomToolNamespace>Migrations</CustomToolNamespace>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\20180802-1830-CreateFileNames.migration">
+    <EmbeddedResource Include="Migrations\Main\20180802-1820-CreateSettings.migration">
       <CustomToolNamespace>Migrations</CustomToolNamespace>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\20180802-2030-CreateFilePaths.migration">
+    <EmbeddedResource Include="Migrations\Project\20180802-1830-CreateFileNames.migration">
+      <CustomToolNamespace>Migrations</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\Project\20180802-2030-CreateFilePaths.migration">
       <CustomToolNamespace>Migrations</CustomToolNamespace>
     </EmbeddedResource>
   </ItemGroup>

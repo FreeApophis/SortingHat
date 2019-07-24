@@ -1,0 +1,7 @@
+﻿/* Create Projects */
+
+CREATE TABLE `Projects` (
+    `ID`                        INTEGER PRIMARY KEY AUTOINCREMENT,
+    `Name`                      VARCHAR (255) NOT NULL,
+);
+

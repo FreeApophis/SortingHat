@@ -5,7 +5,7 @@ namespace SortingHat.API.Models
 {
     public class Tag
     {
-        private readonly IDatabase _db;
+        private readonly IProjectDatabase _db;
 
         public string Name { get; set; }
         public Tag? Parent { get; }
@@ -14,7 +14,7 @@ namespace SortingHat.API.Models
 
         public string FullName => $"{(Parent == null ? string.Empty : Parent.FullName)}:{Name}";
 
-        public Tag(IDatabase db, string name, Tag? parent = null)
+        public Tag(IProjectDatabase db, string name, Tag? parent = null)
         {
             _db = db;
             Name = name;
@@ -43,7 +43,7 @@ namespace SortingHat.API.Models
             return _db.Tag.Move(this, destinationTag);
         }
 
-        public static bool operator ==(Tag lhs, Tag rhs)
+        public static bool operator ==(Tag? lhs, Tag? rhs)
         {
             if (lhs is null)
             {
@@ -53,20 +53,24 @@ namespace SortingHat.API.Models
             return lhs.Equals(rhs);
         }
 
-        public static bool operator !=(Tag lhs, Tag rhs)
+        public static bool operator !=(Tag? lhs, Tag? rhs)
         {
             return !(lhs == rhs);
         }
 
-        public override bool Equals(object other)
+        public override bool Equals(object? other)
         {
             if (other == null || GetType() != other.GetType())
             {
                 return false;
             }
 
-            var tag = other as Tag;
-            return FullName == tag.FullName;
+            if (other is Tag tag)
+            {
+                return FullName == tag.FullName;
+            }
+
+            return false;
         }
 
         public override int GetHashCode()
@@ -74,7 +78,7 @@ namespace SortingHat.API.Models
             return FullName.GetHashCode();
         }
 
-        public static IEnumerable<Tag> List(IDatabase db)
+        public static IEnumerable<Tag> List(IProjectDatabase db)
         {
             return db.Tag.GetTags();
         }

@@ -4,12 +4,12 @@ using SortingHat.Test.Mock;
 
 namespace SortingHat.Test
 {
-    public class MockDatabase : IDatabase
+    public class MockProjectDatabase : IProjectDatabase
     {
         public MockFileStore MockFile { get; }
         public MockTagStore MockTag { get; }
 
-        private MockDatabase(MockFileStore file, MockTagStore tag)
+        private MockProjectDatabase(MockFileStore file, MockTagStore tag)
         {
             MockFile = file;
             MockTag = tag;
@@ -31,9 +31,9 @@ namespace SortingHat.Test
             throw new System.NotImplementedException();
         }
 
-        public static MockDatabase Create()
+        public static MockProjectDatabase Create()
         {
-            return new MockDatabase(MockFileStore.Create(), MockTagStore.Create());
+            return new MockProjectDatabase(MockFileStore.Create(), MockTagStore.Create());
         }
     }
 }

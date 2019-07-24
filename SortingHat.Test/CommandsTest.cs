@@ -14,8 +14,8 @@ namespace SortingHat.Test
         [Fact]
         public void CreateAndListTagsTest()
         {
-            var db = MockDatabase.Create();
-            var tagParser = new TagParser((name, parent) => new Tag(db, name, parent));
+            var db = MockMainDatabase.Create();
+            var tagParser = new TagParser((name, parent) => new Tag(db.ProjectDatabase, name, parent));
             ICommand addTag = new AddTagCommand(tagParser);
 
             List<string> taxPeriods = new List<string> { ":tax_period:2016", ":tax_period:2017", ":tax_period:2018", ":tax_period:2019" };
@@ -28,7 +28,7 @@ namespace SortingHat.Test
             addTag.Execute(taxPeriods, mockOptions.Object);
             addTag.Execute(movieRating, mockOptions.Object);
 
-            Assert.Collection(db.MockTag.Tags,
+            Assert.Collection(((MockProjectDatabase)db.ProjectDatabase).MockTag.Tags,
                 item => Assert.Equal("2016", item.Name),
                 item => Assert.Equal("tax_period", item.Parent?.Name),
                 item => Assert.Equal(taxPeriods[2], item.FullName),

@@ -25,7 +25,7 @@ namespace SortingHat.UI
 
             builder.RegisterType<MainWindow>().AsSelf();
 
-            builder.RegisterType<SQLiteDB>().As<IDatabase>().AsSelf().SingleInstance();
+            builder.RegisterType<SQLiteMainDatabase>().As<IMainDatabase>().AsSelf().SingleInstance();
             builder.RegisterType<SQLiteFile>().As<IFile>().SingleInstance();
             builder.RegisterType<SQLiteTag>().As<ITag>().SingleInstance();
 

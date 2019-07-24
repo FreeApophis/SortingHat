@@ -15,13 +15,13 @@ namespace SortingHat.DB
         private readonly StringBuilder _selectBuilder = new StringBuilder();
         private readonly StringBuilder _whereBuilder = new StringBuilder();
         private const string GroupBy = "\r\nGROUP BY FilePaths.ID";
-        private readonly IDatabase _db;
+        private readonly IProjectDatabase _db;
         private readonly ITagParser _tagParser;
         private int _fileTagCount;
 
         public bool UnknownTag { get; private set; }
 
-        public SearchQueryVisitor(IDatabase db, ITagParser tagParser)
+        public SearchQueryVisitor(IProjectDatabase db, ITagParser tagParser)
         {
             _db = db;
             _tagParser = tagParser;

@@ -15,10 +15,10 @@ namespace SortingHat.DB
     {
         private readonly Func<SearchQueryVisitor> _newSearchQueryVisitor;
         private readonly Func<File> _newFile;
-        private readonly SQLiteDB _db;
+        private readonly SQLiteProjectDatabase _db;
         private readonly Parser _parser;
 
-        public SQLiteFile(Func<SearchQueryVisitor> newSearchQueryVisitor, Func<File> newFile, SQLiteDB db, Parser parser)
+        public SQLiteFile(Func<SearchQueryVisitor> newSearchQueryVisitor, Func<File> newFile, SQLiteProjectDatabase db, Parser parser)
         {
             _newSearchQueryVisitor = newSearchQueryVisitor;
             _newFile = newFile;

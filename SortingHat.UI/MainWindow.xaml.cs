@@ -25,7 +25,7 @@ namespace SortingHat.UI
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private readonly IDatabase _db;
+        private readonly IMainDatabase _db;
         private readonly ILogger<MainWindow> _logger;
         private readonly Func<SearchQueryVisitor> _newSearchQueryVisitor;
         private readonly Parser _parser;
@@ -91,7 +91,7 @@ namespace SortingHat.UI
             }
         }
 
-        public MainWindow(IDatabase db, ILogger<MainWindow> logger, Func<SearchQueryVisitor> newSearchQueryVisitor, Parser parser)
+        public MainWindow(IMainDatabase db, ILogger<MainWindow> logger, Func<SearchQueryVisitor> newSearchQueryVisitor, Parser parser)
         {
             logger.LogTrace("Main Window created");
 
@@ -113,7 +113,7 @@ namespace SortingHat.UI
 
             PossibleNextArguments(search);
 
-            Files = _db.File.Search(search);
+            Files = _db.ProjectDatabase.File.Search(search);
 
             return search;
         }
@@ -164,7 +164,7 @@ namespace SortingHat.UI
         private void SelectPossibleTokens(TagToken tagToken)
         {
             var partial = (tagToken == null ? string.Empty : tagToken.Value) ?? string.Empty;
-            foreach (var possibleTag in _db.Tag.GetTags().Select(t => t.FullName).Where(f => f.StartsWith(partial))) {
+            foreach (var possibleTag in _db.ProjectDatabase.Tag.GetTags().Select(t => t.FullName).Where(f => f.StartsWith(partial))) {
                 IntelliSense.Items.Add(new IntellisenseItem { Title = possibleTag });
                 if (IntelliSense.Items.Count > 8) {
                     break;
@@ -182,7 +182,7 @@ namespace SortingHat.UI
 
         private void LoadTags()
         {
-            var tags = API.Models.Tag.List(_db);
+            var tags = API.Models.Tag.List(_db.ProjectDatabase);
 
             foreach (var tag in tags) {
                 if (tag.Parent == null) {

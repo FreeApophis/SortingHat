@@ -12,10 +12,10 @@ namespace SortingHat.CLI.Commands
     [UsedImplicitly]
     internal class DuplicateFileCommand : ICommand
     {
-        private readonly IDatabase _db;
+        private readonly IMainDatabase _db;
         private readonly IConsoleWriter _consoleWriter;
 
-        public DuplicateFileCommand(IDatabase db, IConsoleWriter consoleWriter)
+        public DuplicateFileCommand(IMainDatabase db, IConsoleWriter consoleWriter)
         {
             _db = db;
             _consoleWriter = consoleWriter;
@@ -23,7 +23,7 @@ namespace SortingHat.CLI.Commands
 
         public bool Execute(IEnumerable<string> arguments, IOptions options)
         {
-            foreach (var file in _db.File.GetDuplicates())
+            foreach (var file in _db.ProjectDatabase.File.GetDuplicates())
             {
                 _consoleWriter.WriteLine("--- Duplicate ---");
                 _consoleWriter.WriteLine($"CreatedAt (oldest): {file.CreatedAt}");
