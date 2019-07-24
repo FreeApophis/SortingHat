@@ -4,8 +4,8 @@ using SortingHat.API.Models;
 using Moq;
 using SortingHat.API.DI;
 using Xunit;
-using SortingHat.ConsoleWriter;
 using System.Linq;
+using SortingHat.CliAbstractions;
 using SortingHat.Test.Mock;
 
 namespace SortingHat.Test

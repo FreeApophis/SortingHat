@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
-using SortingHat.ConsoleWriter;
+using SortingHat.CliAbstractions;
 
 namespace SortingHat.API.DI
 {
@@ -24,13 +24,12 @@ namespace SortingHat.API.DI
         {
             return Task.Run(() =>
             {
-                using (var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-                {
-                    _consoleWriter.WriteLine($"Hashing: '{path}'");
-                    var hash = _hashAlgorithm.ComputeHash(fileStream);
-                    _consoleWriter.WriteLine($"End Hashing: '{path}'");
-                    return $"{_hashPrefix}:{ToHex(hash)}";
-                }
+                using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+                _consoleWriter.WriteLine($"Hashing: '{path}'");
+                var hash = _hashAlgorithm.ComputeHash(fileStream);
+                _consoleWriter.WriteLine($"End Hashing: '{path}'");
+                return $"{_hashPrefix}:{ToHex(hash)}";
             });
         }
 

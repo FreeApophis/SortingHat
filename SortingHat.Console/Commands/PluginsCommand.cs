@@ -4,7 +4,7 @@ using SortingHat.API.Plugin;
 using System.Collections.Generic;
 using System.Linq;
 using Funcky.Monads;
-using SortingHat.ConsoleWriter;
+using SortingHat.CliAbstractions;
 
 namespace SortingHat.CLI.Commands
 {

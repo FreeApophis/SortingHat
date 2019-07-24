@@ -1,13 +1,10 @@
 ﻿using System.Security.Cryptography;
-using apophis.Lexer;
-using apophis.Lexer.Rules;
 using Autofac;
 using Microsoft.Extensions.Logging;
 using SortingHat.API;
 using SortingHat.API.DI;
 using SortingHat.API.Parser;
-using SortingHat.API.Parser.Token;
-using SortingHat.ConsoleWriter;
+using SortingHat.CliAbstractions;
 using SortingHat.DB;
 
 namespace SortingHat.UI

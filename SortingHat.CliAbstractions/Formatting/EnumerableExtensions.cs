@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SortingHat.CLI.Output
+namespace SortingHat.CliAbstractions.Formatting
 {
     static class EnumerableExtensions
     {

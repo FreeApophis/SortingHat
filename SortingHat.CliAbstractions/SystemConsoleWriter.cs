@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SortingHat.ConsoleWriter
+namespace SortingHat.CliAbstractions
 {
     public class SystemConsoleWriter : IConsoleWriter
     {

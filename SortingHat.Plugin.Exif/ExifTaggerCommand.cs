@@ -1,10 +1,9 @@
 ﻿using JetBrains.Annotations;
 using MetadataExtractor;
 using SortingHat.API.DI;
-using System;
 using System.Collections.Generic;
 using Funcky.Monads;
-using SortingHat.ConsoleWriter;
+using SortingHat.CliAbstractions;
 
 namespace SortingHat.Plugin.Exif
 {

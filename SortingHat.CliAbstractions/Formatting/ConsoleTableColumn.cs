@@ -1,6 +1,6 @@
-﻿namespace SortingHat.CLI.Output
+﻿namespace SortingHat.CliAbstractions.Formatting
 {
-    class ConsoleTableColumn
+    public class ConsoleTableColumn
     {
         public ConsoleTableColumnAlignment Alignment { get; set; } = ConsoleTableColumnAlignment.Left;
         public int PaddingLeft { get; set; } = 0;

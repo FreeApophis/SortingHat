@@ -1,9 +1,9 @@
 ﻿using JetBrains.Annotations;
 using SortingHat.API.DI;
-using SortingHat.CLI.Output;
 using System.Collections.Generic;
 using Funcky.Monads;
-using SortingHat.ConsoleWriter;
+using SortingHat.CliAbstractions;
+using SortingHat.CliAbstractions.Formatting;
 
 namespace SortingHat.CLI.Commands
 {

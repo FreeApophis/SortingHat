@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using apophis.Lexer;
 using apophis.Lexer.Tokens;
 using JetBrains.Annotations;
-using SortingHat.ConsoleWriter;
+using SortingHat.CliAbstractions;
 using SortingHat.Plugin.ExtractRelevantText.Token;
 
 namespace SortingHat.Plugin.ExtractRelevantText
@@ -13,8 +12,8 @@ namespace SortingHat.Plugin.ExtractRelevantText
     public class FolderScanner
     {
         private readonly IConsoleWriter _consoleWriter;
-        private TokenWalker _tokenWalker;
-        private Dictionary<string, int> _wordCount;
+        private readonly TokenWalker _tokenWalker;
+        private readonly Dictionary<string, int> _wordCount;
 
         [UsedImplicitly]
         public FolderScanner(IConsoleWriter consoleWriter)

@@ -1,4 +1,4 @@
-﻿namespace SortingHat.CLI.Output
+﻿namespace SortingHat.CliAbstractions.Formatting
 {
     public static class NumberFormatter
     {

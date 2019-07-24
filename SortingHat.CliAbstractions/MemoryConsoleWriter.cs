@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SortingHat.ConsoleWriter
+namespace SortingHat.CliAbstractions
 {
     public class MemoryConsoleWriter : IConsoleWriter
     {

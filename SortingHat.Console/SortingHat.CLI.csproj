@@ -64,7 +64,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SortingHat.API\SortingHat.API.csproj" />
-    <ProjectReference Include="..\SortingHat.ConsoleWriter\SortingHat.ConsoleWriter.csproj" />
+    <ProjectReference Include="..\SortingHat.CliAbstractions\SortingHat.CliAbstractions.csproj" />
     <ProjectReference Include="..\SortingHat.DB\SortingHat.DB.csproj" />
   </ItemGroup>
 

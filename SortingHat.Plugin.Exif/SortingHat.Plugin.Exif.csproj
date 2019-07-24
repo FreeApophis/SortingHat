@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SortingHat.API\SortingHat.API.csproj" />
+    <ProjectReference Include="..\SortingHat.CliAbstractions\SortingHat.CliAbstractions.csproj" />
   </ItemGroup>
 
 </Project>

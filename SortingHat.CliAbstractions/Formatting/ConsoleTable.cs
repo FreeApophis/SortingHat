@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
-using SortingHat.ConsoleWriter;
 
-namespace SortingHat.CLI.Output
+namespace SortingHat.CliAbstractions.Formatting
 {
-    using static Enumerable;
-
-    internal class ConsoleTable
+    public class ConsoleTable
     {
         private const char Space = ' ';
 
@@ -19,7 +15,7 @@ namespace SortingHat.CLI.Output
 
         public ConsoleTable(int columns = 0)
         {
-            foreach (var _ in Range(0, columns))
+            foreach (var _ in Enumerable.Range(0, columns))
             {
                 Columns.Add(new ConsoleTableColumn());
             }

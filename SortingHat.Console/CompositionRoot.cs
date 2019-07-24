@@ -15,7 +15,7 @@ using apophis.Lexer.Rules;
 using SortingHat.API.AutoTag;
 using SortingHat.API.Parser;
 using SortingHat.API.Parser.Token;
-using SortingHat.ConsoleWriter;
+using SortingHat.CliAbstractions;
 
 namespace SortingHat.CLI
 {
