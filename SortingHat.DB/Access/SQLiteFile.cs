@@ -1,14 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Data.Common;
+using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Microsoft.Data.Sqlite;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
 using SortingHat.API.Parser;
-using System.Collections.Generic;
-using System.Data.Common;
-using JetBrains.Annotations;
-using System.Threading.Tasks;
 
-namespace SortingHat.DB
+namespace SortingHat.DB.Access
 {
     [UsedImplicitly]
     public class SQLiteFile : IFile
@@ -16,20 +16,22 @@ namespace SortingHat.DB
         private readonly Func<SearchQueryVisitor> _newSearchQueryVisitor;
         private readonly Func<File> _newFile;
         private readonly SQLiteProjectDatabase _db;
+        private readonly SQLiteTag _sqLiteTag;
         private readonly Parser _parser;
 
-        public SQLiteFile(Func<SearchQueryVisitor> newSearchQueryVisitor, Func<File> newFile, SQLiteProjectDatabase db, Parser parser)
+        public SQLiteFile(Func<SearchQueryVisitor> newSearchQueryVisitor, Func<File> newFile, SQLiteProjectDatabase db, SQLiteTag sqLiteTag, Parser parser)
         {
             _newSearchQueryVisitor = newSearchQueryVisitor;
             _newFile = newFile;
             _db = db;
+            _sqLiteTag = sqLiteTag;
             _parser = parser;
         }
 
         public async Task Tag(File file, Tag tag)
         {
             long? fileId = await FindOrCreate(file);
-            var tagId = ((SQLiteTag)_db.Tag).FindOrCreate(tag);
+            var tagId = _sqLiteTag.FindOrCreate(tag);
 
             _db.ExecuteNonQuery("INSERT INTO FileTags (TagId, FileId) VALUES(@tagId, @fileId);", new SqliteParameter("@tagId", tagId), new SqliteParameter("@fileId", fileId));
         }
@@ -92,7 +94,7 @@ namespace SortingHat.DB
         public async Task Untag(File file, Tag tag)
         {
             var fileId = await Find(file);
-            var tagId = ((SQLiteTag)_db.Tag).Find(tag);
+            var tagId = _sqLiteTag.Find(tag);
 
             if (fileId.HasValue && tagId.HasValue)
             {
@@ -184,7 +186,7 @@ WHERE Files.Hash = @fileHash";
 
             while (reader.Read())
             {
-                Tag tag = ((SQLiteTag)_db.Tag).Load(reader.GetInt64(0));
+                Tag tag = _sqLiteTag.Load(reader.GetInt64(0));
                 tags.Add(tag);
             }
 

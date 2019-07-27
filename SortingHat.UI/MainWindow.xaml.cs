@@ -1,5 +1,4 @@
-﻿using SortingHat.API;
-using SortingHat.API.Models;
+﻿using SortingHat.API.Models;
 using SortingHat.API.Parser;
 using SortingHat.DB;
 using System;
@@ -26,7 +25,8 @@ namespace SortingHat.UI
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private readonly IMainDatabase _db;
+        private readonly IFile _file;
+        private readonly ITag _tag;
         private readonly ILogger<MainWindow> _logger;
         private readonly Func<SearchQueryVisitor> _newSearchQueryVisitor;
         private readonly Parser _parser;
@@ -92,11 +92,12 @@ namespace SortingHat.UI
             }
         }
 
-        public MainWindow(IMainDatabase db, ILogger<MainWindow> logger, Func<SearchQueryVisitor> newSearchQueryVisitor, Parser parser)
+        public MainWindow(IFile file, ITag tag, ILogger<MainWindow> logger, Func<SearchQueryVisitor> newSearchQueryVisitor, Parser parser)
         {
             logger.LogTrace("Main Window created");
 
-            _db = db;
+            _file = file;
+            _tag = tag;
             _logger = logger;
             _newSearchQueryVisitor = newSearchQueryVisitor;
             _parser = parser;
@@ -116,7 +117,7 @@ namespace SortingHat.UI
 
             PossibleNextArguments(search);
 
-            Files = _db.ProjectDatabase.File.Search(search);
+            Files = _file.Search(search);
 
             return search;
         }
@@ -169,7 +170,7 @@ namespace SortingHat.UI
         private void SelectPossibleTokens(TagToken tagToken)
         {
             var partial = (tagToken == null ? string.Empty : tagToken.Value) ?? string.Empty;
-            foreach (var possibleTag in _db.ProjectDatabase.Tag.GetTags().Select(t => t.FullName).Where(f => f.StartsWith(partial)))
+            foreach (var possibleTag in _tag.GetTags().Select(t => t.FullName).Where(f => f.StartsWith(partial)))
             {
                 IntelliSense.Items.Add(new IntellisenseItem { Title = possibleTag });
                 if (IntelliSense.Items.Count > 8)
@@ -190,17 +191,17 @@ namespace SortingHat.UI
 
         private void LoadTags()
         {
-            var tags = API.Models.Tag.List(_db.ProjectDatabase);
+            // API.Models.Tag.List(_db.ProjectDatabase);
 
-            foreach (var tag in tags)
-            {
-                if (tag.Parent is null)
-                {
-                    var tagItem = new TagItem(tag);
-                    TagHierarchy.Items.Add(tagItem);
-                    BuildTagTree(tagItem.Items, tag.Children);
-                }
-            };
+            //foreach (var tag in tags)
+            //{
+            //    if (tag.Parent is null)
+            //    {
+            //        var tagItem = new TagItem(tag);
+            //        TagHierarchy.Items.Add(tagItem);
+            //        BuildTagTree(tagItem.Items, tag.Children);
+            //    }
+            //};
         }
 
         private void BuildTagTree(ObservableCollection<TagItem> items, List<Tag> children)

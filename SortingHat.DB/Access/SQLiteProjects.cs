@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Data.Sqlite;
 using SortingHat.API.DI;
 
-namespace SortingHat.DB
+namespace SortingHat.DB.Access
 {
     public class SQLiteProjects : IProjects
     {

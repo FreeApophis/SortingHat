@@ -5,18 +5,18 @@ namespace SortingHat.API.Models
 {
     public class Tag
     {
-        private readonly IProjectDatabase _db;
+        private readonly ITag _tag;
 
         public string Name { get; set; }
         public Tag? Parent { get; }
         public List<Tag> Children { get; } = new List<Tag>();
-        public long FileCount => _db.Tag.FileCount(this);
+        public long FileCount => _tag.FileCount(this);
 
         public string FullName => $"{(Parent == null ? string.Empty : Parent.FullName)}:{Name}";
 
-        public Tag(IProjectDatabase db, string name, Tag? parent = null)
+        public Tag(ITag tag, string name, Tag? parent = null)
         {
-            _db = db;
+            _tag = tag;
             Name = name;
             Parent = parent;
 
@@ -25,22 +25,22 @@ namespace SortingHat.API.Models
 
         public bool Store()
         {
-            return _db.Tag.Store(this);
+            return _tag.Store(this);
         }
 
         public bool Destroy()
         {
-            return _db.Tag.Destroy(this);
+            return _tag.Destroy(this);
         }
 
         public bool Rename(string newName)
         {
-            return _db.Tag.Rename(this, newName);
+            return _tag.Rename(this, newName);
         }
 
         public bool Move(Tag destinationTag)
         {
-            return _db.Tag.Move(this, destinationTag);
+            return _tag.Move(this, destinationTag);
         }
 
         public static bool operator ==(Tag? lhs, Tag? rhs)
@@ -78,9 +78,9 @@ namespace SortingHat.API.Models
             return FullName.GetHashCode();
         }
 
-        public static IEnumerable<Tag> List(IProjectDatabase db)
+        static public IEnumerable<Tag> List(ITag tag)
         {
-            return db.Tag.GetTags();
+            return tag.GetTags();
         }
     }
 }

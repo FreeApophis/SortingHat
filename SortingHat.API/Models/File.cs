@@ -14,20 +14,20 @@ namespace SortingHat.API.Models
         public Task<string> Hash { get; set; } = Task.FromResult("BADHASH");
         public string Path { get; set; } = "BADPATH";
 
-        private readonly IProjectDatabase _db;
+        private readonly IFile _file;
         private readonly IHashService _hashService;
 
         [UsedImplicitly]
-        public File(IProjectDatabase db, IHashService hashService)
+        public File(IFile file, IHashService hashService)
         {
-            _db = db;
+            _file = file;
             _hashService = hashService;
         }
 
 
         public void DBLoadByPath()
         {
-            _db.File.LoadByPath(this);
+            _file.LoadByPath(this);
         }
 
         public void LoadByPath()
@@ -45,27 +45,27 @@ namespace SortingHat.API.Models
 
         public async Task Tag(Tag tag)
         {
-            await _db.File.Tag(this, tag);
+            await _file.Tag(this, tag);
         }
 
         public void Untag(Tag tag)
         {
-            _db.File.Untag(this, tag);
+            _file.Untag(this, tag);
         }
 
         public async Task<IEnumerable<Tag>> GetTags()
         {
-            return await _db.File.GetTags(this);
+            return await _file.GetTags(this);
         }
 
         public async Task<IEnumerable<string>> GetPaths()
         {
-            return await _db.File.GetPaths(this);
+            return await _file.GetPaths(this);
         }
 
         public async Task<IEnumerable<string>> GetNames()
         {
-            return await _db.File.GetNames(this);
+            return await _file.GetNames(this);
         }
     }
 }

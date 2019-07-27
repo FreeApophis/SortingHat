@@ -10,18 +10,18 @@ namespace SortingHat.CLI.Commands
     [UsedImplicitly]
     internal class RepairCommand : ICommand
     {
-        private readonly IMainDatabase _db;
+        private readonly IFile _file;
         private readonly IConsoleWriter _consoleWriter;
 
-        public RepairCommand(IMainDatabase db, IConsoleWriter consoleWriter)
+        public RepairCommand(IFile file, IConsoleWriter consoleWriter)
         {
-            _db = db;
+            _file = file;
             _consoleWriter = consoleWriter;
         }
 
         public bool Execute(IEnumerable<string> arguments, IOptions options)
         {
-            foreach (var path in _db.ProjectDatabase.File.GetPaths())
+            foreach (var path in _file.GetPaths())
             {
                 if (File.Exists(path) == false)
                 {

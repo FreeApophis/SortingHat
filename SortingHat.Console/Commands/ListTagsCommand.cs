@@ -12,18 +12,18 @@ namespace SortingHat.CLI.Commands
     [UsedImplicitly]
     internal class ListTagsCommand : ICommand
     {
-        private readonly IProjectDatabase _db;
+        private readonly ITag _tag;
         private readonly IConsoleWriter _consoleWriter;
 
-        public ListTagsCommand(IProjectDatabase db, IConsoleWriter consoleWriter)
+        public ListTagsCommand(ITag tag, IConsoleWriter consoleWriter)
         {
-            _db = db;
+            _tag = tag;
             _consoleWriter = consoleWriter;
         }
 
         public bool Execute(IEnumerable<string> arguments, IOptions options)
         {
-            var tags = Tag.List(_db).ToList();
+            var tags = Tag.List(_tag).ToList();
             if (tags.Any())
             {
                 _consoleWriter.WriteLine("Used tags: ");

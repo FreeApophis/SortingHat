@@ -1,9 +1,7 @@
 ﻿using Microsoft.Data.Sqlite;
 using SortingHat.API;
 using SortingHat.API.DI;
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
 
@@ -13,17 +11,9 @@ namespace SortingHat.DB
     public sealed class SQLiteProjectDatabase : SQLiteDatabase, IProjectDatabase
     {
 
-        private readonly Func<IFile> _file;
-        public IFile File => _file();
-
-        private readonly Func<ITag> _tag;
-        public ITag Tag => _tag();
-
-        public SQLiteProjectDatabase(Func<IFile> file, Func<ITag> tag, DatabaseSettings databaseSettings, string projectName) :
-            base(databaseSettings, projectName)
+        public SQLiteProjectDatabase(DatabaseSettings databaseSettings, ISettings settings) :
+            base(databaseSettings, settings[Constants.ProjectDatabaseKey])
         {
-            _file = file;
-            _tag = tag;
         }
 
         private static string PerTableStatisticsQuery(string table)

@@ -1,14 +1,14 @@
-﻿using Microsoft.Data.Sqlite;
-using SortingHat.API.DI;
-using SortingHat.API.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
+using Microsoft.Data.Sqlite;
+using SortingHat.API.DI;
+using SortingHat.API.Models;
 
-namespace SortingHat.DB
+namespace SortingHat.DB.Access
 {
     [UsedImplicitly]
     public class SQLiteTag : ITag
@@ -197,7 +197,7 @@ SELECT id, parentId, name, level FROM tree;";
             // we iterate on the siblings on the same level
             while (reader.GetInt32(3) == level)
             {
-                var tag = new Tag(_db, reader.GetString(2), parent);
+                var tag = new Tag(this, reader.GetString(2), parent);
                 result.Add(tag);
                 if (reader.Read())
                 {
@@ -229,8 +229,8 @@ SELECT id, parentId, name, level FROM tree;";
             if (!reader.Read()) throw new NotSupportedException();
 
             return reader.IsDBNull(0)
-                ? new Tag(_db, reader.GetString(1))
-                : new Tag(_db, reader.GetString(1), Load(reader.GetInt64(0)));
+                ? new Tag(this, reader.GetString(1))
+                : new Tag(this, reader.GetString(1), Load(reader.GetInt64(0)));
 
         }
     }

@@ -12,13 +12,13 @@ namespace SortingHat.CLI.Commands
 
     internal class CreateProjectCommand : ICommand
     {
+        private readonly IProjects _projects;
         private readonly IConsoleWriter _consoleWriter;
-        private IMainDatabase _mainDatabase;
 
         [UsedImplicitly]
-        public CreateProjectCommand(IMainDatabase mainDatabase, IConsoleWriter consoleWriter)
+        public CreateProjectCommand(IProjects projects, IConsoleWriter consoleWriter)
         {
-            _mainDatabase = mainDatabase;
+            _projects = projects;
             _consoleWriter = consoleWriter;
         }
         public CommandGrouping CommandGrouping => CommandGrouping.Project;
@@ -29,7 +29,7 @@ namespace SortingHat.CLI.Commands
         {
             var project = arguments.First();
 
-            _mainDatabase.Projects.AddProject(project);
+            _projects.AddProject(project);
             _consoleWriter.WriteLine($"Project '{project}' has been created, and we switched to the project.");
             return true;
         }

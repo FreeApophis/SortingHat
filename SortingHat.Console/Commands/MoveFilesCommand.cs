@@ -12,12 +12,12 @@ namespace SortingHat.CLI.Commands
     [UsedImplicitly]
     internal class MoveFilesCommand : ICommand
     {
-        private readonly IMainDatabase _db;
+        private readonly IFile _file;
         private readonly IConsoleWriter _consoleWriter;
 
-        public MoveFilesCommand(IMainDatabase db, IConsoleWriter consoleWriter)
+        public MoveFilesCommand(IFile file, IConsoleWriter consoleWriter)
         {
-            _db = db;
+            _file = file;
             _consoleWriter = consoleWriter;
         }
 
@@ -31,7 +31,7 @@ namespace SortingHat.CLI.Commands
 
             _consoleWriter.WriteLine($"Find Files: {search}");
 
-            var files = _db.ProjectDatabase.File.Search(search).ToList();
+            var files = _file.Search(search).ToList();
 
             if (files.Any())
             {

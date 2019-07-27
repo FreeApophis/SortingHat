@@ -4,6 +4,7 @@ using Autofac;
 using Autofac.Core;
 using SortingHat.API;
 using SortingHat.API.DI;
+using SortingHat.DB.Access;
 using Module = Autofac.Module;
 
 namespace SortingHat.DB
@@ -12,11 +13,13 @@ namespace SortingHat.DB
     {
         protected override void Load(ContainerBuilder builder)
         {
+            // Register Databases
             builder.Register(CreateProjectDatabase()).As<SQLiteProjectDatabase>().As<IProjectDatabase>().InstancePerLifetimeScope();
             builder.Register(CreateMainDatabase()).As<SQLiteMainDatabase>().As<IMainDatabase>().InstancePerLifetimeScope();
 
+            // Register DataAccess
             builder.RegisterType<SQLiteFile>().As<IFile>().InstancePerLifetimeScope();
-            builder.RegisterType<SQLiteTag>().As<ITag>().InstancePerLifetimeScope();
+            builder.RegisterType<SQLiteTag>().As<ITag>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<SQLiteSettings>().As<ISettings>().InstancePerLifetimeScope();
             builder.RegisterType<SQLiteProjects>().As<IProjects>().InstancePerLifetimeScope();
         }
@@ -25,17 +28,9 @@ namespace SortingHat.DB
         {
             return context =>
             {
-                var safeContext = context.Resolve<IComponentContext>();
-                var db = new SQLiteMainDatabase(
-                    () => safeContext.Resolve<ISettings>(),
-                    () => safeContext.Resolve<IProjects>(),
-                    projectName => context.Resolve<IProjectDatabase>(new NamedParameter("projectName", projectName)),
-                    context.Resolve<DatabaseSettings>()
-                    );
+                var db = new SQLiteMainDatabase(context.Resolve<DatabaseSettings>());
 
-                RunDatabaseSetup(db);
-
-                return db;
+                return RunDatabaseSetup(db);
             };
         }
 
@@ -43,25 +38,23 @@ namespace SortingHat.DB
         {
             return (context, parameters) =>
             {
-                var safeContext = context.Resolve<IComponentContext>();
                 var db = new SQLiteProjectDatabase(
-                    () => safeContext.Resolve<IFile>(), 
-                    () => safeContext.Resolve<ITag>(), 
                     context.Resolve<DatabaseSettings>(),
-                    parameters.Named<string>("projectName"));
+                    context.Resolve<ISettings>());
 
-                RunDatabaseSetup(db);
-
-                return db;
+                return RunDatabaseSetup(db);
             };
         }
 
-        private static void RunDatabaseSetup(SQLiteDatabase db)
+        private static TDatabase RunDatabaseSetup<TDatabase>(TDatabase db)
+            where TDatabase : SQLiteDatabase
         {
             var migrator = new RevisionMigrator(db);
 
             migrator.Initialize();
             migrator.Migrate();
+
+            return db;
         }
     }
 }

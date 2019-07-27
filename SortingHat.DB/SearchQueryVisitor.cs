@@ -5,6 +5,7 @@ using System.Text;
 using System;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
+using SortingHat.DB.Access;
 
 namespace SortingHat.DB
 {
@@ -16,14 +17,16 @@ namespace SortingHat.DB
         private readonly StringBuilder _whereBuilder = new StringBuilder();
         private const string GroupBy = "\r\nGROUP BY FilePaths.Id";
         private readonly IProjectDatabase _db;
+        private readonly SQLiteTag _sqLiteTag;
         private readonly ITagParser _tagParser;
         private int _fileTagCount;
 
         public bool UnknownTag { get; private set; }
 
-        public SearchQueryVisitor(IProjectDatabase db, ITagParser tagParser)
+        public SearchQueryVisitor(IProjectDatabase db, SQLiteTag sqLiteTag, ITagParser tagParser)
         {
             _db = db;
+            _sqLiteTag = sqLiteTag;
             _tagParser = tagParser;
 
             _selectBuilder.AppendLine("SELECT Files.CreatedAt, Files.Hash, Files.Size, FilePaths.Path");
@@ -96,7 +99,7 @@ namespace SortingHat.DB
 
             return tag == null
                 ? null
-                : ((SQLiteTag)_db.Tag).Find(tag);
+                : _sqLiteTag.Find(tag);
         }
 
         public void Visit(BooleanNode boolean)
