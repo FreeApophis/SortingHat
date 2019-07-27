@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
 using SortingHat.CliAbstractions;
 
-namespace SortingHat.CLI.Commands
+namespace SortingHat.CLI.Commands.Projects
 {
     [UsedImplicitly]
 
@@ -22,7 +21,7 @@ namespace SortingHat.CLI.Commands
             _consoleWriter = consoleWriter;
         }
         public CommandGrouping CommandGrouping => CommandGrouping.Project;
-        public string LongCommand => "create-project";
+        public string LongCommand => "new-project";
         public Option<string> ShortCommand => Option<string>.None();
         public string ShortHelp => "Creates a new project database with a given name.";
         public bool Execute(IEnumerable<string> arguments, IOptions options)

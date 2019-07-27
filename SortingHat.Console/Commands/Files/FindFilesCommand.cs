@@ -1,13 +1,13 @@
-﻿using JetBrains.Annotations;
-using SortingHat.API.DI;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Funcky.Monads;
+using JetBrains.Annotations;
 using SortingHat.API;
+using SortingHat.API.DI;
 using SortingHat.CliAbstractions;
 using SortingHat.CliAbstractions.Formatting;
 
-namespace SortingHat.CLI.Commands
+namespace SortingHat.CLI.Commands.Files
 {
     [UsedImplicitly]
     internal class FindFilesCommand : ICommand

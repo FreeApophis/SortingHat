@@ -1,13 +1,13 @@
-﻿using JetBrains.Annotations;
-using SortingHat.API.DI;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Funcky.Monads;
+using JetBrains.Annotations;
+using SortingHat.API.DI;
 using SortingHat.CliAbstractions;
 
-namespace SortingHat.CLI.Commands
+namespace SortingHat.CLI.Commands.Files
 {
     [UsedImplicitly]
     internal class MoveFilesCommand : ICommand

@@ -1,13 +1,13 @@
-﻿using JetBrains.Annotations;
-using SortingHat.API.DI;
-using SortingHat.API.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Funcky.Monads;
+using JetBrains.Annotations;
+using SortingHat.API.DI;
+using SortingHat.API.Models;
 using SortingHat.CliAbstractions;
 using SortingHat.CliAbstractions.Formatting;
 
-namespace SortingHat.CLI.Commands
+namespace SortingHat.CLI.Commands.Tags
 {
     [UsedImplicitly]
     internal class ListTagsCommand : ICommand

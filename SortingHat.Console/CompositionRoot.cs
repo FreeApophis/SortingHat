@@ -116,10 +116,9 @@ namespace SortingHat.CLI
 
         private bool IsCommandClass(Type type)
         {
-
             return type != null
                 && type.Namespace != null
-                && type.Namespace.EndsWith(nameof(Commands)) && type.Name.EndsWith("Command");
+                && type.Namespace.Contains(nameof(Commands)) && type.Name.EndsWith("Command");
         }
     }
 }

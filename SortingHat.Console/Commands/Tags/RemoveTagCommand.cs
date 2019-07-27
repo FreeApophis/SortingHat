@@ -1,11 +1,11 @@
-﻿using JetBrains.Annotations;
+﻿using System.Collections.Generic;
+using Funcky.Monads;
+using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
-using System.Collections.Generic;
-using Funcky.Monads;
 
-namespace SortingHat.CLI.Commands
+namespace SortingHat.CLI.Commands.Tags
 {
     [UsedImplicitly]
     internal class RemoveTagCommand : ICommand

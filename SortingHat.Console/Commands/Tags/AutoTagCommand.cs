@@ -1,16 +1,17 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Funcky.Monads;
+using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using SortingHat.API;
 using SortingHat.API.AutoTag;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Funcky.Monads;
+using SortingHat.CLI.Commands.Files;
 using SortingHat.CliAbstractions;
 
-namespace SortingHat.CLI.Commands
+namespace SortingHat.CLI.Commands.Tags
 {
     [UsedImplicitly]
     internal class AutoTagCommand : ICommand

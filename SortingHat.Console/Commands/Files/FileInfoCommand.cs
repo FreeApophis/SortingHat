@@ -1,12 +1,12 @@
-﻿using JetBrains.Annotations;
-using SortingHat.API.DI;
-using SortingHat.API.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Funcky.Monads;
+using JetBrains.Annotations;
+using SortingHat.API.DI;
+using SortingHat.API.Models;
 using SortingHat.CliAbstractions;
 
-namespace SortingHat.CLI.Commands
+namespace SortingHat.CLI.Commands.Files
 {
     [UsedImplicitly]
     internal class FileInfoCommand : ICommand

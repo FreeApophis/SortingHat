@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 using SortingHat.API.DI;
 using SortingHat.CliAbstractions;
 
-namespace SortingHat.CLI.Commands
+namespace SortingHat.CLI.Commands.Projects
 {
     [UsedImplicitly]
     internal class ListProjectsCommand : ICommand

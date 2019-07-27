@@ -5,6 +5,7 @@ using Moq;
 using SortingHat.API.DI;
 using Xunit;
 using System.Linq;
+using SortingHat.CLI.Commands.Tags;
 using SortingHat.CliAbstractions;
 using SortingHat.Test.Mock;
 
