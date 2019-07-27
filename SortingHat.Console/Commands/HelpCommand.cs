@@ -65,7 +65,9 @@ namespace SortingHat.CLI.Commands
 
         private static Stream GetHelResourceStream(ICommand command)
         {
-            return Assembly.GetExecutingAssembly().GetManifestResourceStream(GetHelpResourceName(command));
+            return Assembly.GetExecutingAssembly().GetManifestResourceStream(GetHelpResourceName(command))
+                   ?? throw new NullReferenceException($"Help resource for command {command.LongCommand} not found");
+
         }
 
         private static string GetHelpResourceName(ICommand command)
@@ -101,8 +103,9 @@ namespace SortingHat.CLI.Commands
             return table;
         }
 
-        private void PrintHelpCommands(IEnumerable<ICommand> commands)
+        private void PrintHelpCommands(IEnumerable<ICommand> lazyCommands)
         {
+            var commands = lazyCommands.ToList();
             if (commands.Any())
             {
                 _consoleWriter.WriteLine();
@@ -110,7 +113,7 @@ namespace SortingHat.CLI.Commands
                 _consoleWriter.WriteLine();
 
                 var table = HelpTable();
-                foreach (CommandGrouping commandGrouping in Enum.GetValues(typeof(CommandGrouping)))
+                foreach (var commandGrouping in Enum.GetValues(typeof(CommandGrouping)).Cast<CommandGrouping>())
                 {
                     foreach (var command in commands.Where(c => c.CommandGrouping == commandGrouping))
                     {
@@ -131,7 +134,7 @@ namespace SortingHat.CLI.Commands
         public string LongCommand => "help";
         public Option<string> ShortCommand => Option.Some("?");
 
-        public string ShortHelp => "This is the help command, it shows a list of the available commands.";
+        public string ShortHelp => "This is the help command, it shows a list of the available lazyCommands.";
         public CommandGrouping CommandGrouping => CommandGrouping.General;
 
     }

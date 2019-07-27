@@ -12,7 +12,7 @@ using SortingHat.API.AutoTag;
 namespace SortingHat.Plugin.FileType
 {
     [UsedImplicitly]
-    class FileTypeModule : Autofac.Module, IPlugin
+    internal class FileTypeModule : Autofac.Module, IPlugin
     {
         private const string SignatureResource = "SortingHat.Plugin.FileType.Resources.FileSignatures.csv";
 

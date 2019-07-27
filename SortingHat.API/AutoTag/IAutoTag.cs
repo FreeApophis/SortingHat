@@ -8,6 +8,6 @@ namespace SortingHat.API.AutoTag
         string Description { get; }
         string HumanReadableAutoTagsKey { get; }
         string? FindMatch(string value);
-        string? HandleTag(FileInfo file, string tagMatch);
+        string? HandleTag(FileInfo file, string? tagMatch);
     }
 }

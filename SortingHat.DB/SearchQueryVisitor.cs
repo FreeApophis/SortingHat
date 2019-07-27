@@ -14,7 +14,7 @@ namespace SortingHat.DB
         public string Result => _selectBuilder.ToString() + _whereBuilder + GroupBy;
         private readonly StringBuilder _selectBuilder = new StringBuilder();
         private readonly StringBuilder _whereBuilder = new StringBuilder();
-        private const string GroupBy = "\r\nGROUP BY FilePaths.ID";
+        private const string GroupBy = "\r\nGROUP BY FilePaths.Id";
         private readonly IProjectDatabase _db;
         private readonly ITagParser _tagParser;
         private int _fileTagCount;
@@ -28,7 +28,7 @@ namespace SortingHat.DB
 
             _selectBuilder.AppendLine("SELECT Files.CreatedAt, Files.Hash, Files.Size, FilePaths.Path");
             _selectBuilder.AppendLine("FROM Files");
-            _selectBuilder.AppendLine("JOIN FilePaths ON FilePaths.FileID = Files.ID");
+            _selectBuilder.AppendLine("JOIN FilePaths ON FilePaths.FileId = Files.Id");
 
             _whereBuilder.Append("WHERE ");
         }
@@ -70,12 +70,12 @@ namespace SortingHat.DB
 
         public void Visit(TagNode tagNode)
         {
-            long? tagID = GetTagID(tagNode);
+            long? tagId = GetTagId(tagNode);
 
-            if (tagID.HasValue)
+            if (tagId.HasValue)
             {
-                _selectBuilder.AppendLine($"JOIN FileTags ft{_fileTagCount} ON ft{_fileTagCount}.FileID = Files.ID");
-                _whereBuilder.Append($"ft{_fileTagCount}.TagID = {tagID.Value}");
+                _selectBuilder.AppendLine($"JOIN FileTags ft{_fileTagCount} ON ft{_fileTagCount}.FileId = Files.Id");
+                _whereBuilder.Append($"ft{_fileTagCount}.TagId = {tagId.Value}");
                 _fileTagCount++;
             }
             else
@@ -90,7 +90,7 @@ namespace SortingHat.DB
             }
         }
 
-        private long? GetTagID(TagNode tagNode)
+        private long? GetTagId(TagNode tagNode)
         {
             var tag = _tagParser.Parse(tagNode.Tag);
 

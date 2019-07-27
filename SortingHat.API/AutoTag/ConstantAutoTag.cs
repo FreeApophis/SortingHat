@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 
 namespace SortingHat.API.AutoTag
 {
@@ -9,12 +8,12 @@ namespace SortingHat.API.AutoTag
         public abstract string Description { get; }
         public string HumanReadableAutoTagsKey => AutoTagKey;
 
-        public string HandleTag(FileInfo file, string tagMatch)
+        public string? HandleTag(FileInfo file, string? tagMatch)
         {
             return HandleTag(file);
         }
 
-        protected abstract string HandleTag(FileInfo file);
+        protected abstract string? HandleTag(FileInfo file);
 
         public string? FindMatch(string value)
         {

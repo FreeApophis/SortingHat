@@ -1,7 +1,7 @@
 ﻿/* Create Settings */
 
 CREATE TABLE `Settings` (
-    `ID`                        INTEGER PRIMARY KEY AUTOINCREMENT,
+    `Id`                        INTEGER PRIMARY KEY AUTOINCREMENT,
     `Key`                       VARCHAR (255) NOT NULL,
     `Value`                     TEXT NULL,
 

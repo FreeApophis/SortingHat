@@ -1,4 +1,6 @@
-﻿namespace SortingHat.Plugin.FileType.Detectors
+﻿using System;
+
+namespace SortingHat.Plugin.FileType.Detectors
 {
     internal static class FileTypeDetectorFactory
     {
@@ -8,15 +10,12 @@
         {
             var parts = signature.Split(',');
 
-            switch (parts[FileTypeDetectorOffset])
+            return parts[FileTypeDetectorOffset] switch
             {
-                case "basic":
-                    return new BasicFileTypeDetector(parts);
-                case "ts":
-                    return new TransportStreamDetector(parts);
-                default:
-                    return null;
-            }
+                "basic" => new BasicFileTypeDetector(parts),
+                "ts" => new TransportStreamDetector(parts),
+                _ => throw new NotImplementedException("Unknown FileTypeDetector")
+            };
         }
     }
 }

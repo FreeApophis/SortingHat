@@ -2,6 +2,6 @@
 {
     public interface IOptions
     {
-        bool HasOption(string shortOption, string longOption);
+        bool HasOption(string? shortOption, string? longOption);
     }
 }

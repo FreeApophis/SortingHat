@@ -50,8 +50,11 @@ namespace SortingHat.CLI.Commands
             {
                 foreach (var tag in tags.Select(_tagParser.Parse))
                 {
-                    _logger.LogInformation($"File {file.Path} tagged with {tag.Name}");
-                    file.Untag(tag);
+                    if (tag != null)
+                    {
+                        _logger.LogInformation($"File {file.Path} tagged with {tag.Name}");
+                        file.Untag(tag);
+                    }
                 }
             }
 

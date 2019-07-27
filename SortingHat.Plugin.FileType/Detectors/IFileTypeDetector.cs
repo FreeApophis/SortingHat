@@ -2,8 +2,8 @@
 
 namespace SortingHat.Plugin.FileType.Detectors
 {
-    public interface IFileTypeDetector
+    internal interface IFileTypeDetector
     {
-        FileType Detect(Stream file);
+        FileType? Detect(Stream file);
     }
 }

@@ -1,11 +1,11 @@
 ﻿/* Create FileNames */
 
 CREATE TABLE `FileNames` (
-    `ID`                        INTEGER PRIMARY KEY AUTOINCREMENT,
-    `FileID`                    INTEGER NOT NULL,
+    `Id`                        INTEGER PRIMARY KEY AUTOINCREMENT,
+    `FileId`                    INTEGER NOT NULL,
     `Name`                      VARCHAR (255),
 
-    FOREIGN KEY(`FileID`)       REFERENCES `Files`(`ID`),
-    UNIQUE (FileID, Name)       ON CONFLICT REPLACE
+    FOREIGN KEY(`FileId`)       REFERENCES `Files`(`Id`),
+    UNIQUE (FileId, Name)       ON CONFLICT REPLACE
 );
 

@@ -86,7 +86,7 @@ namespace SortingHat.CLI
 
         private static string ConfigurationPath()
         {
-            return Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location);
+            return Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) ?? throw new NullReferenceException("Configuration path cannot be null");
         }
 
         private void RegisterConfiguration(ContainerBuilder builder)

@@ -22,9 +22,9 @@ namespace SortingHat.API.Parser
             if (walker.NextIs<TagToken>())
             {
                 var lexem = walker.Pop();
-                if (lexem.Token is TagToken tagToken && tagToken.Value != null)
+                if (lexem.Token is TagToken tagToken && tagToken.Value is { } value)
                 {
-                    return new TagNode(tagToken.Value);
+                    return new TagNode(value);
                 }
             }
 

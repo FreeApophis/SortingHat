@@ -15,14 +15,14 @@ namespace SortingHat.API.AutoTag
         public string HumanReadableAutoTagsKey =>
             AutoTagKey.Replace("<>", "<DatePart> Possible values: " + string.Join(", ", _selectableDateParts.Select(part => part.Key)));
 
-        public string HandleTag(FileInfo file, string tagMatch)
+        public string? HandleTag(FileInfo file, string? tagMatch)
         {
             return HandleTag(file, _selectableDateParts.First(part => part.Key == tagMatch));
         }
 
-        protected abstract string HandleTag(FileInfo file, IDateTagPart tagPart);
+        protected abstract string? HandleTag(FileInfo file, IDateTagPart tagPart);
 
-        public string FindMatch(string value)
+        public string? FindMatch(string value)
         {
             var findString = new Regex(AutoTagKey.Replace("<>", @"(\w+)"));
             var match = findString.Match(value);

@@ -10,19 +10,16 @@ namespace SortingHat.API.AutoTag
         public string HumanReadableAutoTagsKey
             => AutoTagKey.Replace("<>", "<STRING> Any valid String of characters");
 
-        public abstract string HandleTag(FileInfo file, string variable);
+        public abstract string? HandleTag(FileInfo file, string? tagMatch);
 
-        public string FindMatch(string value)
+        public string? FindMatch(string value)
         {
             var findString = new Regex(AutoTagKey.Replace("<>", @"(\w+)"));
             var match = findString.Match(value);
 
-            if (!match.Success)
-            {
-                return null;
-            }
-
-            return match.Groups[1].Value;
+            return match.Success
+                ? match.Groups[1].Value
+                : null;
         }
 
     }

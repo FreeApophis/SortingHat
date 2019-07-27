@@ -19,7 +19,7 @@ namespace SortingHat.CLI.Commands
 
         public bool Execute(IEnumerable<string> arguments, IOptions options)
         {
-            return arguments.Select(_tagParser.Parse).Aggregate(true, (result, tag) => result & tag.Store());
+            return arguments.Select(_tagParser.Parse).Aggregate(true, (result, tag) => result & (tag != null && tag.Store()));
         }
 
         public string LongCommand => "add-tags";

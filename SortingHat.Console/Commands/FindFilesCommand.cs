@@ -33,7 +33,7 @@ namespace SortingHat.CLI.Commands
             var search = string.Join(" ", arguments);
             _consoleWriter.WriteLine($"Find Files: {search}");
 
-            var files = _db.ProjectDatabase.File.Search(search);
+            var files = _db.ProjectDatabase.File.Search(search).ToList();
 
             if (files.Any()) {
                 var table = FileTable();

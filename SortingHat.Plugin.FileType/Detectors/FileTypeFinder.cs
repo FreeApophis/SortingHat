@@ -6,7 +6,7 @@ using System.Linq;
 namespace SortingHat.Plugin.FileType.Detectors
 {
     [UsedImplicitly]
-    public class FileTypeFinder : IFileTypeFinder
+    internal class FileTypeFinder : IFileTypeFinder
     {
         private readonly IEnumerable<IFileTypeDetector> _detectors;
 
@@ -15,15 +15,14 @@ namespace SortingHat.Plugin.FileType.Detectors
             _detectors = detectors;
         }
 
-        public FileType Identify(FileInfo file)
+        public FileType? Identify(FileInfo file)
         {
-            using (var stream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
-            {
-                return Identify(stream);
-            }
+            using var stream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+            return Identify(stream);
         }
 
-        public FileType Identify(Stream stream)
+        public FileType? Identify(Stream stream)
         {
             return _detectors
                 .Select(detector => detector.Detect(stream))

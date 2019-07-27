@@ -1,15 +1,15 @@
 ﻿/* Create Tags */
 
 CREATE TABLE `Tags` (
-    `ID`                        INTEGER PRIMARY KEY AUTOINCREMENT,
-    `ParentID`                  INTEGER NULL,
+    `Id`                        INTEGER PRIMARY KEY AUTOINCREMENT,
+    `ParentId`                  INTEGER NULL,
     `Name`                      VARCHAR (255),
 
-    FOREIGN KEY(`ParentID`)     REFERENCES `Tags`(`ID`)
+    FOREIGN KEY(`ParentId`)     REFERENCES `Tags`(`Id`)
 );
 
 CREATE INDEX TagsParentIndex
-ON Tags (ParentID); 
+ON Tags (ParentId); 
 
 CREATE INDEX TagsNameIndex
 ON Tags (Name); 

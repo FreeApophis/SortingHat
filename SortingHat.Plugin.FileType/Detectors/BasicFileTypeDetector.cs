@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace SortingHat.Plugin.FileType.Detectors
 {
-    class BasicFileTypeDetector : IFileTypeDetector
+    internal class BasicFileTypeDetector : IFileTypeDetector
     {
         private const int FileTypeCategoryOffset = 1;
         private string FileTypeCategory { get; }
@@ -29,8 +29,7 @@ namespace SortingHat.Plugin.FileType.Detectors
             if (long.TryParse(parts[FileOffsetOffset], out long fileOffset))
             {
                 FileOffset = fileOffset;
-            }
-            else
+            } else
             {
                 throw new Exception("FileSignatures.csv corrupt!");
             }
@@ -52,7 +51,7 @@ namespace SortingHat.Plugin.FileType.Detectors
                 .All(hex => hex.Item1 == hex.Item2);
         }
 
-        public virtual FileType Detect(Stream file)
+        public virtual FileType? Detect(Stream file)
         {
             file.Seek(FileOffset, SeekOrigin.Begin);
 
@@ -80,7 +79,7 @@ namespace SortingHat.Plugin.FileType.Detectors
 
         protected FileType CreateFileType()
         {
-            return new FileType { Category = FileTypeCategory, Extensions = FileTypeExtensions, Name = FileType };
+            return new FileType(FileTypeCategory, FileType, FileTypeExtensions);
         }
     }
 }

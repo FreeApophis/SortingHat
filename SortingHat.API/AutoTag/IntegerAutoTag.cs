@@ -1,5 +1,7 @@
 ﻿using System.IO;
 using System.Text.RegularExpressions;
+using System.Xml.Serialization;
+using Funcky.Extensions;
 
 namespace SortingHat.API.AutoTag
 {
@@ -11,28 +13,32 @@ namespace SortingHat.API.AutoTag
         public string HumanReadableAutoTagsKey =>
             AutoTagKey.Replace("<>", "<Integer> Can be any valid integer number: 0,1,2...");
 
-        public string? HandleTag(FileInfo file, string tagMatch)
+        public string? HandleTag(FileInfo file, string? tagMatch)
         {
-            return int.TryParse(tagMatch, out var integer)
-                ? HandleTag(file, integer)
-                : null;
+            if (tagMatch is { } match)
+            {
+                return match.TryParseInt().Match(
+                    none: null as string,
+                    some: integer => HandleTag(file, integer)
+                );
+
+            }
+
+            return null;
         }
 
         protected abstract string? HandleTag(FileInfo file, int index);
 
-        public string FindMatch(string value)
+        public string? FindMatch(string value)
         {
             var findDigits = new Regex(AutoTagKey.Replace("<>", @"(\d+)"));
 
 
             var match = findDigits.Match(value);
 
-            if (!match.Success)
-            {
-                return null;
-            }
-
-            return match.Groups[1].Value;
+            return match.Success
+                ? match.Groups[1].Value
+                : null;
         }
     }
 }

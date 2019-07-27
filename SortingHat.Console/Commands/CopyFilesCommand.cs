@@ -30,14 +30,17 @@ namespace SortingHat.CLI.Commands
 
             _consoleWriter.WriteLine($"Find Files: {search}");
 
-            var files = _db.ProjectDatabase.File.Search(search);
+            var files = _db.ProjectDatabase.File.Search(search).ToList();
 
             if (files.Any())
             {
                 foreach (var file in files)
                 {
-                    _consoleWriter.WriteLine($"cp {file.Path} {Path.Combine(path, Path.GetFileName(file.Path))}");
-                    File.Copy(file.Path, Path.Combine(path, Path.GetFileName(file.Path)));
+                    if (Path.GetFileName(file.Path) is { } fileName)
+                    {
+                        _consoleWriter.WriteLine($"cp {file.Path} {Path.Combine(path, fileName)}");
+                        File.Copy(file.Path, Path.Combine(path, fileName));
+                    }
                 }
             } else
             {

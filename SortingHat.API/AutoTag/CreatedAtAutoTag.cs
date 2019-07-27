@@ -9,7 +9,7 @@ namespace SortingHat.API.AutoTag
         public override string AutoTagKey => "CreatedAt.<>";
         public override string Description => "The date and time of the creation of the file.";
 
-        protected override string HandleTag(FileInfo file, IDateTagPart tagPart)
+        protected override string? HandleTag(FileInfo file, IDateTagPart tagPart)
         {
             return tagPart.Select(file.CreationTime);
         }

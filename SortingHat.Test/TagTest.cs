@@ -33,7 +33,7 @@ namespace SortingHat.Test
         public void GivenAStringRepresentingATagThenTagParseShouldReturnATagWithTheRightValue()
         {
             var referenceTag = new Tag(_db.ProjectDatabase, "tag");
-            Tag parsedTag = _tagParser.Parse(":tag");
+            var parsedTag = _tagParser.Parse(":tag");
 
             Assert.Equal(referenceTag, parsedTag);
         }
@@ -41,8 +41,8 @@ namespace SortingHat.Test
         [Fact]
         public void ParseSimpleTagMissingColon()
         {
-            Tag referenceTag = null;
-            Tag parsedTag = _tagParser.Parse("tag");
+            var referenceTag = null as Tag;
+            var parsedTag = _tagParser.Parse("tag");
 
             Assert.Equal(referenceTag, parsedTag);
         }
@@ -52,7 +52,7 @@ namespace SortingHat.Test
         public void ParseTag()
         {
             var referenceTag = new Tag(_db.ProjectDatabase, "child", new Tag(_db.ProjectDatabase, "father", new Tag(_db.ProjectDatabase, "grandfather")));
-            Tag parsedTag = _tagParser.Parse(":grandfather:father:child");
+            var parsedTag = _tagParser.Parse(":grandfather:father:child");
 
             Assert.Equal(referenceTag, parsedTag);
         }
@@ -61,8 +61,8 @@ namespace SortingHat.Test
         [Fact]
         public void ParseEmptyTag()
         {
-            Tag referenceTag = null;
-            Tag parsedTag = _tagParser.Parse(":");
+            var referenceTag = null as Tag;
+            var parsedTag = _tagParser.Parse(":");
 
             Assert.Equal(referenceTag, parsedTag);
         }
@@ -70,8 +70,8 @@ namespace SortingHat.Test
         [Fact]
         public void ParseTagMissingColon()
         {
-            Tag referenceTag = null;
-            Tag parsedTag = _tagParser.Parse("grandfather:father:child");
+            var referenceTag = null as Tag;
+            var parsedTag = _tagParser.Parse("grandfather:father:child");
 
             Assert.Equal(referenceTag, parsedTag);
         }
@@ -80,7 +80,7 @@ namespace SortingHat.Test
         public void ParseTagWhitespace()
         {
             var referenceTag = new Tag(_db.ProjectDatabase, "child with whitespace", new Tag(_db.ProjectDatabase, "father", new Tag(_db.ProjectDatabase, "grand father")));
-            Tag parsedTag = _tagParser.Parse(":grand father:father:child with whitespace");
+            var parsedTag = _tagParser.Parse(":grand father:father:child with whitespace");
 
             Assert.Equal(referenceTag, parsedTag);
         }
@@ -88,9 +88,12 @@ namespace SortingHat.Test
         [Fact]
         public void ParseMultipleColon()
         {
-            Tag parsedTag = _tagParser.Parse("::first:::last");
+            var parsedTag = _tagParser.Parse("::first:::last");
 
-            Assert.Equal(":first:last", parsedTag.FullName);
+            Assert.NotNull(parsedTag);
+
+            // ReSharper disable once ConstantConditionalAccessQualifier
+            Assert.Equal(":first:last", parsedTag?.FullName);
         }
     }
 }

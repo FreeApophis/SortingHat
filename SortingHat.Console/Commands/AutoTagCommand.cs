@@ -20,7 +20,6 @@ namespace SortingHat.CLI.Commands
         private readonly IFilePathExtractor _filePathExtractor;
         private readonly IAutoTagHandler _autoTagHandler;
         private readonly Func<File> _newFile;
-        private IOptions _options;
 
         public AutoTagCommand(ILogger<TagFileCommand> logger, IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor, IAutoTagHandler autoTagHandler, Func<File> newFile)
         {
@@ -40,14 +39,14 @@ namespace SortingHat.CLI.Commands
 
             return file;
         }
-        private bool ListTagVariables()
+        private bool ListTagVariables(IOptions options)
         {
             _consoleWriter.WriteLine("Possible Tag Variables:");
             _consoleWriter.WriteLine();
             foreach (var tag in _autoTagHandler.AutoTags.OrderBy(tag => tag.AutoTagKey))
             {
                 _consoleWriter.WriteLine($"* {tag.HumanReadableAutoTagsKey}");
-                if (_options.HasOption("v", "verbose"))
+                if (options.HasOption("v", "verbose"))
                 {
                     _consoleWriter.WriteLine($"=>  {tag.Description}");
                     _consoleWriter.WriteLine();
@@ -57,9 +56,10 @@ namespace SortingHat.CLI.Commands
             return true;
         }
 
-        private bool TagFiles(IEnumerable<string> arguments)
+        private bool TagFiles(IEnumerable<string> lazyArguments, IOptions options)
         {
-            var tags = arguments.Where(a => a.IsTag());
+            var arguments = lazyArguments.ToList();
+            var tags = arguments.Where(a => a.IsTag()).ToList();
             var files = arguments.Where(a => a.IsFile());
 
             foreach (var file in FilesFromPattern(files))
@@ -68,7 +68,7 @@ namespace SortingHat.CLI.Commands
                 {
                     _consoleWriter.WriteLine($"Tag '{file.Path}' with '{tag.FullName}'");
 
-                    if (_options.HasOption(null, "dry-run"))
+                    if (options.HasOption(null, "dry-run"))
                     {
                         continue;
                     }
@@ -87,21 +87,25 @@ namespace SortingHat.CLI.Commands
 
         private IEnumerable<Tag> ReplacedTags(IEnumerable<string> tags, File file)
         {
-            return tags.Select(t => TagFromMask(t, file)).Where(t => t != null);
+            foreach (var tag in tags.Select(t => TagFromMask(t, file)))
+            {
+                if (tag is { })
+                {
+                    yield return tag;
+                }
+            }
         }
 
-        private Tag TagFromMask(string t, File file)
+        private Tag? TagFromMask(string tagMask, File file)
         {
-            return _autoTagHandler.TagFromMask(t, new System.IO.FileInfo(file.Path));
+            return _autoTagHandler.TagFromMask(tagMask, new System.IO.FileInfo(file.Path));
         }
 
         public bool Execute(IEnumerable<string> arguments, IOptions options)
         {
-            _options = options;
-
             return arguments.Any()
-                ? TagFiles(arguments)
-                : ListTagVariables();
+                ? TagFiles(arguments, options)
+                : ListTagVariables(options);
         }
 
         public string LongCommand => "auto-tag";

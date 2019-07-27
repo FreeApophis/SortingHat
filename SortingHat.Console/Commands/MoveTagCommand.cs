@@ -21,11 +21,12 @@ namespace SortingHat.CLI.Commands
             _tagParser = tagParser;
         }
 
-        public bool Execute(IEnumerable<string> arguments, IOptions options)
+        public bool Execute(IEnumerable<string> lazyArguments, IOptions options)
         {
+            var arguments = lazyArguments.ToList();
             var result = false;
 
-            if (arguments.Count() >= 2)
+            if (arguments.Count >= 2)
             {
                 result = MoveTags(arguments);
             }
@@ -38,13 +39,15 @@ namespace SortingHat.CLI.Commands
             return result;
         }
 
-        private bool MoveTags(IEnumerable<string> arguments)
+        private bool MoveTags(IEnumerable<string> lazyArguments)
         {
+            var arguments = lazyArguments.ToList();
             if (CheckArguments(arguments))
             {
-                var destinationTag = _tagParser.Parse(arguments.Last());
-
-                return arguments.SkipLast(1).Select(_tagParser.Parse).All(t => t.Move(destinationTag));
+                if (_tagParser.Parse(arguments.Last()) is { } destinationTag)
+                {
+                    return arguments.SkipLast(1).Select(_tagParser.Parse).All(t => t != null && t.Move(destinationTag));
+                }
             }
 
             return false;

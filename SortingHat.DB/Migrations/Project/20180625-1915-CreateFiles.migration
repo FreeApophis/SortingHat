@@ -1,7 +1,7 @@
 ﻿/* Create Files */
 
 CREATE TABLE IF NOT EXISTS `Files` (
-    `ID`                        INTEGER PRIMARY KEY AUTOINCREMENT,
+    `Id`                        INTEGER PRIMARY KEY AUTOINCREMENT,
     `Hash`                      VARCHAR ( 128 ) UNIQUE,
     `Size`                      INTEGER NOT NULL,
     `CreatedAt`                 TIMESTAMP NOT NULL

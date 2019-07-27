@@ -24,7 +24,7 @@ namespace SortingHat.CLI.Commands
         public string ShortHelp => "Lists all the project databases on this machine.";
         public bool Execute(IEnumerable<string> arguments, IOptions options)
         {
-            foreach (var project in _mainDatabase.ProjectDatabases)
+            foreach (var project in _mainDatabase.Projects.GetProjects())
             {
                 FormatProject(project);
             }

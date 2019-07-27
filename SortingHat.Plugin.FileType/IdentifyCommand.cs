@@ -21,16 +21,15 @@ namespace SortingHat.Plugin.FileType
             _filePathExtractor = filePathExtractor;
         }
 
-        private FileType FileType(string argument) => _fileTypeFinder.Identify(new System.IO.FileInfo(argument));
+        private FileType? FileType(string argument) => _fileTypeFinder.Identify(new System.IO.FileInfo(argument));
 
         public bool Execute(IEnumerable<string> arguments, IOptions options)
         {
             foreach (var argument in _filePathExtractor.FromFilePatterns(arguments))
             {
                 _consoleWriter.WriteLine($"File: {argument}");
-                var fileType = FileType(argument);
 
-                if (fileType != null)
+                if (FileType(argument) is { } fileType)
                 {
                     _consoleWriter.WriteLine($"Category : {fileType.Category}");
                     _consoleWriter.WriteLine($"Name     : {fileType.Name}");

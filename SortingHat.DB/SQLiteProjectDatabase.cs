@@ -28,7 +28,7 @@ namespace SortingHat.DB
 
         private static string PerTableStatisticsQuery(string table)
         {
-            return $"SELECT '{table}', Count(ID) FROM {table}";
+            return $"SELECT '{table}', Count(Id) FROM {table}";
         }
 
         private string StatisticsQuery()

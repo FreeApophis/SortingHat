@@ -44,7 +44,7 @@ namespace SortingHat.API.AutoTag
             return bracedString.Substring(1, bracedString.Length - 2);
         }
 
-        private string GetMatchingAutoTag(string autoTagVariable, FileInfo file)
+        private string? GetMatchingAutoTag(string autoTagVariable, FileInfo file)
         {
             return AutoTags
                 .Where(autoTag => autoTag.FindMatch(autoTagVariable) != null)
@@ -52,7 +52,7 @@ namespace SortingHat.API.AutoTag
                 .FirstOrDefault();
         }
 
-        private static string HandleMatchingTag(string autoTagVariable, FileInfo file, IAutoTag autoTag)
+        private static string? HandleMatchingTag(string autoTagVariable, FileInfo file, IAutoTag autoTag)
         {
             return autoTag.HandleTag(file, autoTag.FindMatch(autoTagVariable));
         }

@@ -13,7 +13,7 @@ namespace SortingHat.CLI
             _options = options.Select(ToKeys);
         }
 
-        public bool HasOption(string shortOption, string longOption)
+        public bool HasOption(string? shortOption, string? longOption)
         {
             return _options
                 .Any(AnyOption(shortOption, longOption));
@@ -25,11 +25,10 @@ namespace SortingHat.CLI
             return option.TrimStart('-').ToLower();
         }
 
-        private static Func<string, bool> AnyOption(string shortOption, string longOption)
+        private static Func<string, bool> AnyOption(string? shortOption, string? longOption)
         {
-            return option =>
-              (shortOption != null && option == shortOption.ToLower()) ||
-              (longOption != null && option == longOption.ToLower());
+            return option => shortOption != null && option == shortOption.ToLower()
+                || longOption != null && option == longOption.ToLower();
         }
     }
 }

@@ -8,6 +8,6 @@ namespace SortingHat.API.AutoTag
     {
         IEnumerable<IAutoTag> AutoTags { get; }
 
-        Tag TagFromMask(string tagMask, FileInfo file);
+        Tag? TagFromMask(string tagMask, FileInfo file);
     }
 }

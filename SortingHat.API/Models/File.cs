@@ -11,8 +11,8 @@ namespace SortingHat.API.Models
     {
         public DateTime CreatedAt { get; set; }
         public long Size { get; set; }
-        public Task<string> Hash { get; set; }
-        public string Path { get; set; }
+        public Task<string> Hash { get; set; } = Task.FromResult("BADHASH");
+        public string Path { get; set; } = "BADPATH";
 
         private readonly IProjectDatabase _db;
         private readonly IHashService _hashService;
@@ -32,11 +32,14 @@ namespace SortingHat.API.Models
 
         public void LoadByPath()
         {
-            var fileInfo = new FileInfo(Path);
+            if (Path is { })
+            {
+                var fileInfo = new FileInfo(Path);
 
-            Hash = _hashService.GetHash(Path);
-            Size = fileInfo.Length;
-            CreatedAt = fileInfo.CreationTimeUtc;
+                Hash = _hashService.GetHash(Path);
+                Size = fileInfo.Length;
+                CreatedAt = fileInfo.CreationTimeUtc;
+            }
         }
 
 

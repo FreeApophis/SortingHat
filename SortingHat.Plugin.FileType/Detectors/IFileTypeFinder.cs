@@ -2,9 +2,9 @@
 
 namespace SortingHat.Plugin.FileType.Detectors
 {
-    public interface IFileTypeFinder
+    internal interface IFileTypeFinder
     {
-        FileType Identify(Stream stream);
-        FileType Identify(FileInfo file);
+        FileType? Identify(Stream stream);
+        FileType? Identify(FileInfo file);
     }
 }

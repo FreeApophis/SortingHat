@@ -8,9 +8,9 @@ namespace SortingHat.API.Models
     [UsedImplicitly]
     public class TagParser : ITagParser
     {
-        private readonly Func<string, Tag, Tag> _newTag;
+        private readonly Func<string, Tag?, Tag> _newTag;
 
-        public TagParser(Func<string, Tag, Tag> newTag)
+        public TagParser(Func<string, Tag?, Tag> newTag)
         {
             _newTag = newTag;
         }
@@ -29,9 +29,14 @@ namespace SortingHat.API.Models
             return ToTag(tagString.Split(new[] { ':' }).Select(s => s.Trim()).Where(s => s.Length > 0));
         }
 
-        private Tag ToTag(IEnumerable<string> tagParts)
+        private Tag? ToTag(IEnumerable<string> tagParts)
         {
-            return tagParts.Aggregate<string, Tag>(null, (current, tagPart) => _newTag(tagPart, current));
+            Tag? result = null;
+            foreach (var part in tagParts)
+            {
+                result = _newTag(part, result);
+            }
+            return result;
         }
     }
 }

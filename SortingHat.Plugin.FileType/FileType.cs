@@ -2,10 +2,17 @@
 
 namespace SortingHat.Plugin.FileType
 {
-    public class FileType
+    internal class FileType
     {
-        public string Category;
-        public string Name;
-        public IEnumerable<string> Extensions;
+        public readonly string Category;
+        public readonly string Name;
+        public readonly IEnumerable<string> Extensions;
+
+        internal FileType(string category, string name, IEnumerable<string> extensions)
+        {
+            Category = category;
+            Name = name;
+            Extensions = extensions;
+        }
     }
 }

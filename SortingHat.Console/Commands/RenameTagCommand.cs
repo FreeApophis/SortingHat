@@ -31,8 +31,7 @@ namespace SortingHat.CLI.Commands
             if (arguments.Count() == 2)
             {
                 result = RenameTag(arguments);
-            }
-            else
+            } else
             {
                 _logger.LogWarning("rename tag has exactly two arguments, the tag to rename, and a new name: hat rename-tag :tag new_name");
                 _consoleWriter.WriteLine("rename tag has exactly two arguments, the tag to rename, and a new name: hat rename-tag :tag new_name");
@@ -48,13 +47,19 @@ namespace SortingHat.CLI.Commands
 
         private bool RenameTag(IEnumerable<string> arguments)
         {
-            var tagString = arguments.First();
-            var newName = arguments.Last();
+            var renamePair = arguments.ToList();
+
+            var tagString = renamePair.First();
+            var newName = renamePair.Last();
 
             if (CheckArguments(tagString, newName))
             {
                 var tag = _tagParser.Parse(tagString);
-                return tag.Rename(newName);
+                if (tag != null)
+                {
+                    return tag.Rename(newName);
+
+                }
             }
 
             return false;

@@ -10,7 +10,7 @@ namespace SortingHat.Plugin.FileType.Detectors
         {
         }
 
-        public override FileType Detect(Stream file)
+        public override FileType? Detect(Stream file)
         {
             for (long index = 0; Intervall * index < file.Length; ++index)
             {

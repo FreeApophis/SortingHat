@@ -45,24 +45,25 @@ namespace SortingHat.CLI.Commands
             return file;
         }
 
-        public async Task ExecuteAsync(IEnumerable<string> arguments)
+        public async Task ExecuteAsync(IEnumerable<string> lazyArguments)
         {
-            var tags = arguments.Where(a => a.IsTag());
+            var arguments = lazyArguments.ToList();
+            var tags = arguments.Where(a => a.IsTag()).ToList();
             var files = arguments.Where(IsFile);
 
-            var tasks = new List<Task>();
             foreach (var file in _filePathExtractor.FromFilePatterns(files).Select(FileFromPath))
             {
                 foreach (var tag in tags.Select(_tagParser.Parse))
                 {
-                    _logger.LogInformation($"File {file.Path} tagged with {tag.Name}");
+                    if (tag is { })
+                    {
+                        _logger.LogInformation($"File {file.Path} tagged with {tag.Name}");
 
-                    _consoleWriter.WriteLine($"File {file.Path} queued with tag {tag.Name}");
-                    await file.Tag(tag);
-                    //tasks.Add(file.Tag(tag));
+                        _consoleWriter.WriteLine($"File {file.Path} queued with tag {tag.Name}");
+                        await file.Tag(tag);
+                    }
                 }
             }
-            //await Task.WhenAll(tasks);
         }
 
         public bool Execute(IEnumerable<string> arguments, IOptions options)

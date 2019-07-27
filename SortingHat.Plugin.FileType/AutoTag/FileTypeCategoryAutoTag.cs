@@ -18,7 +18,7 @@ namespace SortingHat.Plugin.FileType.AutoTag
             _fileTypeDetector = fileTypeDetector;
         }
 
-        protected override string HandleTag(FileInfo file)
+        protected override string? HandleTag(FileInfo file)
         {
             var fileType = _fileTypeDetector.Identify(file);
 

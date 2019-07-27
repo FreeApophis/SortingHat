@@ -18,6 +18,7 @@ namespace SortingHat.DB
             builder.RegisterType<SQLiteFile>().As<IFile>().InstancePerLifetimeScope();
             builder.RegisterType<SQLiteTag>().As<ITag>().InstancePerLifetimeScope();
             builder.RegisterType<SQLiteSettings>().As<ISettings>().InstancePerLifetimeScope();
+            builder.RegisterType<SQLiteProjects>().As<IProjects>().InstancePerLifetimeScope();
         }
 
         private Func<IComponentContext, SQLiteMainDatabase> CreateMainDatabase()
@@ -26,7 +27,8 @@ namespace SortingHat.DB
             {
                 var safeContext = context.Resolve<IComponentContext>();
                 var db = new SQLiteMainDatabase(
-                    () => safeContext.Resolve<ISettings>(), 
+                    () => safeContext.Resolve<ISettings>(),
+                    () => safeContext.Resolve<IProjects>(),
                     projectName => context.Resolve<IProjectDatabase>(new NamedParameter("projectName", projectName)),
                     context.Resolve<DatabaseSettings>()
                     );

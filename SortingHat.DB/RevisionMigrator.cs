@@ -8,7 +8,7 @@ namespace SortingHat.DB
 {
     internal class RevisionMigrator
     {
-        private const string CreateRevisionTableCommand = @"CREATE TABLE IF NOT EXISTS [Revisions] ([ID] INTEGER  NOT NULL PRIMARY KEY AUTOINCREMENT, [Name] VARCHAR(255)  UNIQUE NOT NULL, [MigratedAt] DATETIME DEFAULT CURRENT_TIME NOT NULL);";
+        private const string CreateRevisionTableCommand = @"CREATE TABLE IF NOT EXISTS [Revisions] ([Id] INTEGER  NOT NULL PRIMARY KEY AUTOINCREMENT, [Name] VARCHAR(255)  UNIQUE NOT NULL, [MigratedAt] DATETIME DEFAULT CURRENT_TIME NOT NULL);";
         private readonly SQLiteDatabase _db;
 
         public RevisionMigrator(SQLiteDatabase db)
@@ -47,7 +47,7 @@ namespace SortingHat.DB
         private bool HasMigrated(string migration)
         {
 
-            return ((long?)_db.ExecuteScalar("SELECT ID From Revisions WHERE Name = @migration", new SqliteParameter("@migration", migration))).HasValue;
+            return ((long?)_db.ExecuteScalar("SELECT Id From Revisions WHERE Name = @migration", new SqliteParameter("@migration", migration))).HasValue;
         }
 
         private IEnumerable<string> Migrations()

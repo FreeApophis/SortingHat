@@ -27,9 +27,13 @@ namespace SortingHat.CLI.Commands
             {
                 var tag = _tagParser.Parse(tagString);
 
-                if (tag.Destroy() == false)
+                if (tag is null)
                 {
-                    _logger.LogWarning("Remove tag failed");
+                    _logger.LogWarning($"Remove tag '{tagString}' failed (parse)");
+                }
+                else if (tag.Destroy() == false)
+                {
+                    _logger.LogWarning($"Remove tag '{tagString}' failed (db)");
                 }
             }
 

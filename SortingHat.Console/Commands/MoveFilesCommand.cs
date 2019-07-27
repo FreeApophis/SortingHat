@@ -21,25 +21,28 @@ namespace SortingHat.CLI.Commands
             _consoleWriter = consoleWriter;
         }
 
-        public bool Execute(IEnumerable<string> arguments, IOptions options)
+        public bool Execute(IEnumerable<string> larzyArguments, IOptions options)
         {
-            if (arguments.Count() != 2) throw new ArgumentOutOfRangeException(nameof(arguments));
+            var arguments = larzyArguments.ToList();
+            if (arguments.Count != 2) { throw new ArgumentOutOfRangeException(nameof(arguments)); }
 
             var search = arguments.First();
             var path = Path.Combine(Directory.GetCurrentDirectory(), arguments.Last());
 
             _consoleWriter.WriteLine($"Find Files: {search}");
 
-            var files = _db.ProjectDatabase.File.Search(search);
+            var files = _db.ProjectDatabase.File.Search(search).ToList();
 
             if (files.Any())
             {
                 foreach (var file in files)
                 {
-                    File.Move(file.Path, Path.Combine(path, Path.GetFileName(file.Path)));
+                    if (Path.GetFileName(file.Path) is { } fileName)
+                    {
+                        File.Move(file.Path, Path.Combine(path, fileName));
+                    }
                 }
-            }
-            else
+            } else
             {
                 _consoleWriter.WriteLine("No files found for your search query...");
             }
