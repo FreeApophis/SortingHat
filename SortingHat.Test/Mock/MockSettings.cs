@@ -8,5 +8,16 @@ namespace SortingHat.Test.Mock
         {
             return new MockSettings();
         }
+
+        public string this[string key]
+        {
+            get => throw new System.NotImplementedException();
+            set => throw new System.NotImplementedException();
+        }
+
+        public bool HasValue(string key)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

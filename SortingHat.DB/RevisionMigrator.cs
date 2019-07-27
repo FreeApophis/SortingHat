@@ -52,7 +52,10 @@ namespace SortingHat.DB
 
         private IEnumerable<string> Migrations()
         {
-            return Assembly.GetExecutingAssembly().GetManifestResourceNames().Where(res => res.StartsWith($"SortingHat.DB.Migrations.{_db.MigrationType}"));
+            return Assembly.GetExecutingAssembly()
+                .GetManifestResourceNames()
+                .Where(res => res.StartsWith($"SortingHat.DB.Migrations.{_db.MigrationType}"))
+                .OrderBy(n => n);
         }
 
         /// <summary>

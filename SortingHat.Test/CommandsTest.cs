@@ -41,7 +41,7 @@ namespace SortingHat.Test
                 );
 
             var console = new MemoryConsoleWriter();
-            ICommand listTags = new ListTagsCommand(db, console);
+            ICommand listTags = new ListTagsCommand(db.ProjectDatabase, console);
 
             listTags.Execute(Enumerable.Empty<string>(), mockOptions.Object);
 

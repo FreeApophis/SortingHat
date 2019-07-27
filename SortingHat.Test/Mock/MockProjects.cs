@@ -14,5 +14,15 @@ namespace SortingHat.Test.Mock
         {
             throw new System.NotImplementedException();
         }
+
+        public bool AddProject(string project)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public bool RemoveProject(string project)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

@@ -1,4 +1,4 @@
 ﻿/* Add Default-Project */
 
-INSERT INTO `Projects` (`Name`) VALUES ("Default"); 
+INSERT INTO [Projects] ([Name]) VALUES ("Default"); 
 
