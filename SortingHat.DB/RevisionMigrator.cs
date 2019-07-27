@@ -34,7 +34,7 @@ namespace SortingHat.DB
 
         private void RunMigration(SQLiteDatabase db, string migration)
         {
-            _logger.Log(LogLevel.Information, ($"Run migration '{migration}' on database '{db.Name}'"));
+            _logger.Log(LogLevel.Information, ($"Run migration '{migration}' on database '{db.DbName}'"));
 
             using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(migration);
             if (stream is { })

@@ -36,7 +36,9 @@ namespace SortingHat.DB.Access
 
         public bool RemoveProject(string project)
         {
-            throw new NotImplementedException();
+            _db.ExecuteNonQuery("DELETE FROM [Projects] WHERE [NAME] = @project", new SqliteParameter("@project", project));
+
+            return true;
         }
     }
 }

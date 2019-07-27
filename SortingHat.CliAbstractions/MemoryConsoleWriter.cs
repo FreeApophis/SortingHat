@@ -10,7 +10,7 @@ namespace SortingHat.CliAbstractions
         {
         }
 
-        public IEnumerable<string> Lines => _lines;
+        public List<string> Lines => _lines;
 
         public void WriteLine(string line)
         {

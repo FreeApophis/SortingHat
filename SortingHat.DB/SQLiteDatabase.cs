@@ -8,7 +8,6 @@ namespace SortingHat.DB
     public abstract class SQLiteDatabase : IDisposable
     {
         private readonly string _path;
-        private readonly string _dbName;
         private readonly string _encryptionKey = "Encrypted";
 
         private SqliteConnection Connection { get; }
@@ -17,10 +16,10 @@ namespace SortingHat.DB
         {
             if (databaseSettings.Type == "sqlite")
             {
-                _path = BasePath(databaseSettings);
-                _dbName = dbName;
+                _path = databaseSettings.DbPath;
+                DbName = dbName;
 
-                Connection = new SqliteConnection($"Filename={DBFile()}");
+                Connection = new SqliteConnection($"Filename={DbFile()}");
                 Connection.Open();
 
                 ExecuteNonQuery("PRAGMA foreign_keys=ON;");
@@ -35,9 +34,9 @@ namespace SortingHat.DB
             }
         }
 
-        abstract internal MigrationType MigrationType { get; }
+        internal abstract MigrationType MigrationType { get; }
 
-        public string Name => _dbName;
+        public string DbName { get; }
 
         internal void ExecuteNonQuery(string commandText, params SqliteParameter[] parameters)
         {
@@ -54,31 +53,19 @@ namespace SortingHat.DB
             return CreateCommand(commandText, parameters).ExecuteReader();
         }
 
-        private static string BasePath(DatabaseSettings databaseSettings)
+        private string ExistingDbPath()
         {
-            return databaseSettings.Path switch
-                {
-                "#USERDOC" => Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                "#APPDATA" => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                _ => databaseSettings.Path
-                };
-        }
-
-        private string DBPath()
-        {
-            string result = Path.Combine(_path, ".hat");
-
-            if (Directory.Exists(result) == false)
+            if (Directory.Exists(_path) == false)
             {
-                Directory.CreateDirectory(result);
+                Directory.CreateDirectory(_path);
             }
 
-            return result;
+            return _path;
         }
 
-        private string DBFile()
+        private string DbFile()
         {
-            return Path.Combine(DBPath(), $"{_dbName}.db");
+            return Path.Combine(ExistingDbPath(), $"{DbName}.db");
         }
 
         private SqliteCommand CreateCommand(string commandText, params SqliteParameter[] parameters)

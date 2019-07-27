@@ -12,6 +12,7 @@ using System.Security.Cryptography;
 using System;
 using SortingHat.API.AutoTag;
 using SortingHat.API.Parser;
+using SortingHat.CLI.FileSystem;
 using SortingHat.CliAbstractions;
 
 namespace SortingHat.CLI
@@ -40,7 +41,10 @@ namespace SortingHat.CLI
             builder.Register(c => new HashService(SHA256.Create(), nameof(SHA256), c.Resolve<IConsoleWriter>())).As<IHashService>().SingleInstance();
             builder.RegisterType<LoggerFactory>().As<ILoggerFactory>().SingleInstance();
             builder.RegisterGeneric(typeof(Logger<>)).As(typeof(ILogger<>)).SingleInstance();
+
             builder.RegisterType<SystemConsoleWriter>().As<IConsoleWriter>();
+            builder.RegisterType<SystemFileCopy>().As<ICopyFile>();
+            builder.RegisterType<SystemFileMove>().As<IMoveFile>();
 
             RegisterCommands(builder);
             RegisterAutoTags(builder);

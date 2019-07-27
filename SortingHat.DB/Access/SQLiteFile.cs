@@ -102,6 +102,13 @@ namespace SortingHat.DB.Access
             }
         }
 
+        public bool Store(File file)
+        {
+            FindOrCreate(file).Wait();
+
+            return true;
+        }
+
         public IEnumerable<File> Search(string query)
         {
             return MetaSearch(ParseQuery(query));

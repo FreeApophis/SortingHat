@@ -5,6 +5,7 @@ using System.Linq;
 using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
+using SortingHat.CLI.FileSystem;
 using SortingHat.CliAbstractions;
 
 namespace SortingHat.CLI.Commands.Files
@@ -13,11 +14,13 @@ namespace SortingHat.CLI.Commands.Files
     internal class CopyFilesCommand : ICommand
     {
         private readonly IFile _file;
+        private readonly ICopyFile _copyFile;
         private readonly IConsoleWriter _consoleWriter;
 
-        public CopyFilesCommand(IFile file, IConsoleWriter consoleWriter)
+        public CopyFilesCommand(IFile file, ICopyFile copyFile, IConsoleWriter consoleWriter)
         {
             _file = file;
+            _copyFile = copyFile;
             _consoleWriter = consoleWriter;
         }
 
@@ -34,12 +37,19 @@ namespace SortingHat.CLI.Commands.Files
 
             if (files.Any())
             {
-                foreach (var file in files)
+                foreach (dynamic file in GroupByHash(files))
                 {
-                    if (Path.GetFileName(file.Path) is { } fileName)
+                    _consoleWriter.WriteLine();
+                    foreach (var fileName in file.Paths)
                     {
-                        _consoleWriter.WriteLine($"cp {file.Path} {Path.Combine(path, fileName)}");
-                        File.Copy(file.Path, Path.Combine(path, fileName));
+                        _consoleWriter.WriteLine($"* {fileName} (0)");
+                    }
+
+                    var selectedPath = "";
+                    if (Path.GetFileName(selectedPath) is { } x)
+                    {
+                        _consoleWriter.WriteLine($"cp {file.Path} {Path.Combine(path, x)}");
+                        _copyFile.Copy(file.Path, Path.Combine(path, x));
                     }
                 }
             } else
@@ -48,6 +58,11 @@ namespace SortingHat.CLI.Commands.Files
             }
 
             return true;
+        }
+
+        private static IEnumerable<object> GroupByHash(List<API.Models.File> files)
+        {
+            return files.GroupBy(f => f.Hash.Result, (hash, file) => new { Hash = hash, Paths = file.Select(f => f.Path) });
         }
 
         public string LongCommand => "copy-files";

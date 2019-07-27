@@ -27,6 +27,11 @@ namespace SortingHat.Test.Mock
             throw new System.NotImplementedException();
         }
 
+        public bool Store(File file)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public Task<IEnumerable<Tag>> GetTags(File file)
         {
             throw new System.NotImplementedException();

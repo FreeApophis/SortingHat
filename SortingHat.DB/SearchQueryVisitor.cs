@@ -12,10 +12,10 @@ namespace SortingHat.DB
     [UsedImplicitly]
     public class SearchQueryVisitor : INodeVisitor
     {
-        public string Result => _selectBuilder.ToString() + _whereBuilder + GroupBy;
+        public string Result => _selectBuilder.ToString() + _whereBuilder + GroupAndOrderClause;
         private readonly StringBuilder _selectBuilder = new StringBuilder();
         private readonly StringBuilder _whereBuilder = new StringBuilder();
-        private const string GroupBy = "\r\nGROUP BY FilePaths.Id";
+        private const string GroupAndOrderClause = "\r\nGROUP BY FilePaths.Id\r\nORDER BY Files.Hash";
         private readonly IProjectDatabase _db;
         private readonly SQLiteTag _sqLiteTag;
         private readonly ITagParser _tagParser;

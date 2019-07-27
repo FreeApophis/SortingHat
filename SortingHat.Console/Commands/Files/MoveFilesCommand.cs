@@ -5,6 +5,7 @@ using System.Linq;
 using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
+using SortingHat.CLI.FileSystem;
 using SortingHat.CliAbstractions;
 
 namespace SortingHat.CLI.Commands.Files
@@ -13,11 +14,13 @@ namespace SortingHat.CLI.Commands.Files
     internal class MoveFilesCommand : ICommand
     {
         private readonly IFile _file;
+        private readonly IMoveFile _moveFile;
         private readonly IConsoleWriter _consoleWriter;
 
-        public MoveFilesCommand(IFile file, IConsoleWriter consoleWriter)
+        public MoveFilesCommand(IFile file, IMoveFile moveFile, IConsoleWriter consoleWriter)
         {
             _file = file;
+            _moveFile = moveFile;
             _consoleWriter = consoleWriter;
         }
 
@@ -39,7 +42,7 @@ namespace SortingHat.CLI.Commands.Files
                 {
                     if (Path.GetFileName(file.Path) is { } fileName)
                     {
-                        File.Move(file.Path, Path.Combine(path, fileName));
+                        _moveFile.Move(file.Path, Path.Combine(path, fileName));
                     }
                 }
             } else

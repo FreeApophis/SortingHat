@@ -9,6 +9,7 @@ namespace SortingHat.API.DI
         bool LoadByPath(File file);
         Task Tag(File file, Tag tag);
         Task Untag(File file, Tag tag);
+        bool Store(File file);
 
         Task<IEnumerable<Tag>> GetTags(File file);
         IEnumerable<string> GetPaths();
