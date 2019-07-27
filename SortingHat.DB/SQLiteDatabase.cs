@@ -37,6 +37,8 @@ namespace SortingHat.DB
 
         abstract internal MigrationType MigrationType { get; }
 
+        public string Name => _dbName;
+
         internal void ExecuteNonQuery(string commandText, params SqliteParameter[] parameters)
         {
             CreateCommand(commandText, parameters).ExecuteNonQuery();

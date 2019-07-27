@@ -42,10 +42,11 @@ namespace SortingHat.CLI
             builder.RegisterGeneric(typeof(Logger<>)).As(typeof(ILogger<>)).SingleInstance();
             builder.RegisterType<SystemConsoleWriter>().As<IConsoleWriter>();
 
-            RegisterConfiguration(builder);
             RegisterCommands(builder);
             RegisterAutoTags(builder);
             RegisterPlugins(builder);
+
+            RegisterConfiguration(builder);
 
             return ConfigureLogger(builder.Build());
         }

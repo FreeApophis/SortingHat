@@ -13,6 +13,8 @@ namespace SortingHat.DB
     {
         protected override void Load(ContainerBuilder builder)
         {
+            builder.RegisterType<RevisionMigrator>().As<IRevisionMigrator>().InstancePerLifetimeScope();
+
             // Register Databases
             builder.Register(CreateProjectDatabase()).As<SQLiteProjectDatabase>().As<IProjectDatabase>().InstancePerLifetimeScope();
             builder.Register(CreateMainDatabase()).As<SQLiteMainDatabase>().As<IMainDatabase>().InstancePerLifetimeScope();
@@ -30,7 +32,7 @@ namespace SortingHat.DB
             {
                 var db = new SQLiteMainDatabase(context.Resolve<DatabaseSettings>());
 
-                return RunDatabaseSetup(db);
+                return RunDatabaseSetup(context.Resolve<IRevisionMigrator>(), db);
             };
         }
 
@@ -42,17 +44,14 @@ namespace SortingHat.DB
                     context.Resolve<DatabaseSettings>(),
                     context.Resolve<ISettings>());
 
-                return RunDatabaseSetup(db);
+                return RunDatabaseSetup(context.Resolve<IRevisionMigrator>(), db);
             };
         }
 
-        private static TDatabase RunDatabaseSetup<TDatabase>(TDatabase db)
+        private static TDatabase RunDatabaseSetup<TDatabase>(IRevisionMigrator migrator, TDatabase db)
             where TDatabase : SQLiteDatabase
         {
-            var migrator = new RevisionMigrator(db);
-
-            migrator.Initialize();
-            migrator.Migrate();
+            migrator.Migrate(db);
 
             return db;
         }
