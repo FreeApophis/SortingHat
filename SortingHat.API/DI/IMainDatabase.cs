@@ -6,7 +6,7 @@ namespace SortingHat.API.DI
     {
         IProjectDatabase ProjectDatabase { get; }
 
-        IEnumerable<string> ProjectDatabases { get; }
+        IProjects Projects { get; }
 
         ISettings Settings { get; }
     }

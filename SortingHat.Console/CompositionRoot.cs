@@ -10,11 +10,8 @@ using System.IO;
 using System.Reflection;
 using System.Security.Cryptography;
 using System;
-using apophis.Lexer;
-using apophis.Lexer.Rules;
 using SortingHat.API.AutoTag;
 using SortingHat.API.Parser;
-using SortingHat.API.Parser.Token;
 using SortingHat.CliAbstractions;
 
 namespace SortingHat.CLI
@@ -113,8 +110,16 @@ namespace SortingHat.CLI
             var cliAssembly = GetType().Assembly;
 
             builder.RegisterAssemblyTypes(cliAssembly)
-                .Where(t => t.Namespace.EndsWith(nameof(Commands)) && t.Name.EndsWith("Command"))
+                .Where(IsCommandClass)
                 .As<ICommand>();
+        }
+
+        private bool IsCommandClass(Type type)
+        {
+
+            return type != null
+                && type.Namespace != null
+                && type.Namespace.EndsWith(nameof(Commands)) && type.Name.EndsWith("Command");
         }
     }
 }

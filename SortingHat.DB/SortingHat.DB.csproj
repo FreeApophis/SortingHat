@@ -18,9 +18,13 @@
     <None Remove="Migrations\20180802-1830-CreateFileNames.migration" />
     <None Remove="Migrations\20180802-2030-CreateFilePaths.migration" />
     <None Remove="Migrations\Main\20190724-1820-CreateProjects.migration" />
+    <None Remove="Migrations\Main\20190727-1400-AddDefaultProject.migration" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Migrations\Main\20190727-1400-AddDefaultProject.migration">
+      <CustomToolNamespace>Migrations</CustomToolNamespace>
+    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\Main\20190724-1820-CreateProjects.migration">
       <CustomToolNamespace>Migrations</CustomToolNamespace>
     </EmbeddedResource>

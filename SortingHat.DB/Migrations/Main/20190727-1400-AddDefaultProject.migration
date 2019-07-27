@@ -1,0 +1,4 @@
+﻿/* Add Default-Project */
+
+INSERT INTO `Projects` (`Name`) VALUES ("Default"); 
+
