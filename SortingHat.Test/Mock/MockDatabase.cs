@@ -1,28 +1,11 @@
 ﻿using System.Collections.Generic;
 using SortingHat.API.DI;
-using SortingHat.Test.Mock;
 
-namespace SortingHat.Test
+namespace SortingHat.Test.Mock
 {
     public class MockProjectDatabase : IProjectDatabase
     {
-        public MockFileStore MockFile { get; }
-        public MockTagStore MockTag { get; }
-
-        private MockProjectDatabase(MockFileStore file, MockTagStore tag)
-        {
-            MockFile = file;
-            MockTag = tag;
-        }
-
-        public IFile File => MockFile;
-        public ITag Tag => MockTag;
-
-        public void Setup()
-        {
-        }
-
-        public void TearDown()
+        private MockProjectDatabase()
         {
         }
 
@@ -33,7 +16,7 @@ namespace SortingHat.Test
 
         public static MockProjectDatabase Create()
         {
-            return new MockProjectDatabase(MockFileStore.Create(), MockTagStore.Create());
+            return new MockProjectDatabase();
         }
     }
 }

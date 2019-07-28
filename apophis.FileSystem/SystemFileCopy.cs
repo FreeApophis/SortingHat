@@ -1,6 +1,6 @@
-﻿namespace SortingHat.CLI.FileSystem
+﻿namespace apophis.FileSystem
 {
-    class SystemFileCopy : ICopyFile
+    public class SystemFileCopy : ICopyFile
     {
         public void Copy(string sourceFileName, string destinationFileName)
         {

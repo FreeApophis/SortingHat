@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using Autofac;
 using Xunit;
 
 namespace SortingHat.Test
@@ -40,7 +40,7 @@ namespace SortingHat.Test
         {
             var maybeNullStrings = new List<string?> { null, "Cool", "1337", null, "Test" };
 
-            foreach(var maybeNullString in maybeNullStrings)
+            foreach (var maybeNullString in maybeNullStrings)
             {
                 if (maybeNullString is { } notNullString)
                 {
@@ -53,7 +53,36 @@ namespace SortingHat.Test
                     Assert.Null(maybeNullString);
                 }
             }
+        }
 
+        interface IDo
+        {
+            string GiveMe();
+        }
+
+        class Do1 : IDo
+        {
+            public string GiveMe() => "one";
+        }
+
+        class Do2 : IDo
+        {
+            public string GiveMe() => "two";
+        }
+
+        [Fact]
+        void OverrideAutoFacRegistration()
+        {
+            var builder = new ContainerBuilder();
+
+            builder.RegisterType<Do1>().As<IDo>();
+            builder.RegisterType<Do2>().As<IDo>();
+
+            var container = builder.Build();
+
+            var doInstance = container.Resolve<IDo>();
+
+            Assert.Equal("two", doInstance.GiveMe());
         }
     }
 }

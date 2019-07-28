@@ -1,30 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using apophis.CLI.Writer;
 using Funcky.Monads;
 using JetBrains.Annotations;
-using Microsoft.Extensions.Logging;
 using SortingHat.API;
 using SortingHat.API.AutoTag;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
-using SortingHat.CLI.Commands.Files;
-using SortingHat.CliAbstractions;
 
 namespace SortingHat.CLI.Commands.Tags
 {
     [UsedImplicitly]
     internal class AutoTagCommand : ICommand
     {
-        private readonly ILogger<TagFileCommand> _logger;
         private readonly IConsoleWriter _consoleWriter;
         private readonly IFilePathExtractor _filePathExtractor;
         private readonly IAutoTagHandler _autoTagHandler;
         private readonly Func<File> _newFile;
 
-        public AutoTagCommand(ILogger<TagFileCommand> logger, IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor, IAutoTagHandler autoTagHandler, Func<File> newFile)
+        public AutoTagCommand(IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor, IAutoTagHandler autoTagHandler, Func<File> newFile)
         {
-            _logger = logger;
             _consoleWriter = consoleWriter;
             _filePathExtractor = filePathExtractor;
             _autoTagHandler = autoTagHandler;

@@ -3,9 +3,9 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using apophis.CLI.Writer;
 using SortingHat.API.DI;
 using Funcky.Extensions;
-using SortingHat.CliAbstractions;
 
 namespace SortingHat.CLI
 {

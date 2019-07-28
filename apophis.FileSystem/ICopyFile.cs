@@ -1,6 +1,6 @@
-﻿namespace SortingHat.CLI.FileSystem
+﻿namespace apophis.FileSystem
 {
-    interface ICopyFile
+    public interface ICopyFile
     {
         void Copy(string sourceFileName, string destinationFileName);
         void Copy(string sourceFileName, string destinationFileName, bool overwrite);

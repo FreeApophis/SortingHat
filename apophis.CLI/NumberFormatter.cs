@@ -1,4 +1,4 @@
-﻿namespace SortingHat.CliAbstractions.Formatting
+﻿namespace apophis.CLI
 {
     public static class NumberFormatter
     {

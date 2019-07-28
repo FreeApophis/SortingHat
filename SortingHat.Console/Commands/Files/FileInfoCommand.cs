@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using apophis.CLI.Writer;
 using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
-using SortingHat.CliAbstractions;
 
 namespace SortingHat.CLI.Commands.Files
 {

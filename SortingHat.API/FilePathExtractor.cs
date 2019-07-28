@@ -34,15 +34,18 @@ namespace SortingHat.API
             else
             {
                 var absolutePath = Path.Combine(Directory.GetCurrentDirectory(), filePattern);
+
                 AddExistingFiles(absolutePath);
             }
         }
 
         private void AddExistingFiles(string filePath)
         {
-            if (File.Exists(filePath))
+            var normalizedFilePath = Path.GetFullPath(filePath);
+
+            if (File.Exists(normalizedFilePath))
             {
-                _filePaths.Add(filePath);
+                _filePaths.Add(normalizedFilePath);
             }
         }
     }

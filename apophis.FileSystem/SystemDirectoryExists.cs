@@ -1,6 +1,6 @@
-﻿namespace SortingHat.CLI.FileSystem
+﻿namespace apophis.FileSystem
 {
-    class SystemDirectoryExists : IExistsDirectory
+    public class SystemDirectoryExists : IExistsDirectory
     {
         public bool Exists(string path)
         {

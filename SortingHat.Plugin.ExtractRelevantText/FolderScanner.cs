@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using apophis.CLI.Writer;
 using apophis.Lexer;
 using apophis.Lexer.Tokens;
 using JetBrains.Annotations;
-using SortingHat.CliAbstractions;
 using SortingHat.Plugin.ExtractRelevantText.Token;
 
 namespace SortingHat.Plugin.ExtractRelevantText

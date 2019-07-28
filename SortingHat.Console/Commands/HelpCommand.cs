@@ -7,9 +7,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using apophis.CLI;
+using apophis.CLI.Writer;
 using Funcky.Monads;
-using SortingHat.CliAbstractions;
-using SortingHat.CliAbstractions.Formatting;
 
 namespace SortingHat.CLI.Commands
 {

@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SortingHat.CliAbstractions\SortingHat.CliAbstractions.csproj" />
+    <ProjectReference Include="..\apophis.CLI\apophis.CLI.csproj" />
   </ItemGroup>
 
 </Project>

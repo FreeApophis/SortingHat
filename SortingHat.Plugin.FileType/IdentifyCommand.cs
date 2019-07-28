@@ -2,8 +2,8 @@
 using SortingHat.API.DI;
 using SortingHat.Plugin.FileType.Detectors;
 using System.Collections.Generic;
+using apophis.CLI.Writer;
 using Funcky.Monads;
-using SortingHat.CliAbstractions;
 
 namespace SortingHat.Plugin.FileType
 {

@@ -10,49 +10,56 @@ using System.IO;
 using System.Reflection;
 using System.Security.Cryptography;
 using System;
+using System.Threading;
+using apophis.CLI.Writer;
+using apophis.FileSystem;
 using SortingHat.API.AutoTag;
 using SortingHat.API.Parser;
-using SortingHat.CLI.FileSystem;
-using SortingHat.CliAbstractions;
 
 namespace SortingHat.CLI
 {
     internal class CompositionRoot
     {
+        public ContainerBuilder Builder { get; } = new ContainerBuilder();
+
+        public CompositionRoot Register()
+        {
+            Builder.RegisterModule(new ParserModule());
+            Builder.RegisterModule(new SqliteDatabaseModule());
+            Builder.RegisterModule(new FileSystemModule());
+
+            Builder.RegisterType<Application>().AsSelf();
+            Builder.RegisterType<ArgumentParser>().AsSelf();
+
+            Builder.RegisterType<API.Models.TagParser>().As<API.Models.ITagParser>();
+            Builder.RegisterType<AutoTagHandler>().As<IAutoTagHandler>();
+
+            Builder.RegisterType<FilePathExtractor>().As<IFilePathExtractor>().SingleInstance();
+            Builder.RegisterType<API.Models.Tag>().As<API.Models.Tag>().InstancePerDependency();
+            Builder.RegisterType<API.Models.File>().As<API.Models.File>().InstancePerDependency();
+
+            Builder.RegisterType<SearchQueryVisitor>().As<SearchQueryVisitor>().InstancePerDependency();
+
+            Builder.Register(c => new HashService(SHA256.Create(), nameof(SHA256), c.Resolve<IConsoleWriter>())).As<IHashService>().SingleInstance();
+            Builder.RegisterType<LoggerFactory>().As<ILoggerFactory>().SingleInstance();
+            Builder.RegisterGeneric(typeof(Logger<>)).As(typeof(ILogger<>)).SingleInstance();
+
+            Builder.RegisterType<SystemConsoleWriter>().As<IConsoleWriter>();
+
+            RegisterCommands(Builder);
+            RegisterAutoTags(Builder);
+            RegisterPlugins(Builder);
+
+            RegisterConfiguration(Builder);
+
+            return this;
+        }
+
         public IContainer Build()
         {
-            var builder = new ContainerBuilder();
 
-            builder.RegisterModule(new ParserModule());
-            builder.RegisterModule(new SqliteDatabaseModule());
 
-            builder.RegisterType<Application>().AsSelf();
-            builder.RegisterType<ArgumentParser>().AsSelf();
-
-            builder.RegisterType<API.Models.TagParser>().As<API.Models.ITagParser>();
-            builder.RegisterType<AutoTagHandler>().As<IAutoTagHandler>();
-
-            builder.RegisterType<FilePathExtractor>().As<IFilePathExtractor>().SingleInstance();
-            builder.RegisterType<API.Models.Tag>().As<API.Models.Tag>().InstancePerDependency();
-            builder.RegisterType<API.Models.File>().As<API.Models.File>().InstancePerDependency();
-
-            builder.RegisterType<SearchQueryVisitor>().As<SearchQueryVisitor>().InstancePerDependency();
-
-            builder.Register(c => new HashService(SHA256.Create(), nameof(SHA256), c.Resolve<IConsoleWriter>())).As<IHashService>().SingleInstance();
-            builder.RegisterType<LoggerFactory>().As<ILoggerFactory>().SingleInstance();
-            builder.RegisterGeneric(typeof(Logger<>)).As(typeof(ILogger<>)).SingleInstance();
-
-            builder.RegisterType<SystemConsoleWriter>().As<IConsoleWriter>();
-            builder.RegisterType<SystemFileCopy>().As<ICopyFile>();
-            builder.RegisterType<SystemFileMove>().As<IMoveFile>();
-
-            RegisterCommands(builder);
-            RegisterAutoTags(builder);
-            RegisterPlugins(builder);
-
-            RegisterConfiguration(builder);
-
-            return ConfigureLogger(builder.Build());
+            return ConfigureLogger(Builder.Build());
         }
 
         private void RegisterAutoTags(ContainerBuilder builder)

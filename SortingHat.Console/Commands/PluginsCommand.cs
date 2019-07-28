@@ -3,8 +3,8 @@ using SortingHat.API.DI;
 using SortingHat.API.Plugin;
 using System.Collections.Generic;
 using System.Linq;
+using apophis.CLI.Writer;
 using Funcky.Monads;
-using SortingHat.CliAbstractions;
 
 namespace SortingHat.CLI.Commands
 {
@@ -19,7 +19,26 @@ namespace SortingHat.CLI.Commands
             _consoleWriter = consoleWriter;
             _pluginLoader = pluginLoader;
         }
+
+        public string LongCommand => "plugins";
+        public Option<string> ShortCommand => Option<string>.None();
+        public string ShortHelp => "Lists the loaded plugins";
+        public CommandGrouping CommandGrouping => CommandGrouping.General;
+
         public bool Execute(IEnumerable<string> arguments, IOptions options)
+        {
+            if (arguments.Any())
+            {
+                _consoleWriter.WriteLine("Too many arguments given, the plugin command does not take any arguments.");
+                return false;
+            }
+
+            ListPlugins();
+
+            return true;
+        }
+
+        private void ListPlugins()
         {
             if (_pluginLoader.Plugins.Any())
             {
@@ -31,17 +50,11 @@ namespace SortingHat.CLI.Commands
                     _consoleWriter.WriteLine($"  {plugin.Description}");
                     _consoleWriter.WriteLine();
                 }
-            } else
+            }
+            else
             {
                 _consoleWriter.WriteLine("No plugins loaded");
             }
-
-            return true;
         }
-
-        public string LongCommand => "plugins";
-        public Option<string> ShortCommand => Option<string>.None();
-        public string ShortHelp => "Lists the loaded plugins";
-        public CommandGrouping CommandGrouping => CommandGrouping.General;
     }
 }

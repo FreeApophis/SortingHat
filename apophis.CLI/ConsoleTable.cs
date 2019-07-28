@@ -2,8 +2,9 @@
 using System.Data;
 using System.Linq;
 using System.Text;
+using apophis.CLI.Writer;
 
-namespace SortingHat.CliAbstractions.Formatting
+namespace apophis.CLI
 {
     public class ConsoleTable
     {

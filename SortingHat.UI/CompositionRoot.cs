@@ -1,10 +1,11 @@
 ﻿using System.Security.Cryptography;
+using apophis.CLI.Writer;
+using apophis.FileSystem;
 using Autofac;
 using Microsoft.Extensions.Logging;
 using SortingHat.API;
 using SortingHat.API.DI;
 using SortingHat.API.Parser;
-using SortingHat.CliAbstractions;
 using SortingHat.DB;
 
 namespace SortingHat.UI
@@ -20,6 +21,7 @@ namespace SortingHat.UI
 
             builder.RegisterModule(new ParserModule());
             builder.RegisterModule(new SqliteDatabaseModule());
+            builder.RegisterModule(new FileSystemModule());
 
             builder.RegisterType<MainWindow>().AsSelf();
 

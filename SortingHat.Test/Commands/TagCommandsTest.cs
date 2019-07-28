@@ -1,20 +1,19 @@
-﻿using SortingHat.CLI.Commands;
-using System.Collections.Generic;
-using SortingHat.API.Models;
+﻿using System.Collections.Generic;
+using System.Linq;
+using apophis.CLI.Writer;
 using Moq;
 using SortingHat.API.DI;
-using Xunit;
-using System.Linq;
+using SortingHat.API.Models;
 using SortingHat.CLI.Commands.Tags;
-using SortingHat.CliAbstractions;
 using SortingHat.Test.Mock;
+using Xunit;
 
-namespace SortingHat.Test
+namespace SortingHat.Test.Commands
 {
-    public class CommandsTest
+    public class TagCommandsTest
     {
         [Fact]
-        public void CreateAndListTagsTest()
+        public void GivenAListOfTagsToTheCreateCommandThenTheListCommandListsThemCorrectly()
         {
             var tag = MockTagStore.Create();
 

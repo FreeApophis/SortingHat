@@ -2,8 +2,8 @@
 using MetadataExtractor;
 using SortingHat.API.DI;
 using System.Collections.Generic;
+using apophis.CLI.Writer;
 using Funcky.Monads;
-using SortingHat.CliAbstractions;
 
 namespace SortingHat.Plugin.Exif
 {

@@ -1,4 +1,4 @@
-﻿namespace SortingHat.CliAbstractions
+﻿namespace apophis.CLI.Writer
 {
     public interface IConsoleWriter
     {

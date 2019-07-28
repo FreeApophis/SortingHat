@@ -1,12 +1,12 @@
 ﻿using System.Linq;
+using apophis.CLI.Writer;
 using Autofac;
 using Moq;
 using SortingHat.API.DI;
 using SortingHat.CLI.Commands.Projects;
-using SortingHat.CliAbstractions;
 using Xunit;
 
-namespace SortingHat.Test
+namespace SortingHat.Test.Commands
 {
     public class ProjectCommandsTest
     {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SortingHat.CliAbstractions
+namespace apophis.CLI.Writer
 {
     public class MemoryConsoleWriter : IConsoleWriter
     {

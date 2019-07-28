@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using apophis.CLI.Writer;
 using Funcky.Monads;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using SortingHat.API;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
-using SortingHat.CliAbstractions;
 
 namespace SortingHat.CLI.Commands.Files
 {
@@ -20,14 +20,16 @@ namespace SortingHat.CLI.Commands.Files
         private readonly ITagParser _tagParser;
         private readonly IFilePathExtractor _filePathExtractor;
         private readonly Func<File> _newFile;
+        private readonly IFile _file;
 
-        public TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter consoleWriter, ITagParser tagParser, IFilePathExtractor filePathExtractor, Func<File> newFile)
+        public TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter consoleWriter, ITagParser tagParser, IFilePathExtractor filePathExtractor, Func<File> newFile, IFile file)
         {
             _logger = logger;
             _consoleWriter = consoleWriter;
             _tagParser = tagParser;
             _filePathExtractor = filePathExtractor;
             _newFile = newFile;
+            _file = file;
         }
 
         private static bool IsFile(string value)
@@ -53,15 +55,28 @@ namespace SortingHat.CLI.Commands.Files
 
             foreach (var file in _filePathExtractor.FromFilePatterns(files).Select(FileFromPath))
             {
-                foreach (var tag in tags.Select(_tagParser.Parse))
+                if (tags.Count == 0)
                 {
-                    if (tag is { })
-                    {
-                        _logger.LogInformation($"File {file.Path} tagged with {tag.Name}");
+                    _file.Store(file);
+                }
+                else
+                {
+                    await TagFile(tags, file);
+                }
+                
+            }
+        }
 
-                        _consoleWriter.WriteLine($"File {file.Path} queued with tag {tag.Name}");
-                        await file.Tag(tag);
-                    }
+        private async Task TagFile(List<string> tags, File file)
+        {
+            foreach (var tag in tags.Select(_tagParser.Parse))
+            {
+                if (tag is { })
+                {
+                    _logger.LogInformation($"File {file.Path} tagged with {tag.Name}");
+
+                    _consoleWriter.WriteLine($"File {file.Path} queued with tag {tag.Name}");
+                    await file.Tag(tag);
                 }
             }
         }

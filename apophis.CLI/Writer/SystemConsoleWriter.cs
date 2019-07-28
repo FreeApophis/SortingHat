@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SortingHat.CliAbstractions
+namespace apophis.CLI.Writer
 {
     public class SystemConsoleWriter : IConsoleWriter
     {

@@ -40,8 +40,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\apophis.CLI\apophis.CLI.csproj" />
+    <ProjectReference Include="..\apophis.FileSystem\apophis.FileSystem.csproj" />
     <ProjectReference Include="..\SortingHat.API\SortingHat.API.csproj" />
-    <ProjectReference Include="..\SortingHat.CliAbstractions\SortingHat.CliAbstractions.csproj" />
     <ProjectReference Include="..\SortingHat.DB\SortingHat.DB.csproj" />
   </ItemGroup>
 

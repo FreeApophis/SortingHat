@@ -8,6 +8,7 @@ namespace SortingHat.CLI
     static class Program
     {
         static void Main(string[] args) => new CompositionRoot()
+                .Register()
                 .Build()
                 .Resolve<Application>()
                 .Run(args);

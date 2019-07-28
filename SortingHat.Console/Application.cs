@@ -3,7 +3,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using SortingHat.API.Parser;
 using System;
-using SortingHat.CliAbstractions;
+using apophis.CLI.Writer;
 
 namespace SortingHat.CLI
 {

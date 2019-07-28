@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using apophis.CLI;
+using apophis.CLI.Writer;
 using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
-using SortingHat.CliAbstractions;
-using SortingHat.CliAbstractions.Formatting;
 
 namespace SortingHat.CLI.Commands.Files
 {

@@ -2,8 +2,8 @@
 using SortingHat.API.DI;
 using System.Collections.Generic;
 using System.IO;
+using apophis.CLI.Writer;
 using Funcky.Monads;
-using SortingHat.CliAbstractions;
 
 namespace SortingHat.CLI.Commands
 {
