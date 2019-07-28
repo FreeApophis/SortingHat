@@ -17,7 +17,7 @@ namespace SortingHat.Plugin.FileType.Detectors
 
         public FileType? Identify(FileInfo file)
         {
-            using var stream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read);
+            using var stream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
             return Identify(stream);
         }

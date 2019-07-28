@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using apophis.CLI.Writer;
+using apophis.FileSystem;
 using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API;
@@ -14,12 +15,14 @@ namespace SortingHat.CLI.Commands.Projects
     {
         private readonly DatabaseSettings _databaseSettings;
         private readonly IConsoleWriter _consoleWriter;
+        private readonly ICopyFile _copyFile;
         private const string CurrentDirectory = ".";
 
-        public ExportProjectCommand(DatabaseSettings databaseSettings, IConsoleWriter consoleWriter)
+        public ExportProjectCommand(DatabaseSettings databaseSettings, IConsoleWriter consoleWriter, ICopyFile copyFile)
         {
             _databaseSettings = databaseSettings;
             _consoleWriter = consoleWriter;
+            _copyFile = copyFile;
         }
         public CommandGrouping CommandGrouping => CommandGrouping.Project;
         public string LongCommand => "export";
@@ -54,8 +57,7 @@ namespace SortingHat.CLI.Commands.Projects
 
         private bool ExportProject(string project, string destination)
         {
-            File.Copy(DatabaseSource(project), DestinationPath(destination, project));
-
+            _copyFile.Copy(DatabaseSource(project), DestinationPath(destination, project));
             _consoleWriter.WriteLine($"Project '{project}' has been exported to: {DestinationPath(destination, project)}");
 
             return true;

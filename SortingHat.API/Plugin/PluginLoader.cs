@@ -6,12 +6,20 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using apophis.FileSystem;
 
 namespace SortingHat.API.Plugin
 {
     [UsedImplicitly]
     public class PluginLoader : IPluginLoader
     {
+        private readonly IExistsDirectory _existsDirectory;
+
+        public PluginLoader(IExistsDirectory existsDirectory)
+        {
+            _existsDirectory = existsDirectory;
+        }
+
         public List<IPlugin> Plugins { get; } = new List<IPlugin>();
 
         private static string PluginDirectory => Path.Combine(PathToExecutable(), "plugins");
@@ -51,9 +59,9 @@ namespace SortingHat.API.Plugin
             }
         }
 
-        private static IEnumerable<Assembly> GetPluginAssemblies()
+        private IEnumerable<Assembly> GetPluginAssemblies()
         {
-            if (Directory.Exists(PluginDirectory))
+            if (_existsDirectory.Exists(PluginDirectory))
             {
                 return Directory.GetFiles(PluginDirectory, PluginFilePattern, SearchOption.TopDirectoryOnly)
                     .Select(Assembly.LoadFrom);

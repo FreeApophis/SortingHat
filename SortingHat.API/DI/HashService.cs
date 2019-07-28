@@ -24,7 +24,7 @@ namespace SortingHat.API.DI
         {
             return Task.Run(() =>
             {
-                using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+                using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
                 _consoleWriter.WriteLine($"Hashing: '{path}'");
                 var hash = _hashAlgorithm.ComputeHash(fileStream);

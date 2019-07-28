@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using apophis.CLI.Writer;
+using apophis.FileSystem;
 using Funcky.Monads;
 using JetBrains.Annotations;
+using SortingHat.API;
 using SortingHat.API.DI;
 
 namespace SortingHat.CLI.Commands.Projects
@@ -12,11 +15,17 @@ namespace SortingHat.CLI.Commands.Projects
     internal class ImportProjectCommand : ICommand
     {
         private readonly IConsoleWriter _consoleWriter;
+        private readonly ICopyFile _copyFile;
+        private readonly DatabaseSettings _databaseSettings;
+        private readonly IProjects _projects;
 
         [UsedImplicitly]
-        public ImportProjectCommand(IConsoleWriter consoleWriter)
+        public ImportProjectCommand(IConsoleWriter consoleWriter, ICopyFile copyFile, DatabaseSettings databaseSettings, IProjects projects)
         {
             _consoleWriter = consoleWriter;
+            _copyFile = copyFile;
+            _databaseSettings = databaseSettings;
+            _projects = projects;
         }
 
         public CommandGrouping CommandGrouping => CommandGrouping.Project;
@@ -38,24 +47,41 @@ namespace SortingHat.CLI.Commands.Projects
 
         private bool TooManyArguments()
         {
-            _consoleWriter.WriteLine("Too many arguments given, please give filePath and/or projectName.");
+            _consoleWriter.WriteLine("Too many arguments given, please give only filePath and projectName.");
 
             return false;
         }
 
-        private bool ImportProject(string filePath, string project)
+        private bool ImportProject(string filePath, string projectName)
         {
-            throw new NotImplementedException();
+            _copyFile.Copy(filePath, DestinationPath(projectName));
+            _projects.AddProject(projectName);
+
+            _consoleWriter.WriteLine($"New project '{projectName}' imported.");
+
+            return true;
         }
 
-        private bool ImportProject(string projectOrFilePath)
+        private bool ImportProject(string filePath)
         {
-            throw new NotImplementedException();
+            var projectName = Path.GetFileNameWithoutExtension(filePath);
+
+            if (projectName == null)
+            {
+                throw new NullReferenceException(nameof(projectName));
+            }
+
+            return ImportProject(filePath, projectName);
         }
 
         private bool NotEnoughArguments()
         {
             throw new NotImplementedException();
+        }
+
+        private string DestinationPath(string project)
+        {
+            return Path.Combine(_databaseSettings.DbPath, $"{project}.db");
         }
     }
 }

@@ -3,18 +3,17 @@ using Karambolo.Extensions.Logging.File;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SortingHat.API.DI;
-using SortingHat.API.Plugin;
 using SortingHat.API;
 using SortingHat.DB;
 using System.IO;
 using System.Reflection;
 using System.Security.Cryptography;
 using System;
-using System.Threading;
 using apophis.CLI.Writer;
 using apophis.FileSystem;
 using SortingHat.API.AutoTag;
 using SortingHat.API.Parser;
+using SortingHat.API.Plugin;
 
 namespace SortingHat.CLI
 {
@@ -45,10 +44,10 @@ namespace SortingHat.CLI
             Builder.RegisterGeneric(typeof(Logger<>)).As(typeof(ILogger<>)).SingleInstance();
 
             Builder.RegisterType<SystemConsoleWriter>().As<IConsoleWriter>();
+            Builder.RegisterType<PluginLoader>().As<IPluginLoader>().SingleInstance();
 
             RegisterCommands(Builder);
             RegisterAutoTags(Builder);
-            RegisterPlugins(Builder);
 
             RegisterConfiguration(Builder);
 
@@ -57,8 +56,6 @@ namespace SortingHat.CLI
 
         public IContainer Build()
         {
-
-
             return ConfigureLogger(Builder.Build());
         }
 
@@ -82,18 +79,6 @@ namespace SortingHat.CLI
             //loggerFactory.AddConsole();
 
             return container;
-        }
-
-        private void RegisterPlugins(ContainerBuilder builder)
-        {
-            // Instantiate the plugin loader
-            IPluginLoader pluginLoader = new PluginLoader();
-
-            // Make the plugin loader available in the IoC container
-            builder.RegisterInstance(pluginLoader).As<IPluginLoader>().SingleInstance();
-
-            // Register plugin modules
-            pluginLoader.RegisterModules(builder);
         }
 
         private static string ConfigurationPath()
