@@ -33,7 +33,7 @@ namespace SortingHat.CLI.Commands
 
             if (arguments.Any())
             {
-                return FindCommand(arguments, _container.Resolve<IEnumerable<ICommand>>());
+                return PrintSpecificHelp(arguments, _container.Resolve<IEnumerable<ICommand>>());
             }
 
             PrintOverview();
@@ -41,7 +41,7 @@ namespace SortingHat.CLI.Commands
 
         }
 
-        private bool FindCommand(IEnumerable<string> arguments, IEnumerable<ICommand> commands)
+        private bool PrintSpecificHelp(IEnumerable<string> arguments, IEnumerable<ICommand> commands)
         {
             foreach (var command in commands)
             {
@@ -79,7 +79,35 @@ namespace SortingHat.CLI.Commands
         {
             PrintHelpHeader();
             PrintHelpCommands(_container.Resolve<IEnumerable<ICommand>>());
+            PrintHelpOptions(_container.Resolve<IEnumerable<IOption>>());
             PrintHelpExamples();
+        }
+
+        private void PrintHelpOptions(IEnumerable<IOption> lazyOptions)
+        {
+            var options = lazyOptions.ToList();
+            if (options.Any())
+            {
+                _consoleWriter.WriteLine();
+                _consoleWriter.WriteLine("Options");
+                _consoleWriter.WriteLine();
+
+                var table = HelpTable();
+                foreach (var option in options)
+                {
+                    table.Append(FormatOption(option.ShortOption, "-"), FormatOption(option.LongOption, "--"), option.ShortHelp);
+                }
+                table.AppendSeperator();
+                table.WriteTo(_consoleWriter);
+            }
+        }
+
+        private string FormatOption(Option<string> option, string optionPrefix)
+        {
+            return option.Match(
+                none: "",
+                some: o => $"{optionPrefix}{o}"
+                );
         }
 
         private void PrintHelpExamples()
@@ -128,7 +156,7 @@ namespace SortingHat.CLI.Commands
 
         private void PrintHelpHeader()
         {
-            _consoleWriter.WriteLine("Sortinghat <command> [arguments]:");
+            _consoleWriter.WriteLine("hat <command> [<arguments>] [<options>]:");
         }
 
         public string LongCommand => "help";
