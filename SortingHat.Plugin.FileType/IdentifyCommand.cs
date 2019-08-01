@@ -25,7 +25,7 @@ namespace SortingHat.Plugin.FileType
 
         public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
-            foreach (var argument in _filePathExtractor.FromFilePatterns(arguments))
+            foreach (var argument in _filePathExtractor.FromFilePatterns(arguments, false))
             {
                 _consoleWriter.WriteLine($"File: {argument}");
 

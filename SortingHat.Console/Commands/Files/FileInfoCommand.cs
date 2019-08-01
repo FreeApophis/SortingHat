@@ -5,6 +5,7 @@ using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
+using SortingHat.CLI.Options;
 
 namespace SortingHat.CLI.Commands.Files
 {
@@ -24,7 +25,7 @@ namespace SortingHat.CLI.Commands.Files
 
         public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
-            foreach (var filePath in _filePathExtractor.FromFilePatterns(arguments))
+            foreach (var filePath in _filePathExtractor.FromFilePatterns(arguments, options.HasOption(new RecursiveOption())))
             {
                 _consoleWriter.WriteLine();
                 _consoleWriter.WriteLine($"File: {filePath}");

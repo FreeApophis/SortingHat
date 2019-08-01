@@ -80,7 +80,7 @@ namespace SortingHat.CLI.Commands.Tags
 
         private IEnumerable<File> FilesFromPattern(IEnumerable<string> files)
         {
-            return _filePathExtractor.FromFilePatterns(files).Select(FileFromPath);
+            return _filePathExtractor.FromFilePatterns(files, false).Select(FileFromPath);
         }
 
         private IEnumerable<Tag> ReplacedTags(IEnumerable<string> tags, File file)

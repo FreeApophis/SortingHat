@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using SortingHat.API;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
+using SortingHat.CLI.Options;
 
 namespace SortingHat.CLI.Commands.Files
 {
@@ -46,7 +47,7 @@ namespace SortingHat.CLI.Commands.Files
             var tags = arguments.Where(a => a.IsTag());
             var files = arguments.Where(IsFile);
 
-            foreach (var file in _filePathExtractor.FromFilePatterns(files).Select(FileFromPath))
+            foreach (var file in _filePathExtractor.FromFilePatterns(files, options.HasOption(new RecursiveOption())).Select(FileFromPath))
             {
                 foreach (var tag in tags.Select(_tagParser.Parse))
                 {

@@ -23,7 +23,7 @@ namespace SortingHat.Plugin.Exif
 
         public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
-            foreach (var filePath in _filePathExtractor.FromFilePatterns(arguments))
+            foreach (var filePath in _filePathExtractor.FromFilePatterns(arguments, false))
             {
                 IEnumerable<Directory> directories = ReadMetadata(filePath);
                 foreach (var directory in directories)

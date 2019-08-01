@@ -2,48 +2,52 @@
 using SortingHat.API.DI;
 using System.Collections.Generic;
 using System.IO;
-using apophis.Utils;
+using System.Linq;
 
 namespace SortingHat.API
 {
     [UsedImplicitly]
     public class FilePathExtractor : IFilePathExtractor
     {
-        private readonly List<string> _filePaths = new List<string>();
-
-        public IEnumerable<string> FromFilePatterns(IEnumerable<string> filePatterns)
+        public IEnumerable<string> FromFilePatterns(IEnumerable<string> filePatterns, bool recursive)
         {
-            _filePaths.Clear();
-
-            filePatterns.Each(FromFilePattern);
-
-            return _filePaths;
+            return filePatterns.Aggregate(new List<string>(), (filePaths, filePattern) => FromFilePattern(filePaths, filePattern, recursive, Directory.GetCurrentDirectory()));
         }
 
-        private void FromFilePattern(string filePattern)
+        private List<string> FromFilePattern(List<string> filePaths, string filePattern, bool recursive, string baseDirectory)
         {
             if (filePattern.Contains("*") || filePattern.Contains("?"))
             {
-                foreach (var filePath in Directory.GetFiles(Directory.GetCurrentDirectory(), filePattern))
+                foreach (var filePath in Directory.GetFiles(baseDirectory, filePattern))
                 {
-                    AddExistingFiles(filePath);
+                    AddExistingFiles(filePaths, filePath);
+                }
+
+                if (recursive)
+                {
+                    foreach (var directory in Directory.GetDirectories(baseDirectory))
+                    {
+                        FromFilePattern(filePaths, filePattern, true, directory);
+                    }
                 }
             }
             else
             {
-                var absolutePath = Path.Combine(Directory.GetCurrentDirectory(), filePattern);
+                var absolutePath = Path.Combine(baseDirectory, filePattern);
 
-                AddExistingFiles(absolutePath);
+                AddExistingFiles(filePaths, absolutePath);
             }
+
+            return filePaths;
         }
 
-        private void AddExistingFiles(string filePath)
+        private void AddExistingFiles(List<string> filePaths, string filePath)
         {
             var normalizedFilePath = Path.GetFullPath(filePath);
 
             if (File.Exists(normalizedFilePath))
             {
-                _filePaths.Add(normalizedFilePath);
+                filePaths.Add(normalizedFilePath);
             }
         }
     }
