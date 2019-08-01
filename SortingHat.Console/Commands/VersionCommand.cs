@@ -20,7 +20,7 @@ namespace SortingHat.CLI.Commands
             _consoleWriter = consoleWriter;
         }
 
-        public bool Execute(IEnumerable<string> arguments, IOptions options)
+        public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
             var version = GetVersion();
 

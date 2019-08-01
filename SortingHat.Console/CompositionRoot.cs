@@ -46,10 +46,11 @@ namespace SortingHat.CLI
             Builder.RegisterType<SystemConsoleWriter>().As<IConsoleWriter>();
             Builder.RegisterType<PluginLoader>().As<IPluginLoader>().SingleInstance();
 
-            RegisterCommands(Builder);
-            RegisterAutoTags(Builder);
+            RegisterCommands();
+            RegisterOptions();
+            RegisterAutoTags();
 
-            RegisterConfiguration(Builder);
+            RegisterConfiguration();
 
             return this;
         }
@@ -59,10 +60,10 @@ namespace SortingHat.CLI
             return ConfigureLogger(Builder.Build());
         }
 
-        private void RegisterAutoTags(ContainerBuilder builder)
+        private void RegisterAutoTags()
         {
-            builder.RegisterType<CreatedAtAutoTag>().As<IAutoTag>().SingleInstance();
-            builder.RegisterType<FolderFromRootAutoTag>().As<IAutoTag>().SingleInstance();
+            Builder.RegisterType<CreatedAtAutoTag>().As<IAutoTag>().SingleInstance();
+            Builder.RegisterType<FolderFromRootAutoTag>().As<IAutoTag>().SingleInstance();
         }
 
         public IContainer ConfigureLogger(IContainer container)
@@ -86,12 +87,12 @@ namespace SortingHat.CLI
             return Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) ?? throw new NullReferenceException("Configuration path cannot be null");
         }
 
-        private void RegisterConfiguration(ContainerBuilder builder)
+        private void RegisterConfiguration()
         {
             // https://github.com/dotnet/cli/issues/11545
             var configuration = ConfigurationRoot();
 
-            builder.Register(c => configuration.GetSection("Database").Get<DatabaseSettings>()).As<DatabaseSettings>();
+            Builder.Register(c => configuration.GetSection("Database").Get<DatabaseSettings>()).As<DatabaseSettings>();
         }
 
         private static IConfigurationRoot ConfigurationRoot()
@@ -102,11 +103,11 @@ namespace SortingHat.CLI
               .Build();
         }
 
-        private void RegisterCommands(ContainerBuilder builder)
+        private void RegisterCommands()
         {
             var cliAssembly = GetType().Assembly;
 
-            builder.RegisterAssemblyTypes(cliAssembly)
+            Builder.RegisterAssemblyTypes(cliAssembly)
                 .Where(IsCommandClass)
                 .As<ICommand>();
         }
@@ -116,6 +117,22 @@ namespace SortingHat.CLI
             return type != null
                 && type.Namespace != null
                 && type.Namespace.Contains(nameof(Commands)) && type.Name.EndsWith("Command");
+        }
+
+        private void RegisterOptions()
+        {
+            var cliAssembly = GetType().Assembly;
+
+            Builder.RegisterAssemblyTypes(cliAssembly)
+                .Where(IsOption)
+                .As<IOption>();
+        }
+
+        private bool IsOption(Type type)
+        {
+            return type != null
+                && type.Namespace != null
+                && type.Namespace.EndsWith(nameof(Options)) && type.Name.EndsWith("Option");
         }
     }
 }

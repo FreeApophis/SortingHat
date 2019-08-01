@@ -21,7 +21,7 @@ namespace SortingHat.Plugin.ExtractRelevantText
 
         public string ShortHelp => "scans a folder and its content";
 
-        public bool Execute(IEnumerable<string> arguments, IOptions options)
+        public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
             return _folderScanner.Scan(arguments);
         }

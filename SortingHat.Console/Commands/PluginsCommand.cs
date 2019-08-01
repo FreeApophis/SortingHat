@@ -25,7 +25,7 @@ namespace SortingHat.CLI.Commands
         public string ShortHelp => "Lists the loaded plugins";
         public CommandGrouping CommandGrouping => CommandGrouping.General;
 
-        public bool Execute(IEnumerable<string> arguments, IOptions options)
+        public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
             if (arguments.Any())
             {

@@ -2,6 +2,7 @@
 using SortingHat.API.DI;
 using System.Collections.Generic;
 using System.IO;
+using apophis.Utils;
 
 namespace SortingHat.API
 {
@@ -14,10 +15,7 @@ namespace SortingHat.API
         {
             _filePaths.Clear();
 
-            foreach (var filePattern in filePatterns)
-            {
-                FromFilePattern(filePattern);
-            }
+            filePatterns.Each(FromFilePattern);
 
             return _filePaths;
         }

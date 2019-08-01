@@ -1,7 +1,14 @@
-﻿namespace SortingHat.API.DI
+﻿using Funcky.Monads;
+
+namespace SortingHat.API.DI
 {
-    public interface IOptions
+    /// <summary>
+    /// Command line option representing long options (--long-option) and short options (-s)
+    /// </summary>
+    public interface IOption
     {
-        bool HasOption(string? shortOption, string? longOption);
+        Option<string> ShortOption { get; }
+        Option<string> LongOption { get; }
+        string ShortHelp { get; }
     }
 }

@@ -8,6 +8,7 @@ using SortingHat.API;
 using SortingHat.API.AutoTag;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
+using SortingHat.CLI.Options;
 
 namespace SortingHat.CLI.Commands.Tags
 {
@@ -36,14 +37,14 @@ namespace SortingHat.CLI.Commands.Tags
 
             return file;
         }
-        private bool ListTagVariables(IOptions options)
+        private bool ListTagVariables(IOptionParser options)
         {
             _consoleWriter.WriteLine("Possible Tag Variables:");
             _consoleWriter.WriteLine();
             foreach (var tag in _autoTagHandler.AutoTags.OrderBy(tag => tag.AutoTagKey))
             {
                 _consoleWriter.WriteLine($"* {tag.HumanReadableAutoTagsKey}");
-                if (options.HasOption("v", "verbose"))
+                if (options.HasOption(new VerboseOption()))
                 {
                     _consoleWriter.WriteLine($"=>  {tag.Description}");
                     _consoleWriter.WriteLine();
@@ -53,7 +54,7 @@ namespace SortingHat.CLI.Commands.Tags
             return true;
         }
 
-        private bool TagFiles(IEnumerable<string> lazyArguments, IOptions options)
+        private bool TagFiles(IEnumerable<string> lazyArguments, IOptionParser options)
         {
             var arguments = lazyArguments.ToList();
             var tags = arguments.Where(a => a.IsTag()).ToList();
@@ -65,7 +66,7 @@ namespace SortingHat.CLI.Commands.Tags
                 {
                     _consoleWriter.WriteLine($"Tag '{file.Path}' with '{tag.FullName}'");
 
-                    if (options.HasOption(null, "dry-run"))
+                    if (options.HasOption(new DryRunOption()))
                     {
                         continue;
                     }
@@ -98,7 +99,7 @@ namespace SortingHat.CLI.Commands.Tags
             return _autoTagHandler.TagFromMask(tagMask, new System.IO.FileInfo(file.Path));
         }
 
-        public bool Execute(IEnumerable<string> arguments, IOptions options)
+        public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
             return arguments.Any()
                 ? TagFiles(arguments, options)

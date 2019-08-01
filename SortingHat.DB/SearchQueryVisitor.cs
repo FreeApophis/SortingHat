@@ -16,16 +16,14 @@ namespace SortingHat.DB
         private readonly StringBuilder _selectBuilder = new StringBuilder();
         private readonly StringBuilder _whereBuilder = new StringBuilder();
         private const string GroupAndOrderClause = "\r\nGROUP BY FilePaths.Id\r\nORDER BY Files.Hash";
-        private readonly IProjectDatabase _db;
         private readonly SQLiteTag _sqLiteTag;
         private readonly ITagParser _tagParser;
         private int _fileTagCount;
 
         public bool UnknownTag { get; private set; }
 
-        public SearchQueryVisitor(IProjectDatabase db, SQLiteTag sqLiteTag, ITagParser tagParser)
+        public SearchQueryVisitor(SQLiteTag sqLiteTag, ITagParser tagParser)
         {
-            _db = db;
             _sqLiteTag = sqLiteTag;
             _tagParser = tagParser;
 

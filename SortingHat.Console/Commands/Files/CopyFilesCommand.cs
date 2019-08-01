@@ -24,7 +24,7 @@ namespace SortingHat.CLI.Commands.Files
             _consoleWriter = consoleWriter;
         }
 
-        public bool Execute(IEnumerable<string> arguments, IOptions options)
+        public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
             if (arguments.Count() != 2) throw new ArgumentOutOfRangeException(nameof(arguments));
 
@@ -52,7 +52,8 @@ namespace SortingHat.CLI.Commands.Files
                         _copyFile.Copy(file.Path, Path.Combine(path, x));
                     }
                 }
-            } else
+            }
+            else
             {
                 _consoleWriter.WriteLine("No files found for your search query...");
             }

@@ -29,7 +29,7 @@ namespace SortingHat.Test.Commands
         public void GivenTheCreateProjectCommandWithACorrectProjectNameTheProjectIsCreated()
         {
             var createProject = GetContainer().Resolve<CreateProjectCommand>();
-            var options = new Mock<IOptions>();
+            var options = new Mock<IOptionParser>();
             var projectName = "myProject";
             createProject.Execute(Enumerable.Repeat(projectName, 1), options.Object);
 
@@ -42,7 +42,7 @@ namespace SortingHat.Test.Commands
         public void GivenTheCreateProjectCommandWithNoProjectNameThereIsAnError()
         {
             var createProject = GetContainer().Resolve<CreateProjectCommand>();
-            var options = new Mock<IOptions>();
+            var options = new Mock<IOptionParser>();
             createProject.Execute(Enumerable.Empty<string>(), options.Object);
 
             // Not called
@@ -54,7 +54,7 @@ namespace SortingHat.Test.Commands
         public void GivenTheCreateProjectCommandWithMoreThanOneParametersIsAnError()
         {
             var createProject = GetContainer().Resolve<CreateProjectCommand>();
-            var options = new Mock<IOptions>();
+            var options = new Mock<IOptionParser>();
             createProject.Execute(Enumerable.Repeat("myProject", 2), options.Object);
 
             // Not called

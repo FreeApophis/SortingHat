@@ -20,6 +20,6 @@ namespace SortingHat.API.DI
         /// <returns></returns>
         string ShortHelp { get; }
 
-        bool Execute(IEnumerable<string> arguments, IOptions options);
+        bool Execute(IEnumerable<string> arguments, IOptionParser options);
     }
 }

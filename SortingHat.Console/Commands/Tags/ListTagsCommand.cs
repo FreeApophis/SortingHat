@@ -21,7 +21,7 @@ namespace SortingHat.CLI.Commands.Tags
             _consoleWriter = consoleWriter;
         }
 
-        public bool Execute(IEnumerable<string> arguments, IOptions options)
+        public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
             var tags = Tag.List(_tag).ToList();
             if (tags.Any())

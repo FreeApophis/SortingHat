@@ -6,6 +6,7 @@ using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API;
 using SortingHat.API.DI;
+using SortingHat.CLI.Options;
 
 namespace SortingHat.CLI.Commands.Files
 {
@@ -28,24 +29,29 @@ namespace SortingHat.CLI.Commands.Files
             return table;
         }
 
-        public bool Execute(IEnumerable<string> arguments, IOptions options)
+        public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
             var search = string.Join(" ", arguments);
             _consoleWriter.WriteLine($"Find Files: {search}");
 
             var files = _file.Search(search).ToList();
 
-            if (files.Any()) {
+            if (files.Any())
+            {
                 var table = FileTable();
-                foreach (var file in files) {
-                    if (options.HasOption(null, "open")) {
+                foreach (var file in files)
+                {
+                    if (options.HasOption(new OpenOption()))
+                    {
                         FileHelper.OpenWithAssociatedProgram(file.Path);
                     }
 
                     table.Append(file.Hash.Result.ShortHash(), file.CreatedAt, file.Size.HumanSize(), file.Path);
                 }
                 table.WriteTo(_consoleWriter);
-            } else {
+            }
+            else
+            {
                 _consoleWriter.WriteLine("No files found for your search query...");
             }
 

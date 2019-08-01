@@ -17,7 +17,7 @@ namespace SortingHat.CLI.Commands.Tags
             _tagParser = tagParser;
         }
 
-        public bool Execute(IEnumerable<string> arguments, IOptions options)
+        public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
             return arguments.Select(_tagParser.Parse).Aggregate(true, (result, tag) => result & (tag != null && tag.Store()));
         }

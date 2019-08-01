@@ -31,6 +31,37 @@ namespace SortingHat.CLI.Commands.Files
             _newFile = newFile;
             _file = file;
         }
+        public string LongCommand => "tag-files";
+        public Option<string> ShortCommand => Option.Some("tag");
+        public string ShortHelp => "Is tagging the files the given tags";
+        public CommandGrouping CommandGrouping => CommandGrouping.File;
+
+        public bool Execute(IEnumerable<string> arguments, IOptionParser options)
+        {
+            ExecuteAsync(arguments, options).Wait();
+
+            return true;
+        }
+
+        public async Task ExecuteAsync(IEnumerable<string> lazyArguments, IOptionParser options)
+        {
+            var arguments = lazyArguments.ToList();
+            var tags = arguments.Where(a => a.IsTag()).ToList();
+            var files = arguments.Where(IsFile);
+
+            foreach (var file in _filePathExtractor.FromFilePatterns(files).Select(FileFromPath))
+            {
+                if (tags.Count == 0)
+                {
+                    _file.Store(file);
+                }
+                else
+                {
+                    await TagFile(tags, file);
+                }
+
+            }
+        }
 
         private static bool IsFile(string value)
         {
@@ -47,26 +78,6 @@ namespace SortingHat.CLI.Commands.Files
             return file;
         }
 
-        public async Task ExecuteAsync(IEnumerable<string> lazyArguments)
-        {
-            var arguments = lazyArguments.ToList();
-            var tags = arguments.Where(a => a.IsTag()).ToList();
-            var files = arguments.Where(IsFile);
-
-            foreach (var file in _filePathExtractor.FromFilePatterns(files).Select(FileFromPath))
-            {
-                if (tags.Count == 0)
-                {
-                    _file.Store(file);
-                }
-                else
-                {
-                    await TagFile(tags, file);
-                }
-                
-            }
-        }
-
         private async Task TagFile(List<string> tags, File file)
         {
             foreach (var tag in tags.Select(_tagParser.Parse))
@@ -80,17 +91,5 @@ namespace SortingHat.CLI.Commands.Files
                 }
             }
         }
-
-        public bool Execute(IEnumerable<string> arguments, IOptions options)
-        {
-            ExecuteAsync(arguments).Wait();
-
-            return true;
-        }
-
-        public string LongCommand => "tag-files";
-        public Option<string> ShortCommand => Option.Some("tag");
-        public string ShortHelp => "Is tagging the files the given tags";
-        public CommandGrouping CommandGrouping => CommandGrouping.File;
     }
 }

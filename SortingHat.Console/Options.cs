@@ -1,22 +1,23 @@
-﻿using SortingHat.API.DI;
+﻿using Funcky.Monads;
+using SortingHat.API.DI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace SortingHat.CLI
 {
-    class Options : IOptions
+    class OptionParser : IOptionParser
     {
         readonly IEnumerable<string> _options;
-        public Options(IEnumerable<string> options)
+        public OptionParser(IEnumerable<string> options)
         {
             _options = options.Select(ToKeys);
         }
 
-        public bool HasOption(string? shortOption, string? longOption)
+        public bool HasOption(IOption option)
         {
             return _options
-                .Any(AnyOption(shortOption, longOption));
+                .Any(AnyOption(option.ShortOption, option.LongOption));
 
         }
 
@@ -25,10 +26,10 @@ namespace SortingHat.CLI
             return option.TrimStart('-').ToLower();
         }
 
-        private static Func<string, bool> AnyOption(string? shortOption, string? longOption)
+        private static Func<string, bool> AnyOption(Option<string> shortOption, Option<string> longOption)
         {
-            return option => shortOption != null && option == shortOption.ToLower()
-                || longOption != null && option == longOption.ToLower();
+            return option => shortOption.Match(false, o => string.Equals(o, option, StringComparison.OrdinalIgnoreCase))
+                || longOption.Match(false, o => string.Equals(o, option, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

@@ -22,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\apophis.CLI\apophis.CLI.csproj" />
     <ProjectReference Include="..\apophis.FileSystem\apophis.FileSystem.csproj" />
+    <ProjectReference Include="..\apophis.Utils\apophis.Utils.csproj" />
   </ItemGroup>
 
 </Project>

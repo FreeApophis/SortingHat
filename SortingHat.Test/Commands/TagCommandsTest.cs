@@ -23,9 +23,9 @@ namespace SortingHat.Test.Commands
             List<string> taxPeriods = new List<string> { ":tax_period:2016", ":tax_period:2017", ":tax_period:2018", ":tax_period:2019" };
             List<string> movieRating = new List<string> { ":movie:bad", ":movie:average", ":movie:good", ":movie:great" };
 
-            var mockOptions = new Mock<IOptions>();
+            var mockOptions = new Mock<IOptionParser>();
 
-            mockOptions.Setup(o => o.HasOption(It.IsAny<string>(), It.IsAny<string>())).Returns(false);
+            mockOptions.Setup(o => o.HasOption(It.IsAny<IOption>())).Returns(false);
 
             addTag.Execute(taxPeriods, mockOptions.Object);
             addTag.Execute(movieRating, mockOptions.Object);

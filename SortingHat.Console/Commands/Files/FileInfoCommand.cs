@@ -22,7 +22,7 @@ namespace SortingHat.CLI.Commands.Files
             _newFile = newFile;
         }
 
-        public bool Execute(IEnumerable<string> arguments, IOptions options)
+        public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
             foreach (var filePath in _filePathExtractor.FromFilePatterns(arguments))
             {

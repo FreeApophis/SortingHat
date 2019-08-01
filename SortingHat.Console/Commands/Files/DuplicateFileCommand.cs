@@ -21,7 +21,7 @@ namespace SortingHat.CLI.Commands.Files
             _consoleWriter = consoleWriter;
         }
 
-        public bool Execute(IEnumerable<string> arguments, IOptions options)
+        public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
             foreach (var file in _file.GetDuplicates())
             {

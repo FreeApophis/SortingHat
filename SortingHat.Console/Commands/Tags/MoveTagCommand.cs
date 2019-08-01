@@ -21,7 +21,7 @@ namespace SortingHat.CLI.Commands.Tags
             _tagParser = tagParser;
         }
 
-        public bool Execute(IEnumerable<string> lazyArguments, IOptions options)
+        public bool Execute(IEnumerable<string> lazyArguments, IOptionParser options)
         {
             var arguments = lazyArguments.ToList();
             var result = false;

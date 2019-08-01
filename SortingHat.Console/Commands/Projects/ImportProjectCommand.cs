@@ -32,7 +32,7 @@ namespace SortingHat.CLI.Commands.Projects
         public string LongCommand => "import";
         public Option<string> ShortCommand => Option<string>.None();
         public string ShortHelp => "Imports a project file into the db.";
-        public bool Execute(IEnumerable<string> lazyArguments, IOptions options)
+        public bool Execute(IEnumerable<string> lazyArguments, IOptionParser options)
         {
             var arguments = lazyArguments.ToList();
 

@@ -54,7 +54,7 @@ namespace SortingHat.CLI
 
         private void ExecuteCommand(ICommand command, List<string> arguments)
         {
-            if (command.Execute(TagAndFileArguments(arguments), new Options(OptionArguments(arguments))) == false)
+            if (command.Execute(TagAndFileArguments(arguments), new OptionParser(OptionArguments(arguments))) == false)
             {
                 _logger.Value.LogWarning("Command Execution failed!");
             }

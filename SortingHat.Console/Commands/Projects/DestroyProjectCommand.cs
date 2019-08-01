@@ -23,7 +23,7 @@ namespace SortingHat.CLI.Commands.Projects
         public string LongCommand => "remove-project";
         public Option<string> ShortCommand => Option<string>.None();
         public string ShortHelp => "Removes a project with all tags and files.";
-        public bool Execute(IEnumerable<string> arguments, IOptions options)
+        public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
             var projects = arguments.ToList();
 

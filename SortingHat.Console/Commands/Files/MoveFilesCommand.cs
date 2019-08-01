@@ -24,7 +24,7 @@ namespace SortingHat.CLI.Commands.Files
             _consoleWriter = consoleWriter;
         }
 
-        public bool Execute(IEnumerable<string> larzyArguments, IOptions options)
+        public bool Execute(IEnumerable<string> larzyArguments, IOptionParser options)
         {
             var arguments = larzyArguments.ToList();
             if (arguments.Count != 2) { throw new ArgumentOutOfRangeException(nameof(arguments)); }
@@ -45,7 +45,8 @@ namespace SortingHat.CLI.Commands.Files
                         _moveFile.Move(file.Path, Path.Combine(path, fileName));
                     }
                 }
-            } else
+            }
+            else
             {
                 _consoleWriter.WriteLine("No files found for your search query...");
             }

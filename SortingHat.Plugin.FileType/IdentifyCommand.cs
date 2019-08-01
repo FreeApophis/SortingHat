@@ -23,7 +23,7 @@ namespace SortingHat.Plugin.FileType
 
         private FileType? FileType(string argument) => _fileTypeFinder.Identify(new System.IO.FileInfo(argument));
 
-        public bool Execute(IEnumerable<string> arguments, IOptions options)
+        public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
             foreach (var argument in _filePathExtractor.FromFilePatterns(arguments))
             {
