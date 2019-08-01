@@ -73,8 +73,7 @@ namespace SortingHat.CLI.Commands.Files
         {
             var file = _newFile();
 
-            file.Path = filePath;
-            file.LoadByPath();
+            file.LoadByPathFromDbWithFallback(filePath);
 
             return file;
         }

@@ -31,8 +31,8 @@ namespace SortingHat.CLI.Commands.Files
                 _consoleWriter.WriteLine($"File: {filePath}");
 
                 var file = _newFile();
-                file.Path = filePath;
-                file.DBLoadByPath();
+
+                file.LoadByPathFromDb(filePath);
                 if (file.Hash == null)
                 {
                     _consoleWriter.WriteLine("File not in index!");

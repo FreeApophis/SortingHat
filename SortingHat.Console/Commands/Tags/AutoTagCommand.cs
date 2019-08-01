@@ -32,8 +32,7 @@ namespace SortingHat.CLI.Commands.Tags
         {
             var file = _newFile();
 
-            file.Path = filePath;
-            file.LoadByPath();
+            file.LoadByPath(filePath);
 
             return file;
         }

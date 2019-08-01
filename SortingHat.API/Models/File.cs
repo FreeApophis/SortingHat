@@ -25,13 +25,17 @@ namespace SortingHat.API.Models
         }
 
 
-        public void DBLoadByPath()
+        public void LoadByPathFromDb(string filePath)
         {
+            Path = filePath;
+
             _file.LoadByPath(this);
         }
 
-        public void LoadByPath()
+        public void LoadByPath(string filePath)
         {
+            Path = filePath;
+
             if (Path is { })
             {
                 var fileInfo = new FileInfo(Path);
@@ -66,6 +70,22 @@ namespace SortingHat.API.Models
         public async Task<IEnumerable<string>> GetNames()
         {
             return await _file.GetNames(this);
+        }
+
+        public void LoadByPathFromDbWithFallback(string path)
+        {
+            Path = path;
+
+            if (_file.LoadByPath(this)) { return; }
+
+            if (Path is { })
+            {
+                var fileInfo = new FileInfo(Path);
+
+                Hash = _hashService.GetHash(Path);
+                Size = fileInfo.Length;
+                CreatedAt = fileInfo.CreationTimeUtc;
+            }
         }
     }
 }
