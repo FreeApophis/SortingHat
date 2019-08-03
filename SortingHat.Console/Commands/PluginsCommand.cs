@@ -33,12 +33,10 @@ namespace SortingHat.CLI.Commands
                 return false;
             }
 
-            ListPlugins();
-
-            return true;
+            return ListPlugins();
         }
 
-        private void ListPlugins()
+        private bool ListPlugins()
         {
             if (_pluginLoader.Plugins.Any())
             {
@@ -55,6 +53,8 @@ namespace SortingHat.CLI.Commands
             {
                 _consoleWriter.WriteLine("No plugins loaded");
             }
+
+            return true;
         }
     }
 }

@@ -97,7 +97,7 @@ namespace SortingHat.CLI.Commands
                 {
                     table.Append(FormatOption(option.ShortOption, "-"), FormatOption(option.LongOption, "--"), option.ShortHelp);
                 }
-                table.AppendSeperator();
+                table.AppendSeparator();
                 table.WriteTo(_consoleWriter);
             }
         }
@@ -148,7 +148,7 @@ namespace SortingHat.CLI.Commands
                         var shortCommand = command.ShortCommand.Match("", c => c);
                         table.Append(command.LongCommand, shortCommand, command.ShortHelp);
                     }
-                    table.AppendSeperator();
+                    table.AppendSeparator();
                 }
                 table.WriteTo(_consoleWriter);
             }

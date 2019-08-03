@@ -20,6 +20,11 @@ namespace SortingHat.CLI.Commands
             _consoleWriter = consoleWriter;
         }
 
+        public string LongCommand => "version";
+        public Option<string> ShortCommand => Option.Some("v");
+        public string ShortHelp => "Shows the current Version of this program";
+        public CommandGrouping CommandGrouping => CommandGrouping.General;
+
         public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
             var version = GetVersion();
@@ -43,9 +48,5 @@ namespace SortingHat.CLI.Commands
             return Assembly.GetExecutingAssembly().GetName();
         }
 
-        public string LongCommand => "version";
-        public Option<string> ShortCommand => Option.Some("v");
-        public string ShortHelp => "Shows the current Version of this program";
-        public CommandGrouping CommandGrouping => CommandGrouping.General;
     }
 }

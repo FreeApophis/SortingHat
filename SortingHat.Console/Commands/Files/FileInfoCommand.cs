@@ -23,6 +23,11 @@ namespace SortingHat.CLI.Commands.Files
             _newFile = newFile;
         }
 
+        public string LongCommand => "file-info";
+        public Option<string> ShortCommand => Option.Some("info");
+        public string ShortHelp => "Shows all available information about the current file.";
+        public CommandGrouping CommandGrouping => CommandGrouping.File;
+
         public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
             foreach (var filePath in _filePathExtractor.FromFilePatterns(arguments, options.HasOption(new RecursiveOption())))
@@ -62,11 +67,5 @@ namespace SortingHat.CLI.Commands.Files
 
             return true;
         }
-
-        public string LongCommand => "file-info";
-        public Option<string> ShortCommand => Option.Some("info");
-        public string ShortHelp => "Shows all available information about the current file.";
-        public CommandGrouping CommandGrouping => CommandGrouping.File;
-
     }
 }

@@ -50,7 +50,7 @@ namespace SortingHat.CLI.Commands.Files
                 _consoleWriter.WriteLine();
             }
 
-            _consoleWriter.WriteLine("Files with an asterix (*) are in the database, but at the given path they seem to be deleted.");
+            _consoleWriter.WriteLine("Files with an asterisk (*) are in the database, but at the given path they seem to be deleted.");
 
             return true;
         }

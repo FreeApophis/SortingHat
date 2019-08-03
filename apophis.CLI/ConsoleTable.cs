@@ -32,7 +32,7 @@ namespace apophis.CLI
             _rows.Add(args);
         }
 
-        public void AppendSeperator()
+        public void AppendSeparator()
         {
             _rows.Add(new string[Columns.Count]);
         }
