@@ -2,6 +2,6 @@
 {
     public interface IOptionParser
     {
-        bool HasOption(IOption option);
+        bool HasOption<TOption>() where TOption : IOption, new();
     }
 }

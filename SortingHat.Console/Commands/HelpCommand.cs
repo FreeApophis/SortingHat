@@ -170,7 +170,7 @@ namespace SortingHat.CLI.Commands
             foreach (var tag in autoTagHandler.AutoTags.OrderBy(tag => tag.AutoTagKey))
             {
                 _consoleWriter.WriteLine($"* {tag.HumanReadableAutoTagsKey}");
-                if (options.HasOption(new VerboseOption()))
+                if (options.HasOption<VerboseOption>())
                 {
                     _consoleWriter.WriteLine($"=>  {tag.Description}");
                     _consoleWriter.WriteLine();

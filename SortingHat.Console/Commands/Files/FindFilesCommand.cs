@@ -41,7 +41,7 @@ namespace SortingHat.CLI.Commands.Files
                 var table = FileTable();
                 foreach (var file in files)
                 {
-                    if (options.HasOption(new OpenOption()))
+                    if (options.HasOption<OpenOption>())
                     {
                         FileHelper.OpenWithAssociatedProgram(file.Path);
                     }

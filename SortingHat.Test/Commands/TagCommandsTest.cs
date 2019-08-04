@@ -25,8 +25,6 @@ namespace SortingHat.Test.Commands
 
             var mockOptions = new Mock<IOptionParser>();
 
-            mockOptions.Setup(o => o.HasOption(It.IsAny<IOption>())).Returns(false);
-
             addTag.Execute(taxPeriods, mockOptions.Object);
             addTag.Execute(movieRating, mockOptions.Object);
 

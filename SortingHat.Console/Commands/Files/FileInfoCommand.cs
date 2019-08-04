@@ -30,7 +30,7 @@ namespace SortingHat.CLI.Commands.Files
 
         public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
-            foreach (var filePath in _filePathExtractor.FromFilePatterns(arguments, options.HasOption(new RecursiveOption())))
+            foreach (var filePath in _filePathExtractor.FromFilePatterns(arguments, options.HasOption<RecursiveOption>()))
             {
                 _consoleWriter.WriteLine();
                 _consoleWriter.WriteLine($"File: {filePath}");

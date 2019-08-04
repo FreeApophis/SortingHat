@@ -34,7 +34,7 @@ namespace SortingHat.Test.Commands
             application.Run(new[] { "help" });
 
             // Test the output
-            Assert.Equal("Sortinghat <command> [arguments]:", writer.Lines[0]);
+            Assert.Equal("hat <command> [<arguments>] [<options>]:", writer.Lines[0]);
         }
 
         private static Application CompositionRootWithMyWriter(MemoryConsoleWriter writer)

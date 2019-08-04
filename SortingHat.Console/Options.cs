@@ -14,11 +14,13 @@ namespace SortingHat.CLI
             _options = options.Select(ToKeys);
         }
 
-        public bool HasOption(IOption option)
+        public bool HasOption<TOption>()
+            where TOption : IOption, new()
         {
+            var option = new TOption();
+
             return _options
                 .Any(AnyOption(option.ShortOption, option.LongOption));
-
         }
 
         private string ToKeys(string option)
@@ -31,5 +33,7 @@ namespace SortingHat.CLI
             return option => shortOption.Match(false, o => string.Equals(o, option, StringComparison.OrdinalIgnoreCase))
                 || longOption.Match(false, o => string.Equals(o, option, StringComparison.OrdinalIgnoreCase));
         }
+
+
     }
 }

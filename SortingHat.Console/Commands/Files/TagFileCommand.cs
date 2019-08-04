@@ -54,7 +54,7 @@ namespace SortingHat.CLI.Commands.Files
             var tags = arguments.Where(a => a.IsTag()).ToList();
             var files = arguments.Where(IsFile);
 
-            foreach (var file in _filePathExtractor.FromFilePatterns(files, options.HasOption(new RecursiveOption())).Select(FileFromPath))
+            foreach (var file in _filePathExtractor.FromFilePatterns(files, options.HasOption<RecursiveOption>()).Select(FileFromPath))
             {
                 if (tags.Count == 0)
                 {
