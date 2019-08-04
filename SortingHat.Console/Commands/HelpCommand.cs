@@ -10,6 +10,8 @@ using System.Reflection;
 using apophis.CLI;
 using apophis.CLI.Writer;
 using Funcky.Monads;
+using SortingHat.API.AutoTag;
+using SortingHat.CLI.Options;
 
 namespace SortingHat.CLI.Commands
 {
@@ -36,7 +38,7 @@ namespace SortingHat.CLI.Commands
                 return PrintSpecificHelp(arguments, _container.Resolve<IEnumerable<ICommand>>());
             }
 
-            PrintOverview();
+            PrintOverview(options);
             return true;
 
         }
@@ -75,11 +77,12 @@ namespace SortingHat.CLI.Commands
             return $"SortingHat.CLI.Help.{command.GetType().Name}.help";
         }
 
-        private void PrintOverview()
+        private void PrintOverview(IOptionParser options)
         {
             PrintHelpHeader();
             PrintHelpCommands(_container.Resolve<IEnumerable<ICommand>>());
             PrintHelpOptions(_container.Resolve<IEnumerable<IOption>>());
+            PrintTagVariables(options);
             PrintHelpExamples();
         }
 
@@ -157,6 +160,24 @@ namespace SortingHat.CLI.Commands
         private void PrintHelpHeader()
         {
             _consoleWriter.WriteLine("hat <command> [<arguments>] [<options>]:");
+        }
+
+        private bool PrintTagVariables(IOptionParser options)
+        {
+            var autoTagHandler = _container.Resolve<IAutoTagHandler>();
+            _consoleWriter.WriteLine("Possible Tag Variables:");
+            _consoleWriter.WriteLine();
+            foreach (var tag in autoTagHandler.AutoTags.OrderBy(tag => tag.AutoTagKey))
+            {
+                _consoleWriter.WriteLine($"* {tag.HumanReadableAutoTagsKey}");
+                if (options.HasOption(new VerboseOption()))
+                {
+                    _consoleWriter.WriteLine($"=>  {tag.Description}");
+                    _consoleWriter.WriteLine();
+                }
+            }
+
+            return true;
         }
 
         public string LongCommand => "help";

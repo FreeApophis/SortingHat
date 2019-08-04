@@ -7,6 +7,7 @@ using Funcky.Monads;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using SortingHat.API;
+using SortingHat.API.AutoTag;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
 using SortingHat.CLI.Options;
@@ -22,8 +23,10 @@ namespace SortingHat.CLI.Commands.Files
         private readonly IFilePathExtractor _filePathExtractor;
         private readonly Func<File> _newFile;
         private readonly IFile _file;
+        private readonly IAutoTagHandler _autoTagHandler;
 
-        public TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter consoleWriter, ITagParser tagParser, IFilePathExtractor filePathExtractor, Func<File> newFile, IFile file)
+
+        public TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter consoleWriter, ITagParser tagParser, IFilePathExtractor filePathExtractor, Func<File> newFile, IFile file, IAutoTagHandler autoTagHandler)
         {
             _logger = logger;
             _consoleWriter = consoleWriter;
@@ -31,6 +34,7 @@ namespace SortingHat.CLI.Commands.Files
             _filePathExtractor = filePathExtractor;
             _newFile = newFile;
             _file = file;
+            _autoTagHandler = autoTagHandler;
         }
         public string LongCommand => "tag-files";
         public Option<string> ShortCommand => Option.Some("tag");
@@ -80,7 +84,7 @@ namespace SortingHat.CLI.Commands.Files
 
         private async Task TagFile(List<string> tags, File file)
         {
-            foreach (var tag in tags.Select(_tagParser.Parse))
+            foreach (var tag in ReplacedTags(tags, file))
             {
                 if (tag is { })
                 {
@@ -90,6 +94,22 @@ namespace SortingHat.CLI.Commands.Files
                     await file.Tag(tag);
                 }
             }
+        }
+
+        private IEnumerable<Tag> ReplacedTags(IEnumerable<string> tags, File file)
+        {
+            foreach (var tag in tags.Select(t => TagFromMask(t, file)))
+            {
+                if (tag is { })
+                {
+                    yield return tag;
+                }
+            }
+        }
+
+        private Tag? TagFromMask(string tagMask, File file)
+        {
+            return _autoTagHandler.TagFromMask(tagMask, new System.IO.FileInfo(file.Path));
         }
     }
 }
