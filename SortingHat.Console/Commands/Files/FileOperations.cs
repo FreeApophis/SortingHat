@@ -25,63 +25,130 @@ namespace SortingHat.CLI.Commands.Files
             _file = file;
         }
 
-        public bool ExportFiles(IEnumerable<string> arguments, IOptionParser options)
+        public bool ExportFiles(IEnumerable<string> lazyArguments, IOptionParser options, string longCommand)
         {
-            if (arguments.Count() != 2) throw new ArgumentOutOfRangeException(nameof(arguments));
+            var arguments = lazyArguments.ToList();
 
-            var search = arguments.First();
-            var absolutePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), arguments.Last()));
+            return arguments.Count switch
+            {
+                0 => NotEnoughArguments(longCommand),
+                1 => NotEnoughArguments(longCommand),
+                2 => ExportFiles(GetSearchArgument(arguments), GetDestinationPath(arguments)),
+                _ => TooManyArguments(longCommand)
+            };
+        }
 
+        private bool TooManyArguments(string longCommand)
+        {
+            _console.Writer.WriteLine("Too many arguments given, give complexes searches in quotes.");
+            _console.Writer.WriteLine($"{_console.Application.Name} {longCommand} search destination");
+
+            return false;
+        }
+
+
+        private bool NotEnoughArguments(string longCommand)
+        {
+            _console.Writer.WriteLine("Too few arguments given, please specify files with a search query and give a destination.");
+            _console.Writer.WriteLine($"{_console.Application.Name} {longCommand} search destination");
+
+            return false;
+        }
+
+        public bool ExportFiles(string search, string destinationPath)
+        {
             _console.Writer.WriteLine($"Find Files: {search}");
 
             var filesByHash = _file.Search(search).GroupByHash().ToList();
 
-            if (filesByHash.Any())
-            {
-                foreach (var file in filesByHash)
-                {
-                    _console.Writer.WriteLine();
-                    _console.Writer.WriteLine(" File");
-                    var consoleTable = new ConsoleTable(2);
-                    foreach (var (filePath, index) in file.Paths.Select((path, index) => (path, index)))
-                    {
-                        consoleTable.Append(FileSelectionIndex(filePath, index), filePath);
-                        _console.Writer.WriteLine($"  {filePath}");
-                    }
 
-                    _console.Reader
-                        .ReadInt()
-                        .AndThen(selectedFileIndex => ExportFile(file, selectedFileIndex, absolutePath));
-                }
-            }
-            else
+            return filesByHash.Count switch
             {
-                _console.Writer.WriteLine("No files found for your search query...");
-            }
-
-            return true;
+                0 => EmptyQuery(),
+                _ => ExportEachFile(filesByHash, destinationPath)
+            };
         }
 
-        private void ExportFile(HashGroup file, int selectedFileIndex, string absolutePath)
+        private bool ExportEachFile(List<HashGroup> filesByHash, string destinationPath)
         {
-            var selectedPath = file.Paths.Skip(selectedFileIndex).First();
-
-            if (Path.GetFileName(selectedPath) is { } selectedFileName)
+            bool result = true;
+            foreach (var file in filesByHash)
             {
-                _console.Writer.WriteLine($"cp {file.Paths.First()} {Path.Combine(absolutePath, selectedFileName)}");
+                result = result && file.Paths.Count() switch
+                {
+                    0 => throw new NotImplementedException("How did that happen?"),
+                    1 => ExportFile(file.Paths.First(), destinationPath),
+                    _ => ChoseFileToExport(file, destinationPath)
+                };
+            }
+
+            if (result == false)
+            {
+                _console.Writer.WriteLine("Last file failed, process aborted...");
+            }
+
+            return result;
+        }
+
+        private bool ChoseFileToExport(HashGroup file, string destinationPath)
+        {
+            _console.Writer.WriteLine();
+            _console.Writer.WriteLine($" The file with hash {file.Hash.ShortHash()} has multiple sources, which one you want to copy:");
+
+            var consoleTable = new ConsoleTable(2);
+
+            foreach (var (filePath, index) in file.Paths.Select((path, index) => (path, index)))
+            {
+                consoleTable.Append(FileSelectionIndex(filePath, index), filePath);
+            }
+
+            consoleTable.WriteTo(_console.Writer);
+
+            return _console.Reader
+                .ReadInt()
+                .AndThen(selectedFileIndex => ExportFile(file.Paths.Skip(selectedFileIndex).FirstOrDefault(), destinationPath))
+                .OrElse(false);
+        }
+
+        private bool EmptyQuery()
+        {
+            _console.Writer.WriteLine("No files found for your search query...");
+
+            return false;
+        }
+
+        private static string GetDestinationPath(IEnumerable<string> arguments)
+        {
+            return Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), arguments.Last()));
+        }
+
+        private static string GetSearchArgument(IEnumerable<string> arguments)
+        {
+            return arguments.First();
+        }
+
+        private bool ExportFile(string? sourcePath, string destinationPath)
+        {
+            if (sourcePath is {} && Path.GetFileName(sourcePath) is { } fileName)
+            {
                 switch (_fileOperation)
                 {
                     case ICopyFile copyFile:
-                        copyFile.Copy(file.Paths.First(), Path.Combine(absolutePath, selectedFileName));
+                        _console.Writer.WriteLine($"cp {sourcePath} {Path.Combine(destinationPath, fileName)}");
+                        copyFile.Copy(sourcePath, Path.Combine(destinationPath, fileName));
                         break;
                     case IMoveFile moveFile:
-                        moveFile.Move(file.Paths.First(), Path.Combine(absolutePath, selectedFileName));
+                        _console.Writer.WriteLine($"mv {sourcePath} {Path.Combine(destinationPath, fileName)}");
+                        moveFile.Move(sourcePath, Path.Combine(destinationPath, fileName));
                         break;
                     default:
                         throw new NotImplementedException("Unknown file operation");
                 }
-
+                return true;
             }
+
+            _console.Writer.WriteLine("Source unusable.");
+            return false;
         }
 
         private string FileSelectionIndex(string filePath, in int index)

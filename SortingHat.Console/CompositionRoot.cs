@@ -47,6 +47,7 @@ namespace SortingHat.CLI
 
             Builder.RegisterType<SystemConsoleWriter>().As<IConsoleWriter>();
             Builder.RegisterType<SystemConsoleReader>().As<IConsoleReader>();
+            Builder.RegisterType<ConsoleApplicationInformationProvider>().As<IConsoleApplicationInformationProvider>();
             Builder.RegisterType<apophis.CLI.Console>().AsSelf();
 
             Builder.RegisterType<PluginLoader>().As<IPluginLoader>().SingleInstance();

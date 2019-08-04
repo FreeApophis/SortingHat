@@ -18,7 +18,7 @@ namespace SortingHat.CLI.Commands.Files
 
         public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
-            return _moveFileOperation.ExportFiles(arguments, options);
+            return _moveFileOperation.ExportFiles(arguments, options, LongCommand);
         }
 
         public string LongCommand => "move-files";

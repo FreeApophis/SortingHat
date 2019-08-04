@@ -9,7 +9,8 @@ namespace SortingHat.CLI.Commands.Files
             Hash = hash;
             Paths = paths;
         }
-        private string Hash { get; }
+
+        public string Hash { get; }
         public IEnumerable<string> Paths { get; }
     }
 }

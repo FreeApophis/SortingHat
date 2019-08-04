@@ -8,10 +8,10 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using apophis.CLI;
-using apophis.CLI.Writer;
 using Funcky.Monads;
 using SortingHat.API.AutoTag;
 using SortingHat.CLI.Options;
+using Console = apophis.CLI.Console;
 
 namespace SortingHat.CLI.Commands
 {
@@ -19,13 +19,13 @@ namespace SortingHat.CLI.Commands
     internal class HelpCommand : ICommand
     {
         private readonly ILogger<HelpCommand> _logger;
-        private readonly IConsoleWriter _consoleWriter;
+        private readonly Console _console;
         private readonly IComponentContext _container;
 
-        public HelpCommand(ILogger<HelpCommand> logger, IConsoleWriter consoleWriter, IComponentContext container)
+        public HelpCommand(ILogger<HelpCommand> logger, Console console, IComponentContext container)
         {
             _logger = logger;
-            _consoleWriter = consoleWriter;
+            _console= console;
             _container = container;
         }
 
@@ -62,7 +62,7 @@ namespace SortingHat.CLI.Commands
             using var resourceStream = GetHelResourceStream(command);
             using var reader = new StreamReader(resourceStream);
 
-            _consoleWriter.WriteLine(reader.ReadToEnd());
+            _console.Writer.WriteLine(reader.ReadToEnd());
         }
 
         private static Stream GetHelResourceStream(ICommand command)
@@ -91,9 +91,9 @@ namespace SortingHat.CLI.Commands
             var options = lazyOptions.ToList();
             if (options.Any())
             {
-                _consoleWriter.WriteLine();
-                _consoleWriter.WriteLine("Options");
-                _consoleWriter.WriteLine();
+                _console.Writer.WriteLine();
+                _console.Writer.WriteLine("Options");
+                _console.Writer.WriteLine();
 
                 var table = HelpTable();
                 foreach (var option in options)
@@ -101,7 +101,7 @@ namespace SortingHat.CLI.Commands
                     table.Append(FormatOption(option.ShortOption, "-"), FormatOption(option.LongOption, "--"), option.ShortHelp);
                 }
                 table.AppendSeparator();
-                table.WriteTo(_consoleWriter);
+                table.WriteTo(_console.Writer);
             }
         }
 
@@ -115,14 +115,14 @@ namespace SortingHat.CLI.Commands
 
         private void PrintHelpExamples()
         {
-            _consoleWriter.WriteLine();
-            _consoleWriter.WriteLine("Examples:");
-            _consoleWriter.WriteLine();
-            _consoleWriter.WriteLine("  hat.exe find (:tax:2018 or :tax:2017) and :bank");
-            _consoleWriter.WriteLine("    This will output all files which are tagged as bank documents for tax in 2017 or 2018.");
-            _consoleWriter.WriteLine();
-            _consoleWriter.WriteLine("  auto-tag :Files:{FileType.Category}:{CameraMake} :Taken:{Taken.Year} *");
-            _consoleWriter.WriteLine("    This will tag all files in the current directory, the possible automatic tags depend on your plugins.");
+            _console.Writer.WriteLine();
+            _console.Writer.WriteLine("Examples:");
+            _console.Writer.WriteLine();
+            _console.Writer.WriteLine($"  {_console.Application.Name} find (:tax:2018 or :tax:2017) and :bank");
+            _console.Writer.WriteLine("    This will output all files which are tagged as bank documents for tax in 2017 or 2018.");
+            _console.Writer.WriteLine();
+            _console.Writer.WriteLine($"  {_console.Application.Name} auto-tag :Files:{{FileType.Category}}:{{CameraMake}} :Taken:{{Taken.Year}} *");
+            _console.Writer.WriteLine("    This will tag all files in the current directory, the possible automatic tags depend on your plugins.");
         }
 
         private ConsoleTable HelpTable()
@@ -139,9 +139,9 @@ namespace SortingHat.CLI.Commands
             var commands = lazyCommands.ToList();
             if (commands.Any())
             {
-                _consoleWriter.WriteLine();
-                _consoleWriter.WriteLine("Commands");
-                _consoleWriter.WriteLine();
+                _console.Writer.WriteLine();
+                _console.Writer.WriteLine("Commands");
+                _console.Writer.WriteLine();
 
                 var table = HelpTable();
                 foreach (var commandGrouping in Enum.GetValues(typeof(CommandGrouping)).Cast<CommandGrouping>())
@@ -153,27 +153,27 @@ namespace SortingHat.CLI.Commands
                     }
                     table.AppendSeparator();
                 }
-                table.WriteTo(_consoleWriter);
+                table.WriteTo(_console.Writer);
             }
         }
 
         private void PrintHelpHeader()
         {
-            _consoleWriter.WriteLine("hat <command> [<arguments>] [<options>]:");
+            _console.Writer.WriteLine($"{_console.Application.Name} <command> [<arguments>] [<options>]:");
         }
 
         private bool PrintTagVariables(IOptionParser options)
         {
             var autoTagHandler = _container.Resolve<IAutoTagHandler>();
-            _consoleWriter.WriteLine("Possible Tag Variables:");
-            _consoleWriter.WriteLine();
+            _console.Writer.WriteLine("Possible Tag Variables:");
+            _console.Writer.WriteLine();
             foreach (var tag in autoTagHandler.AutoTags.OrderBy(tag => tag.AutoTagKey))
             {
-                _consoleWriter.WriteLine($"* {tag.HumanReadableAutoTagsKey}");
+                _console.Writer.WriteLine($"* {tag.HumanReadableAutoTagsKey}");
                 if (options.HasOption<VerboseOption>())
                 {
-                    _consoleWriter.WriteLine($"=>  {tag.Description}");
-                    _consoleWriter.WriteLine();
+                    _console.Writer.WriteLine($"=>  {tag.Description}");
+                    _console.Writer.WriteLine();
                 }
             }
 

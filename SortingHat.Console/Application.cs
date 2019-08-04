@@ -3,7 +3,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using SortingHat.API.Parser;
 using System;
-using apophis.CLI.Writer;
+using Console = apophis.CLI.Console;
 
 namespace SortingHat.CLI
 {
@@ -13,13 +13,13 @@ namespace SortingHat.CLI
         private readonly ILogger<Application> _logger;
         private readonly ArgumentParser _argumentParser;
         private readonly ILoggerFactory _loggerFactory;
-        private readonly IConsoleWriter _consoleWriter;
+        private readonly Console _console;
 
-        public Application(ILogger<Application> logger, ILoggerFactory loggerFactory, IConsoleWriter consoleWriter, ArgumentParser argumentParser)
+        public Application(ILogger<Application> logger, ILoggerFactory loggerFactory, Console console, ArgumentParser argumentParser)
         {
             _logger = logger;
             _loggerFactory = loggerFactory;
-            _consoleWriter = consoleWriter;
+            _console = console;
             _argumentParser = argumentParser;
         }
 
@@ -33,8 +33,8 @@ namespace SortingHat.CLI
             }
             catch (ParseException e)
             {
-                _consoleWriter.WriteLine("Parser is not happy with your input, maybe find a ravenclaw...");
-                _consoleWriter.WriteLine(e.Message);
+                _console.Writer.WriteLine("Parser is not happy with your input, maybe find a ravenclaw...");
+                _console.Writer.WriteLine(e.Message);
                 Environment.Exit(-1);
 
             }
@@ -42,22 +42,23 @@ namespace SortingHat.CLI
             {
                 _logger.LogWarning("The database is throwing an exception...");
                 _logger.LogWarning(e.Message);
-                _consoleWriter.WriteLine(e.Message);
+                _console.Writer.WriteLine(e.Message);
                 Environment.Exit(-1);
             }
             catch (Exception e)
             {
                 if (e.Message.Contains("no such table:"))
                 {
-                    _logger.LogWarning("Database not initialized? Run .hat init");
+                    _console.Writer.WriteLine($"Database not initialized? Run '{_console.Application.Name} init'");
+                    _logger.LogWarning($"Database not initialized? Run '{_console.Application.Name} init'");
                 }
 
                 _logger.LogError(e.Message);
-                _consoleWriter.WriteLine(e.Message);
+                _console.Writer.WriteLine(e.Message);
 
                 if (e.StackTrace != null)
                 {
-                    _consoleWriter.WriteLine(e.StackTrace);
+                    _console.Writer.WriteLine(e.StackTrace);
                 }
 
                 Environment.Exit(-1);
