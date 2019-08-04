@@ -30,7 +30,7 @@ namespace SortingHat.CLI.Commands.Files
                 _consoleWriter.WriteLine($"File Size: {file.Size}");
                 _consoleWriter.WriteLine($"File Tags: {string.Join(", ", file.GetTags().Result.Select(t => t.FullName))}");
 
-                var table = FileTable();
+                var table = new ConsoleTable(5);
                 foreach (var path in file.GetPaths().Result)
                 {
                     var fileInfo = new FileInfo(path);
@@ -53,13 +53,6 @@ namespace SortingHat.CLI.Commands.Files
             _consoleWriter.WriteLine("Files with an asterisk (*) are in the database, but at the given path they seem to be deleted.");
 
             return true;
-        }
-
-        private ConsoleTable FileTable()
-        {
-            var table = new ConsoleTable(5);
-
-            return table;
         }
 
         public string LongCommand => "duplicate";

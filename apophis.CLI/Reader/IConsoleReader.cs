@@ -1,8 +1,10 @@
-﻿namespace apophis.CLI.Reader
+﻿using Funcky.Monads;
+
+namespace apophis.CLI.Reader
 {
     public interface IConsoleReader
     {
-        void WriteLine(string line);
-        void WriteLine();
+        Option<int> ReadInt();
+        string ReadLine();
     }
 }

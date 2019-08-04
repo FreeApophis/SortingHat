@@ -9,11 +9,13 @@ using System.IO;
 using System.Reflection;
 using System.Security.Cryptography;
 using System;
+using apophis.CLI.Reader;
 using apophis.CLI.Writer;
 using apophis.FileSystem;
 using SortingHat.API.AutoTag;
 using SortingHat.API.Parser;
 using SortingHat.API.Plugin;
+using SortingHat.CLI.Commands.Files;
 
 namespace SortingHat.CLI
 {
@@ -44,6 +46,9 @@ namespace SortingHat.CLI
             Builder.RegisterGeneric(typeof(Logger<>)).As(typeof(ILogger<>)).SingleInstance();
 
             Builder.RegisterType<SystemConsoleWriter>().As<IConsoleWriter>();
+            Builder.RegisterType<SystemConsoleReader>().As<IConsoleReader>();
+            Builder.RegisterType<apophis.CLI.Console>().AsSelf();
+
             Builder.RegisterType<PluginLoader>().As<IPluginLoader>().SingleInstance();
 
             RegisterCommands();
@@ -105,6 +110,9 @@ namespace SortingHat.CLI
 
         private void RegisterCommands()
         {
+            Builder.RegisterType<FileOperations<ICopyFile>>().AsSelf();
+            Builder.RegisterType<FileOperations<IMoveFile>>().AsSelf();
+
             var cliAssembly = GetType().Assembly;
 
             Builder.RegisterAssemblyTypes(cliAssembly)

@@ -1,6 +1,6 @@
 ﻿namespace apophis.FileSystem
 {
-    public interface IMoveFile
+    public interface IMoveFile : IFileOperation
     {
         void Move(string sourceFileName, string destinationFileName);
     }

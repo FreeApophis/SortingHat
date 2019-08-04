@@ -145,15 +145,14 @@ namespace SortingHat.DB.Access
 
         private string ParseQuery(string query)
         {
+            var visitor = _newSearchQueryVisitor();
+
             if (_parser.Parse(query) is { } ir)
             {
-                var visitor = _newSearchQueryVisitor();
                 ir.Accept(visitor);
-
-                return visitor.Result;
             }
 
-            return string.Empty;
+            return visitor.Result;
         }
 
         private static bool LoadFileFromReader(DbDataReader reader, File file)

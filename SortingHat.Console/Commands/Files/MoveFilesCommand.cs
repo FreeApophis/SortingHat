@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using apophis.CLI.Writer;
+﻿using System.Collections.Generic;
 using apophis.FileSystem;
 using Funcky.Monads;
 using JetBrains.Annotations;
@@ -13,45 +9,16 @@ namespace SortingHat.CLI.Commands.Files
     [UsedImplicitly]
     internal class MoveFilesCommand : ICommand
     {
-        private readonly IFile _file;
-        private readonly IMoveFile _moveFile;
-        private readonly IConsoleWriter _consoleWriter;
+        private readonly FileOperations<IMoveFile> _moveFileOperation;
 
-        public MoveFilesCommand(IFile file, IMoveFile moveFile, IConsoleWriter consoleWriter)
+        public MoveFilesCommand(FileOperations<IMoveFile> moveFileOperation)
         {
-            _file = file;
-            _moveFile = moveFile;
-            _consoleWriter = consoleWriter;
+            _moveFileOperation = moveFileOperation;
         }
 
-        public bool Execute(IEnumerable<string> larzyArguments, IOptionParser options)
+        public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
-            var arguments = larzyArguments.ToList();
-            if (arguments.Count != 2) { throw new ArgumentOutOfRangeException(nameof(arguments)); }
-
-            var search = arguments.First();
-            var path = Path.Combine(Directory.GetCurrentDirectory(), arguments.Last());
-
-            _consoleWriter.WriteLine($"Find Files: {search}");
-
-            var files = _file.Search(search).ToList();
-
-            if (files.Any())
-            {
-                foreach (var file in files)
-                {
-                    if (Path.GetFileName(file.Path) is { } fileName)
-                    {
-                        _moveFile.Move(file.Path, Path.Combine(path, fileName));
-                    }
-                }
-            }
-            else
-            {
-                _consoleWriter.WriteLine("No files found for your search query...");
-            }
-
-            return true;
+            return _moveFileOperation.ExportFiles(arguments, options);
         }
 
         public string LongCommand => "move-files";

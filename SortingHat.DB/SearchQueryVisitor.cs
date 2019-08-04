@@ -4,7 +4,6 @@ using SortingHat.API.Parser;
 using System.Text;
 using System;
 using JetBrains.Annotations;
-using SortingHat.API.DI;
 using SortingHat.DB.Access;
 
 namespace SortingHat.DB
@@ -12,13 +11,16 @@ namespace SortingHat.DB
     [UsedImplicitly]
     public class SearchQueryVisitor : INodeVisitor
     {
-        public string Result => _selectBuilder.ToString() + _whereBuilder + GroupAndOrderClause;
+        public string Result => _selectBuilder + WhereClause + GroupAndOrderClause;
+
+        private string WhereClause => _whereBuilder.Length == WhereStart.Length ? $"{WhereStart}0" : _whereBuilder.ToString();
         private readonly StringBuilder _selectBuilder = new StringBuilder();
         private readonly StringBuilder _whereBuilder = new StringBuilder();
         private const string GroupAndOrderClause = "\r\nGROUP BY FilePaths.Id\r\nORDER BY Files.Hash";
         private readonly SQLiteTag _sqLiteTag;
         private readonly ITagParser _tagParser;
         private int _fileTagCount;
+        private const string WhereStart = "WHERE ";
 
         public bool UnknownTag { get; private set; }
 
@@ -31,7 +33,7 @@ namespace SortingHat.DB
             _selectBuilder.AppendLine("FROM Files");
             _selectBuilder.AppendLine("JOIN FilePaths ON FilePaths.FileId = Files.Id");
 
-            _whereBuilder.Append("WHERE ");
+            _whereBuilder.Append(WhereStart);
         }
 
         public void Visit(UnaryOperatorNode op)

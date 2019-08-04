@@ -36,7 +36,7 @@ namespace SortingHat.CLI.Commands
 
             table.Columns[0].Alignment = ConsoleTableColumnAlignment.Right;
 
-            table.Append("Culture:", version.CultureName);
+            table.Append("Culture:", version.CultureName ?? "<NULL>");
             table.Append("Current Culture:", CultureInfo.CurrentCulture);
 
             table.WriteTo(_consoleWriter);
