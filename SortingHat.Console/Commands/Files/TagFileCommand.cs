@@ -88,9 +88,9 @@ namespace SortingHat.CLI.Commands.Files
             {
                 if (tag is { })
                 {
-                    _logger.LogInformation($"File {file.Path} tagged with {tag.Name}");
+                    _logger.LogInformation($"File {file.Path} tagged with {tag.FullName}");
 
-                    _consoleWriter.WriteLine($"File {file.Path} queued with tag {tag.Name}");
+                    _consoleWriter.WriteLine($"File {file.Path} queued with tag {tag.FullName}");
                     await file.Tag(tag);
                 }
             }

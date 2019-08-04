@@ -11,44 +11,50 @@ namespace SortingHat.API
     {
         public IEnumerable<string> FromFilePatterns(IEnumerable<string> filePatterns, bool recursive)
         {
-            return filePatterns.Aggregate(new List<string>(), (filePaths, filePattern) => FromFilePattern(filePaths, filePattern, recursive, Directory.GetCurrentDirectory()));
+            return filePatterns.SelectMany(pattern => PathFromFilePattern(pattern, recursive, Directory.GetCurrentDirectory()));
         }
 
-        private List<string> FromFilePattern(List<string> filePaths, string filePattern, bool recursive, string baseDirectory)
+        private IEnumerable<string> PathFromFilePattern( string filePattern, bool recursive, string baseDirectory)
         {
             if (filePattern.Contains("*") || filePattern.Contains("?"))
             {
                 foreach (var filePath in Directory.GetFiles(baseDirectory, filePattern))
                 {
-                    AddExistingFiles(filePaths, filePath);
+                    if (NormalizedExistingPath(filePath) is { } path)
+                    {
+                        yield return path;
+                    }
                 }
 
                 if (recursive)
                 {
                     foreach (var directory in Directory.GetDirectories(baseDirectory))
                     {
-                        FromFilePattern(filePaths, filePattern, true, directory);
+                        foreach(var path in PathFromFilePattern(filePattern, true, directory))
+                        {
+                            yield return path;
+                        }
                     }
                 }
             }
             else
             {
-                var absolutePath = Path.Combine(baseDirectory, filePattern);
+                var fullPath = Path.Combine(baseDirectory, filePattern);
 
-                AddExistingFiles(filePaths, absolutePath);
+                if (NormalizedExistingPath(fullPath) is { } path)
+                {
+                    yield return path;
+                }
             }
-
-            return filePaths;
         }
 
-        private void AddExistingFiles(List<string> filePaths, string filePath)
+        private string? NormalizedExistingPath(string filePath)
         {
             var normalizedFilePath = Path.GetFullPath(filePath);
 
-            if (File.Exists(normalizedFilePath))
-            {
-                filePaths.Add(normalizedFilePath);
-            }
+            return File.Exists(normalizedFilePath)
+                ? normalizedFilePath
+                : null;
         }
     }
 }
