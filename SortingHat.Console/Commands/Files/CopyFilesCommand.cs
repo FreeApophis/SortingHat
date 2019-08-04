@@ -29,7 +29,7 @@ namespace SortingHat.CLI.Commands.Files
             if (arguments.Count() != 2) throw new ArgumentOutOfRangeException(nameof(arguments));
 
             var search = arguments.First();
-            var path = Path.Combine(Directory.GetCurrentDirectory(), arguments.Last());
+            var compbinedPath = Path.Combine(Directory.GetCurrentDirectory(), arguments.Last());
 
             _consoleWriter.WriteLine($"Find Files: {search}");
 
@@ -37,19 +37,19 @@ namespace SortingHat.CLI.Commands.Files
 
             if (files.Any())
             {
-                foreach (dynamic file in GroupByHash(files))
+                foreach (var file in GroupByHash(files))
                 {
                     _consoleWriter.WriteLine();
-                    foreach (var fileName in file.Paths)
+                    foreach (var (fileName, index) in file.Paths.Select((path, index) => (path, index)))
                     {
-                        _consoleWriter.WriteLine($"* {fileName} (0)");
+                        _consoleWriter.WriteLine($"* {fileName} ({index})");
                     }
 
                     var selectedPath = "";
                     if (Path.GetFileName(selectedPath) is { } x)
                     {
-                        _consoleWriter.WriteLine($"cp {file.Path} {Path.Combine(path, x)}");
-                        _copyFile.Copy(file.Path, Path.Combine(path, x));
+                        _consoleWriter.WriteLine($"cp {file.Paths.First()} {Path.Combine(compbinedPath, x)}");
+                        _copyFile.Copy(file.Paths.First(), Path.Combine(compbinedPath, x));
                     }
                 }
             }
@@ -61,9 +61,9 @@ namespace SortingHat.CLI.Commands.Files
             return true;
         }
 
-        private static IEnumerable<object> GroupByHash(List<API.Models.File> files)
+        private static IEnumerable<HashGroup> GroupByHash(List<API.Models.File> files)
         {
-            return files.GroupBy(f => f.Hash.Result, (hash, file) => new { Hash = hash, Paths = file.Select(f => f.Path) });
+            return files.GroupBy(f => f.Hash.Result, (hash, file) => new HashGroup(hash, file.Select(f => f.Path)));
         }
 
         public string LongCommand => "copy-files";
