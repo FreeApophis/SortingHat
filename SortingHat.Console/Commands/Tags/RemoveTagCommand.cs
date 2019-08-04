@@ -21,6 +21,11 @@ namespace SortingHat.CLI.Commands.Tags
             _logger = logger;
         }
 
+        public string LongCommand => "remove-tags";
+        public Option<string> ShortCommand => Option<string>.None();
+        public string ShortHelp => "Removes a tag from database";
+        public CommandGrouping CommandGrouping => CommandGrouping.Tag;
+
         public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
             foreach (var tagString in arguments)
@@ -39,10 +44,5 @@ namespace SortingHat.CLI.Commands.Tags
 
             return true;
         }
-
-        public string LongCommand => "remove-tags";
-        public Option<string> ShortCommand => Option<string>.None();
-        public string ShortHelp => "Removes a tag from database";
-        public CommandGrouping CommandGrouping => CommandGrouping.Tag;
     }
 }

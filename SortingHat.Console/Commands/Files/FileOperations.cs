@@ -6,6 +6,7 @@ using apophis.CLI;
 using apophis.FileSystem;
 using SortingHat.API.DI;
 using Console = apophis.CLI.Console;
+using File = SortingHat.API.Models.File;
 
 namespace SortingHat.CLI.Commands.Files
 {
@@ -74,10 +75,10 @@ namespace SortingHat.CLI.Commands.Files
             bool result = true;
             foreach (var file in filesByHash)
             {
-                result = result && file.Paths.Count() switch
+                result = result && file.Files.Count() switch
                 {
                     0 => throw new NotImplementedException("How did that happen?"),
-                    1 => ExportFile(file.Paths.First(), destinationPath),
+                    1 => ExportFile(file.Files.First(), destinationPath),
                     _ => ChoseFileToExport(file, destinationPath)
                 };
             }
@@ -90,23 +91,23 @@ namespace SortingHat.CLI.Commands.Files
             return result;
         }
 
-        private bool ChoseFileToExport(HashGroup file, string destinationPath)
+        private bool ChoseFileToExport(HashGroup fileGroup, string destinationPath)
         {
             _console.Writer.WriteLine();
-            _console.Writer.WriteLine($" The file with hash {file.Hash.ShortHash()} has multiple sources, which one you want to copy:");
+            _console.Writer.WriteLine($" The file with hash {fileGroup.Hash.ShortHash()} has multiple sources, which one you want to copy:");
 
             var consoleTable = new ConsoleTable(2);
 
-            foreach (var (filePath, index) in file.Paths.Select((path, index) => (path, index)))
+            foreach (var (file, index) in fileGroup.Files.Select((f, i) => (f, i)))
             {
-                consoleTable.Append(FileSelectionIndex(filePath, index), filePath);
+                consoleTable.Append(FileSelectionIndex(file.Path, index), file.Path);
             }
 
             consoleTable.WriteTo(_console.Writer);
 
             return _console.Reader
                 .ReadInt()
-                .AndThen(selectedFileIndex => ExportFile(file.Paths.Skip(selectedFileIndex).FirstOrDefault(), destinationPath))
+                .AndThen(selectedFileIndex => ExportFile(fileGroup.Files.Skip(selectedFileIndex).FirstOrDefault(), destinationPath))
                 .OrElse(false);
         }
 
@@ -127,19 +128,21 @@ namespace SortingHat.CLI.Commands.Files
             return arguments.First();
         }
 
-        private bool ExportFile(string? sourcePath, string destinationPath)
+        private bool ExportFile(File? sourceFile, string destinationPath)
         {
-            if (sourcePath is {} && Path.GetFileName(sourcePath) is { } fileName)
+            if (sourceFile is {} && Path.GetFileName(sourceFile.Path) is { } fileName)
             {
+                var destinationFilePath = Path.Combine(destinationPath, fileName);
+
                 switch (_fileOperation)
                 {
                     case ICopyFile copyFile:
-                        _console.Writer.WriteLine($"cp {sourcePath} {Path.Combine(destinationPath, fileName)}");
-                        copyFile.Copy(sourcePath, Path.Combine(destinationPath, fileName));
+                        _console.Writer.WriteLine($"cp {sourceFile.Path} {destinationFilePath}");
+                        copyFile.Copy(sourceFile.Path, destinationFilePath);
                         break;
                     case IMoveFile moveFile:
-                        _console.Writer.WriteLine($"mv {sourcePath} {Path.Combine(destinationPath, fileName)}");
-                        moveFile.Move(sourcePath, Path.Combine(destinationPath, fileName));
+                        _console.Writer.WriteLine($"mv {sourceFile.Path} {destinationFilePath}");
+                        moveFile.Move(sourceFile.Path, destinationFilePath);
                         break;
                     default:
                         throw new NotImplementedException("Unknown file operation");

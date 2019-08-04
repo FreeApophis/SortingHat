@@ -20,6 +20,10 @@ namespace SortingHat.CLI.Commands.Tags
             _logger = logger;
             _tagParser = tagParser;
         }
+        public string LongCommand => "move-tags";
+        public Option<string> ShortCommand => Option<string>.None();
+        public string ShortHelp => "this moves a tag to another parent tag, if you want to move it to the root, use the empty tag ':'";
+        public CommandGrouping CommandGrouping => CommandGrouping.Tag;
 
         public bool Execute(IEnumerable<string> lazyArguments, IOptionParser options)
         {
@@ -57,11 +61,5 @@ namespace SortingHat.CLI.Commands.Tags
         {
             return arguments.All(a => a.IsTag());
         }
-
-        public string LongCommand => "move-tags";
-        public Option<string> ShortCommand => Option<string>.None();
-        public string ShortHelp => "this moves a tag to another parent tag, if you want to move it to the root, use the empty tag ':'";
-        public CommandGrouping CommandGrouping => CommandGrouping.Tag;
-
     }
 }

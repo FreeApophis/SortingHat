@@ -28,6 +28,7 @@ namespace SortingHat.CLI.Commands.Projects
         public string LongCommand => "export";
         public Option<string> ShortCommand => Option<string>.None();
         public string ShortHelp => "Exports a project as a file.";
+
         public bool Execute(IEnumerable<string> lazyArguments, IOptionParser options)
         {
             var arguments = lazyArguments.ToList();

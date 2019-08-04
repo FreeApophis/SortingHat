@@ -7,7 +7,7 @@ namespace SortingHat.CLI.Commands.Files
     {
         public static IEnumerable<HashGroup> GroupByHash(this IEnumerable<API.Models.File> files)
         {
-            return files.GroupBy(f => f.Hash.Result, (hash, file) => new HashGroup(hash, file.Select(f => f.Path)));
+            return files.GroupBy(f => f.Hash.Result, (hash, file) => new HashGroup(hash, file));
         }
     }
 }

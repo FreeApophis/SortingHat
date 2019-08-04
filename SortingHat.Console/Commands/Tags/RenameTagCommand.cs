@@ -24,6 +24,12 @@ namespace SortingHat.CLI.Commands.Tags
             _tagParser = tagParser;
         }
 
+        public string LongCommand => "rename-tag";
+        public Option<string> ShortCommand => Option<string>.None();
+        public string ShortHelp => "Renames a tag from database";
+        public CommandGrouping CommandGrouping => CommandGrouping.Tag;
+
+
         public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
             var result = false;
@@ -85,10 +91,5 @@ namespace SortingHat.CLI.Commands.Tags
 
             return true;
         }
-
-        public string LongCommand => "rename-tag";
-        public Option<string> ShortCommand => Option<string>.None();
-        public string ShortHelp => "Renames a tag from database";
-        public CommandGrouping CommandGrouping => CommandGrouping.Tag;
     }
 }

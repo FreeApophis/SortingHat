@@ -27,19 +27,10 @@ namespace SortingHat.CLI.Commands.Files
             _newFile = newFile;
         }
 
-        private static bool IsFile(string value)
-        {
-            return value.StartsWith(":") == false;
-        }
-
-        private File FileFromPath(string filePath)
-        {
-            var file = _newFile();
-
-            file.LoadByPath(filePath);
-
-            return file;
-        }
+        public string LongCommand => "untag-files";
+        public Option<string> ShortCommand => Option<string>.None();
+        public string ShortHelp => "Remove tags from the indicated files";
+        public CommandGrouping CommandGrouping => CommandGrouping.File;
 
         public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
@@ -59,12 +50,20 @@ namespace SortingHat.CLI.Commands.Files
             }
 
             return true;
-
         }
 
-        public string LongCommand => "untag-files";
-        public Option<string> ShortCommand => Option<string>.None();
-        public string ShortHelp => "Remove tags from the indicated files";
-        public CommandGrouping CommandGrouping => CommandGrouping.File;
+        private static bool IsFile(string value)
+        {
+            return value.StartsWith(":") == false;
+        }
+
+        private File FileFromPath(string filePath)
+        {
+            var file = _newFile();
+
+            file.LoadByPath(filePath);
+
+            return file;
+        }
     }
 }

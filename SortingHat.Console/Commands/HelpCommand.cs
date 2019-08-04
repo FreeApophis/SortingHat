@@ -29,6 +29,12 @@ namespace SortingHat.CLI.Commands
             _container = container;
         }
 
+        public string LongCommand => "help";
+        public Option<string> ShortCommand => Option.Some("?");
+        public string ShortHelp => "This is the help command, it shows a list of the available lazyCommands.";
+        public CommandGrouping CommandGrouping => CommandGrouping.General;
+
+
         public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
             _logger.LogTrace("Help Command executed");
@@ -179,12 +185,5 @@ namespace SortingHat.CLI.Commands
 
             return true;
         }
-
-        public string LongCommand => "help";
-        public Option<string> ShortCommand => Option.Some("?");
-
-        public string ShortHelp => "This is the help command, it shows a list of the available lazyCommands.";
-        public CommandGrouping CommandGrouping => CommandGrouping.General;
-
     }
 }

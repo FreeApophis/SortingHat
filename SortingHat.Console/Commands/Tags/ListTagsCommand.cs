@@ -21,6 +21,11 @@ namespace SortingHat.CLI.Commands.Tags
             _consoleWriter = consoleWriter;
         }
 
+        public string LongCommand => "list-tags";
+        public Option<string> ShortCommand => Option.Some("tags");
+        public string ShortHelp => "Lists all avaialable tags in hierarchical form";
+        public CommandGrouping CommandGrouping => CommandGrouping.Tag;
+
         public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
             var tags = Tag.List(_tag).ToList();
@@ -48,11 +53,5 @@ namespace SortingHat.CLI.Commands.Tags
 
             return table;
         }
-
-        public string LongCommand => "list-tags";
-        public Option<string> ShortCommand => Option.Some("tags");
-        public string ShortHelp => "Lists all avaialable tags in hierarchical form";
-        public CommandGrouping CommandGrouping => CommandGrouping.Tag;
-
     }
 }

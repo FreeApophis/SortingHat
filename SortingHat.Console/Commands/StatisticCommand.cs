@@ -19,6 +19,11 @@ namespace SortingHat.CLI.Commands
             _consoleWriter = consoleWriter;
         }
 
+        public string LongCommand => "statistics";
+        public Option<string> ShortCommand => Option.Some("stat");
+        public string ShortHelp => "Shows global statistics";
+        public CommandGrouping CommandGrouping => CommandGrouping.General;
+
         public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
             var table = StatisticsTable();
@@ -44,11 +49,5 @@ namespace SortingHat.CLI.Commands
 
             return table;
         }
-
-        public string LongCommand => "statistics";
-        public Option<string> ShortCommand => Option.Some("stat");
-        public string ShortHelp => "Shows global statistics";
-        public CommandGrouping CommandGrouping => CommandGrouping.General;
-
     }
 }

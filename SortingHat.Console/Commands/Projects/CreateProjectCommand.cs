@@ -20,10 +20,12 @@ namespace SortingHat.CLI.Commands.Projects
             _projects = projects;
             _consoleWriter = consoleWriter;
         }
+
         public CommandGrouping CommandGrouping => CommandGrouping.Project;
         public string LongCommand => "new-project";
         public Option<string> ShortCommand => Option<string>.None();
         public string ShortHelp => "Creates a new project database with a given name.";
+
         public bool Execute(IEnumerable<string> lazyArguments, IOptionParser options)
         {
             var arguments = lazyArguments.ToList();

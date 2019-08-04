@@ -19,18 +19,16 @@ namespace SortingHat.CLI.Commands.Files
     {
         private readonly ILogger<TagFileCommand> _logger;
         private readonly IConsoleWriter _consoleWriter;
-        private readonly ITagParser _tagParser;
         private readonly IFilePathExtractor _filePathExtractor;
         private readonly Func<File> _newFile;
         private readonly IFile _file;
         private readonly IAutoTagHandler _autoTagHandler;
 
 
-        public TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter consoleWriter, ITagParser tagParser, IFilePathExtractor filePathExtractor, Func<File> newFile, IFile file, IAutoTagHandler autoTagHandler)
+        public TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor, Func<File> newFile, IFile file, IAutoTagHandler autoTagHandler)
         {
             _logger = logger;
             _consoleWriter = consoleWriter;
-            _tagParser = tagParser;
             _filePathExtractor = filePathExtractor;
             _newFile = newFile;
             _file = file;

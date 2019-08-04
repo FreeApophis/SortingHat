@@ -19,6 +19,11 @@ namespace SortingHat.CLI.Commands
             _consoleWriter = consoleWriter;
         }
 
+        public string LongCommand => "repair";
+        public Option<string> ShortCommand => Option<string>.None();
+        public string ShortHelp => "Check each path locked in the database if the file still exists and is not corrupted / changed";
+        public CommandGrouping CommandGrouping => CommandGrouping.General;
+
         public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
             foreach (var path in _file.GetPaths())
@@ -31,10 +36,5 @@ namespace SortingHat.CLI.Commands
 
             return true;
         }
-
-        public string LongCommand => "repair";
-        public Option<string> ShortCommand => Option<string>.None();
-        public string ShortHelp => "Check each path locked in the database if the file still exists and is not corrupted / changed";
-        public CommandGrouping CommandGrouping => CommandGrouping.General;
     }
 }

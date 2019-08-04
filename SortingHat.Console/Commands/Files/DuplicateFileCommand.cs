@@ -21,6 +21,11 @@ namespace SortingHat.CLI.Commands.Files
             _consoleWriter = consoleWriter;
         }
 
+        public string LongCommand => "duplicate";
+        public Option<string> ShortCommand => Option.Some("d");
+        public string ShortHelp => "Find duplicate files in your dms";
+        public CommandGrouping CommandGrouping => CommandGrouping.File;
+
         public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
             foreach (var file in _file.GetDuplicates())
@@ -54,10 +59,5 @@ namespace SortingHat.CLI.Commands.Files
 
             return true;
         }
-
-        public string LongCommand => "duplicate";
-        public Option<string> ShortCommand => Option.Some("d");
-        public string ShortHelp => "Find duplicate files in your dms";
-        public CommandGrouping CommandGrouping => CommandGrouping.File;
     }
 }
