@@ -1,13 +1,11 @@
 ﻿using System.IO;
 using System.Text.RegularExpressions;
-using System.Xml.Serialization;
 using Funcky.Extensions;
 
 namespace SortingHat.API.AutoTag
 {
     public abstract class IntegerAutoTag : IAutoTag
     {
-
         public abstract string AutoTagKey { get; }
         public abstract string Description { get; }
         public string HumanReadableAutoTagsKey =>
@@ -21,7 +19,6 @@ namespace SortingHat.API.AutoTag
                     none: null as string,
                     some: integer => HandleTag(file, integer)
                 );
-
             }
 
             return null;
@@ -32,7 +29,6 @@ namespace SortingHat.API.AutoTag
         public string? FindMatch(string value)
         {
             var findDigits = new Regex(AutoTagKey.Replace("<>", @"(\d+)"));
-
 
             var match = findDigits.Match(value);
 

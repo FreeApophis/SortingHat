@@ -5,7 +5,6 @@
         General,
         Tag,
         File,
-        Project,
-        AutoTagging
+        Project
     }
 }

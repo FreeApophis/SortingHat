@@ -54,7 +54,12 @@ namespace SortingHat.CLI
 
                 _logger.LogError(e.Message);
                 _consoleWriter.WriteLine(e.Message);
-                _consoleWriter.WriteLine(e.StackTrace);
+
+                if (e.StackTrace != null)
+                {
+                    _consoleWriter.WriteLine(e.StackTrace);
+                }
+
                 Environment.Exit(-1);
             }
 
