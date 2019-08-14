@@ -9,6 +9,7 @@ using System.IO;
 using System.Reflection;
 using System.Security.Cryptography;
 using System;
+using apophis.CLI;
 using apophis.CLI.Reader;
 using apophis.CLI.Writer;
 using apophis.FileSystem;

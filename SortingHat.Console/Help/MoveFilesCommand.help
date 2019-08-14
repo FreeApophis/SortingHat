@@ -1,0 +1,6 @@
+﻿<PROGRAMNAME> move-files <search> <destination>
+
+Copies files identified by the search into the specified folder.
+
+<serach>      : A tag or a complex search query which identifies the files you want to move.
+<destination> : Destination Directory

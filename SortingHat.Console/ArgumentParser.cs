@@ -19,7 +19,7 @@ namespace SortingHat.CLI
         public ArgumentParser(Lazy<ILogger<ArgumentParser>> logger, Console console, IEnumerable<ICommand> commands)
         {
             _logger = logger;
-            _console= console;
+            _console = console;
 
             RegisterCommands(commands);
         }
@@ -35,35 +35,41 @@ namespace SortingHat.CLI
             }
         }
 
-        internal void Execute(IEnumerable<string> lazyArguments)
+        internal bool Execute(IEnumerable<string> lazyArguments)
         {
             var arguments = lazyArguments.ToList();
             if (arguments.Any())
             {
-                _commandTargets
+                return _commandTargets
                     .TryGetValue(key: arguments.First())
                     .Match(
                         none: () => UnknownCommandError(arguments.First()),
                         some: c => ExecuteCommand(c, arguments));
 
-            } else
-            {
-                _console.Writer.WriteLine($"Maybe run '{_console.Application.Name} help'");
             }
+
+            _console.Writer.WriteLine($"Maybe run '{_console.Application.Name} help'");
+            return false;
         }
 
-        private void ExecuteCommand(ICommand command, List<string> arguments)
+        private bool ExecuteCommand(ICommand command, List<string> arguments)
         {
-            if (command.Execute(TagAndFileArguments(arguments), new OptionParser(OptionArguments(arguments))) == false)
+            var success = command.Execute(TagAndFileArguments(arguments), new OptionParser(OptionArguments(arguments)));
+
+            if (success == false)
             {
                 _logger.Value.LogWarning("Command Execution failed!");
             }
+
+            return success;
         }
 
-        private void UnknownCommandError(string commandName)
+        private bool UnknownCommandError(string commandName)
         {
             _logger.Value.LogWarning($"Unknown command: '{commandName}' cannot be executed.");
             _console.Writer.WriteLine($"Unknown command: '{commandName}'");
+
+            return false;
         }
 
         private static IEnumerable<string> TagAndFileArguments(IEnumerable<string> arguments)

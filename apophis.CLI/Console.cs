@@ -1,6 +1,5 @@
 ﻿using apophis.CLI.Reader;
 using apophis.CLI.Writer;
-using SortingHat.API.DI;
 
 namespace apophis.CLI
 {

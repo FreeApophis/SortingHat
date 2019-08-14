@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-using SortingHat.API.DI;
+using apophis.CLI;
 
 namespace SortingHat.CLI
 {

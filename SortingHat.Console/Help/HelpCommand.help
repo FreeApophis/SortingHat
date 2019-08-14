@@ -1,1 +1,4 @@
-﻿<PROGRAMNAME> help <command-name>
+﻿<PROGRAMNAME> help [<command>]
+
+'help' without an argument shows all the possible commands and a short description.
+'help' with a command as the single argument shows a detailed description of the functionality with possible arguments and options.
