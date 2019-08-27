@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace SortingHat.CLI
 {
-    class OptionParser : IOptionParser
+    internal sealed class OptionParser : IOptionParser
     {
         readonly IEnumerable<string> _options;
         public OptionParser(IEnumerable<string> options)

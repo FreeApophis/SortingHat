@@ -1,0 +1,5 @@
+<PROGRAMNAME> remove-project <project-name>
+
+Destroys a project with the name <project-name>. 
+    
+BE CAREFUL this deletes the associated database with all entries in it.

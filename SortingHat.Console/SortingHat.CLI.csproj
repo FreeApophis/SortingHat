@@ -14,19 +14,28 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Help\AddTagCommand.help" />
+    <EmbeddedResource Include="Help\CopyFilesCommand.help" />
+    <EmbeddedResource Include="Help\CreateProjectCommand.help" />
+    <EmbeddedResource Include="Help\DestroyProjectCommand.help" />
+    <EmbeddedResource Include="Help\DuplicateFileCommand.help" />
+    <EmbeddedResource Include="Help\ExportProjectCommand.help" />
     <EmbeddedResource Include="Help\FileInfoCommand.help" />
-    <EmbeddedResource Include="Help\FileMoveCommand.help" />
     <EmbeddedResource Include="Help\FindFilesCommand.help" />
+    <EmbeddedResource Include="Help\HelpCommand.help" />
+    <EmbeddedResource Include="Help\ImportProjectCommand.help" />
+    <EmbeddedResource Include="Help\ListProjectsCommand.help" />
     <EmbeddedResource Include="Help\ListTagsCommand.help" />
+    <EmbeddedResource Include="Help\MoveFilesCommand.help" />
+    <EmbeddedResource Include="Help\MoveTagCommand.help" />
+    <EmbeddedResource Include="Help\PluginsCommand.help" />
     <EmbeddedResource Include="Help\RemoveTagCommand.help" />
-    <EmbeddedResource Include="Help\InitCommand.help" />
-    <EmbeddedResource Include="Help\IdentifyCommand.help" />
     <EmbeddedResource Include="Help\RenameTagCommand.help" />
     <EmbeddedResource Include="Help\RepairCommand.help" />
+    <EmbeddedResource Include="Help\StatisticCommand.help" />
+    <EmbeddedResource Include="Help\SwitchProjectCommand.help" />
     <EmbeddedResource Include="Help\TagFileCommand.help" />
     <EmbeddedResource Include="Help\UntagFileCommand.help" />
     <EmbeddedResource Include="Help\VersionCommand.help" />
-    <EmbeddedResource Include="Help\HelpCommand.help" />
   </ItemGroup>
 
   <ItemGroup>
@@ -52,6 +61,10 @@
     </None>
   </ItemGroup>
 
-  <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties />
+    </VisualStudio>
+  </ProjectExtensions>
 
 </Project>

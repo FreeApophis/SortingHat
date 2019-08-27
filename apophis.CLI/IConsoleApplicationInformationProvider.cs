@@ -1,4 +1,4 @@
-﻿namespace SortingHat.API.DI
+﻿namespace apophis.CLI
 {
     public interface IConsoleApplicationInformationProvider
     {

@@ -11,10 +11,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Help\IdentifyCommand.help" />
     <None Remove="Resources\FileSignatures.csv" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Help\IdentifyCommand.help" />
     <EmbeddedResource Include="Resources\FileSignatures.csv">
       <CustomToolNamespace></CustomToolNamespace>
     </EmbeddedResource>

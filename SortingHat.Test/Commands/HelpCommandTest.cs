@@ -1,5 +1,10 @@
-﻿using apophis.CLI.Writer;
+﻿using System;
+using System.Linq;
+using System.Reflection;
+using apophis.CLI;
+using apophis.CLI.Writer;
 using Autofac;
+using Moq;
 using SortingHat.API.DI;
 using SortingHat.CLI;
 using SortingHat.Test.Mock;
@@ -17,10 +22,10 @@ namespace SortingHat.Test.Commands
             var application = CompositionRootWithMyWriter(writer);
 
             // Run application without a command
-            application.Run(new string[] { });
+            application.Execute(new string[] { });
 
             // Test the output
-            Assert.Collection(writer.Lines, line => Assert.Equal("Maybe run 'hat help'", line));
+            Assert.Collection(writer.Lines, line => Assert.Equal("Maybe run 'program help'", line));
         }
 
         [Fact]
@@ -31,13 +36,70 @@ namespace SortingHat.Test.Commands
             var application = CompositionRootWithMyWriter(writer);
 
             // Run application without a command
-            application.Run(new[] { "help" });
+            application.Execute(new[] { "help" });
 
             // Test the output
-            Assert.Equal("hat <command> [<arguments>] [<options>]:", writer.Lines[0]);
+            Assert.Equal("program <command> [<arguments>] [<options>]:", writer.Lines[0]);
         }
 
-        private static Application CompositionRootWithMyWriter(MemoryConsoleWriter writer)
+        [Theory]
+        [MemberData(nameof(HelpCommands))]
+        public void GivenTheHelpWithACommandArgumentShowTheCorrespondingHelp(string command)
+        {
+            var writer = new MemoryConsoleWriter();
+            var application = CompositionRootWithMyWriter(writer);
+
+            // Run application without a command
+            Assert.True(application.Execute(new[] { "help", command }));
+
+            Assert.NotEmpty(writer.Lines[0]);
+        }
+
+        public static TheoryData<string> HelpCommands()
+        {
+
+            return new TheoryData<string>
+            {
+                "help",
+                "plugins",
+                "repair",
+                "statistics",
+                "version",
+//                "exif",
+//                "identify",
+                "add-tags",
+                "list-tags",
+                "move-tags",
+                "remove-tags",
+                "rename-tag",
+                "copy-files",
+                "duplicate",
+                "file-info",
+                "find-files",
+                "move-files",
+                "tag-files",
+                "untag-files",
+//                "scan",
+                "new-project",
+                "remove-project",
+                "export",
+                "import",
+                "list-projects",
+                "switch-project"
+            };
+        }
+
+        private static string ExtractCommandName(Type arg)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static bool IsCommandClass(Type t)
+        {
+            return t.Namespace != null && (t.IsClass && t.Namespace.Contains("Commands") && t.Name.EndsWith("Command"));
+        }
+
+        private static ArgumentParser CompositionRootWithMyWriter(MemoryConsoleWriter writer)
         {
             // CLI Application CompositionRoot
             var compositionRoot = new CompositionRoot()
@@ -47,11 +109,21 @@ namespace SortingHat.Test.Commands
             compositionRoot.Builder.Register(context => writer).As<IConsoleWriter>();
 
             OverrideDatabase(compositionRoot);
+            OverrideConsoleApplicationInformationProvider(compositionRoot);
 
             // Return The application Object
             return compositionRoot
                 .Build()
-                .Resolve<Application>();
+                .Resolve<ArgumentParser>();
+        }
+
+        private static void OverrideConsoleApplicationInformationProvider(CompositionRoot compositionRoot)
+        {
+            var mock = new Mock<IConsoleApplicationInformationProvider>(MockBehavior.Strict);
+
+            mock.Setup(m => m.Name).Returns("program");
+
+            compositionRoot.Builder.Register(context => mock.Object).As<IConsoleApplicationInformationProvider>();
         }
 
         private static void OverrideDatabase(CompositionRoot compositionRoot)

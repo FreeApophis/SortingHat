@@ -21,12 +21,14 @@ namespace SortingHat.CLI.Commands
         private readonly ILogger<HelpCommand> _logger;
         private readonly Console _console;
         private readonly IComponentContext _container;
+        private readonly IConsoleApplicationInformationProvider _consoleApplicationInformation;
 
-        public HelpCommand(ILogger<HelpCommand> logger, Console console, IComponentContext container)
+        public HelpCommand(ILogger<HelpCommand> logger, Console console, IComponentContext container, IConsoleApplicationInformationProvider consoleApplicationInformation)
         {
             _logger = logger;
-            _console= console;
+            _console = console;
             _container = container;
+            _consoleApplicationInformation = consoleApplicationInformation;
         }
 
         public string LongCommand => "help";
@@ -68,7 +70,15 @@ namespace SortingHat.CLI.Commands
             using var resourceStream = GetHelResourceStream(command);
             using var reader = new StreamReader(resourceStream);
 
-            _console.Writer.WriteLine(reader.ReadToEnd());
+            WriteStreamLineByLine(reader, line => line.Replace("<PROGRAMNAME>", _consoleApplicationInformation.Name));
+        }
+
+        private void WriteStreamLineByLine(StreamReader reader, Func<string, string> transformLine)
+        {
+            while (reader.ReadLine() is { } line)
+            {
+                _console.Writer.WriteLine(transformLine(line));
+            }
         }
 
         private static Stream GetHelResourceStream(ICommand command)
