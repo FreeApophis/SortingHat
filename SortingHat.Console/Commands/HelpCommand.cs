@@ -43,27 +43,26 @@ namespace SortingHat.CLI.Commands
         {
             _logger.LogTrace("Help Command executed");
 
-            return arguments.Any()
-                ? PrintSpecificHelp(arguments, _container.Resolve<IEnumerable<ICommand>>())
-                : PrintOverview(options);
+            var firstArgument = arguments.FirstOrNone();
 
+            return firstArgument.Match(
+                none: PrintOverview(options),
+                some: argument => PrintSpecificHelp(argument, _container.Resolve<IEnumerable<ICommand>>()));
         }
 
-        private bool PrintSpecificHelp(IEnumerable<string> arguments, IEnumerable<ICommand> commands)
+        private bool PrintSpecificHelp(string argument, IEnumerable<ICommand> commands)
         {
-            var specificHelp = FindSpecificHelp(arguments, commands);
+            var specificHelp = FindSpecificHelp(argument, commands);
 
             specificHelp.AndThen(PrintLongHelp);
             return specificHelp.Match(false, True);
 
         }
 
-        private Option<ICommand> FindSpecificHelp(IEnumerable<string> arguments, IEnumerable<ICommand> commands)
+        private Option<ICommand> FindSpecificHelp(string argument, IEnumerable<ICommand> commands)
         {
-            var firstArgument = arguments.First();
-
             return commands
-                .Where(c => c.LongCommand == firstArgument)
+                .Where(c => c.LongCommand == argument)
                 .FirstOrNone();
         }
 
@@ -127,7 +126,7 @@ namespace SortingHat.CLI.Commands
         private string FormatOption(Option<string> option, string optionPrefix)
         {
             return option.Match(
-                none: "",
+                none: string.Empty,
                 some: o => $"{optionPrefix}{o}"
                 );
         }

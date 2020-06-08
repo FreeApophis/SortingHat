@@ -13,4 +13,8 @@
     <PackageReference Include="Funcky" Version="1.7.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\apophis.Utils\apophis.Utils.csproj" />
+  </ItemGroup>
+
 </Project>

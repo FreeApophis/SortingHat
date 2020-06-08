@@ -4,6 +4,7 @@ using System.Linq;
 using apophis.CLI.Writer;
 using apophis.Lexer;
 using apophis.Lexer.Tokens;
+using Funcky.Extensions;
 using JetBrains.Annotations;
 using SortingHat.Plugin.ExtractRelevantText.Token;
 
@@ -20,10 +21,10 @@ namespace SortingHat.Plugin.ExtractRelevantText
         {
             _consoleWriter = consoleWriter;
             var lexerRules = new LexerRules();
-            ILinePositionCalculator NewLinePositionCalculator(List<Lexem> lexems) => new LinePositionCalculator(lexems);
-            ILexerReader NewLexerReader(string expression) => new LexerReader(expression);
+            static ILinePositionCalculator NewLinePositionCalculator(List<Lexem> lexems) => new LinePositionCalculator(lexems);
+            static ILexerReader NewLexerReader(string expression) => new LexerReader(expression);
             var tokenizer = new Tokenizer(lexerRules, NewLexerReader, NewLinePositionCalculator);
-            IToken NewEpsilonToken() => new EpsilonToken();
+            static IToken NewEpsilonToken() => new EpsilonToken();
             _tokenWalker = new TokenWalker(tokenizer, NewEpsilonToken, NewLinePositionCalculator);
             _wordCount = new Dictionary<string, int>();
         }
@@ -31,13 +32,10 @@ namespace SortingHat.Plugin.ExtractRelevantText
         internal bool Scan(IEnumerable<string> folders)
         {
             _consoleWriter.WriteLine("Scanning...");
-            foreach (var folder in folders)
-            {
-                foreach (string file in Directory.EnumerateFiles(folder, "*.txt", SearchOption.AllDirectories))
-                {
-                    Read(file);
-                }
-            }
+
+            folders
+                .SelectMany(folder => Directory.EnumerateFiles(folder, "*.txt", SearchOption.AllDirectories))
+                .Each(Read);
 
             return true;
         }
