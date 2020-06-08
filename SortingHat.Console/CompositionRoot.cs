@@ -79,9 +79,9 @@ namespace SortingHat.CLI
             var loggerFactory = container.Resolve<ILoggerFactory>();
 
             // File Logger
-            var context = new FileLoggerContext(AppContext.BaseDirectory, "fallback.log");
-            var settings = new FileLoggerSettings();
-            loggerFactory.AddFile(context, settings);
+            //var context = new FileLoggerContext(AppContext.BaseDirectory, "fallback.log");
+            //var settings = new FileLoggerSettings();
+            //loggerFactory.AddFile(context, settings);
 
             // Console Logger
             //loggerFactory.AddConsole();

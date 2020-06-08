@@ -20,8 +20,11 @@ namespace SortingHat.Plugin.ExtractRelevantText
         {
             _consoleWriter = consoleWriter;
             var lexerRules = new LexerRules();
-            var tokenizer = new Tokenizer(lexerRules, e => new LexerReader(e));
-            _tokenWalker = new TokenWalker(tokenizer, () => new EpsilonToken());
+            ILinePositionCalculator NewLinePositionCalculator(List<Lexem> lexems) => new LinePositionCalculator(lexems);
+            ILexerReader NewLexerReader(string expression) => new LexerReader(expression);
+            var tokenizer = new Tokenizer(lexerRules, NewLexerReader, NewLinePositionCalculator);
+            IToken NewEpsilonToken() => new EpsilonToken();
+            _tokenWalker = new TokenWalker(tokenizer, NewEpsilonToken, NewLinePositionCalculator);
             _wordCount = new Dictionary<string, int>();
         }
 
@@ -76,7 +79,8 @@ namespace SortingHat.Plugin.ExtractRelevantText
                 if (_wordCount.TryGetValue(word.Word, out var count))
                 {
                     _wordCount[word.Word] = count + 1;
-                } else
+                }
+                else
                 {
                     _wordCount[word.Word] = 1;
                 }

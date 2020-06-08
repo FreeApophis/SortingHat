@@ -9,8 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="4.9.3" />
-    <PackageReference Include="Funcky" Version="1.2.0" />
+    <PackageReference Include="Autofac" Version="5.2.0" />
+    <PackageReference Include="Funcky" Version="1.7.0" />
   </ItemGroup>
 
 </Project>

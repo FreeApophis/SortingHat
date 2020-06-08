@@ -11,21 +11,7 @@ namespace SortingHat.Test
 {
     public class ParserTest
     {
-        private readonly Parser _parser = CreateParser();
-
-        private static Parser CreateParser()
-        {
-            // Create the object tree without DI Framework
-            var expressionParser = new ExpressionParser();
-            var factorParser = new FactorParser(expressionParser);
-            var termParser = new TermParser(factorParser);
-            expressionParser.TermParser = termParser;
-            var lexerRules = new LexerRules();
-            var tokenizer = new Tokenizer(lexerRules, s => new LexerReader(s));
-            var tokenWalker = new TokenWalker(tokenizer, () => new EpsilonToken());
-
-            return new Parser(tokenWalker, expressionParser);
-        }
+        private readonly Parser _parser = Parser.Create();
 
         [Fact]
         public void EmptySearch()

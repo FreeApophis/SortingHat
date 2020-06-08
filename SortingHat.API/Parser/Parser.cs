@@ -31,11 +31,27 @@ namespace SortingHat.API.Parser
         private readonly ExpressionParser _expressionParser;
         private readonly List<IToken> _nextToken = new List<IToken>();
 
-
         public Parser(TokenWalker tokenWalker, ExpressionParser expressionParser)
         {
             _tokenWalker = tokenWalker;
             _expressionParser = expressionParser;
+        }
+
+        public static Parser Create()
+        {
+            // Create the object tree without DI Framework
+            var expressionParser = new ExpressionParser();
+            var factorParser = new FactorParser(expressionParser);
+            var termParser = new TermParser(factorParser);
+            expressionParser.TermParser = termParser;
+            var lexerRules = new LexerRules();
+            ILinePositionCalculator NewLinePositionCalculator(List<Lexem> lexems) => new LinePositionCalculator(lexems);
+            ILexerReader NewLexerReader(string expression) => new LexerReader(expression);
+            var tokenizer = new Tokenizer(lexerRules, NewLexerReader, NewLinePositionCalculator);
+            IToken NewEpsilonToken() => new EpsilonToken();
+            var tokenWalker = new TokenWalker(tokenizer, NewEpsilonToken, NewLinePositionCalculator);
+
+            return new Parser(tokenWalker, expressionParser);
         }
 
         public IParseNode Parse(TokenWalker walker)
@@ -59,7 +75,8 @@ namespace SortingHat.API.Parser
                 _nextToken.Add(new OrToken());
                 return ast;
 
-            } catch (ExpectedTokenException e)
+            }
+            catch (ExpectedTokenException e)
             {
                 IllegalExpression = true;
                 if (e.ExpectedToken is OpenParenthesisToken && e.FoundToken is EpsilonToken)
@@ -77,7 +94,8 @@ namespace SortingHat.API.Parser
                 }
 
                 return null;
-            } catch (Exception)
+            }
+            catch (Exception)
             {
                 IllegalExpression = true;
                 return null;
