@@ -4,6 +4,7 @@ using System.Linq;
 using apophis.CLI.Writer;
 using apophis.Lexer;
 using apophis.Lexer.Tokens;
+using Funcky.Extensions;
 using JetBrains.Annotations;
 using SortingHat.Plugin.ExtractRelevantText.Token;
 
@@ -58,28 +59,22 @@ namespace SortingHat.Plugin.ExtractRelevantText
 
         private void PrintSignificant()
         {
-            var signifcantWords = _wordCount
+            _consoleWriter.WriteLine($"Words: {_wordCount.Count}");
+
+            _wordCount
                 .OrderByDescending(w => w.Value)
                 .Select(w => w.Key)
-                .Take(500);
-            _consoleWriter.WriteLine($"Words: {_wordCount.Count}");
-            foreach (var signifcantWord in signifcantWords)
-            {
-                _consoleWriter.WriteLine(signifcantWord);
-            }
+                .Take(500)
+                .ForEach(significantWord => _consoleWriter.WriteLine(significantWord));
         }
 
         private void Count(IToken token)
         {
             if (token is WordToken word)
             {
-                if (_wordCount.TryGetValue(word.Word, out var count))
-                {
-                    _wordCount[word.Word] = count + 1;
-                } else
-                {
-                    _wordCount[word.Word] = 1;
-                }
+                _wordCount[word.Word] = _wordCount
+                    .TryGetValue(key: word.Word)
+                    .Match(none: 1, some: count => count + 1);
             }
         }
     }
