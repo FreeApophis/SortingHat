@@ -25,7 +25,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "apophis.CLI", "apophis.CLI\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "apophis.Utils", "apophis.Utils\apophis.Utils.csproj", "{25D5C8F6-CFD7-4744-9AB2-F7C6947D08E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SortingHat.Plugin.MoveOnTag", "SortingHat.Plugin.MoveOnTag\SortingHat.Plugin.MoveOnTag.csproj", "{A64F2AD6-0E08-4CCA-9D20-CB212899D606}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SortingHat.Plugin.MoveOnTag", "SortingHat.Plugin.MoveOnTag\SortingHat.Plugin.MoveOnTag.csproj", "{A64F2AD6-0E08-4CCA-9D20-CB212899D606}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SortingHat.Avalonia", "SortingHat.Avalonia\SortingHat.Avalonia.csproj", "{04305D99-0CB3-46E6-B3D7-86D713E0C9BB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -81,6 +83,10 @@ Global
 		{A64F2AD6-0E08-4CCA-9D20-CB212899D606}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A64F2AD6-0E08-4CCA-9D20-CB212899D606}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A64F2AD6-0E08-4CCA-9D20-CB212899D606}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04305D99-0CB3-46E6-B3D7-86D713E0C9BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04305D99-0CB3-46E6-B3D7-86D713E0C9BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04305D99-0CB3-46E6-B3D7-86D713E0C9BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04305D99-0CB3-46E6-B3D7-86D713E0C9BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
