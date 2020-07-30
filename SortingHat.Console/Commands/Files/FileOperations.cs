@@ -108,7 +108,7 @@ namespace SortingHat.CLI.Commands.Files
             return _console.Reader
                 .ReadInt()
                 .AndThen(selectedFileIndex => ExportFile(fileGroup.Files.Skip(selectedFileIndex).FirstOrDefault(), destinationPath))
-                .OrElse(false);
+                .GetOrElse(false);
         }
 
         private bool EmptyQuery()
