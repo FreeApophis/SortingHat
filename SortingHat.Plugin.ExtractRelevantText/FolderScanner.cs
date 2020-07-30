@@ -21,8 +21,8 @@ namespace SortingHat.Plugin.ExtractRelevantText
         {
             _consoleWriter = consoleWriter;
             var lexerRules = new LexerRules();
-            var tokenizer = new Tokenizer(lexerRules, e => new LexerReader(e));
-            _tokenWalker = new TokenWalker(tokenizer, () => new EpsilonToken());
+            var tokenizer = new Tokenizer(lexerRules, e => new LexerReader(e), lexems => new LinePositionCalculator(lexems));
+            _tokenWalker = new TokenWalker(tokenizer, () => new EpsilonToken(), lexems => new LinePositionCalculator(lexems));
             _wordCount = new Dictionary<string, int>();
         }
 

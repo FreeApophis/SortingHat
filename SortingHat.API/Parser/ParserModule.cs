@@ -15,7 +15,7 @@ namespace SortingHat.API.Parser
             builder.RegisterType<LexerRules>().As<ILexerRules>();
             builder.RegisterType<LexerReader>().As<ILexerReader>();
             builder.RegisterType<Tokenizer>().AsSelf();
-            builder.Register(c => new TokenWalker(c.Resolve<Tokenizer>(), () => new EpsilonToken())).As<TokenWalker>();
+            builder.Register(c => new TokenWalker(c.Resolve<Tokenizer>(), () => new EpsilonToken(), lexems => new LinePositionCalculator(lexems))).As<TokenWalker>();
             builder.RegisterType<Parser>().AsSelf();
         }
     }

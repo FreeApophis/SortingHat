@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="apophis.Lexer" Version="1.1.1" />
+    <PackageReference Include="apophis.Lexer" Version="1.4.1" />
     <PackageReference Include="Autofac" Version="5.2.0" />
     <PackageReference Include="Funcky" Version="2.0.0" />
     <PackageReference Include="JetBrains.Annotations" Version="2020.1.0" />
