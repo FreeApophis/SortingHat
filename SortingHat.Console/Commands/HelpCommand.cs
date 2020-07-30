@@ -8,10 +8,12 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using apophis.CLI;
+using Funcky.Extensions;
 using Funcky.Monads;
 using SortingHat.API.AutoTag;
 using SortingHat.CLI.Options;
 using Console = apophis.CLI.Console;
+using static Funcky.Functional;
 
 namespace SortingHat.CLI.Commands
 {
@@ -41,28 +43,27 @@ namespace SortingHat.CLI.Commands
         {
             _logger.LogTrace("Help Command executed");
 
-            if (arguments.Any())
-            {
-                return PrintSpecificHelp(arguments, _container.Resolve<IEnumerable<ICommand>>());
-            }
+            var firstArgument = arguments.FirstOrNone();
 
-            PrintOverview(options);
-            return true;
+            return firstArgument.Match(
+                none: PrintOverview(options),
+                some: argument => PrintSpecificHelp(argument, _container.Resolve<IEnumerable<ICommand>>()));
+        }
+
+        private bool PrintSpecificHelp(string argument, IEnumerable<ICommand> commands)
+        {
+            var specificHelp = FindSpecificHelp(argument, commands);
+
+            specificHelp.AndThen(PrintLongHelp);
+            return specificHelp.Match(false, True);
 
         }
 
-        private bool PrintSpecificHelp(IEnumerable<string> arguments, IEnumerable<ICommand> commands)
+        private Option<ICommand> FindSpecificHelp(string argument, IEnumerable<ICommand> commands)
         {
-            foreach (var command in commands)
-            {
-                if (command.LongCommand == arguments.First())
-                {
-                    PrintLongHelp(command);
-                    return true;
-                }
-            }
-
-            return false;
+            return commands
+                .Where(c => c.LongCommand == argument)
+                .FirstOrNone();
         }
 
         private void PrintLongHelp(ICommand command)
@@ -73,7 +74,7 @@ namespace SortingHat.CLI.Commands
             WriteStreamLineByLine(reader, line => line.Replace("<PROGRAMNAME>", _consoleApplicationInformation.Name));
         }
 
-        private void WriteStreamLineByLine(StreamReader reader, Func<string, string> transformLine)
+        private void WriteStreamLineByLine(TextReader reader, Func<string, string> transformLine)
         {
             while (reader.ReadLine() is { } line)
             {
@@ -93,13 +94,14 @@ namespace SortingHat.CLI.Commands
             return $"SortingHat.CLI.Help.{command.GetType().Name}.help";
         }
 
-        private void PrintOverview(IOptionParser options)
+        private bool PrintOverview(IOptionParser options)
         {
             PrintHelpHeader();
             PrintHelpCommands(_container.Resolve<IEnumerable<ICommand>>());
             PrintHelpOptions(_container.Resolve<IEnumerable<IOption>>());
             PrintTagVariables(options);
             PrintHelpExamples();
+            return true;
         }
 
         private void PrintHelpOptions(IEnumerable<IOption> lazyOptions)
@@ -124,7 +126,7 @@ namespace SortingHat.CLI.Commands
         private string FormatOption(Option<string> option, string optionPrefix)
         {
             return option.Match(
-                none: "",
+                none: string.Empty,
                 some: o => $"{optionPrefix}{o}"
                 );
         }

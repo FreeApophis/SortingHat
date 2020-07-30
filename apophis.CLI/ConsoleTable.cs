@@ -3,6 +3,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using apophis.CLI.Writer;
+using apophis.Utils;
 
 namespace apophis.CLI
 {

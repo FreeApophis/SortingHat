@@ -29,13 +29,10 @@ namespace SortingHat.Plugin.ExtractRelevantText
         internal bool Scan(IEnumerable<string> folders)
         {
             _consoleWriter.WriteLine("Scanning...");
-            foreach (var folder in folders)
-            {
-                foreach (string file in Directory.EnumerateFiles(folder, "*.txt", SearchOption.AllDirectories))
-                {
-                    Read(file);
-                }
-            }
+
+            folders
+                .SelectMany(folder => Directory.EnumerateFiles(folder, "*.txt", SearchOption.AllDirectories))
+                .ForEach(Read);
 
             return true;
         }

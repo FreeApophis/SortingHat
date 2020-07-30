@@ -11,7 +11,7 @@ namespace SortingHat.Test
 {
     public class ParserTest
     {
-        private readonly Parser _parser = CreateParser();
+        private readonly Parser _parser = Parser.Create();
 
         private static Parser CreateParser()
         {
