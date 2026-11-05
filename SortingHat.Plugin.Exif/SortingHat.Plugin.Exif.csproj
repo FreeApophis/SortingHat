@@ -3,15 +3,11 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <LangVersion>8.0</LangVersion>
-    <Nullable>enable</Nullable>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Version>1.0.0.1</Version>
-    <NoWarn>1701;1702;1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MetadataExtractor" Version="2.4.3" />
+    <PackageReference Include="MetadataExtractor" />
   </ItemGroup>
 
   <ItemGroup>
