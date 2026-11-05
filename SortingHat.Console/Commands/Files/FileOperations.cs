@@ -94,7 +94,7 @@ namespace SortingHat.CLI.Commands.Files
         private bool ChoseFileToExport(HashGroup fileGroup, string destinationPath)
         {
             _console.Writer.WriteLine();
-            _console.Writer.WriteLine($" The file with hash {fileGroup.Hash.ShortHash()} has multiple sources, which one you want to copy:");
+            _console.Writer.WriteLine($" The file with hash {fileGroup.Hash.ShortHash().GetOrElse(fileGroup.Hash)} has multiple sources, which one you want to copy:");
 
             var consoleTable = new ConsoleTable(2);
 

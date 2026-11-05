@@ -46,7 +46,8 @@ namespace SortingHat.CLI.Commands.Files
                         FileHelper.OpenWithAssociatedProgram(file.Path);
                     }
 
-                    table.Append(file.Hash.Result.ShortHash(), file.CreatedAt, file.Size.HumanSize(), file.Path);
+                    var hash = file.Hash.Result;
+                    table.Append(hash.ShortHash().GetOrElse(hash), file.CreatedAt, file.Size.HumanSize(), file.Path);
                 }
                 table.WriteTo(_consoleWriter);
             }
