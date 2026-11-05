@@ -2,7 +2,7 @@
 {
     public interface ISettings
     {
-        string this[string key] { get; set; }
+        string? this[string key] { get; set; }
         bool HasValue(string key);
     }
 }

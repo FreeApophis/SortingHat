@@ -14,7 +14,6 @@ namespace SortingHat.Plugin.Exif
     internal class ExifTaggerModule : Autofac.Module, IPlugin
     {
         public string Name => "Exif Tagger";
-        public Version Version => Assembly.GetExecutingAssembly().GetName().Version;
         public string Description => "This plugin can automatically tag files according to their exif tags.";
 
         protected override void Load(ContainerBuilder builder)

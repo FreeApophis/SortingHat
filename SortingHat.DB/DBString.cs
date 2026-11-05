@@ -12,7 +12,7 @@
         public static string ToSQL(long? value)
         {
             return value.HasValue
-                ? value.ToString()
+                ? value.Value.ToString()
                 : "NULL";
         }
     }

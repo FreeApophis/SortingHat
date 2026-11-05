@@ -12,7 +12,7 @@ namespace SortingHat.DB
     {
 
         public SQLiteProjectDatabase(DatabaseSettings databaseSettings, ISettings settings) :
-            base(databaseSettings, settings[Constants.ProjectDatabaseKey])
+            base(databaseSettings, settings.ActiveProject(databaseSettings))
         {
         }
 

@@ -23,7 +23,7 @@ namespace SortingHat.UI
     /// </summary>
     public partial class MainWindow : MetroWindow, INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         private readonly IFile _file;
         private readonly ITag _tag;

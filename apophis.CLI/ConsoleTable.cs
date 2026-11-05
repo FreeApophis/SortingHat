@@ -12,7 +12,7 @@ namespace apophis.CLI
         private const char Space = ' ';
 
         public List<ConsoleTableColumn> Columns { get; } = new List<ConsoleTableColumn>();
-        private readonly List<object[]> _rows = new List<object[]>();
+        private readonly List<object?[]> _rows = new List<object?[]>();
 
 
         public ConsoleTable(int columns = 0)
@@ -23,7 +23,7 @@ namespace apophis.CLI
             }
         }
 
-        public void Append(params object[] args)
+        public void Append(params object?[] args)
         {
             if (args.Length != Columns.Count)
             {
@@ -43,11 +43,9 @@ namespace apophis.CLI
             return _rows.Max(row => ToTableString(row[columnIndex]).Length);
         }
 
-        private static string ToTableString(object data)
+        private static string ToTableString(object? data)
         {
-            return data == null
-                ? string.Empty
-                : data.ToString();
+            return data?.ToString() ?? string.Empty;
         }
 
         private static string AlignmentFormat(ConsoleTableColumnAlignment alignment)

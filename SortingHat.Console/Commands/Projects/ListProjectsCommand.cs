@@ -2,7 +2,9 @@
 using apophis.CLI.Writer;
 using Funcky.Monads;
 using JetBrains.Annotations;
+using SortingHat.API;
 using SortingHat.API.DI;
+using SortingHat.DB;
 
 namespace SortingHat.CLI.Commands.Projects
 {
@@ -11,13 +13,15 @@ namespace SortingHat.CLI.Commands.Projects
     {
         private readonly IProjects _projects;
         private readonly ISettings _settings;
+        private readonly DatabaseSettings _databaseSettings;
         private readonly IConsoleWriter _consoleWriter;
 
         [UsedImplicitly]
-        public ListProjectsCommand(IProjects projects, ISettings settings, IConsoleWriter consoleWriter)
+        public ListProjectsCommand(IProjects projects, ISettings settings, DatabaseSettings databaseSettings, IConsoleWriter consoleWriter)
         {
             _projects = projects;
             _settings = settings;
+            _databaseSettings = databaseSettings;
             _consoleWriter = consoleWriter;
         }
         public CommandGrouping CommandGrouping => CommandGrouping.Project;
@@ -42,7 +46,7 @@ namespace SortingHat.CLI.Commands.Projects
 
         private string ActiveMarker(string project)
         {
-            return project == _settings[DB.Constants.ProjectDatabaseKey]
+            return project == _settings.ActiveProject(_databaseSettings)
                 ? "*"
                 : " ";
         }

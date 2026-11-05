@@ -99,7 +99,8 @@ namespace SortingHat.CLI
             // https://github.com/dotnet/cli/issues/11545
             var configuration = ConfigurationRoot();
 
-            Builder.Register(c => configuration.GetSection("Database").Get<DatabaseSettings>()).As<DatabaseSettings>();
+            Builder.Register(c => configuration.GetSection("Database").Get<DatabaseSettings>()
+                ?? throw new InvalidOperationException("The 'Database' section is missing in hat-config.json")).As<DatabaseSettings>();
         }
 
         private static IConfigurationRoot ConfigurationRoot()

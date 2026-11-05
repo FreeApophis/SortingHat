@@ -22,12 +22,7 @@ namespace SortingHat.API.Plugin
 
         public List<IPlugin> Plugins { get; } = new List<IPlugin>();
 
-        private static string PluginDirectory => Path.Combine(PathToExecutable(), "plugins");
-
-        private static string PathToExecutable()
-        {
-            return Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
-        }
+        private static string PluginDirectory => Path.Combine(AppContext.BaseDirectory, "plugins");
 
         private static string PluginFilePattern => "*.dll";
 
@@ -39,7 +34,8 @@ namespace SortingHat.API.Plugin
                 //  Make sure that each module **MUST** have a parameterless constructor.
                 var modules = assembly.GetTypes()
                     .Where(p => typeof(IModule).IsAssignableFrom(p) && !p.IsAbstract)
-                    .Select(p => (IModule)Activator.CreateInstance(p));
+                    .Select(p => Activator.CreateInstance(p))
+                    .OfType<IModule>();
 
                 //  Registers each module.
                 foreach (var module in modules)

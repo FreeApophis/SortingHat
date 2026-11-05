@@ -5,11 +5,11 @@ namespace SortingHat.API
 {
     public static class PathHelper
     {
-        public static List<string> PathElements(DirectoryInfo directory)
+        public static List<string> PathElements(DirectoryInfo? directory)
         {
-            var result = new List<string> { directory.Name };
+            var result = new List<string>();
 
-            while ((directory = directory.Parent) != null)
+            for (; directory != null; directory = directory.Parent)
             {
                 result.Add(directory.Name);
             }

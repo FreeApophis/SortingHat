@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
 using SortingHat.API.DI;
+using System;
 
 namespace SortingHat.DB.Access
 {
@@ -12,7 +13,7 @@ namespace SortingHat.DB.Access
             _db = db;
         }
 
-        public string this[string key]
+        public string? this[string key]
         {
             get => GetValue(key);
             set => SetValue(key, value);
@@ -25,18 +26,17 @@ namespace SortingHat.DB.Access
             return result != null;
         }
 
-        private string GetValue(string key)
+        private string? GetValue(string key)
         {
-            var result = _db.ExecuteScalar("SELECT [Value] FROM [SETTINGS] WHERE Key = @key", new SqliteParameter("@key", key));
-
-            return (string)result;
+            // null if the key does not exist, DBNull if the value is NULL
+            return _db.ExecuteScalar("SELECT [Value] FROM [SETTINGS] WHERE Key = @key", new SqliteParameter("@key", key)) as string;
         }
 
-        private void SetValue(string key, string value)
+        private void SetValue(string key, string? value)
         {
             _db.ExecuteNonQuery("INSERT INTO [Settings] ([Key], [Value]) VALUES (@key, @value)",
                 new SqliteParameter("@key", key),
-                new SqliteParameter("@value", value));
+                new SqliteParameter("@value", (object?)value ?? DBNull.Value));
         }
     }
 }

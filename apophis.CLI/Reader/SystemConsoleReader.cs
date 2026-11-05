@@ -13,7 +13,8 @@ namespace apophis.CLI.Reader
 
         public string ReadLine()
         {
-            return System.Console.ReadLine();
+            // ReadLine returns null at the end of the input stream
+            return System.Console.ReadLine() ?? string.Empty;
         }
     }
 }

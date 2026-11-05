@@ -26,7 +26,7 @@ namespace SortingHat.UI
             InitializeComponent();
         }
 
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
             LogView.Items.Add(new LogItem(logLevel));
         }
@@ -36,7 +36,8 @@ namespace SortingHat.UI
             return false;
         }
 
-        public IDisposable BeginScope<TState>(TState state)
+        public IDisposable? BeginScope<TState>(TState state)
+            where TState : notnull
         {
             throw new NotImplementedException();
         }

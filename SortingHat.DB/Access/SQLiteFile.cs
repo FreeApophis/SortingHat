@@ -57,7 +57,8 @@ namespace SortingHat.DB.Access
             var size = new SqliteParameter("@size", file.Size);
             var createdAt = new SqliteParameter("@createdAt", file.CreatedAt);
 
-            return (long)_db.ExecuteScalar("INSERT INTO Files (Hash, Size, CreatedAt) VALUES(@hash,@size, @createdAt); SELECT last_insert_rowid();", hash, size, createdAt);
+            return _db.ExecuteScalar("INSERT INTO Files (Hash, Size, CreatedAt) VALUES(@hash,@size, @createdAt); SELECT last_insert_rowid();", hash, size, createdAt) as long?
+                ?? throw new InvalidOperationException("Inserting the file did not return its id.");
         }
 
         private void InsertFileName(File file, long fileId)

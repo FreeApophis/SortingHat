@@ -10,8 +10,6 @@ namespace SortingHat.Plugin.MoveOnTag
     {
         public string Name => "Move on tag";
 
-        public Version Version => Assembly.GetExecutingAssembly().GetName().Version;
-
         public string Description => "This plugin can automatically move a file, when a certain tag-mask is set for the file.";
     }
 }

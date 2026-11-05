@@ -17,7 +17,6 @@ namespace SortingHat.Plugin.FileType
         private const string SignatureResource = "SortingHat.Plugin.FileType.Resources.FileSignatures.csv";
 
         public string Name => "File Type Plugin";
-        public Version Version => Assembly.GetExecutingAssembly().GetName().Version;
         public string Description => "This plugin can automatically can identify file type accoridng to their content, and als create automatically tags on file type.";
 
         protected override void Load(ContainerBuilder builder)
@@ -35,14 +34,15 @@ namespace SortingHat.Plugin.FileType
 
         private static Stream SignatureStream()
         {
-            return Assembly.GetExecutingAssembly().GetManifestResourceStream(SignatureResource);
+            return Assembly.GetExecutingAssembly().GetManifestResourceStream(SignatureResource)
+                ?? throw new InvalidOperationException($"Embedded resource '{SignatureResource}' is missing.");
         }
 
         private void LoadDetectors(ContainerBuilder builder)
         {
-            TextReader reader = new StreamReader(SignatureStream());
+            using TextReader reader = new StreamReader(SignatureStream());
 
-            string line;
+            string? line;
             while ((line = reader.ReadLine()) != null)
             {
                 if (line.StartsWith("#") == false)

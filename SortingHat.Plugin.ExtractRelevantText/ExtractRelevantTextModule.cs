@@ -11,7 +11,6 @@ namespace SortingHat.Plugin.ExtractRelevantText
     internal class RelevantInformationModule : Autofac.Module, IPlugin
     {
         public string Name => "Relevant Information Extractor";
-        public Version Version => Assembly.GetExecutingAssembly().GetName().Version;
         public string Description => "This plugin can automatically tag files according to their text content (txt).";
 
         protected override void Load(ContainerBuilder builder)

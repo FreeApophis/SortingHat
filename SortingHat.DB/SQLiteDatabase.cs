@@ -43,7 +43,7 @@ namespace SortingHat.DB
             CreateCommand(commandText, parameters).ExecuteNonQuery();
         }
 
-        internal object ExecuteScalar(string commandText, params SqliteParameter[] parameters)
+        internal object? ExecuteScalar(string commandText, params SqliteParameter[] parameters)
         {
             return CreateCommand(commandText, parameters).ExecuteScalar();
         }

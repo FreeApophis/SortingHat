@@ -42,11 +42,11 @@ namespace SortingHat.CLI.Commands.Files
 
                     if (fileInfo.Exists)
                     {
-                        table.Append(fileInfo.CreationTimeUtc, fileInfo.Length.HumanSize(), fileInfo.Name, string.Empty, fileInfo.Directory.FullName);
+                        table.Append(fileInfo.CreationTimeUtc, fileInfo.Length.HumanSize(), fileInfo.Name, string.Empty, fileInfo.DirectoryName);
                     }
                     else
                     {
-                        table.Append(string.Empty, string.Empty, fileInfo.Name, "*", fileInfo.Directory.FullName);
+                        table.Append(string.Empty, string.Empty, fileInfo.Name, "*", fileInfo.DirectoryName);
                     }
 
                 }
