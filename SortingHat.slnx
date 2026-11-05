@@ -12,7 +12,6 @@
   <Project Path="apophis.FileSystem/apophis.FileSystem.csproj" />
   <Project Path="apophis.Utils/apophis.Utils.csproj" />
   <Project Path="SortingHat.API/SortingHat.API.csproj" />
-  <Project Path="SortingHat.Avalonia/SortingHat.Avalonia.csproj" />
   <Project Path="SortingHat.Console/SortingHat.CLI.csproj" />
   <Project Path="SortingHat.DB/SortingHat.DB.csproj" />
   <Project Path="SortingHat.Plugin.Exif/SortingHat.Plugin.Exif.csproj" />
