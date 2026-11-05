@@ -123,7 +123,7 @@ namespace SortingHat.DB.Access
             var reader = _db.ExecuteReader(TagIdsQuery(tag));
             var result = new List<long>();
 
-            if (reader.HasRows)
+            if (reader.Read())
             {
                 for (int i = 0; i < reader.FieldCount; ++i)
                 {
