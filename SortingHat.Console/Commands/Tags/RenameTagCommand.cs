@@ -73,7 +73,7 @@ namespace SortingHat.CLI.Commands.Tags
 
         private bool CheckArguments(string tagString, string newName)
         {
-            if (tagString.IsTag() == false)
+            if (tagString.IsTag == false)
             {
                 _logger.LogWarning($"First Argument '{tagString}' must be a tag");
                 _consoleWriter.WriteLine($"First Argument '{tagString}' must be a tag");
@@ -81,7 +81,7 @@ namespace SortingHat.CLI.Commands.Tags
                 return false;
             }
 
-            if (newName.IsTag())
+            if (newName.IsTag)
             {
                 _logger.LogWarning($"Second Argument '{newName}' cannot be a tag");
                 _consoleWriter.WriteLine($"Second Argument '{newName}' cannot be a tag");

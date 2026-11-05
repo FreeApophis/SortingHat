@@ -4,11 +4,11 @@
     {
         extension(string value)
         {
-            public bool IsTag()
+            public bool IsTag
                 => value.StartsWith(":");
 
-            public bool IsFile()
-                => !value.IsTag();
+            public bool IsFile
+                => !value.IsTag;
         }
     }
 }

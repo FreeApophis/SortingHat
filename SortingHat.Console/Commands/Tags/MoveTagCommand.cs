@@ -59,7 +59,7 @@ namespace SortingHat.CLI.Commands.Tags
 
         private bool CheckArguments(IEnumerable<string> arguments)
         {
-            return arguments.All(a => a.IsTag());
+            return arguments.All(a => a.IsTag);
         }
     }
 }

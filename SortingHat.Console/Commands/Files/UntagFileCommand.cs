@@ -34,7 +34,7 @@ namespace SortingHat.CLI.Commands.Files
 
         public bool Execute(IEnumerable<string> arguments, IOptionParser options)
         {
-            var tags = arguments.Where(a => a.IsTag());
+            var tags = arguments.Where(a => a.IsTag);
             var files = arguments.Where(IsFile);
 
             foreach (var file in _filePathExtractor.FromFilePatterns(files, options.HasOption<RecursiveOption>()).Select(FileFromPath))

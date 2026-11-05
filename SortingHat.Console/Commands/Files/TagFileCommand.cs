@@ -49,7 +49,7 @@ namespace SortingHat.CLI.Commands.Files
         public async Task ExecuteAsync(IEnumerable<string> lazyArguments, IOptionParser options)
         {
             var arguments = lazyArguments.ToList();
-            var tags = arguments.Where(a => a.IsTag()).ToList();
+            var tags = arguments.Where(a => a.IsTag).ToList();
             var files = arguments.Where(IsFile);
 
             foreach (var file in _filePathExtractor.FromFilePatterns(files, options.HasOption<RecursiveOption>()).Select(FileFromPath))
