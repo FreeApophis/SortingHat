@@ -5,9 +5,10 @@ namespace SortingHat.CLI.Commands.Files
 {
     internal static class GroupByHashExtension
     {
-        public static IEnumerable<HashGroup> GroupByHash(this IEnumerable<API.Models.File> files)
+        extension(IEnumerable<API.Models.File> files)
         {
-            return files.GroupBy(f => f.Hash.Result, (hash, file) => new HashGroup(hash, file));
+            public IEnumerable<HashGroup> GroupByHash()
+                => files.GroupBy(f => f.Hash.Result, (hash, file) => new HashGroup(hash, file));
         }
     }
 }

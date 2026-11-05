@@ -5,10 +5,13 @@ namespace SortingHat.DB
 {
     public static class SettingsExtensions
     {
-        /// <summary>
-        /// The project database in use: the one selected with switch-project, otherwise the configured default project.
-        /// </summary>
-        public static string ActiveProject(this ISettings settings, DatabaseSettings databaseSettings)
-            => settings[Constants.ProjectDatabaseKey] ?? databaseSettings.DefaultProject;
+        extension(ISettings settings)
+        {
+            /// <summary>
+            /// The project database in use: the one selected with switch-project, otherwise the configured default project.
+            /// </summary>
+            public string ActiveProject(DatabaseSettings databaseSettings)
+                => settings[Constants.ProjectDatabaseKey] ?? databaseSettings.DefaultProject;
+        }
     }
 }

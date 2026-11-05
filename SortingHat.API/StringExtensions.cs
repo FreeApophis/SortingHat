@@ -2,14 +2,13 @@
 {
     public static class StringExtensions
     {
-        public static bool IsTag(this string value)
+        extension(string value)
         {
-            return value.StartsWith(":");
-        }
+            public bool IsTag()
+                => value.StartsWith(":");
 
-        public static bool IsFile(this string value)
-        {
-            return value.StartsWith(":") == false;
+            public bool IsFile()
+                => !value.IsTag();
         }
     }
 }
