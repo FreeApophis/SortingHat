@@ -1,5 +1,5 @@
 ﻿using System;
-using apophis.Lexer.Tokens;
+using Funcky.Lexer.Token;
 using SortingHat.API.Parser.Token;
 
 namespace SortingHat.API.Parser

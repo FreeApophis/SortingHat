@@ -22,7 +22,7 @@ namespace SortingHat.CLI.Commands.Projects
         }
         public CommandGrouping CommandGrouping => CommandGrouping.Project;
         public string LongCommand => "list-projects";
-        public Option<string> ShortCommand => Option<string>.None();
+        public Option<string> ShortCommand => Option<string>.None;
         public string ShortHelp => "Lists all the project databases on this machine.";
 
         public bool Execute(IEnumerable<string> arguments, IOptionParser options)

@@ -21,7 +21,7 @@ namespace SortingHat.CLI.Commands.Projects
         }
         public CommandGrouping CommandGrouping => CommandGrouping.Project;
         public string LongCommand => "remove-project";
-        public Option<string> ShortCommand => Option<string>.None();
+        public Option<string> ShortCommand => Option<string>.None;
         public string ShortHelp => "Removes a project with all tags and files.";
 
         public bool Execute(IEnumerable<string> arguments, IOptionParser options)

@@ -26,7 +26,7 @@ namespace SortingHat.CLI.Commands.Projects
         }
         public CommandGrouping CommandGrouping => CommandGrouping.Project;
         public string LongCommand => "export";
-        public Option<string> ShortCommand => Option<string>.None();
+        public Option<string> ShortCommand => Option<string>.None;
         public string ShortHelp => "Exports a project as a file.";
 
         public bool Execute(IEnumerable<string> lazyArguments, IOptionParser options)

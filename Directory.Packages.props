@@ -4,12 +4,12 @@
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="apophis.Lexer" Version="1.4.2" />
     <PackageVersion Include="Autofac" Version="6.0.0" />
     <PackageVersion Include="Avalonia" Version="0.9.12" />
     <PackageVersion Include="Avalonia.Desktop" Version="0.9.12" />
     <PackageVersion Include="Avalonia.ReactiveUI" Version="0.9.12" />
-    <PackageVersion Include="Funcky" Version="2.7.1" />
+    <PackageVersion Include="Funcky" Version="3.8.0" />
+    <PackageVersion Include="Funcky.Lexer" Version="2.0.0" />
     <PackageVersion Include="JetBrains.Annotations" Version="2026.2.0" />
     <PackageVersion Include="Karambolo.Extensions.Logging.File" Version="3.1.1" />
     <PackageVersion Include="MahApps.Metro" Version="2.4.11" />

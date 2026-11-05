@@ -17,7 +17,7 @@ namespace SortingHat.CLI.Commands.Tags
             _tagParser = tagParser;
         }
         public string LongCommand => "add-tags";
-        public Option<string> ShortCommand => Option<string>.None();
+        public Option<string> ShortCommand => Option<string>.None;
         public string ShortHelp => "This adds a tag without any associated files to the db.";
         public CommandGrouping CommandGrouping => CommandGrouping.Tag;
 

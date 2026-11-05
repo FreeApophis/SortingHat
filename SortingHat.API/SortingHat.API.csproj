@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="apophis.Lexer" />
+    <PackageReference Include="Funcky.Lexer" />
     <PackageReference Include="Autofac" />
     <PackageReference Include="Funcky" />
     <PackageReference Include="JetBrains.Annotations" />

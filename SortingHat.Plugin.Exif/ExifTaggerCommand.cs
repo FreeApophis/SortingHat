@@ -38,7 +38,7 @@ namespace SortingHat.Plugin.Exif
         }
 
         public string LongCommand => "exif";
-        public Option<string> ShortCommand => Option<string>.None();
+        public Option<string> ShortCommand => Option<string>.None;
         public string ShortHelp => "Reads exif information from files.";
 
         public CommandGrouping CommandGrouping => CommandGrouping.General;

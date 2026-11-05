@@ -22,7 +22,7 @@ namespace SortingHat.CLI.Commands.Tags
         }
 
         public string LongCommand => "remove-tags";
-        public Option<string> ShortCommand => Option<string>.None();
+        public Option<string> ShortCommand => Option<string>.None;
         public string ShortHelp => "Removes a tag from database";
         public CommandGrouping CommandGrouping => CommandGrouping.Tag;
 

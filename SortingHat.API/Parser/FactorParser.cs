@@ -1,4 +1,5 @@
-﻿using apophis.Lexer;
+﻿using Funcky.Lexer;
+using Funcky.Lexer.Extensions;
 using SortingHat.API.Parser.Nodes;
 using SortingHat.API.Parser.Token;
 
@@ -17,7 +18,7 @@ namespace SortingHat.API.Parser
         /// Parsing the following Production:
         /// Factor       := Tag | BoolConstant | Not Factor | "(" Expression ")
         /// </summary>
-        public IParseNode Parse(TokenWalker walker)
+        public IParseNode Parse(ILexemeWalker walker)
         {
             if (walker.NextIs<TagToken>())
             {

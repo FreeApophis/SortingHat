@@ -1,4 +1,4 @@
-﻿using apophis.Lexer.Tokens;
+﻿using Funcky.Lexer.Token;
 
 namespace SortingHat.API.Parser.Token
 {

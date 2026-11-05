@@ -1,5 +1,6 @@
 ﻿using Funcky.Monads;
 using SortingHat.API.DI;
+using IOption = SortingHat.API.DI.IOption;
 using System;
 using System.Collections.Generic;
 using System.Linq;

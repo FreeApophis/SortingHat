@@ -41,7 +41,7 @@ namespace SortingHat.CLI
             if (arguments.Any())
             {
                 return _commandTargets
-                    .TryGetValue(key: arguments.First())
+                    .GetValueOrNone(key: arguments.First())
                     .Match(
                         none: () => UnknownCommandError(arguments.First()),
                         some: c => ExecuteCommand(c, arguments));

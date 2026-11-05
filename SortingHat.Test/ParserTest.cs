@@ -1,7 +1,6 @@
 ﻿using SortingHat.API.Parser;
 using SortingHat.API.Parser.Nodes;
 using System.Linq;
-using apophis.Lexer;
 using SortingHat.API.Parser.OperatorType;
 using SortingHat.API.Parser.Token;
 using SortingHat.Test.Mock;
@@ -12,20 +11,6 @@ namespace SortingHat.Test
     public class ParserTest
     {
         private readonly Parser _parser = Parser.Create();
-
-        private static Parser CreateParser()
-        {
-            // Create the object tree without DI Framework
-            var expressionParser = new ExpressionParser();
-            var factorParser = new FactorParser(expressionParser);
-            var termParser = new TermParser(factorParser);
-            expressionParser.TermParser = termParser;
-            var lexerRules = new LexerRules();
-            var tokenizer = new Tokenizer(lexerRules, s => new LexerReader(s), lexems => new LinePositionCalculator(lexems));
-            var tokenWalker = new TokenWalker(tokenizer, () => new EpsilonToken(), lexems => new LinePositionCalculator(lexems));
-
-            return new Parser(tokenWalker, expressionParser);
-        }
 
         [Fact]
         public void EmptySearch()

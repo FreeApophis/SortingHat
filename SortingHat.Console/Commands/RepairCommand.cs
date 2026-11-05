@@ -20,7 +20,7 @@ namespace SortingHat.CLI.Commands
         }
 
         public string LongCommand => "repair";
-        public Option<string> ShortCommand => Option<string>.None();
+        public Option<string> ShortCommand => Option<string>.None;
         public string ShortHelp => "Check each path locked in the database if the file still exists and is not corrupted / changed";
         public CommandGrouping CommandGrouping => CommandGrouping.General;
 

@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using apophis.Lexer;
-using apophis.Lexer.Tokens;
+using Funcky.Lexer;
+using Funcky.Lexer.Token;
 using SortingHat.API.Parser.Nodes;
 using SortingHat.API.Parser.Token;
-using Tokenizer = apophis.Lexer.Tokenizer;
-using TokenWalker = apophis.Lexer.TokenWalker;
 
 namespace SortingHat.API.Parser
 {
     /// <summary>
     /// This is a Recursive Descent Parser with the following Grammer in EBNF.
-    /// 
+    ///
     /// Expression   := Term { Or Term }
     /// Term         := Factor { And Factor }
     /// Factor       := Tag | BoolConstant | Not Factor | "(" Expression ") | Predicate
@@ -27,13 +24,13 @@ namespace SortingHat.API.Parser
     /// </summary>
     public class Parser : IParser
     {
-        private readonly TokenWalker _tokenWalker;
+        private readonly LexerRuleBook _lexerRuleBook;
         private readonly ExpressionParser _expressionParser;
         private readonly List<IToken> _nextToken = new List<IToken>();
 
-        public Parser(TokenWalker tokenWalker, ExpressionParser expressionParser)
+        public Parser(LexerRuleBook lexerRuleBook, ExpressionParser expressionParser)
         {
-            _tokenWalker = tokenWalker;
+            _lexerRuleBook = lexerRuleBook;
             _expressionParser = expressionParser;
         }
 
@@ -44,17 +41,11 @@ namespace SortingHat.API.Parser
             var factorParser = new FactorParser(expressionParser);
             var termParser = new TermParser(factorParser);
             expressionParser.TermParser = termParser;
-            var lexerRules = new LexerRules();
-            ILinePositionCalculator NewLinePositionCalculator(List<Lexem> lexems) => new LinePositionCalculator(lexems);
-            ILexerReader NewLexerReader(string expression) => new LexerReader(expression);
-            var tokenizer = new Tokenizer(lexerRules, NewLexerReader, NewLinePositionCalculator);
-            IToken NewEpsilonToken() => new EpsilonToken();
-            var tokenWalker = new TokenWalker(tokenizer, NewEpsilonToken, NewLinePositionCalculator);
 
-            return new Parser(tokenWalker, expressionParser);
+            return new Parser(LexerRules.Create(), expressionParser);
         }
 
-        public IParseNode Parse(TokenWalker walker)
+        public IParseNode Parse(ILexemeWalker walker)
         {
             return _expressionParser.Parse(walker);
         }
@@ -69,8 +60,7 @@ namespace SortingHat.API.Parser
             try
             {
                 _nextToken.Clear();
-                _tokenWalker.Scan(expression, lexems => lexems.Where(t => t.Token.GetType() != typeof(WhiteSpaceToken)));
-                var ast = Parse(_tokenWalker);
+                var ast = Parse(_lexerRuleBook.Scan(expression).Walker);
                 _nextToken.Add(new AndToken());
                 _nextToken.Add(new OrToken());
                 return ast;

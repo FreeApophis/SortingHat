@@ -25,7 +25,7 @@ namespace SortingHat.CLI.Commands.Tags
         }
 
         public string LongCommand => "rename-tag";
-        public Option<string> ShortCommand => Option<string>.None();
+        public Option<string> ShortCommand => Option<string>.None;
         public string ShortHelp => "Renames a tag from database";
         public CommandGrouping CommandGrouping => CommandGrouping.Tag;
 

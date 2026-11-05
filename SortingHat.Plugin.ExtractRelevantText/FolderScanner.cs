@@ -2,9 +2,10 @@
 using System.IO;
 using System.Linq;
 using apophis.CLI.Writer;
-using apophis.Lexer;
-using apophis.Lexer.Tokens;
 using Funcky.Extensions;
+using Funcky.Lexer;
+using Funcky.Lexer.Extensions;
+using Funcky.Lexer.Token;
 using JetBrains.Annotations;
 using SortingHat.Plugin.ExtractRelevantText.Token;
 
@@ -13,16 +14,14 @@ namespace SortingHat.Plugin.ExtractRelevantText
     public class FolderScanner
     {
         private readonly IConsoleWriter _consoleWriter;
-        private readonly TokenWalker _tokenWalker;
+        private readonly LexerRuleBook _lexerRuleBook;
         private readonly Dictionary<string, int> _wordCount;
 
         [UsedImplicitly]
         public FolderScanner(IConsoleWriter consoleWriter)
         {
             _consoleWriter = consoleWriter;
-            var lexerRules = new LexerRules();
-            var tokenizer = new Tokenizer(lexerRules, e => new LexerReader(e), lexems => new LinePositionCalculator(lexems));
-            _tokenWalker = new TokenWalker(tokenizer, () => new EpsilonToken(), lexems => new LinePositionCalculator(lexems));
+            _lexerRuleBook = LexerRules.Create();
             _wordCount = new Dictionary<string, int>();
         }
 
@@ -41,13 +40,13 @@ namespace SortingHat.Plugin.ExtractRelevantText
         {
             _consoleWriter.WriteLine($"Reading: {file}");
 
-            _tokenWalker.Scan(File.ReadAllText(file));
+            var walker = _lexerRuleBook.Scan(File.ReadAllText(file)).Walker;
 
-            while (!(_tokenWalker.Peek().Token is EpsilonToken))
+            while (!walker.NextIs<EpsilonToken>())
             {
-                var lexem = _tokenWalker.Pop();
+                var lexeme = walker.Pop();
 
-                Count(lexem.Token);
+                Count(lexeme.Token);
             }
 
             PrintSignificant();
@@ -70,7 +69,7 @@ namespace SortingHat.Plugin.ExtractRelevantText
             if (token is WordToken word)
             {
                 _wordCount[word.Word] = _wordCount
-                    .TryGetValue(key: word.Word)
+                    .GetValueOrNone(key: word.Word)
                     .Match(none: 1, some: count => count + 1);
             }
         }

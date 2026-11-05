@@ -8,7 +8,7 @@ namespace apophis.CLI.Reader
     {
         public Option<int> ReadInt()
         {
-            return ReadLine().TryParseInt();
+            return ReadLine().ParseInt32OrNone();
         }
 
         public string ReadLine()

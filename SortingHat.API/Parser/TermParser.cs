@@ -1,4 +1,5 @@
-﻿using apophis.Lexer;
+﻿using Funcky.Lexer;
+using Funcky.Lexer.Extensions;
 using SortingHat.API.Parser.Nodes;
 using SortingHat.API.Parser.Token;
 
@@ -22,7 +23,7 @@ namespace SortingHat.API.Parser
         /// </summary>
         /// <param name="walker">Lexer input</param>
         /// <returns></returns>
-        public IParseNode Parse(TokenWalker walker)
+        public IParseNode Parse(ILexemeWalker walker)
         {
             var result = _factorParser.Parse(walker);
             while (walker.NextIs<AndToken>())

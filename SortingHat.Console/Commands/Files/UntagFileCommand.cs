@@ -28,7 +28,7 @@ namespace SortingHat.CLI.Commands.Files
         }
 
         public string LongCommand => "untag-files";
-        public Option<string> ShortCommand => Option<string>.None();
+        public Option<string> ShortCommand => Option<string>.None;
         public string ShortHelp => "Remove tags from the indicated files";
         public CommandGrouping CommandGrouping => CommandGrouping.File;
 

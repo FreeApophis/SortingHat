@@ -21,7 +21,7 @@ namespace SortingHat.CLI.Commands
         }
 
         public string LongCommand => "plugins";
-        public Option<string> ShortCommand => Option<string>.None();
+        public Option<string> ShortCommand => Option<string>.None;
         public string ShortHelp => "Lists the loaded plugins";
         public CommandGrouping CommandGrouping => CommandGrouping.General;
 

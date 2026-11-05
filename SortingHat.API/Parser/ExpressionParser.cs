@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
-using apophis.Lexer;
+using Funcky.Lexer;
+using Funcky.Lexer.Extensions;
 using SortingHat.API.Parser.Nodes;
 using SortingHat.API.Parser.Token;
 
@@ -14,7 +15,7 @@ namespace SortingHat.API.Parser
         // Break the dependency cycle
         public TermParser? TermParser { get; set; }
 
-        public IParseNode Parse(TokenWalker walker)
+        public IParseNode Parse(ILexemeWalker walker)
         {
             Debug.Assert(TermParser != null);
 

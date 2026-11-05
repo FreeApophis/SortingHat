@@ -24,7 +24,7 @@ namespace SortingHat.CLI.Commands.Projects
 
         public CommandGrouping CommandGrouping => CommandGrouping.Project;
         public string LongCommand => "switch-project";
-        public Option<string> ShortCommand => Option<string>.None();
+        public Option<string> ShortCommand => Option<string>.None;
         public string ShortHelp => "Switches to an existing database with the given name.";
 
         public bool Execute(IEnumerable<string> arguments, IOptionParser options)

@@ -15,7 +15,7 @@ namespace SortingHat.API.AutoTag
         {
             if (tagMatch is { } match)
             {
-                return match.TryParseInt().Match(
+                return match.ParseInt32OrNone().Match(
                     none: null as string,
                     some: integer => HandleTag(file, integer)
                 );
