@@ -4,6 +4,10 @@
     <File Path="Directory.Packages.props" />
     <File Path="global.json" />
   </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+  </Folder>
   <Project Path="apophis.CLI/apophis.CLI.csproj" />
   <Project Path="apophis.FileSystem/apophis.FileSystem.csproj" />
   <Project Path="apophis.Utils/apophis.Utils.csproj" />
