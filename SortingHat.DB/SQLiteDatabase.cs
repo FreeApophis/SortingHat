@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Funcky.Monads;
 using Microsoft.Data.Sqlite;
 using SortingHat.API;
 
@@ -12,6 +13,7 @@ public abstract class SQLiteDatabase : IDisposable
     private readonly string _encryptionKey = "Encrypted";
 
     private bool _disposedValue;
+    private Option<SqliteTransaction> _transaction;
 
     protected SQLiteDatabase(DatabaseSettings databaseSettings, string dbName)
     {
@@ -46,6 +48,13 @@ public abstract class SQLiteDatabase : IDisposable
     {
         Dispose(true);
     }
+
+    /// <summary>
+    /// Runs <paramref name="work"/> in a transaction, which is committed when the work returns and rolled back when it throws.
+    /// Inside a running transaction the work joins it, so the outermost transaction decides.
+    /// </summary>
+    internal TResult InTransaction<TResult>(Func<TResult> work)
+        => _transaction.Match(none: () => InNewTransaction(work), some: _ => work());
 
     internal void ExecuteNonQuery(string commandText, params SqliteParameter[] parameters)
     {
@@ -88,6 +97,24 @@ public abstract class SQLiteDatabase : IDisposable
         return rows;
     }
 
+    private TResult InNewTransaction<TResult>(Func<TResult> work)
+    {
+        using var transaction = Connection.BeginTransaction();
+        _transaction = transaction;
+
+        try
+        {
+            var result = work();
+            transaction.Commit();
+
+            return result;
+        }
+        finally
+        {
+            _transaction = Option<SqliteTransaction>.None;
+        }
+    }
+
     private string ExistingDbPath()
     {
         if (!Directory.Exists(_path))
@@ -107,6 +134,7 @@ public abstract class SQLiteDatabase : IDisposable
     {
         SqliteCommand command = Connection.CreateCommand();
         command.CommandText = commandText;
+        _transaction.AndThen(transaction => command.Transaction = transaction);
 
         foreach (var parameter in parameters)
         {

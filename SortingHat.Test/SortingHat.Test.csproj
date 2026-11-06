@@ -24,6 +24,7 @@
     <EmbeddedResource Include="Resources\test.png">
       <CustomToolNamespace>Resource</CustomToolNamespace>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\Project\20000101-0000-FailsHalfway.migration" />
   </ItemGroup>
 
   <ItemGroup>

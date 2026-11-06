@@ -80,31 +80,40 @@ SELECT id, parentId, name, level FROM tree;";
             ? id
             : throw new InvalidOperationException($"Tag '{name}' could not be created.");
 
+    /// <summary>The foreign key on <c>Tags.ParentId</c> rejects a tag that still has children, and the transaction keeps its files tagged.</summary>
     private bool DestroyTag(long tagId)
+        => UnlessRejected(() => db.InTransaction(() =>
+        {
+            var tagIdParameter = new SqliteParameter("@tagId", tagId);
+            db.ExecuteNonQuery("DELETE FROM FileTags WHERE TagId = @tagId", tagIdParameter);
+            db.ExecuteNonQuery("DELETE FROM Tags WHERE Id = @tagId", tagIdParameter);
+
+            return true;
+        }));
+
+    /// <summary>The unique tag name indexes reject a new name that one of its siblings already has.</summary>
+    private Func<long, bool> RenameTag(string newName)
+        => tagId => UnlessRejected(() => Execute("UPDATE Tags SET Name = @tagName WHERE Id = @tagId", new SqliteParameter("@tagId", tagId), new SqliteParameter("@tagName", newName)));
+
+    /// <summary>The unique tag name indexes reject a destination that already has a child with the same name.</summary>
+    private bool MoveTag(long tagId, long destinationTagId)
+        => UnlessRejected(() => Execute("UPDATE Tags SET ParentId = @destinationTagId WHERE Id = @tagId", new SqliteParameter("@tagId", tagId), new SqliteParameter("@destinationTagId", destinationTagId)));
+
+    private bool Execute(string commandText, params SqliteParameter[] parameters)
     {
-        var tagIdParameter = new SqliteParameter("@tagId", tagId);
-        db.ExecuteNonQuery("DELETE FROM FileTags WHERE TagId = @tagId", tagIdParameter);
-        db.ExecuteNonQuery("DELETE FROM Tags WHERE Id = @tagId", tagIdParameter);
+        db.ExecuteNonQuery(commandText, parameters);
 
         return true;
     }
 
-    private Func<long, bool> RenameTag(string newName)
-        => tagId => ExecuteUnlessSiblingExists("UPDATE Tags SET Name = @tagName WHERE Id = @tagId", new SqliteParameter("@tagId", tagId), new SqliteParameter("@tagName", newName));
-
-    private bool MoveTag(long tagId, long destinationTagId)
-        => ExecuteUnlessSiblingExists("UPDATE Tags SET ParentId = @destinationTagId WHERE Id = @tagId", new SqliteParameter("@tagId", tagId), new SqliteParameter("@destinationTagId", destinationTagId));
-
-    /// <summary>The unique tag name indexes reject a change that would give a tag the same name as one of its siblings.</summary>
-    private bool ExecuteUnlessSiblingExists(string commandText, params SqliteParameter[] parameters)
+    /// <summary>A change the database rejects with a constraint (unique index or foreign key) is an expected failure, not an error.</summary>
+    private static bool UnlessRejected(Func<bool> change)
     {
         try
         {
-            db.ExecuteNonQuery(commandText, parameters);
-
-            return true;
+            return change();
         }
-        catch (SqliteException exception) when (exception.SqliteExtendedErrorCode == SQLitePCL.raw.SQLITE_CONSTRAINT_UNIQUE)
+        catch (SqliteException exception) when (exception.SqliteErrorCode == SQLitePCL.raw.SQLITE_CONSTRAINT)
         {
             return false;
         }

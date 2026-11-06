@@ -68,8 +68,14 @@ internal sealed class HatSandbox : IDisposable
     {
         _writer.Lines.Clear();
 
+        InScope(scope => scope.Resolve<ArgumentParser>().Execute(arguments));
+    }
+
+    /// <summary>Runs <paramref name="run"/> in its own lifetime scope, like one invocation of hat, so it gets its own database connection.</summary>
+    public TResult InScope<TResult>(Func<ILifetimeScope, TResult> run)
+    {
         using var scope = _container.BeginLifetimeScope();
 
-        scope.Resolve<ArgumentParser>().Execute(arguments);
+        return run(scope);
     }
 }

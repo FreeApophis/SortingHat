@@ -31,6 +31,28 @@ public sealed class TagCommandTest : IDisposable
     }
 
     [Fact]
+    public void GivenATagWithChildrenThenRemoveTagsKeepsTheTagAndItsFiles()
+    {
+        _hat.TaggedFile("a.txt", ":tax");
+        _hat.TaggedFile("b.txt", ":tax:2018");
+
+        _hat.Hat(["remove-tags", ":tax"]);
+
+        Assert.Equal(["a.txt", "b.txt"], _hat.FindFiles(":tax"));
+    }
+
+    [Fact]
+    public void GivenATagWithoutChildrenThenRemoveTagsRemovesIt()
+    {
+        _hat.TaggedFile("a.txt", ":tax:2018");
+
+        _hat.Hat(["remove-tags", ":tax:2018"]);
+
+        Assert.Empty(_hat.FindFiles(":tax:2018"));
+        Assert.Contains("Unknown tag: :tax:2018", _hat.Lines);
+    }
+
+    [Fact]
     public void GivenAFreeNameThenRenameTagRenamesTheTag()
     {
         _hat.TaggedFile("a.txt", ":a");

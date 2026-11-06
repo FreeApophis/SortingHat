@@ -1,0 +1,7 @@
+﻿/* Fails halfway: the table is created, then the insert fails */
+
+CREATE TABLE `Broken` (
+    `Id`                        INTEGER PRIMARY KEY AUTOINCREMENT
+);
+
+INSERT INTO `Missing` (`Id`) VALUES (1);
