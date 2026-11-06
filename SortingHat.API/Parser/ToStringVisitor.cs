@@ -7,7 +7,7 @@ namespace SortingHat.API.Parser;
 
 public class ToStringVisitor(IOperatorType operatorType) : INodeVisitor
 {
-    private readonly StringBuilder _resultBuilder = new StringBuilder();
+    private readonly StringBuilder _resultBuilder = new();
 
     public string Result => _resultBuilder.ToString();
 

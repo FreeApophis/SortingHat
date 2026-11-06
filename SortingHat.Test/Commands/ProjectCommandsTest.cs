@@ -11,8 +11,8 @@ namespace SortingHat.Test.Commands;
 
 public class ProjectCommandsTest
 {
-    private readonly Mock<IProjects> _projects = new Mock<IProjects>();
-    private readonly MemoryConsoleWriter _writer = new MemoryConsoleWriter();
+    private readonly Mock<IProjects> _projects = new();
+    private readonly MemoryConsoleWriter _writer = new();
 
     public IContainer GetContainer()
     {

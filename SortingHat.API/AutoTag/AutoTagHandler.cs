@@ -10,7 +10,7 @@ namespace SortingHat.API.AutoTag;
 [UsedImplicitly]
 public class AutoTagHandler(IEnumerable<IAutoTag> autoTags, ITagParser tagParser) : IAutoTagHandler
 {
-    private readonly Regex _variableRegex = new Regex("{.*?}");
+    private readonly Regex _variableRegex = new("{.*?}");
 
     public IEnumerable<IAutoTag> AutoTags { get; } = autoTags;
 
