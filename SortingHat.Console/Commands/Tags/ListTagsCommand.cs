@@ -23,7 +23,7 @@ internal class ListTagsCommand : ICommand
 
     public string LongCommand => "list-tags";
     public Option<string> ShortCommand => Option.Some("tags");
-    public string ShortHelp => "Lists all avaialable tags in hierarchical form";
+    public string ShortHelp => "Lists all available tags in hierarchical form";
     public CommandGrouping CommandGrouping => CommandGrouping.Tag;
 
     public bool Execute(IEnumerable<string> arguments, IOptionParser options)

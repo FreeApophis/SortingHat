@@ -44,12 +44,6 @@ internal class Application
         }
         catch (Exception e)
         {
-            if (e.Message.Contains("no such table:"))
-            {
-                _console.Writer.WriteLine($"Database not initialized? Run '{_console.Application.Name} init'");
-                _logger.LogWarning($"Database not initialized? Run '{_console.Application.Name} init'");
-            }
-
             _logger.LogError(e.Message);
             _console.Writer.WriteLine(e.Message);
 

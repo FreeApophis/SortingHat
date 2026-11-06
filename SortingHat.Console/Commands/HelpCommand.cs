@@ -36,7 +36,7 @@ internal class HelpCommand : ICommand
 
     public string LongCommand => "help";
     public Option<string> ShortCommand => Option.Some("?");
-    public string ShortHelp => "This is the help command, it shows a list of the available lazyCommands.";
+    public string ShortHelp => "This is the help command, it shows a list of the available commands.";
     public CommandGrouping CommandGrouping => CommandGrouping.General;
 
     public bool Execute(IEnumerable<string> arguments, IOptionParser options)
@@ -134,10 +134,10 @@ internal class HelpCommand : ICommand
         _console.Writer.WriteLine();
         _console.Writer.WriteLine("Examples:");
         _console.Writer.WriteLine();
-        _console.Writer.WriteLine($"  {_console.Application.Name} find (:tax:2018 or :tax:2017) and :bank");
+        _console.Writer.WriteLine($"  {_console.Application.Name} find-files (:tax:2018 or :tax:2017) and :bank");
         _console.Writer.WriteLine("    This will output all files which are tagged as bank documents for tax in 2017 or 2018.");
         _console.Writer.WriteLine();
-        _console.Writer.WriteLine($"  {_console.Application.Name} auto-tag :Files:{{FileType.Category}}:{{CameraMake}} :Taken:{{Taken.Year}} *");
+        _console.Writer.WriteLine($"  {_console.Application.Name} tag-files :Files:{{FileType.Category}}:{{Camera.Make}} :Taken:{{Camera.Taken.Year}} *");
         _console.Writer.WriteLine("    This will tag all files in the current directory, the possible automatic tags depend on your plugins.");
     }
 

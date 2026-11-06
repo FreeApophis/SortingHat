@@ -63,24 +63,7 @@ internal class CompositionRoot
     }
 
     public IContainer Build()
-    {
-        return ConfigureLogger(Builder.Build());
-    }
-
-    public IContainer ConfigureLogger(IContainer container)
-    {
-        // https://stackoverflow.com/questions/41414796/how-to-get-microsoft-extensions-loggingt-in-console-application-using-serilog
-        var loggerFactory = container.Resolve<ILoggerFactory>();
-
-        // File Logger
-        // var context = new FileLoggerContext(AppContext.BaseDirectory, "fallback.log");
-        // var settings = new FileLoggerSettings();
-        // loggerFactory.AddFile(context, settings);
-
-        // Console Logger
-        // loggerFactory.AddConsole();
-        return container;
-    }
+        => Builder.Build();
 
     private void RegisterAutoTags()
     {

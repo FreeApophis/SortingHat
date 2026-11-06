@@ -9,5 +9,5 @@ internal class RecursiveOption : IOption
 
     public Option<string> LongOption => Option.Some("recursive");
 
-    public string ShortHelp => "Iterate through directories recursivly";
+    public string ShortHelp => "Iterate through directories recursively";
 }

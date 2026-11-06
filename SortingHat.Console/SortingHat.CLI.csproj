@@ -36,8 +36,8 @@
   <ItemGroup>
     <PackageReference Include="Autofac" />
     <PackageReference Include="JetBrains.Annotations" />
-    <PackageReference Include="Karambolo.Extensions.Logging.File" />
     <PackageReference Include="Microsoft.Extensions.Configuration" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
     <PackageReference Include="Microsoft.Extensions.Logging" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
