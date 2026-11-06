@@ -38,6 +38,10 @@ public sealed record ProjectName
     public override string ToString()
         => Value;
 
+    /// <summary>Windows file names ignore case, so <c>default</c> and <c>Default</c> would share one database file.</summary>
+    public static bool IsSameName(string name, string other)
+        => string.Equals(name, other, StringComparison.OrdinalIgnoreCase);
+
     private static Option<string> Problem(string name, string mainDatabaseName)
         => name switch
         {
@@ -58,8 +62,4 @@ public sealed record ProjectName
 
     private static bool IsAllowed(char character)
         => char.IsLetterOrDigit(character) || character is '-' or '_';
-
-    /// <summary>Windows file names ignore case, so <c>default</c> and <c>Default</c> would share one database file.</summary>
-    private static bool IsSameName(string name, string other)
-        => string.Equals(name, other, StringComparison.OrdinalIgnoreCase);
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Xunit;
 
 namespace SortingHat.Test;
@@ -60,8 +61,102 @@ public sealed class ProjectCommandTest : IDisposable
         Assert.Equal(["* Default"], ListProjects());
     }
 
+    [Theory]
+    [InlineData("y")]
+    [InlineData("yes")]
+    [InlineData("Y")]
+    public void GivenConfirmationThenRemoveProjectDeletesTheProjectAndItsDatabase(string answer)
+    {
+        ProjectWithDatabase("myProject");
+        _hat.Keyboard.Type(answer);
+
+        _hat.Hat(["remove-project", "myProject"]);
+
+        Assert.Contains("Removing the project 'myProject' deletes its database with all its files and tags. The files on disk stay where they are.", _hat.Lines);
+        Assert.Equal(["* Default"], ListProjects());
+        Assert.False(File.Exists(_hat.ProjectDatabaseFile("myProject")));
+    }
+
+    [Theory]
+    [InlineData("n")]
+    [InlineData("")]
+    [InlineData("yep")]
+    public void GivenNoConfirmationThenRemoveProjectKeepsTheProjectAndItsDatabase(string answer)
+    {
+        ProjectWithDatabase("myProject");
+        _hat.Keyboard.Type(answer);
+
+        _hat.Hat(["remove-project", "myProject"]);
+
+        Assert.Equal(["* Default", "  myProject"], ListProjects());
+        Assert.True(File.Exists(_hat.ProjectDatabaseFile("myProject")));
+    }
+
+    [Fact]
+    public void GivenNoInputThenRemoveProjectKeepsTheProject()
+    {
+        ProjectWithDatabase("myProject");
+
+        _hat.Hat(["remove-project", "myProject"]);
+
+        Assert.Equal(["* Default", "  myProject"], ListProjects());
+    }
+
+    [Fact]
+    public void GivenAProjectWithoutDatabaseThenRemoveProjectRemovesIt()
+    {
+        _hat.Hat(["new-project", "myProject"]);
+        _hat.Keyboard.Type("y");
+
+        _hat.Hat(["remove-project", "myProject"]);
+
+        Assert.Equal(["* Default"], ListProjects());
+    }
+
+    [Fact]
+    public void GivenTheNameInAnotherCaseThenRemoveProjectRemovesTheProject()
+    {
+        ProjectWithDatabase("myProject");
+        _hat.Keyboard.Type("y");
+
+        _hat.Hat(["remove-project", "MYPROJECT"]);
+
+        Assert.Equal(["* Default"], ListProjects());
+        Assert.False(File.Exists(_hat.ProjectDatabaseFile("myProject")));
+    }
+
+    [Fact]
+    public void GivenTheActiveProjectThenRemoveProjectRefusesWithoutAsking()
+    {
+        _hat.Keyboard.Type("y");
+
+        _hat.Hat(["remove-project", "Default"]);
+
+        Assert.Equal(["The project 'Default' is in use, switch to another project before you remove it."], _hat.Lines);
+        Assert.Equal(["* Default"], ListProjects());
+    }
+
+    [Fact]
+    public void GivenAnUnknownProjectThenRemoveProjectReportsIt()
+    {
+        _hat.Hat(["remove-project", "typo"]);
+
+        Assert.Equal(["There is no project with the name 'typo'."], _hat.Lines);
+    }
+
     public void Dispose()
         => _hat.Dispose();
+
+    /// <summary>A project database file only exists once the project has been used.</summary>
+    private void ProjectWithDatabase(string project)
+    {
+        _hat.Hat(["new-project", project]);
+        _hat.Hat(["switch-project", project]);
+        _hat.TaggedFile($"{project}.txt", ":x");
+        _hat.Hat(["switch-project", "Default"]);
+
+        Assert.True(File.Exists(_hat.ProjectDatabaseFile(project)));
+    }
 
     private string[] ListProjects()
     {

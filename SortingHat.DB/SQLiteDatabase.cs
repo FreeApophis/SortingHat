@@ -22,7 +22,8 @@ public abstract class SQLiteDatabase : IDisposable
             _path = databaseSettings.DbPath;
             DbName = dbName;
 
-            Connection = new SqliteConnection($"Filename={DbFile()}");
+            // without the pool, disposing the database closes its file, so a removed project's file can be deleted
+            Connection = new SqliteConnection($"Filename={DbFile()};Pooling=False");
             Connection.Open();
 
             ExecuteNonQuery("PRAGMA foreign_keys=ON;");
