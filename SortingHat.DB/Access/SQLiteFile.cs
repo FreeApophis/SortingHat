@@ -32,17 +32,16 @@ HAVING DuplicateCount > 1";
 
     public async Task Tag(File file, Tag tag)
     {
-        long? fileId = await FindOrCreate(file);
-        var tagId = sqLiteTag.FindOrCreate(tag);
+        var hash = await file.Hash;
 
-        db.ExecuteNonQuery("INSERT INTO FileTags (TagId, FileId) VALUES(@tagId, @fileId);", new SqliteParameter("@tagId", tagId), new SqliteParameter("@fileId", fileId));
+        db.InTransaction(() => InsertFileTag(FindOrCreate(file, hash), sqLiteTag.FindOrCreate(tag)));
     }
 
     public async Task Untag(File file, Tag tag)
     {
-        var fileId = await Find(file);
+        var fileId = Find(await file.Hash);
 
-        (from f in Option.FromNullable(fileId)
+        (from f in fileId
          from t in sqLiteTag.Find(tag)
          select (FileId: f, TagId: t))
             .AndThen(ids => db.ExecuteNonQuery("DELETE FROM FileTags WHERE TagId = @tagId AND FileId = @fileId;", new SqliteParameter("@fileId", ids.FileId), new SqliteParameter("@tagId", ids.TagId)));
@@ -100,14 +99,12 @@ HAVING DuplicateCount > 1";
         return hasMore;
     }
 
-    private async Task<long?> Find(File file)
-    {
-        return db.ExecuteScalar("SELECT Id FROM Files WHERE Hash = @hash", new SqliteParameter("@hash", await file.Hash)) as long?;
-    }
+    private Option<long> Find(string hash)
+        => Option.FromNullable(db.ExecuteScalar("SELECT Id FROM Files WHERE Hash = @hash", new SqliteParameter("@hash", hash)) as long?);
 
-    private async Task<long> Create(File file)
+    private long Create(File file, string hash)
     {
-        var fileId = await InsertFile(file);
+        var fileId = InsertFile(file, hash);
 
         InsertFileName(file, fileId);
         InsertFilePath(file, fileId);
@@ -115,38 +112,42 @@ HAVING DuplicateCount > 1";
         return fileId;
     }
 
-    private async Task<long> InsertFile(File file)
-    {
-        var hash = new SqliteParameter("@hash", await file.Hash);
-        var size = new SqliteParameter("@size", file.Size);
-        var createdAt = new SqliteParameter("@createdAt", file.CreatedAt);
-
-        return db.ExecuteScalar("INSERT INTO Files (Hash, Size, CreatedAt) VALUES(@hash,@size, @createdAt); SELECT last_insert_rowid();", hash, size, createdAt) as long?
+    private long InsertFile(File file, string hash)
+        => db.ExecuteScalar(
+            "INSERT INTO Files (Hash, Size, CreatedAt) VALUES(@hash,@size, @createdAt); SELECT last_insert_rowid();",
+            new SqliteParameter("@hash", hash),
+            new SqliteParameter("@size", file.Size),
+            new SqliteParameter("@createdAt", file.CreatedAt)) as long?
             ?? throw new InvalidOperationException("Inserting the file did not return its id.");
+
+    /// <summary>Tagging a file again keeps its existing row, the table's ON CONFLICT REPLACE would delete and re-insert it.</summary>
+    private bool InsertFileTag(long fileId, long tagId)
+    {
+        db.ExecuteNonQuery("INSERT OR IGNORE INTO FileTags (TagId, FileId) VALUES(@tagId, @fileId);", new SqliteParameter("@tagId", tagId), new SqliteParameter("@fileId", fileId));
+
+        return true;
     }
 
     private void InsertFileName(File file, long fileId)
     {
         var fileName = System.IO.Path.GetFileName(file.Path);
-        db.ExecuteNonQuery("INSERT INTO FileNames (FileId, Name) VALUES(@fileId, @fileName);", new SqliteParameter("@fileId", fileId), new SqliteParameter("@fileName", fileName));
+        db.ExecuteNonQuery("INSERT OR IGNORE INTO FileNames (FileId, Name) VALUES(@fileId, @fileName);", new SqliteParameter("@fileId", fileId), new SqliteParameter("@fileName", fileName));
     }
 
     private void InsertFilePath(File file, long fileId)
     {
-        db.ExecuteNonQuery("INSERT INTO FilePaths (FileId, Path) VALUES(@fileId, @filePath);", new SqliteParameter("@fileId", fileId), new SqliteParameter("@filePath", file.Path));
+        db.ExecuteNonQuery("INSERT OR IGNORE INTO FilePaths (FileId, Path) VALUES(@fileId, @filePath);", new SqliteParameter("@fileId", fileId), new SqliteParameter("@filePath", file.Path));
     }
 
     private async Task<long> FindOrCreate(File file)
     {
-        long? fileId = await Find(file);
+        var hash = await file.Hash;
 
-        if (fileId.HasValue)
-        {
-            return UpdateFileAttributes(file, fileId.Value);
-        }
-
-        return await Create(file);
+        return db.InTransaction(() => FindOrCreate(file, hash));
     }
+
+    private long FindOrCreate(File file, string hash)
+        => Find(hash).Match(none: () => Create(file, hash), some: fileId => UpdateFileAttributes(file, fileId));
 
     private long UpdateFileAttributes(File file, long fileId)
     {
