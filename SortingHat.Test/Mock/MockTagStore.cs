@@ -10,7 +10,7 @@ public class MockTagStore : ITag
     {
     }
 
-    public List<Tag> Tags { get; } = new List<Tag>();
+    public List<Tag> Tags { get; } = [];
 
     public static MockTagStore Create()
     {

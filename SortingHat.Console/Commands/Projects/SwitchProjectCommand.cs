@@ -8,20 +8,9 @@ using SortingHat.API.DI;
 namespace SortingHat.CLI.Commands.Projects;
 
 [UsedImplicitly]
-internal class SwitchProjectCommand : ICommand
+[method: UsedImplicitly]
+internal class SwitchProjectCommand(IProjects projects, ISettings settings, IConsoleWriter consoleWriter) : ICommand
 {
-    private readonly IProjects _projects;
-    private readonly ISettings _settings;
-    private readonly IConsoleWriter _consoleWriter;
-
-    [UsedImplicitly]
-    public SwitchProjectCommand(IProjects projects, ISettings settings, IConsoleWriter consoleWriter)
-    {
-        _projects = projects;
-        _settings = settings;
-        _consoleWriter = consoleWriter;
-    }
-
     public CommandGrouping CommandGrouping => CommandGrouping.Project;
     public string LongCommand => "switch-project";
     public Option<string> ShortCommand => Option<string>.None;
@@ -31,14 +20,14 @@ internal class SwitchProjectCommand : ICommand
     {
         var project = arguments.First();
 
-        if (_projects.GetProjects().Contains(project))
+        if (projects.GetProjects().Contains(project))
         {
-            _settings[DB.Constants.ProjectDatabaseKey] = project;
-            _consoleWriter.WriteLine($"You switched to project '{project}'");
+            settings[DB.Constants.ProjectDatabaseKey] = project;
+            consoleWriter.WriteLine($"You switched to project '{project}'");
             return true;
         }
 
-        _consoleWriter.WriteLine($"There is no project with the name '{project}' please create it first.");
+        consoleWriter.WriteLine($"There is no project with the name '{project}' please create it first.");
         return false;
     }
 }

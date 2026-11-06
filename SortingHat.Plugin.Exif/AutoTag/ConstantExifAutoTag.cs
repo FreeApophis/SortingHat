@@ -7,21 +7,11 @@ using SortingHat.API.AutoTag;
 namespace SortingHat.Plugin.Exif.AutoTag;
 
 [UsedImplicitly]
-public class ConstantExifAutoTag<TDirectory> : ConstantAutoTag
+public class ConstantExifAutoTag<TDirectory>(int directoryEntryId, string baseKey, string description) : ConstantAutoTag
     where TDirectory : Directory
 {
-    private readonly string _baseKey;
-    private readonly int _directoryEntryId;
-
-    public ConstantExifAutoTag(int directoryEntryId, string baseKey, string description)
-    {
-        _directoryEntryId = directoryEntryId;
-        _baseKey = baseKey;
-        Description = description;
-    }
-
-    public override string AutoTagKey => $"{_baseKey}";
-    public override string Description { get; }
+    public override string AutoTagKey => $"{baseKey}";
+    public override string Description { get; } = description;
 
     protected override string? HandleTag(System.IO.FileInfo file)
     {
@@ -30,6 +20,6 @@ public class ConstantExifAutoTag<TDirectory> : ConstantAutoTag
         // obtain the Exif SubIFD directory
         var directory = directories.OfType<TDirectory>().FirstOrDefault();
 
-        return directory?.GetString(_directoryEntryId);
+        return directory?.GetString(directoryEntryId);
     }
 }

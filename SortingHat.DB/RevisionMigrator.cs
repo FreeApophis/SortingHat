@@ -8,15 +8,9 @@ using static Funcky.Functional;
 
 namespace SortingHat.DB;
 
-internal class RevisionMigrator : IRevisionMigrator
+internal class RevisionMigrator(ILogger<RevisionMigrator> logger) : IRevisionMigrator
 {
     private const string CreateRevisionTableCommand = @"CREATE TABLE IF NOT EXISTS [Revisions] ([Id] INTEGER  NOT NULL PRIMARY KEY AUTOINCREMENT, [Name] VARCHAR(255)  UNIQUE NOT NULL, [MigratedAt] DATETIME DEFAULT CURRENT_TIME NOT NULL);";
-    private readonly ILogger<RevisionMigrator> _logger;
-
-    public RevisionMigrator(ILogger<RevisionMigrator> logger)
-    {
-        _logger = logger;
-    }
 
     public void Migrate(SQLiteDatabase db)
     {
@@ -43,7 +37,7 @@ internal class RevisionMigrator : IRevisionMigrator
 
     private void RunMigration(SQLiteDatabase db, string migration)
     {
-        _logger.Log(LogLevel.Information, ($"Run migration '{migration}' on database '{db.DbName}'"));
+        logger.Log(LogLevel.Information, ($"Run migration '{migration}' on database '{db.DbName}'"));
 
         using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(migration);
         if (stream is { })

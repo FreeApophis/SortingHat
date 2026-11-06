@@ -2,14 +2,9 @@
 
 namespace SortingHat.Plugin.ExtractRelevantText.Token;
 
-internal class WordToken : IToken
+internal class WordToken(string word) : IToken
 {
-    public WordToken(string word)
-    {
-        Word = word;
-    }
-
-    public string Word { get; }
+    public string Word { get; } = word;
 
     public override string ToString()
     {

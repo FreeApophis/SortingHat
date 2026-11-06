@@ -8,19 +8,8 @@ using SortingHat.Plugin.FileType.Detectors;
 namespace SortingHat.Plugin.FileType;
 
 [UsedImplicitly]
-internal class IdentifyCommand : ICommand
+internal class IdentifyCommand(IConsoleWriter consoleWriter, IFileTypeFinder fileTypeFinder, IFilePathExtractor filePathExtractor) : ICommand
 {
-    private readonly IConsoleWriter _consoleWriter;
-    private readonly IFileTypeFinder _fileTypeFinder;
-    private readonly IFilePathExtractor _filePathExtractor;
-
-    public IdentifyCommand(IConsoleWriter consoleWriter, IFileTypeFinder fileTypeFinder, IFilePathExtractor filePathExtractor)
-    {
-        _consoleWriter = consoleWriter;
-        _fileTypeFinder = fileTypeFinder;
-        _filePathExtractor = filePathExtractor;
-    }
-
     public string LongCommand => "identify";
     public Option<string> ShortCommand => Option.Some("id");
     public string ShortHelp => "This command identifies the real file type (ignoring the file-extension)";
@@ -28,24 +17,24 @@ internal class IdentifyCommand : ICommand
 
     public bool Execute(IEnumerable<string> arguments, IOptionParser options)
     {
-        foreach (var argument in _filePathExtractor.FromFilePatterns(arguments, false))
+        foreach (var argument in filePathExtractor.FromFilePatterns(arguments, false))
         {
-            _consoleWriter.WriteLine($"File: {argument}");
+            consoleWriter.WriteLine($"File: {argument}");
 
             if (FileType(argument) is { } fileType)
             {
-                _consoleWriter.WriteLine($"Category : {fileType.Category}");
-                _consoleWriter.WriteLine($"Name     : {fileType.Name}");
-                _consoleWriter.WriteLine($"Extension: {string.Join(",", fileType.Extensions)}");
+                consoleWriter.WriteLine($"Category : {fileType.Category}");
+                consoleWriter.WriteLine($"Name     : {fileType.Name}");
+                consoleWriter.WriteLine($"Extension: {string.Join(",", fileType.Extensions)}");
             }
             else
             {
-                _consoleWriter.WriteLine("Unknown filetype");
+                consoleWriter.WriteLine("Unknown filetype");
             }
         }
 
         return true;
     }
 
-    private FileType? FileType(string argument) => _fileTypeFinder.Identify(new System.IO.FileInfo(argument));
+    private FileType? FileType(string argument) => fileTypeFinder.Identify(new System.IO.FileInfo(argument));
 }

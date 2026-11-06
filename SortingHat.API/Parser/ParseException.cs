@@ -3,23 +3,12 @@ using Funcky.Lexer.Token;
 
 namespace SortingHat.API.Parser;
 
-public class ParseException : Exception
+public class ParseException(string message) : Exception(message)
 {
-    public ParseException(string message)
-        : base(message)
-    {
-    }
 }
 
-public class ExpectedTokenException : Exception
+public class ExpectedTokenException(IToken expectedToken, IToken foundToken) : Exception($"Expecting '{expectedToken}' in expression, instead got: '{foundToken}'")
 {
-    public ExpectedTokenException(IToken expectedToken, IToken foundToken)
-        : base($"Expecting '{expectedToken}' in expression, instead got: '{foundToken}'")
-    {
-        ExpectedToken = expectedToken;
-        FoundToken = foundToken;
-    }
-
-    public IToken ExpectedToken { get; }
-    public IToken FoundToken { get; }
+    public IToken ExpectedToken { get; } = expectedToken;
+    public IToken FoundToken { get; } = foundToken;
 }

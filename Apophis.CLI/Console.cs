@@ -3,17 +3,10 @@ using Apophis.CLI.Writer;
 
 namespace Apophis.CLI;
 
-public class Console
+public class Console(IConsoleReader consoleReader, IConsoleWriter consoleWriter, IConsoleApplicationInformationProvider consoleApplicationInformationProvider)
 {
-    public Console(IConsoleReader consoleReader, IConsoleWriter consoleWriter, IConsoleApplicationInformationProvider consoleApplicationInformationProvider)
-    {
-        Reader = consoleReader;
-        Writer = consoleWriter;
-        Application = consoleApplicationInformationProvider;
-    }
+    public IConsoleReader Reader { get; } = consoleReader;
+    public IConsoleWriter Writer { get; } = consoleWriter;
 
-    public IConsoleReader Reader { get; }
-    public IConsoleWriter Writer { get; }
-
-    public IConsoleApplicationInformationProvider Application { get; }
+    public IConsoleApplicationInformationProvider Application { get; } = consoleApplicationInformationProvider;
 }

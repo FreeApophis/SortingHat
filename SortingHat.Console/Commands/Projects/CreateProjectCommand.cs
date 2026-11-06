@@ -8,19 +8,9 @@ using SortingHat.API.DI;
 namespace SortingHat.CLI.Commands.Projects;
 
 [UsedImplicitly]
-
-internal class CreateProjectCommand : ICommand
+[method: UsedImplicitly]
+internal class CreateProjectCommand(IProjects projects, IConsoleWriter consoleWriter) : ICommand
 {
-    private readonly IProjects _projects;
-    private readonly IConsoleWriter _consoleWriter;
-
-    [UsedImplicitly]
-    public CreateProjectCommand(IProjects projects, IConsoleWriter consoleWriter)
-    {
-        _projects = projects;
-        _consoleWriter = consoleWriter;
-    }
-
     public CommandGrouping CommandGrouping => CommandGrouping.Project;
     public string LongCommand => "new-project";
     public Option<string> ShortCommand => Option<string>.None;
@@ -36,22 +26,22 @@ internal class CreateProjectCommand : ICommand
 
     private bool TooManyArguments()
     {
-        _consoleWriter.WriteLine("Too many arguments given, only one project at a time can be created.");
+        consoleWriter.WriteLine("Too many arguments given, only one project at a time can be created.");
 
         return false;
     }
 
     private bool NotEnoughArguments()
     {
-        _consoleWriter.WriteLine("Not enough arguments given, please give a name for the project you want to create.");
+        consoleWriter.WriteLine("Not enough arguments given, please give a name for the project you want to create.");
 
         return false;
     }
 
     private bool CreateProject(string project)
     {
-        _projects.AddProject(project);
-        _consoleWriter.WriteLine($"Project '{project}' has been created, and we switched to the project.");
+        projects.AddProject(project);
+        consoleWriter.WriteLine($"Project '{project}' has been created, and we switched to the project.");
 
         return true;
     }

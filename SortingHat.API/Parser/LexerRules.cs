@@ -27,7 +27,7 @@ public static class LexerRules
             .AddSimpleRule<ClosedParenthesisToken>(")")
 
             // the parser is not interested in whitespace
-            .WithPostProcess(lexemes => lexemes.Where(lexeme => !(lexeme.Token is WhiteSpaceToken)))
+            .WithPostProcess(lexemes => lexemes.Where(lexeme => lexeme.Token is not WhiteSpaceToken))
             .WithEpsilonToken<EpsilonToken>()
             .Build();
 

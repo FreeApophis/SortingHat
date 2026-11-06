@@ -4,15 +4,8 @@ using SortingHat.API.DI;
 
 namespace SortingHat.Plugin.ExtractRelevantText;
 
-internal class ScanCommand : ICommand
+internal class ScanCommand(FolderScanner folderScanner) : ICommand
 {
-    private readonly FolderScanner _folderScanner;
-
-    public ScanCommand(FolderScanner folderScanner)
-    {
-        _folderScanner = folderScanner;
-    }
-
     public CommandGrouping CommandGrouping => CommandGrouping.File;
 
     public string LongCommand => "scan";
@@ -23,6 +16,6 @@ internal class ScanCommand : ICommand
 
     public bool Execute(IEnumerable<string> arguments, IOptionParser options)
     {
-        return _folderScanner.Scan(arguments);
+        return folderScanner.Scan(arguments);
     }
 }

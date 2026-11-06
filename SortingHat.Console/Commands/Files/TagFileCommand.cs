@@ -15,25 +15,8 @@ using SortingHat.CLI.Options;
 namespace SortingHat.CLI.Commands.Files;
 
 [UsedImplicitly]
-internal class TagFileCommand : ICommand
+internal class TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor, Func<File> newFile, IFile fileStore, IAutoTagHandler autoTagHandler) : ICommand
 {
-    private readonly ILogger<TagFileCommand> _logger;
-    private readonly IConsoleWriter _consoleWriter;
-    private readonly IFilePathExtractor _filePathExtractor;
-    private readonly Func<File> _newFile;
-    private readonly IFile _file;
-    private readonly IAutoTagHandler _autoTagHandler;
-
-    public TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor, Func<File> newFile, IFile file, IAutoTagHandler autoTagHandler)
-    {
-        _logger = logger;
-        _consoleWriter = consoleWriter;
-        _filePathExtractor = filePathExtractor;
-        _newFile = newFile;
-        _file = file;
-        _autoTagHandler = autoTagHandler;
-    }
-
     public string LongCommand => "tag-files";
     public Option<string> ShortCommand => Option.Some("tag");
     public string ShortHelp => "Is tagging the files the given tags";
@@ -52,11 +35,11 @@ internal class TagFileCommand : ICommand
         var tags = arguments.Where(a => a.IsTag).ToList();
         var files = arguments.Where(IsFile);
 
-        foreach (var file in _filePathExtractor.FromFilePatterns(files, options.HasOption<RecursiveOption>()).Select(FileFromPath))
+        foreach (var file in filePathExtractor.FromFilePatterns(files, options.HasOption<RecursiveOption>()).Select(FileFromPath))
         {
             if (tags.Count == 0)
             {
-                _file.Store(file);
+                fileStore.Store(file);
             }
             else
             {
@@ -67,12 +50,12 @@ internal class TagFileCommand : ICommand
 
     private static bool IsFile(string value)
     {
-        return value.StartsWith(":") == false;
+        return !value.StartsWith(":");
     }
 
     private File FileFromPath(string filePath)
     {
-        var file = _newFile();
+        var file = newFile();
 
         file.LoadByPathFromDbWithFallback(filePath);
 
@@ -85,9 +68,9 @@ internal class TagFileCommand : ICommand
         {
             if (tag is { })
             {
-                _logger.LogInformation($"File {file.Path} tagged with {tag.FullName}");
+                logger.LogInformation($"File {file.Path} tagged with {tag.FullName}");
 
-                _consoleWriter.WriteLine($"File {file.Path} queued with tag {tag.FullName}");
+                consoleWriter.WriteLine($"File {file.Path} queued with tag {tag.FullName}");
                 await file.Tag(tag);
             }
         }
@@ -106,6 +89,6 @@ internal class TagFileCommand : ICommand
 
     private Tag? TagFromMask(string tagMask, File file)
     {
-        return _autoTagHandler.TagFromMask(tagMask, new System.IO.FileInfo(file.Path));
+        return autoTagHandler.TagFromMask(tagMask, new System.IO.FileInfo(file.Path));
     }
 }

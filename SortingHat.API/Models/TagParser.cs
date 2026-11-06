@@ -6,15 +6,8 @@ using JetBrains.Annotations;
 namespace SortingHat.API.Models;
 
 [UsedImplicitly]
-public class TagParser : ITagParser
+public class TagParser(Func<string, Tag?, Tag> newTag) : ITagParser
 {
-    private readonly Func<string, Tag?, Tag> _newTag;
-
-    public TagParser(Func<string, Tag?, Tag> newTag)
-    {
-        _newTag = newTag;
-    }
-
     /// <summary>
     /// A tag always begins with a colon (:) and can have multiple parts, each part beginning with a colon (:)
     /// A tagpart can have no whitespace and has at least one character.
@@ -28,12 +21,12 @@ public class TagParser : ITagParser
             return null;
         }
 
-        if (tagString.StartsWith(":") == false)
+        if (!tagString.StartsWith(":"))
         {
             return null;
         }
 
-        return ToTag(tagString.Split(new[] { ':' }).Select(s => s.Trim()).Where(s => s.Length > 0));
+        return ToTag(tagString.Split([':']).Select(s => s.Trim()).Where(s => s.Length > 0));
     }
 
     private Tag? ToTag(IEnumerable<string> tagParts)
@@ -41,7 +34,7 @@ public class TagParser : ITagParser
         Tag? result = null;
         foreach (var part in tagParts)
         {
-            result = _newTag(part, result);
+            result = newTag(part, result);
         }
 
         return result;

@@ -6,21 +6,14 @@ using SortingHat.Plugin.FileType.Detectors;
 namespace SortingHat.Plugin.FileType.AutoTag;
 
 [UsedImplicitly]
-internal class FileTypeCategoryAutoTag : ConstantAutoTag
+internal class FileTypeCategoryAutoTag(IFileTypeFinder fileTypeDetector) : ConstantAutoTag
 {
-    private readonly IFileTypeFinder _fileTypeDetector;
-
-    public FileTypeCategoryAutoTag(IFileTypeFinder fileTypeDetector)
-    {
-        _fileTypeDetector = fileTypeDetector;
-    }
-
     public override string AutoTagKey => "FileType.Category";
     public override string Description => "TODO";
 
     protected override string? HandleTag(FileInfo file)
     {
-        var fileType = _fileTypeDetector.Identify(file);
+        var fileType = fileTypeDetector.Identify(file);
 
         return fileType?.Category;
     }

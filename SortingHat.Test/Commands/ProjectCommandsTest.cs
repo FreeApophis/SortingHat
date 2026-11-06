@@ -46,7 +46,7 @@ public class ProjectCommandsTest
         using var container = GetContainer();
         var createProject = container.Resolve<CreateProjectCommand>();
         var options = new Mock<IOptionParser>();
-        createProject.Execute(Enumerable.Empty<string>(), options.Object);
+        createProject.Execute([], options.Object);
 
         // Not called
         _projects.Verify(p => p.AddProject(It.IsAny<string>()), Times.Never);

@@ -5,16 +5,9 @@ using SortingHat.API.Parser.OperatorType;
 
 namespace SortingHat.API.Parser;
 
-public class ToStringVisitor : INodeVisitor
+public class ToStringVisitor(IOperatorType operatorType) : INodeVisitor
 {
     private readonly StringBuilder _resultBuilder = new StringBuilder();
-
-    private readonly IOperatorType _operatorType;
-
-    public ToStringVisitor(IOperatorType operatorType)
-    {
-        _operatorType = operatorType;
-    }
 
     public string Result => _resultBuilder.ToString();
 
@@ -30,17 +23,17 @@ public class ToStringVisitor : INodeVisitor
 
     public void Visit(NotOperatorNode op)
     {
-        _resultBuilder.Append(op.ToString(_operatorType));
-        _resultBuilder.Append(_operatorType.NotOpen);
+        _resultBuilder.Append(op.ToString(operatorType));
+        _resultBuilder.Append(operatorType.NotOpen);
         op.Operand.Accept(this);
-        _resultBuilder.Append(_operatorType.NotClose);
+        _resultBuilder.Append(operatorType.NotClose);
     }
 
     public void Visit(AndOperatorNode op)
     {
         _resultBuilder.Append("(");
         op.LeftOperand.Accept(this);
-        _resultBuilder.Append($" {op.ToString(_operatorType)} ");
+        _resultBuilder.Append($" {op.ToString(operatorType)} ");
         op.RightOperand.Accept(this);
         _resultBuilder.Append(")");
     }
@@ -49,7 +42,7 @@ public class ToStringVisitor : INodeVisitor
     {
         _resultBuilder.Append("(");
         op.LeftOperand.Accept(this);
-        _resultBuilder.Append($" {op.ToString(_operatorType)} ");
+        _resultBuilder.Append($" {op.ToString(operatorType)} ");
         op.RightOperand.Accept(this);
         _resultBuilder.Append(")");
     }

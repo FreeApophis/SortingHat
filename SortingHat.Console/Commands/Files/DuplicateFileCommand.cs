@@ -10,17 +10,8 @@ using SortingHat.API.DI;
 namespace SortingHat.CLI.Commands.Files;
 
 [UsedImplicitly]
-internal class DuplicateFileCommand : ICommand
+internal class DuplicateFileCommand(IFile fileStore, IConsoleWriter consoleWriter) : ICommand
 {
-    private readonly IFile _file;
-    private readonly IConsoleWriter _consoleWriter;
-
-    public DuplicateFileCommand(IFile file, IConsoleWriter consoleWriter)
-    {
-        _file = file;
-        _consoleWriter = consoleWriter;
-    }
-
     public string LongCommand => "duplicate";
     public Option<string> ShortCommand => Option.Some("d");
     public string ShortHelp => "Find duplicate files in your dms";
@@ -28,12 +19,12 @@ internal class DuplicateFileCommand : ICommand
 
     public bool Execute(IEnumerable<string> arguments, IOptionParser options)
     {
-        foreach (var file in _file.GetDuplicates())
+        foreach (var file in fileStore.GetDuplicates())
         {
-            _consoleWriter.WriteLine("--- Duplicate ---");
-            _consoleWriter.WriteLine($"CreatedAt (oldest): {file.CreatedAt}");
-            _consoleWriter.WriteLine($"File Size: {file.Size}");
-            _consoleWriter.WriteLine($"File Tags: {string.Join(", ", file.GetTags().Result.Select(t => t.FullName))}");
+            consoleWriter.WriteLine("--- Duplicate ---");
+            consoleWriter.WriteLine($"CreatedAt (oldest): {file.CreatedAt}");
+            consoleWriter.WriteLine($"File Size: {file.Size}");
+            consoleWriter.WriteLine($"File Tags: {string.Join(", ", file.GetTags().Result.Select(t => t.FullName))}");
 
             var table = new ConsoleTable(5);
             foreach (var path in file.GetPaths().Result)
@@ -50,11 +41,11 @@ internal class DuplicateFileCommand : ICommand
                 }
             }
 
-            table.WriteTo(_consoleWriter);
-            _consoleWriter.WriteLine();
+            table.WriteTo(consoleWriter);
+            consoleWriter.WriteLine();
         }
 
-        _consoleWriter.WriteLine("Files with an asterisk (*) are in the database, but at the given path they seem to be deleted.");
+        consoleWriter.WriteLine("Files with an asterisk (*) are in the database, but at the given path they seem to be deleted.");
 
         return true;
     }

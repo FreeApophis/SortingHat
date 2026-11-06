@@ -7,18 +7,9 @@ using Apophis.CLI.Writer;
 
 namespace SortingHat.API.DI;
 
-public class HashService : IHashService
+public class HashService(HashAlgorithm hashAlgorithm, string hashPrefix, IConsoleWriter consoleWriter) : IHashService
 {
-    private readonly HashAlgorithm _hashAlgorithm;
-    private readonly IConsoleWriter _consoleWriter;
-    private readonly string _hashPrefix;
-
-    public HashService(HashAlgorithm hashAlgorithm, string hashPrefix, IConsoleWriter consoleWriter)
-    {
-        _hashAlgorithm = hashAlgorithm;
-        _consoleWriter = consoleWriter;
-        _hashPrefix = hashPrefix.ToLower();
-    }
+    private readonly string _hashPrefix = hashPrefix.ToLower();
 
     public Task<string> GetHash(string path)
     {
@@ -26,9 +17,9 @@ public class HashService : IHashService
         {
             using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
-            _consoleWriter.WriteLine($"Hashing: '{path}'");
-            var hash = _hashAlgorithm.ComputeHash(fileStream);
-            _consoleWriter.WriteLine($"End Hashing: '{path}'");
+            consoleWriter.WriteLine($"Hashing: '{path}'");
+            var hash = hashAlgorithm.ComputeHash(fileStream);
+            consoleWriter.WriteLine($"End Hashing: '{path}'");
             return $"{_hashPrefix}:{ToHex(hash)}";
         });
     }

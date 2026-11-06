@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Apophis.CLI.Writer;
 using Moq;
 using SortingHat.API.DI;
@@ -20,8 +19,8 @@ public class TagCommandsTest
         var tagParser = new TagParser((name, parent) => new Tag(tag, name, parent));
         ICommand addTag = new AddTagCommand(tagParser);
 
-        List<string> taxPeriods = new List<string> { ":tax_period:2016", ":tax_period:2017", ":tax_period:2018", ":tax_period:2019" };
-        List<string> movieRating = new List<string> { ":movie:bad", ":movie:average", ":movie:good", ":movie:great" };
+        List<string> taxPeriods = [":tax_period:2016", ":tax_period:2017", ":tax_period:2018", ":tax_period:2019"];
+        List<string> movieRating = [":movie:bad", ":movie:average", ":movie:good", ":movie:great"];
 
         var mockOptions = new Mock<IOptionParser>();
 
@@ -42,7 +41,7 @@ public class TagCommandsTest
         var console = new MemoryConsoleWriter();
         ICommand listTags = new ListTagsCommand(tag, console);
 
-        listTags.Execute(Enumerable.Empty<string>(), mockOptions.Object);
+        listTags.Execute([], mockOptions.Object);
 
         Assert.Collection(
             console.Lines,

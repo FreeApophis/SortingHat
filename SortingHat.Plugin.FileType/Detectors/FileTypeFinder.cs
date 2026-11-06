@@ -6,15 +6,8 @@ using JetBrains.Annotations;
 namespace SortingHat.Plugin.FileType.Detectors;
 
 [UsedImplicitly]
-internal class FileTypeFinder : IFileTypeFinder
+internal class FileTypeFinder(IEnumerable<IFileTypeDetector> detectors) : IFileTypeFinder
 {
-    private readonly IEnumerable<IFileTypeDetector> _detectors;
-
-    public FileTypeFinder(IEnumerable<IFileTypeDetector> detectors)
-    {
-        _detectors = detectors;
-    }
-
     public FileType? Identify(FileInfo file)
     {
         using var stream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
@@ -24,7 +17,7 @@ internal class FileTypeFinder : IFileTypeFinder
 
     public FileType? Identify(Stream stream)
     {
-        return _detectors
+        return detectors
             .Select(detector => detector.Detect(stream))
             .FirstOrDefault(fileType => fileType != null);
     }

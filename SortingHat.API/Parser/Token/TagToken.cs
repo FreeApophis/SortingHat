@@ -2,14 +2,9 @@
 
 namespace SortingHat.API.Parser.Token;
 
-public class TagToken : IToken
+public class TagToken(string? value) : IToken
 {
-    public TagToken(string? value)
-    {
-        Value = value;
-    }
-
-    public string? Value { get; }
+    public string? Value { get; } = value;
 
     public override string ToString() => $"Tag: {Value}";
 }

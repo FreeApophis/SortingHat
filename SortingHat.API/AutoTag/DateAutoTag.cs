@@ -7,7 +7,7 @@ namespace SortingHat.API.AutoTag;
 
 public abstract class DateAutoTag : IAutoTag
 {
-    private readonly List<IDateTagPart> _selectableDateParts = new List<IDateTagPart> { new YearPart(), new MonthPart(), new DayPart(), new WeekDayPart(), new HourPart(), new MinutePart(), new SecondPart() };
+    private readonly List<IDateTagPart> _selectableDateParts = [new YearPart(), new MonthPart(), new DayPart(), new WeekDayPart(), new HourPart(), new MinutePart(), new SecondPart()];
 
     public abstract string AutoTagKey { get; }
     public abstract string Description { get; }

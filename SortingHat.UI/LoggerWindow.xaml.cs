@@ -28,12 +28,7 @@ public partial class LoggerWindow : Window, ILogger
     }
 }
 
-internal class LogItem
+internal class LogItem(LogLevel logLevel)
 {
-    public LogItem(LogLevel logLevel)
-    {
-        LogLevel = logLevel;
-    }
-
-    public LogLevel LogLevel { get; }
+    public LogLevel LogLevel { get; } = logLevel;
 }

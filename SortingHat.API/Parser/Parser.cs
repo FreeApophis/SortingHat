@@ -22,17 +22,9 @@ namespace SortingHat.API.Parser;
 /// True         := "true" | "1"
 /// False        := "false" | "0".
 /// </summary>
-public class Parser : IParser
+public class Parser(LexerRuleBook lexerRuleBook, ExpressionParser expressionParser) : IParser
 {
-    private readonly LexerRuleBook _lexerRuleBook;
-    private readonly ExpressionParser _expressionParser;
-    private readonly List<IToken> _nextToken = new List<IToken>();
-
-    public Parser(LexerRuleBook lexerRuleBook, ExpressionParser expressionParser)
-    {
-        _lexerRuleBook = lexerRuleBook;
-        _expressionParser = expressionParser;
-    }
+    private readonly List<IToken> _nextToken = [];
 
     public bool IllegalExpression { get; private set; }
 
@@ -49,7 +41,7 @@ public class Parser : IParser
 
     public IParseNode Parse(ILexemeWalker walker)
     {
-        return _expressionParser.Parse(walker);
+        return expressionParser.Parse(walker);
     }
 
     public IEnumerable<IToken> NextToken()
@@ -62,7 +54,7 @@ public class Parser : IParser
         try
         {
             _nextToken.Clear();
-            var ast = Parse(_lexerRuleBook.Scan(expression).Walker);
+            var ast = Parse(lexerRuleBook.Scan(expression).Walker);
             _nextToken.Add(new AndToken());
             _nextToken.Add(new OrToken());
             return ast;

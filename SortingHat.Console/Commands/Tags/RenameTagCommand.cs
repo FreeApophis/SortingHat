@@ -11,19 +11,8 @@ using SortingHat.API.Models;
 namespace SortingHat.CLI.Commands.Tags;
 
 [UsedImplicitly]
-internal class RenameTagCommand : ICommand
+internal class RenameTagCommand(ILogger<RenameTagCommand> logger, IConsoleWriter consoleWriter, ITagParser tagParser) : ICommand
 {
-    private readonly ILogger<RenameTagCommand> _logger;
-    private readonly IConsoleWriter _consoleWriter;
-    private readonly ITagParser _tagParser;
-
-    public RenameTagCommand(ILogger<RenameTagCommand> logger, IConsoleWriter consoleWriter, ITagParser tagParser)
-    {
-        _logger = logger;
-        _consoleWriter = consoleWriter;
-        _tagParser = tagParser;
-    }
-
     public string LongCommand => "rename-tag";
     public Option<string> ShortCommand => Option<string>.None;
     public string ShortHelp => "Renames a tag from database";
@@ -39,13 +28,13 @@ internal class RenameTagCommand : ICommand
         }
         else
         {
-            _logger.LogWarning("rename tag has exactly two arguments, the tag to rename, and a new name: hat rename-tag :tag new_name");
-            _consoleWriter.WriteLine("rename tag has exactly two arguments, the tag to rename, and a new name: hat rename-tag :tag new_name");
+            logger.LogWarning("rename tag has exactly two arguments, the tag to rename, and a new name: hat rename-tag :tag new_name");
+            consoleWriter.WriteLine("rename tag has exactly two arguments, the tag to rename, and a new name: hat rename-tag :tag new_name");
         }
 
-        if (result == false)
+        if (!result)
         {
-            _logger.LogWarning("Rename failed");
+            logger.LogWarning("Rename failed");
         }
 
         return result;
@@ -60,7 +49,7 @@ internal class RenameTagCommand : ICommand
 
         if (CheckArguments(tagString, newName))
         {
-            var tag = _tagParser.Parse(tagString);
+            var tag = tagParser.Parse(tagString);
             if (tag != null)
             {
                 return tag.Rename(newName);
@@ -72,18 +61,18 @@ internal class RenameTagCommand : ICommand
 
     private bool CheckArguments(string tagString, string newName)
     {
-        if (tagString.IsTag == false)
+        if (!tagString.IsTag)
         {
-            _logger.LogWarning($"First Argument '{tagString}' must be a tag");
-            _consoleWriter.WriteLine($"First Argument '{tagString}' must be a tag");
+            logger.LogWarning($"First Argument '{tagString}' must be a tag");
+            consoleWriter.WriteLine($"First Argument '{tagString}' must be a tag");
 
             return false;
         }
 
         if (newName.IsTag)
         {
-            _logger.LogWarning($"Second Argument '{newName}' cannot be a tag");
-            _consoleWriter.WriteLine($"Second Argument '{newName}' cannot be a tag");
+            logger.LogWarning($"Second Argument '{newName}' cannot be a tag");
+            consoleWriter.WriteLine($"Second Argument '{newName}' cannot be a tag");
 
             return false;
         }

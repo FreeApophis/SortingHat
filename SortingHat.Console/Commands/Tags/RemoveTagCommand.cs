@@ -8,19 +8,8 @@ using SortingHat.API.Models;
 namespace SortingHat.CLI.Commands.Tags;
 
 [UsedImplicitly]
-internal class RemoveTagCommand : ICommand
+internal class RemoveTagCommand(ITagParser tagParser, ILogger<RemoveTagCommand> logger) : ICommand
 {
-    private readonly ITagParser _tagParser;
-    private readonly IMainDatabase _db;
-    private readonly ILogger<RemoveTagCommand> _logger;
-
-    public RemoveTagCommand(ITagParser tagParser, IMainDatabase db, ILogger<RemoveTagCommand> logger)
-    {
-        _tagParser = tagParser;
-        _db = db;
-        _logger = logger;
-    }
-
     public string LongCommand => "remove-tags";
     public Option<string> ShortCommand => Option<string>.None;
     public string ShortHelp => "Removes a tag from database";
@@ -30,15 +19,15 @@ internal class RemoveTagCommand : ICommand
     {
         foreach (var tagString in arguments)
         {
-            var tag = _tagParser.Parse(tagString);
+            var tag = tagParser.Parse(tagString);
 
             if (tag is null)
             {
-                _logger.LogWarning($"Remove tag '{tagString}' failed (parse)");
+                logger.LogWarning($"Remove tag '{tagString}' failed (parse)");
             }
-            else if (tag.Destroy() == false)
+            else if (!tag.Destroy())
             {
-                _logger.LogWarning($"Remove tag '{tagString}' failed (db)");
+                logger.LogWarning($"Remove tag '{tagString}' failed (db)");
             }
         }
 

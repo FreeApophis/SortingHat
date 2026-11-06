@@ -9,17 +9,8 @@ using static MetadataExtractor.ImageMetadataReader;
 namespace SortingHat.Plugin.Exif;
 
 [UsedImplicitly]
-internal class ExifCommand : ICommand
+internal class ExifCommand(IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor) : ICommand
 {
-    private readonly IConsoleWriter _consoleWriter;
-    private readonly IFilePathExtractor _filePathExtractor;
-
-    public ExifCommand(IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor)
-    {
-        _consoleWriter = consoleWriter;
-        _filePathExtractor = filePathExtractor;
-    }
-
     public string LongCommand => "exif";
     public Option<string> ShortCommand => Option<string>.None;
     public string ShortHelp => "Reads exif information from files.";
@@ -28,14 +19,14 @@ internal class ExifCommand : ICommand
 
     public bool Execute(IEnumerable<string> arguments, IOptionParser options)
     {
-        foreach (var filePath in _filePathExtractor.FromFilePatterns(arguments, false))
+        foreach (var filePath in filePathExtractor.FromFilePatterns(arguments, false))
         {
             IEnumerable<Directory> directories = ReadMetadata(filePath);
             foreach (var directory in directories)
             {
                 foreach (var tag in directory.Tags)
                 {
-                    _consoleWriter.WriteLine($"{directory.Name} - {tag.Name} ({tag.Type}) = {tag.Description}");
+                    consoleWriter.WriteLine($"{directory.Name} - {tag.Name} ({tag.Type}) = {tag.Description}");
                 }
             }
         }

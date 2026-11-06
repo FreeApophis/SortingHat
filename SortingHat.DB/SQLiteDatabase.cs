@@ -65,7 +65,7 @@ public abstract class SQLiteDatabase : IDisposable
 
     private string ExistingDbPath()
     {
-        if (Directory.Exists(_path) == false)
+        if (!Directory.Exists(_path))
         {
             Directory.CreateDirectory(_path);
         }

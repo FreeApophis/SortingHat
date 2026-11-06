@@ -20,7 +20,7 @@ public class HelpCommandTest
         using var container = CompositionRootWithMyWriter(writer);
 
         // Run application without a command
-        container.Resolve<ArgumentParser>().Execute(new string[] { });
+        container.Resolve<ArgumentParser>().Execute([]);
 
         // Test the output
         Assert.Collection(writer.Lines, line => Assert.Equal("Maybe run 'program help'", line));
@@ -34,7 +34,7 @@ public class HelpCommandTest
         using var container = CompositionRootWithMyWriter(writer);
 
         // Run application without a command
-        container.Resolve<ArgumentParser>().Execute(new[] { "help" });
+        container.Resolve<ArgumentParser>().Execute(["help"]);
 
         // Test the output
         Assert.Equal("program <command> [<arguments>] [<options>]:", writer.Lines[0]);
@@ -48,15 +48,15 @@ public class HelpCommandTest
         using var container = CompositionRootWithMyWriter(writer);
 
         // Run application without a command
-        Assert.True(container.Resolve<ArgumentParser>().Execute(new[] { "help", command }));
+        Assert.True(container.Resolve<ArgumentParser>().Execute(["help", command]));
 
         Assert.NotEmpty(writer.Lines[0]);
     }
 
     public static TheoryData<string> HelpCommands()
     {
-        return new TheoryData<string>
-        {
+        return
+        [
             "help",
             "plugins",
             "repair",
@@ -85,7 +85,7 @@ public class HelpCommandTest
             "import",
             "list-projects",
             "switch-project",
-        };
+        ];
     }
 
     private static string ExtractCommandName(Type arg)

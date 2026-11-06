@@ -11,19 +11,9 @@ using SortingHat.API.DI;
 namespace SortingHat.CLI.Commands.Projects;
 
 [UsedImplicitly]
-internal class ExportProjectCommand : ICommand
+internal class ExportProjectCommand(DatabaseSettings databaseSettings, IConsoleWriter consoleWriter, ICopyFile copyFile) : ICommand
 {
     private const string CurrentDirectory = ".";
-    private readonly DatabaseSettings _databaseSettings;
-    private readonly IConsoleWriter _consoleWriter;
-    private readonly ICopyFile _copyFile;
-
-    public ExportProjectCommand(DatabaseSettings databaseSettings, IConsoleWriter consoleWriter, ICopyFile copyFile)
-    {
-        _databaseSettings = databaseSettings;
-        _consoleWriter = consoleWriter;
-        _copyFile = copyFile;
-    }
 
     public CommandGrouping CommandGrouping => CommandGrouping.Project;
     public string LongCommand => "export";
@@ -41,22 +31,22 @@ internal class ExportProjectCommand : ICommand
 
     private bool TooManyArguments()
     {
-        _consoleWriter.WriteLine("Too many arguments given, please only export one project at a time.");
+        consoleWriter.WriteLine("Too many arguments given, please only export one project at a time.");
 
         return false;
     }
 
     private bool NotEnoughArguments()
     {
-        _consoleWriter.WriteLine("Too few arguments given, please specify which project to export.");
+        consoleWriter.WriteLine("Too few arguments given, please specify which project to export.");
 
         return false;
     }
 
     private bool ExportProject(string project, string destination)
     {
-        _copyFile.Copy(DatabaseSource(project), DestinationPath(destination, project));
-        _consoleWriter.WriteLine($"Project '{project}' has been exported to: {DestinationPath(destination, project)}");
+        copyFile.Copy(DatabaseSource(project), DestinationPath(destination, project));
+        consoleWriter.WriteLine($"Project '{project}' has been exported to: {DestinationPath(destination, project)}");
 
         return true;
     }
@@ -70,6 +60,6 @@ internal class ExportProjectCommand : ICommand
 
     private string DatabaseSource(string project)
     {
-        return Path.Combine(_databaseSettings.DbPath, $"{project}.db");
+        return Path.Combine(databaseSettings.DbPath, $"{project}.db");
     }
 }

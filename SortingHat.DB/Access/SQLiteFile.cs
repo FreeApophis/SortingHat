@@ -11,7 +11,7 @@ using SortingHat.API.Parser;
 namespace SortingHat.DB.Access;
 
 [UsedImplicitly]
-public class SQLiteFile : IFile
+public class SQLiteFile(Func<SearchQueryVisitor> newSearchQueryVisitor, Func<File> newFile, SQLiteProjectDatabase db, SQLiteTag sqLiteTag, Parser parser) : IFile
 {
     private const string AllFileTags = @"SELECT Tags.Id
 FROM Tags
@@ -25,37 +25,22 @@ JOIN Files ON FilePaths.FileId = Files.Id
 GROUP BY FileId
 HAVING DuplicateCount > 1";
 
-    private readonly Func<SearchQueryVisitor> _newSearchQueryVisitor;
-    private readonly Func<File> _newFile;
-    private readonly SQLiteProjectDatabase _db;
-    private readonly SQLiteTag _sqLiteTag;
-    private readonly Parser _parser;
-
-    public SQLiteFile(Func<SearchQueryVisitor> newSearchQueryVisitor, Func<File> newFile, SQLiteProjectDatabase db, SQLiteTag sqLiteTag, Parser parser)
-    {
-        _newSearchQueryVisitor = newSearchQueryVisitor;
-        _newFile = newFile;
-        _db = db;
-        _sqLiteTag = sqLiteTag;
-        _parser = parser;
-    }
-
     public async Task Tag(File file, Tag tag)
     {
         long? fileId = await FindOrCreate(file);
-        var tagId = _sqLiteTag.FindOrCreate(tag);
+        var tagId = sqLiteTag.FindOrCreate(tag);
 
-        _db.ExecuteNonQuery("INSERT INTO FileTags (TagId, FileId) VALUES(@tagId, @fileId);", new SqliteParameter("@tagId", tagId), new SqliteParameter("@fileId", fileId));
+        db.ExecuteNonQuery("INSERT INTO FileTags (TagId, FileId) VALUES(@tagId, @fileId);", new SqliteParameter("@tagId", tagId), new SqliteParameter("@fileId", fileId));
     }
 
     public async Task Untag(File file, Tag tag)
     {
         var fileId = await Find(file);
-        var tagId = _sqLiteTag.Find(tag);
+        var tagId = sqLiteTag.Find(tag);
 
         if (fileId.HasValue && tagId.HasValue)
         {
-            _db.ExecuteNonQuery("DELETE FROM FileTags WHERE TagId = @tagId AND FileId = @fileId;", new SqliteParameter("@fileId", fileId), new SqliteParameter("@tagId", tagId));
+            db.ExecuteNonQuery("DELETE FROM FileTags WHERE TagId = @tagId AND FileId = @fileId;", new SqliteParameter("@fileId", fileId), new SqliteParameter("@tagId", tagId));
         }
     }
 
@@ -78,7 +63,7 @@ HAVING DuplicateCount > 1";
 
     public bool LoadByPath(File file)
     {
-        using var reader = _db.ExecuteReader("SELECT Files.CreatedAt, Files.Hash, Files.Size, FilePaths.Path FROM Files JOIN FilePaths ON FilePaths.FileId = Files.Id WHERE FilePaths.Path = @filePath", new SqliteParameter("@filePath", file.Path));
+        using var reader = db.ExecuteReader("SELECT Files.CreatedAt, Files.Hash, Files.Size, FilePaths.Path FROM Files JOIN FilePaths ON FilePaths.FileId = Files.Id WHERE FilePaths.Path = @filePath", new SqliteParameter("@filePath", file.Path));
 
         return LoadFileFromReader(reader, file);
     }
@@ -87,11 +72,11 @@ HAVING DuplicateCount > 1";
     {
         var tags = new List<Tag>();
 
-        using var reader = _db.ExecuteReader(AllFileTags, new SqliteParameter("@fileHash", await file.Hash));
+        using var reader = db.ExecuteReader(AllFileTags, new SqliteParameter("@fileHash", await file.Hash));
 
         while (reader.Read())
         {
-            Tag tag = _sqLiteTag.Load(reader.GetInt64(0));
+            Tag tag = sqLiteTag.Load(reader.GetInt64(0));
             tags.Add(tag);
         }
 
@@ -102,7 +87,7 @@ HAVING DuplicateCount > 1";
     {
         var paths = new List<string>();
 
-        using var reader = _db.ExecuteReader("SELECT FilePaths.Path FROM FilePaths");
+        using var reader = db.ExecuteReader("SELECT FilePaths.Path FROM FilePaths");
 
         while (reader.Read())
         {
@@ -116,7 +101,7 @@ HAVING DuplicateCount > 1";
     {
         var paths = new List<string>();
 
-        using var reader = _db.ExecuteReader("SELECT FilePaths.Path FROM FilePaths JOIN Files ON FilePaths.FileId = Files.Id WHERE Files.Hash = @fileHash", new SqliteParameter("@fileHash", await file.Hash));
+        using var reader = db.ExecuteReader("SELECT FilePaths.Path FROM FilePaths JOIN Files ON FilePaths.FileId = Files.Id WHERE Files.Hash = @fileHash", new SqliteParameter("@fileHash", await file.Hash));
 
         while (reader.Read())
         {
@@ -130,7 +115,7 @@ HAVING DuplicateCount > 1";
     {
         var names = new List<string>();
 
-        using var reader = _db.ExecuteReader("SELECT FileNames.Name FROM FileNames JOIN Files ON FileNames.FileId = Files.Id WHERE Files.Hash = @fileHash", new SqliteParameter("@fileHash", await file.Hash));
+        using var reader = db.ExecuteReader("SELECT FileNames.Name FROM FileNames JOIN Files ON FileNames.FileId = Files.Id WHERE Files.Hash = @fileHash", new SqliteParameter("@fileHash", await file.Hash));
 
         while (reader.Read())
         {
@@ -157,7 +142,7 @@ HAVING DuplicateCount > 1";
 
     private async Task<long?> Find(File file)
     {
-        return _db.ExecuteScalar("SELECT Id FROM Files WHERE Hash = @hash", new SqliteParameter("@hash", await file.Hash)) as long?;
+        return db.ExecuteScalar("SELECT Id FROM Files WHERE Hash = @hash", new SqliteParameter("@hash", await file.Hash)) as long?;
     }
 
     private async Task<long> Create(File file)
@@ -176,19 +161,19 @@ HAVING DuplicateCount > 1";
         var size = new SqliteParameter("@size", file.Size);
         var createdAt = new SqliteParameter("@createdAt", file.CreatedAt);
 
-        return _db.ExecuteScalar("INSERT INTO Files (Hash, Size, CreatedAt) VALUES(@hash,@size, @createdAt); SELECT last_insert_rowid();", hash, size, createdAt) as long?
+        return db.ExecuteScalar("INSERT INTO Files (Hash, Size, CreatedAt) VALUES(@hash,@size, @createdAt); SELECT last_insert_rowid();", hash, size, createdAt) as long?
             ?? throw new InvalidOperationException("Inserting the file did not return its id.");
     }
 
     private void InsertFileName(File file, long fileId)
     {
         var fileName = System.IO.Path.GetFileName(file.Path);
-        _db.ExecuteNonQuery("INSERT INTO FileNames (FileId, Name) VALUES(@fileId, @fileName);", new SqliteParameter("@fileId", fileId), new SqliteParameter("@fileName", fileName));
+        db.ExecuteNonQuery("INSERT INTO FileNames (FileId, Name) VALUES(@fileId, @fileName);", new SqliteParameter("@fileId", fileId), new SqliteParameter("@fileName", fileName));
     }
 
     private void InsertFilePath(File file, long fileId)
     {
-        _db.ExecuteNonQuery("INSERT INTO FilePaths (FileId, Path) VALUES(@fileId, @filePath);", new SqliteParameter("@fileId", fileId), new SqliteParameter("@filePath", file.Path));
+        db.ExecuteNonQuery("INSERT INTO FilePaths (FileId, Path) VALUES(@fileId, @filePath);", new SqliteParameter("@fileId", fileId), new SqliteParameter("@filePath", file.Path));
     }
 
     private async Task<long> FindOrCreate(File file)
@@ -213,7 +198,7 @@ HAVING DuplicateCount > 1";
 
     private IEnumerable<File> MetaSearch(string search)
     {
-        using var reader = _db.ExecuteReader(search);
+        using var reader = db.ExecuteReader(search);
 
         var files = new List<File>();
 
@@ -226,7 +211,7 @@ HAVING DuplicateCount > 1";
 
     private bool AddFileEntry(SqliteDataReader reader, List<File> files)
     {
-        var file = _newFile();
+        var file = newFile();
         var hasEntry = LoadFileFromReader(reader, file);
 
         if (hasEntry)
@@ -239,9 +224,9 @@ HAVING DuplicateCount > 1";
 
     private string ParseQuery(string query)
     {
-        var visitor = _newSearchQueryVisitor();
+        var visitor = newSearchQueryVisitor();
 
-        if (_parser.Parse(query) is { } ir)
+        if (parser.Parse(query) is { } ir)
         {
             ir.Accept(visitor);
         }

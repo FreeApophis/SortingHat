@@ -11,17 +11,8 @@ using SortingHat.CLI.Options;
 namespace SortingHat.CLI.Commands.Files;
 
 [UsedImplicitly]
-internal class FindFilesCommand : ICommand
+internal class FindFilesCommand(IFile fileStore, IConsoleWriter consoleWriter) : ICommand
 {
-    private readonly IFile _file;
-    private readonly IConsoleWriter _consoleWriter;
-
-    public FindFilesCommand(IFile file, IConsoleWriter consoleWriter)
-    {
-        _file = file;
-        _consoleWriter = consoleWriter;
-    }
-
     public string LongCommand => "find-files";
     public Option<string> ShortCommand => Option.Some("ff");
     public string ShortHelp => "Finds all files matching the search query";
@@ -30,9 +21,9 @@ internal class FindFilesCommand : ICommand
     public bool Execute(IEnumerable<string> arguments, IOptionParser options)
     {
         var search = string.Join(" ", arguments);
-        _consoleWriter.WriteLine($"Find Files: {search}");
+        consoleWriter.WriteLine($"Find Files: {search}");
 
-        var files = _file.Search(search).ToList();
+        var files = fileStore.Search(search).ToList();
 
         if (files.Any())
         {
@@ -48,11 +39,11 @@ internal class FindFilesCommand : ICommand
                 table.Append(hash.ShortHash().GetOrElse(hash), file.CreatedAt, file.Size.HumanSize(), file.Path);
             }
 
-            table.WriteTo(_consoleWriter);
+            table.WriteTo(consoleWriter);
         }
         else
         {
-            _consoleWriter.WriteLine("No files found for your search query...");
+            consoleWriter.WriteLine("No files found for your search query...");
         }
 
         return true;

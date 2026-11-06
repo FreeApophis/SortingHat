@@ -19,21 +19,8 @@ using IOption = SortingHat.API.DI.IOption;
 namespace SortingHat.CLI.Commands;
 
 [UsedImplicitly]
-internal class HelpCommand : ICommand
+internal class HelpCommand(ILogger<HelpCommand> logger, Console console, IComponentContext container, IConsoleApplicationInformationProvider consoleApplicationInformation) : ICommand
 {
-    private readonly ILogger<HelpCommand> _logger;
-    private readonly Console _console;
-    private readonly IComponentContext _container;
-    private readonly IConsoleApplicationInformationProvider _consoleApplicationInformation;
-
-    public HelpCommand(ILogger<HelpCommand> logger, Console console, IComponentContext container, IConsoleApplicationInformationProvider consoleApplicationInformation)
-    {
-        _logger = logger;
-        _console = console;
-        _container = container;
-        _consoleApplicationInformation = consoleApplicationInformation;
-    }
-
     public string LongCommand => "help";
     public Option<string> ShortCommand => Option.Some("?");
     public string ShortHelp => "This is the help command, it shows a list of the available commands.";
@@ -41,13 +28,13 @@ internal class HelpCommand : ICommand
 
     public bool Execute(IEnumerable<string> arguments, IOptionParser options)
     {
-        _logger.LogTrace("Help Command executed");
+        logger.LogTrace("Help Command executed");
 
         var firstArgument = arguments.FirstOrNone();
 
         return firstArgument.Match(
             none: PrintOverview(options),
-            some: argument => PrintSpecificHelp(argument, _container.Resolve<IEnumerable<ICommand>>()));
+            some: argument => PrintSpecificHelp(argument, container.Resolve<IEnumerable<ICommand>>()));
     }
 
     private bool PrintSpecificHelp(string argument, IEnumerable<ICommand> commands)
@@ -70,14 +57,14 @@ internal class HelpCommand : ICommand
         using var resourceStream = GetHelResourceStream(command);
         using var reader = new StreamReader(resourceStream);
 
-        WriteStreamLineByLine(reader, line => line.Replace("<PROGRAMNAME>", _consoleApplicationInformation.Name));
+        WriteStreamLineByLine(reader, line => line.Replace("<PROGRAMNAME>", consoleApplicationInformation.Name));
     }
 
     private void WriteStreamLineByLine(TextReader reader, Func<string, string> transformLine)
     {
         while (reader.ReadLine() is { } line)
         {
-            _console.Writer.WriteLine(transformLine(line));
+            console.Writer.WriteLine(transformLine(line));
         }
     }
 
@@ -95,8 +82,8 @@ internal class HelpCommand : ICommand
     private bool PrintOverview(IOptionParser options)
     {
         PrintHelpHeader();
-        PrintHelpCommands(_container.Resolve<IEnumerable<ICommand>>());
-        PrintHelpOptions(_container.Resolve<IEnumerable<IOption>>());
+        PrintHelpCommands(container.Resolve<IEnumerable<ICommand>>());
+        PrintHelpOptions(container.Resolve<IEnumerable<IOption>>());
         PrintTagVariables(options);
         PrintHelpExamples();
         return true;
@@ -107,9 +94,9 @@ internal class HelpCommand : ICommand
         var options = lazyOptions.ToList();
         if (options.Any())
         {
-            _console.Writer.WriteLine();
-            _console.Writer.WriteLine("Options");
-            _console.Writer.WriteLine();
+            console.Writer.WriteLine();
+            console.Writer.WriteLine("Options");
+            console.Writer.WriteLine();
 
             var table = HelpTable();
             foreach (var option in options)
@@ -118,7 +105,7 @@ internal class HelpCommand : ICommand
             }
 
             table.AppendSeparator();
-            table.WriteTo(_console.Writer);
+            table.WriteTo(console.Writer);
         }
     }
 
@@ -131,14 +118,14 @@ internal class HelpCommand : ICommand
 
     private void PrintHelpExamples()
     {
-        _console.Writer.WriteLine();
-        _console.Writer.WriteLine("Examples:");
-        _console.Writer.WriteLine();
-        _console.Writer.WriteLine($"  {_console.Application.Name} find-files (:tax:2018 or :tax:2017) and :bank");
-        _console.Writer.WriteLine("    This will output all files which are tagged as bank documents for tax in 2017 or 2018.");
-        _console.Writer.WriteLine();
-        _console.Writer.WriteLine($"  {_console.Application.Name} tag-files :Files:{{FileType.Category}}:{{Camera.Make}} :Taken:{{Camera.Taken.Year}} *");
-        _console.Writer.WriteLine("    This will tag all files in the current directory, the possible automatic tags depend on your plugins.");
+        console.Writer.WriteLine();
+        console.Writer.WriteLine("Examples:");
+        console.Writer.WriteLine();
+        console.Writer.WriteLine($"  {console.Application.Name} find-files (:tax:2018 or :tax:2017) and :bank");
+        console.Writer.WriteLine("    This will output all files which are tagged as bank documents for tax in 2017 or 2018.");
+        console.Writer.WriteLine();
+        console.Writer.WriteLine($"  {console.Application.Name} tag-files :Files:{{FileType.Category}}:{{Camera.Make}} :Taken:{{Camera.Taken.Year}} *");
+        console.Writer.WriteLine("    This will tag all files in the current directory, the possible automatic tags depend on your plugins.");
     }
 
     private ConsoleTable HelpTable()
@@ -155,9 +142,9 @@ internal class HelpCommand : ICommand
         var commands = lazyCommands.ToList();
         if (commands.Any())
         {
-            _console.Writer.WriteLine();
-            _console.Writer.WriteLine("Commands");
-            _console.Writer.WriteLine();
+            console.Writer.WriteLine();
+            console.Writer.WriteLine("Commands");
+            console.Writer.WriteLine();
 
             var table = HelpTable();
             foreach (var commandGrouping in Enum.GetValues(typeof(CommandGrouping)).Cast<CommandGrouping>())
@@ -171,27 +158,27 @@ internal class HelpCommand : ICommand
                 table.AppendSeparator();
             }
 
-            table.WriteTo(_console.Writer);
+            table.WriteTo(console.Writer);
         }
     }
 
     private void PrintHelpHeader()
     {
-        _console.Writer.WriteLine($"{_console.Application.Name} <command> [<arguments>] [<options>]:");
+        console.Writer.WriteLine($"{console.Application.Name} <command> [<arguments>] [<options>]:");
     }
 
     private bool PrintTagVariables(IOptionParser options)
     {
-        var autoTagHandler = _container.Resolve<IAutoTagHandler>();
-        _console.Writer.WriteLine("Possible Tag Variables:");
-        _console.Writer.WriteLine();
+        var autoTagHandler = container.Resolve<IAutoTagHandler>();
+        console.Writer.WriteLine("Possible Tag Variables:");
+        console.Writer.WriteLine();
         foreach (var tag in autoTagHandler.AutoTags.OrderBy(tag => tag.AutoTagKey))
         {
-            _console.Writer.WriteLine($"* {tag.HumanReadableAutoTagsKey}");
+            console.Writer.WriteLine($"* {tag.HumanReadableAutoTagsKey}");
             if (options.HasOption<VerboseOption>())
             {
-                _console.Writer.WriteLine($"=>  {tag.Description}");
-                _console.Writer.WriteLine();
+                console.Writer.WriteLine($"=>  {tag.Description}");
+                console.Writer.WriteLine();
             }
         }
 

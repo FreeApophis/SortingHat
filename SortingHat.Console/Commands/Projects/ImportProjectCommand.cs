@@ -12,22 +12,9 @@ using SortingHat.API.DI;
 namespace SortingHat.CLI.Commands.Projects;
 
 [UsedImplicitly]
-internal class ImportProjectCommand : ICommand
+[method: UsedImplicitly]
+internal class ImportProjectCommand(IConsoleWriter consoleWriter, ICopyFile copyFile, DatabaseSettings databaseSettings, IProjects projects) : ICommand
 {
-    private readonly IConsoleWriter _consoleWriter;
-    private readonly ICopyFile _copyFile;
-    private readonly DatabaseSettings _databaseSettings;
-    private readonly IProjects _projects;
-
-    [UsedImplicitly]
-    public ImportProjectCommand(IConsoleWriter consoleWriter, ICopyFile copyFile, DatabaseSettings databaseSettings, IProjects projects)
-    {
-        _consoleWriter = consoleWriter;
-        _copyFile = copyFile;
-        _databaseSettings = databaseSettings;
-        _projects = projects;
-    }
-
     public CommandGrouping CommandGrouping => CommandGrouping.Project;
     public string LongCommand => "import";
     public Option<string> ShortCommand => Option<string>.None;
@@ -44,17 +31,17 @@ internal class ImportProjectCommand : ICommand
 
     private bool TooManyArguments()
     {
-        _consoleWriter.WriteLine("Too many arguments given, please give only filePath and projectName.");
+        consoleWriter.WriteLine("Too many arguments given, please give only filePath and projectName.");
 
         return false;
     }
 
     private bool ImportProject(string filePath, string projectName)
     {
-        _copyFile.Copy(filePath, DestinationPath(projectName));
-        _projects.AddProject(projectName);
+        copyFile.Copy(filePath, DestinationPath(projectName));
+        projects.AddProject(projectName);
 
-        _consoleWriter.WriteLine($"New project '{projectName}' imported.");
+        consoleWriter.WriteLine($"New project '{projectName}' imported.");
 
         return true;
     }
@@ -78,6 +65,6 @@ internal class ImportProjectCommand : ICommand
 
     private string DestinationPath(string project)
     {
-        return Path.Combine(_databaseSettings.DbPath, $"{project}.db");
+        return Path.Combine(databaseSettings.DbPath, $"{project}.db");
     }
 }

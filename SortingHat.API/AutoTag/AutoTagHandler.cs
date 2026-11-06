@@ -8,23 +8,15 @@ using SortingHat.API.Models;
 namespace SortingHat.API.AutoTag;
 
 [UsedImplicitly]
-public class AutoTagHandler : IAutoTagHandler
+public class AutoTagHandler(IEnumerable<IAutoTag> autoTags, ITagParser tagParser) : IAutoTagHandler
 {
-    private readonly ITagParser _tagParser;
-
     private readonly Regex _variableRegex = new Regex("{.*?}");
 
-    public AutoTagHandler(IEnumerable<IAutoTag> autoTags, ITagParser tagParser)
-    {
-        AutoTags = autoTags;
-        _tagParser = tagParser;
-    }
-
-    public IEnumerable<IAutoTag> AutoTags { get; }
+    public IEnumerable<IAutoTag> AutoTags { get; } = autoTags;
 
     public Tag? TagFromMask(string tagMask, FileInfo file)
     {
-        return _tagParser.Parse(ReplaceMask(tagMask, file));
+        return tagParser.Parse(ReplaceMask(tagMask, file));
     }
 
     private static string RemoveFirstAndLastCharacter(string bracedString)

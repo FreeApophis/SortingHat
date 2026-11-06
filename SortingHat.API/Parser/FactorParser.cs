@@ -5,15 +5,8 @@ using SortingHat.API.Parser.Token;
 
 namespace SortingHat.API.Parser;
 
-public class FactorParser : IParser
+public class FactorParser(ExpressionParser expressionParser) : IParser
 {
-    private readonly ExpressionParser _expressionParser;
-
-    public FactorParser(ExpressionParser expressionParser)
-    {
-        _expressionParser = expressionParser;
-    }
-
     /// <summary>
     /// Parsing the following Production:
     /// Factor       := Tag | BoolConstant | Not Factor | "(" Expression ").
@@ -45,7 +38,7 @@ public class FactorParser : IParser
         }
 
         walker.ExpectOpeningParenthesis();
-        var result = _expressionParser.Parse(walker);
+        var result = expressionParser.Parse(walker);
         walker.ExpectClosingParenthesis();
 
         return result;

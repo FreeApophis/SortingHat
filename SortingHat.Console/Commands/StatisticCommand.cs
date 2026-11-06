@@ -8,17 +8,8 @@ using SortingHat.API.DI;
 namespace SortingHat.CLI.Commands;
 
 [UsedImplicitly]
-internal class StatisticCommand : ICommand
+internal class StatisticCommand(IMainDatabase db, IConsoleWriter consoleWriter) : ICommand
 {
-    private readonly IMainDatabase _db;
-    private readonly IConsoleWriter _consoleWriter;
-
-    public StatisticCommand(IMainDatabase db, IConsoleWriter consoleWriter)
-    {
-        _db = db;
-        _consoleWriter = consoleWriter;
-    }
-
     public string LongCommand => "statistics";
     public Option<string> ShortCommand => Option.Some("stat");
     public string ShortHelp => "Shows global statistics";
@@ -28,14 +19,14 @@ internal class StatisticCommand : ICommand
     {
         var table = StatisticsTable();
 
-        foreach (var (key, value) in _db.GetStatistics())
+        foreach (var (key, value) in db.GetStatistics())
         {
             table.Append(key, "=", value);
         }
 
-        _consoleWriter.WriteLine("Statistics:");
-        _consoleWriter.WriteLine();
-        table.WriteTo(_consoleWriter);
+        consoleWriter.WriteLine("Statistics:");
+        consoleWriter.WriteLine();
+        table.WriteTo(consoleWriter);
 
         return true;
     }

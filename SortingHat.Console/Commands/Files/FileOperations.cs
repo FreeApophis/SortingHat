@@ -10,22 +10,9 @@ using File = SortingHat.API.Models.File;
 
 namespace SortingHat.CLI.Commands.Files;
 
-public class FileOperations<TFileOperation>
+public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExistsFile existsFile, Console console, IFile fileStore)
     where TFileOperation : IFileOperation
 {
-    private readonly TFileOperation _fileOperation;
-    private readonly IExistsFile _existsFile;
-    private readonly Console _console;
-    private readonly IFile _file;
-
-    public FileOperations(TFileOperation fileOperation, IExistsFile existsFile, Console console, IFile file)
-    {
-        _fileOperation = fileOperation;
-        _existsFile = existsFile;
-        _console = console;
-        _file = file;
-    }
-
     public bool ExportFiles(IEnumerable<string> lazyArguments, IOptionParser options, string longCommand)
     {
         var arguments = lazyArguments.ToList();
@@ -41,9 +28,9 @@ public class FileOperations<TFileOperation>
 
     public bool ExportFiles(string search, string destinationPath)
     {
-        _console.Writer.WriteLine($"Find Files: {search}");
+        console.Writer.WriteLine($"Find Files: {search}");
 
-        var filesByHash = _file.Search(search).GroupByHash().ToList();
+        var filesByHash = fileStore.Search(search).GroupByHash().ToList();
 
         return filesByHash.Count switch
         {
@@ -54,16 +41,16 @@ public class FileOperations<TFileOperation>
 
     private bool TooManyArguments(string longCommand)
     {
-        _console.Writer.WriteLine("Too many arguments given, give complexes searches in quotes.");
-        _console.Writer.WriteLine($"{_console.Application.Name} {longCommand} search destination");
+        console.Writer.WriteLine("Too many arguments given, give complexes searches in quotes.");
+        console.Writer.WriteLine($"{console.Application.Name} {longCommand} search destination");
 
         return false;
     }
 
     private bool NotEnoughArguments(string longCommand)
     {
-        _console.Writer.WriteLine("Too few arguments given, please specify files with a search query and give a destination.");
-        _console.Writer.WriteLine($"{_console.Application.Name} {longCommand} search destination");
+        console.Writer.WriteLine("Too few arguments given, please specify files with a search query and give a destination.");
+        console.Writer.WriteLine($"{console.Application.Name} {longCommand} search destination");
 
         return false;
     }
@@ -81,9 +68,9 @@ public class FileOperations<TFileOperation>
             };
         }
 
-        if (result == false)
+        if (!result)
         {
-            _console.Writer.WriteLine("Last file failed, process aborted...");
+            console.Writer.WriteLine("Last file failed, process aborted...");
         }
 
         return result;
@@ -91,8 +78,8 @@ public class FileOperations<TFileOperation>
 
     private bool ChoseFileToExport(HashGroup fileGroup, string destinationPath)
     {
-        _console.Writer.WriteLine();
-        _console.Writer.WriteLine($" The file with hash {fileGroup.Hash.ShortHash().GetOrElse(fileGroup.Hash)} has multiple sources, which one you want to copy:");
+        console.Writer.WriteLine();
+        console.Writer.WriteLine($" The file with hash {fileGroup.Hash.ShortHash().GetOrElse(fileGroup.Hash)} has multiple sources, which one you want to copy:");
 
         var consoleTable = new ConsoleTable(2);
 
@@ -101,9 +88,9 @@ public class FileOperations<TFileOperation>
             consoleTable.Append(FileSelectionIndex(file.Path, index), file.Path);
         }
 
-        consoleTable.WriteTo(_console.Writer);
+        consoleTable.WriteTo(console.Writer);
 
-        return _console.Reader
+        return console.Reader
             .ReadInt()
             .AndThen(selectedFileIndex => ExportFile(fileGroup.Files.Skip(selectedFileIndex).FirstOrDefault(), destinationPath))
             .GetOrElse(false);
@@ -111,7 +98,7 @@ public class FileOperations<TFileOperation>
 
     private bool EmptyQuery()
     {
-        _console.Writer.WriteLine("No files found for your search query...");
+        console.Writer.WriteLine("No files found for your search query...");
 
         return false;
     }
@@ -132,14 +119,14 @@ public class FileOperations<TFileOperation>
         {
             var destinationFilePath = Path.Combine(destinationPath, fileName);
 
-            switch (_fileOperation)
+            switch (fileOperation)
             {
                 case ICopyFile copyFile:
-                    _console.Writer.WriteLine($"cp {sourceFile.Path} {destinationFilePath}");
+                    console.Writer.WriteLine($"cp {sourceFile.Path} {destinationFilePath}");
                     copyFile.Copy(sourceFile.Path, destinationFilePath);
                     break;
                 case IMoveFile moveFile:
-                    _console.Writer.WriteLine($"mv {sourceFile.Path} {destinationFilePath}");
+                    console.Writer.WriteLine($"mv {sourceFile.Path} {destinationFilePath}");
                     moveFile.Move(sourceFile.Path, destinationFilePath);
                     break;
                 default:
@@ -149,13 +136,13 @@ public class FileOperations<TFileOperation>
             return true;
         }
 
-        _console.Writer.WriteLine("Source unusable.");
+        console.Writer.WriteLine("Source unusable.");
         return false;
     }
 
     private string FileSelectionIndex(string filePath, in int index)
     {
-        return _existsFile.Exists(filePath)
+        return existsFile.Exists(filePath)
             ? $"[{index}]"
             : "[-]";
     }

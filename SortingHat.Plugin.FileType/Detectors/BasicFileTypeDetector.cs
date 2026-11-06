@@ -33,7 +33,7 @@ internal class BasicFileTypeDetector : IFileTypeDetector
         Signature = parts[SignatureOffset];
         FileType = parts[FileTypeOffset];
 
-        foreach (var extension in parts.Skip(FileTypeExtensionsOffset).Where(extension => string.IsNullOrEmpty(extension) == false))
+        foreach (var extension in parts.Skip(FileTypeExtensionsOffset).Where(extension => !string.IsNullOrEmpty(extension)))
         {
             FileTypeExtensions.Add(extension);
         }
@@ -47,7 +47,7 @@ internal class BasicFileTypeDetector : IFileTypeDetector
 
     private string FileType { get; }
 
-    private List<string> FileTypeExtensions { get; } = new List<string>();
+    private List<string> FileTypeExtensions { get; } = [];
 
     public virtual FileType? Detect(Stream file)
     {
@@ -66,7 +66,7 @@ internal class BasicFileTypeDetector : IFileTypeDetector
             var signaturePart = Signature.Substring(offset, 2);
             offset += 2;
 
-            if (EqualWithJoker(signaturePart, octet.ToString("x2")) == false)
+            if (!EqualWithJoker(signaturePart, octet.ToString("x2")))
             {
                 return null;
             }

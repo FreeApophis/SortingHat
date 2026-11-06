@@ -2,14 +2,9 @@
 
 namespace SortingHat.API.Parser.Token;
 
-public class BoolConstantToken : IToken
+public class BoolConstantToken(bool value) : IToken
 {
-    public BoolConstantToken(bool value)
-    {
-        Value = value;
-    }
-
-    public bool Value { get; }
+    public bool Value { get; } = value;
 
     public override string ToString() => $"Bool Value: {Value}";
 }

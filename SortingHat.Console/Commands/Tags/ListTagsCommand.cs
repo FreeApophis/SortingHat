@@ -10,17 +10,8 @@ using SortingHat.API.Models;
 namespace SortingHat.CLI.Commands.Tags;
 
 [UsedImplicitly]
-internal class ListTagsCommand : ICommand
+internal class ListTagsCommand(ITag tagStore, IConsoleWriter consoleWriter) : ICommand
 {
-    private readonly ITag _tag;
-    private readonly IConsoleWriter _consoleWriter;
-
-    public ListTagsCommand(ITag tag, IConsoleWriter consoleWriter)
-    {
-        _tag = tag;
-        _consoleWriter = consoleWriter;
-    }
-
     public string LongCommand => "list-tags";
     public Option<string> ShortCommand => Option.Some("tags");
     public string ShortHelp => "Lists all available tags in hierarchical form";
@@ -28,10 +19,10 @@ internal class ListTagsCommand : ICommand
 
     public bool Execute(IEnumerable<string> arguments, IOptionParser options)
     {
-        var tags = Tag.List(_tag).ToList();
+        var tags = Tag.List(tagStore).ToList();
         if (tags.Any())
         {
-            _consoleWriter.WriteLine("Used tags: ");
+            consoleWriter.WriteLine("Used tags: ");
 
             var table = TagsTable();
             foreach (var tag in tags)
@@ -39,11 +30,11 @@ internal class ListTagsCommand : ICommand
                 table.Append($"* {tag.FullName}", $"({tag.FileCount})");
             }
 
-            table.WriteTo(_consoleWriter);
+            table.WriteTo(consoleWriter);
         }
         else
         {
-            _consoleWriter.WriteLine("There are currently no tags in the database.");
+            consoleWriter.WriteLine("There are currently no tags in the database.");
         }
 
         return true;

@@ -2,14 +2,9 @@
 
 namespace SortingHat.Plugin.ExtractRelevantText.Token;
 
-internal class UnmatchedToken : IToken
+internal class UnmatchedToken(string unmatchedText) : IToken
 {
-    private string _unmatchedText;
-
-    public UnmatchedToken(string unmatchedText)
-    {
-        _unmatchedText = unmatchedText;
-    }
+    private string _unmatchedText = unmatchedText;
 
     public override string ToString()
     {

@@ -8,17 +8,8 @@ using SortingHat.API.DI;
 namespace SortingHat.CLI.Commands;
 
 [UsedImplicitly]
-internal class RepairCommand : ICommand
+internal class RepairCommand(IFile fileStore, IConsoleWriter consoleWriter) : ICommand
 {
-    private readonly IFile _file;
-    private readonly IConsoleWriter _consoleWriter;
-
-    public RepairCommand(IFile file, IConsoleWriter consoleWriter)
-    {
-        _file = file;
-        _consoleWriter = consoleWriter;
-    }
-
     public string LongCommand => "repair";
     public Option<string> ShortCommand => Option<string>.None;
     public string ShortHelp => "Check each path locked in the database if the file still exists and is not corrupted / changed";
@@ -26,11 +17,11 @@ internal class RepairCommand : ICommand
 
     public bool Execute(IEnumerable<string> arguments, IOptionParser options)
     {
-        foreach (var path in _file.GetPaths())
+        foreach (var path in fileStore.GetPaths())
         {
-            if (File.Exists(path) == false)
+            if (!File.Exists(path))
             {
-                _consoleWriter.WriteLine($"File '{path}' does not exist, removed from index");
+                consoleWriter.WriteLine($"File '{path}' does not exist, removed from index");
             }
         }
 

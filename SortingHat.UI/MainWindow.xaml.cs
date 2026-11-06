@@ -14,7 +14,6 @@ using SortingHat.API.Parser;
 using SortingHat.API.Parser.OperatorType;
 using SortingHat.API.Parser.Token;
 using SortingHat.DB;
-using File = SortingHat.API.Models.File;
 
 namespace SortingHat.UI;
 
@@ -41,7 +40,7 @@ public partial class MainWindow : MetroWindow, INotifyPropertyChanged
         _logger = logger;
         _newSearchQueryVisitor = newSearchQueryVisitor;
         _parser = parser;
-        _files = Enumerable.Empty<File>();
+        _files = [];
 
         InitializeComponent();
 

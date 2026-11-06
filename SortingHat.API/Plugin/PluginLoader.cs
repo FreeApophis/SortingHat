@@ -11,16 +11,9 @@ using JetBrains.Annotations;
 namespace SortingHat.API.Plugin;
 
 [UsedImplicitly]
-public class PluginLoader : IPluginLoader
+public class PluginLoader(IExistsDirectory existsDirectory) : IPluginLoader
 {
-    private readonly IExistsDirectory _existsDirectory;
-
-    public PluginLoader(IExistsDirectory existsDirectory)
-    {
-        _existsDirectory = existsDirectory;
-    }
-
-    public List<IPlugin> Plugins { get; } = new List<IPlugin>();
+    public List<IPlugin> Plugins { get; } = [];
 
     private static string PluginDirectory => Path.Combine(AppContext.BaseDirectory, "plugins");
 
@@ -57,12 +50,12 @@ public class PluginLoader : IPluginLoader
 
     private IEnumerable<Assembly> GetPluginAssemblies()
     {
-        if (_existsDirectory.Exists(PluginDirectory))
+        if (existsDirectory.Exists(PluginDirectory))
         {
             return Directory.GetFiles(PluginDirectory, PluginFilePattern, SearchOption.TopDirectoryOnly)
                 .Select(Assembly.LoadFrom);
         }
 
-        return Enumerable.Empty<Assembly>();
+        return [];
     }
 }

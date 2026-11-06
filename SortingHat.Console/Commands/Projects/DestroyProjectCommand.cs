@@ -8,41 +8,26 @@ using SortingHat.API.DI;
 namespace SortingHat.CLI.Commands.Projects;
 
 [UsedImplicitly]
-internal class DestroyProjectCommand : ICommand
+internal class DestroyProjectCommand(IProjects projects, IConsoleWriter consoleWriter) : ICommand
 {
-    private readonly IProjects _projects;
-    private readonly IConsoleWriter _consoleWriter;
-
-    public DestroyProjectCommand(IProjects projects, IConsoleWriter consoleWriter)
-    {
-        _projects = projects;
-        _consoleWriter = consoleWriter;
-    }
-
     public CommandGrouping CommandGrouping => CommandGrouping.Project;
     public string LongCommand => "remove-project";
     public Option<string> ShortCommand => Option<string>.None;
     public string ShortHelp => "Removes a project with all tags and files.";
 
     public bool Execute(IEnumerable<string> arguments, IOptionParser options)
-    {
-        var projects = arguments.ToList();
-
-        return projects.Count switch
+        => arguments.ToList() switch
         {
-            0 => NotEnoughArguments(),
-            _ => DestroyProjects(projects),
+            [] => NotEnoughArguments(),
+            var projectNames => DestroyProjects(projectNames),
         };
-    }
 
-    private bool DestroyProjects(List<string> projects)
-    {
-        return projects.All(project => _projects.RemoveProject(project));
-    }
+    private bool DestroyProjects(List<string> projectNames)
+        => projectNames.All(projectName => projects.RemoveProject(projectName));
 
     private bool NotEnoughArguments()
     {
-        _consoleWriter.WriteLine("Not enough arguments given, please give a name for the project you want to create.");
+        consoleWriter.WriteLine("Not enough arguments given, please give a name for the project you want to create.");
 
         return false;
     }

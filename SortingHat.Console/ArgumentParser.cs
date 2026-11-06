@@ -12,7 +12,7 @@ namespace SortingHat.CLI;
 [UsedImplicitly]
 internal class ArgumentParser
 {
-    private readonly Dictionary<string, ICommand> _commandTargets = new Dictionary<string, ICommand>();
+    private readonly Dictionary<string, ICommand> _commandTargets = [];
     private readonly Lazy<ILogger<ArgumentParser>> _logger;
     private readonly Console _console;
 
@@ -55,7 +55,7 @@ internal class ArgumentParser
     {
         var success = command.Execute(TagAndFileArguments(arguments), new OptionParser(OptionArguments(arguments)));
 
-        if (success == false)
+        if (!success)
         {
             _logger.Value.LogWarning("Command Execution failed!");
         }
@@ -73,7 +73,7 @@ internal class ArgumentParser
 
     private static IEnumerable<string> TagAndFileArguments(IEnumerable<string> arguments)
     {
-        return arguments.Skip(1).Where(s => s.StartsWith("-") == false);
+        return arguments.Skip(1).Where(s => !s.StartsWith("-"));
     }
 
     private static IEnumerable<string> OptionArguments(IEnumerable<string> arguments)

@@ -11,7 +11,7 @@ public class ConsoleTable
 {
     private const char Space = ' ';
 
-    private readonly List<object?[]> _rows = new List<object?[]>();
+    private readonly List<object?[]> _rows = [];
 
     public ConsoleTable(int columns = 0)
     {
@@ -21,7 +21,7 @@ public class ConsoleTable
         }
     }
 
-    public List<ConsoleTableColumn> Columns { get; } = new List<ConsoleTableColumn>();
+    public List<ConsoleTableColumn> Columns { get; } = [];
 
     public void Append(params object?[] args)
     {

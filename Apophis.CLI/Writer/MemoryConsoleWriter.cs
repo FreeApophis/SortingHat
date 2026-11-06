@@ -4,7 +4,7 @@ namespace Apophis.CLI.Writer;
 
 public class MemoryConsoleWriter : IConsoleWriter
 {
-    private List<string> _lines = new List<string>();
+    private List<string> _lines = [];
 
     public MemoryConsoleWriter()
     {

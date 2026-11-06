@@ -4,19 +4,12 @@ using SortingHat.API.DI;
 
 namespace SortingHat.DB.Access;
 
-public class SQLiteProjects : IProjects
+public class SQLiteProjects(SQLiteMainDatabase db) : IProjects
 {
-    private readonly SQLiteMainDatabase _db;
-
-    public SQLiteProjects(SQLiteMainDatabase db)
-    {
-        _db = db;
-    }
-
     public IEnumerable<string> GetProjects()
     {
         var projects = new List<string>();
-        using var reader = _db.ExecuteReader("SELECT Name FROM Projects");
+        using var reader = db.ExecuteReader("SELECT Name FROM Projects");
 
         while (reader.Read())
         {
@@ -28,14 +21,14 @@ public class SQLiteProjects : IProjects
 
     public bool AddProject(string project)
     {
-        _db.ExecuteNonQuery("INSERT INTO [Projects] ([Name]) VALUES (@project)", new SqliteParameter("@project", project));
+        db.ExecuteNonQuery("INSERT INTO [Projects] ([Name]) VALUES (@project)", new SqliteParameter("@project", project));
 
         return true;
     }
 
     public bool RemoveProject(string project)
     {
-        _db.ExecuteNonQuery("DELETE FROM [Projects] WHERE [NAME] = @project", new SqliteParameter("@project", project));
+        db.ExecuteNonQuery("DELETE FROM [Projects] WHERE [NAME] = @project", new SqliteParameter("@project", project));
 
         return true;
     }

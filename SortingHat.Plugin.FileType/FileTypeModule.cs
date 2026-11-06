@@ -45,7 +45,7 @@ internal class FileTypeModule : Autofac.Module, IPlugin
         string? line;
         while ((line = reader.ReadLine()) != null)
         {
-            if (line.StartsWith("#") == false)
+            if (!line.StartsWith("#"))
             {
                 builder.RegisterInstance(FileTypeDetectorFactory.Create(line)).As<IFileTypeDetector>();
             }

@@ -8,15 +8,8 @@ using SortingHat.API.Models;
 namespace SortingHat.CLI.Commands.Tags;
 
 [UsedImplicitly]
-internal class AddTagCommand : ICommand
+internal class AddTagCommand(ITagParser tagParser) : ICommand
 {
-    private readonly ITagParser _tagParser;
-
-    public AddTagCommand(ITagParser tagParser)
-    {
-        _tagParser = tagParser;
-    }
-
     public string LongCommand => "add-tags";
     public Option<string> ShortCommand => Option<string>.None;
     public string ShortHelp => "This adds a tag without any associated files to the db.";
@@ -24,6 +17,6 @@ internal class AddTagCommand : ICommand
 
     public bool Execute(IEnumerable<string> arguments, IOptionParser options)
     {
-        return arguments.Select(_tagParser.Parse).Aggregate(true, (result, tag) => result & (tag != null && tag.Store()));
+        return arguments.Select(tagParser.Parse).Aggregate(true, (result, tag) => result & (tag != null && tag.Store()));
     }
 }

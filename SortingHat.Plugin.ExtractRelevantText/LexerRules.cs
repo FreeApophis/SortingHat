@@ -31,7 +31,7 @@ public static class LexerRules
 
     private static bool NotWhiteSpace(char character)
     {
-        return char.IsWhiteSpace(character) == false;
+        return !char.IsWhiteSpace(character);
     }
 
     private static Lexeme ConsumeWord(ILexemeBuilder builder)

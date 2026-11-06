@@ -8,13 +8,8 @@ using SortingHat.API.DI;
 namespace SortingHat.DB;
 
 [UsedImplicitly]
-public sealed class SQLiteProjectDatabase : SQLiteDatabase, IProjectDatabase
+public sealed class SQLiteProjectDatabase(DatabaseSettings databaseSettings, ISettings settings) : SQLiteDatabase(databaseSettings, settings.ActiveProject(databaseSettings)), IProjectDatabase
 {
-    public SQLiteProjectDatabase(DatabaseSettings databaseSettings, ISettings settings)
-        : base(databaseSettings, settings.ActiveProject(databaseSettings))
-    {
-    }
-
     internal override MigrationType MigrationType => MigrationType.Project;
 
     public Dictionary<string, long> GetStatistics()

@@ -10,16 +10,9 @@ using SortingHat.API.DI;
 namespace SortingHat.CLI.Commands;
 
 [UsedImplicitly]
-internal class VersionCommand : ICommand
+[method: UsedImplicitly]
+internal class VersionCommand(IConsoleWriter consoleWriter) : ICommand
 {
-    private readonly IConsoleWriter _consoleWriter;
-
-    [UsedImplicitly]
-    public VersionCommand(IConsoleWriter consoleWriter)
-    {
-        _consoleWriter = consoleWriter;
-    }
-
     public string LongCommand => "version";
     public Option<string> ShortCommand => Option.Some("v");
     public string ShortHelp => "Shows the current Version of this program";
@@ -29,8 +22,8 @@ internal class VersionCommand : ICommand
     {
         var version = GetVersion();
 
-        _consoleWriter.WriteLine($"{nameof(SortingHat)} {version.Version}");
-        _consoleWriter.WriteLine();
+        consoleWriter.WriteLine($"{nameof(SortingHat)} {version.Version}");
+        consoleWriter.WriteLine();
 
         var table = new ConsoleTable(2);
 
@@ -39,7 +32,7 @@ internal class VersionCommand : ICommand
         table.Append("Culture:", version.CultureName ?? "<NULL>");
         table.Append("Current Culture:", CultureInfo.CurrentCulture);
 
-        table.WriteTo(_consoleWriter);
+        table.WriteTo(consoleWriter);
         return true;
     }
 

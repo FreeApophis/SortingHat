@@ -11,23 +11,15 @@ using SortingHat.Plugin.ExtractRelevantText.Token;
 
 namespace SortingHat.Plugin.ExtractRelevantText;
 
-public class FolderScanner
+[method: UsedImplicitly]
+public class FolderScanner(IConsoleWriter consoleWriter)
 {
-    private readonly IConsoleWriter _consoleWriter;
-    private readonly LexerRuleBook _lexerRuleBook;
-    private readonly Dictionary<string, int> _wordCount;
-
-    [UsedImplicitly]
-    public FolderScanner(IConsoleWriter consoleWriter)
-    {
-        _consoleWriter = consoleWriter;
-        _lexerRuleBook = LexerRules.Create();
-        _wordCount = new Dictionary<string, int>();
-    }
+    private readonly LexerRuleBook _lexerRuleBook = LexerRules.Create();
+    private readonly Dictionary<string, int> _wordCount = [];
 
     internal bool Scan(IEnumerable<string> folders)
     {
-        _consoleWriter.WriteLine("Scanning...");
+        consoleWriter.WriteLine("Scanning...");
 
         folders
             .SelectMany(folder => Directory.EnumerateFiles(folder, "*.txt", SearchOption.AllDirectories))
@@ -38,7 +30,7 @@ public class FolderScanner
 
     private void Read(string file)
     {
-        _consoleWriter.WriteLine($"Reading: {file}");
+        consoleWriter.WriteLine($"Reading: {file}");
 
         var walker = _lexerRuleBook.Scan(File.ReadAllText(file)).Walker;
 
@@ -54,13 +46,13 @@ public class FolderScanner
 
     private void PrintSignificant()
     {
-        _consoleWriter.WriteLine($"Words: {_wordCount.Count}");
+        consoleWriter.WriteLine($"Words: {_wordCount.Count}");
 
         _wordCount
             .OrderByDescending(w => w.Value)
             .Select(w => w.Key)
             .Take(500)
-            .ForEach(significantWord => _consoleWriter.WriteLine(significantWord));
+            .ForEach(significantWord => consoleWriter.WriteLine(significantWord));
     }
 
     private void Count(IToken token)

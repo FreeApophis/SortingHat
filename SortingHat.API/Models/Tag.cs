@@ -18,7 +18,7 @@ public class Tag
 
     public string Name { get; set; }
     public Tag? Parent { get; }
-    public List<Tag> Children { get; } = new List<Tag>();
+    public List<Tag> Children { get; } = [];
     public long FileCount => _tag.FileCount(this);
 
     public string FullName => $"{(Parent == null ? string.Empty : Parent.FullName)}:{Name}";

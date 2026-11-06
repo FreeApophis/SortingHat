@@ -7,19 +7,9 @@ using SortingHat.API.DI;
 
 namespace SortingHat.API.Models;
 
-public class File
+[method: UsedImplicitly]
+public class File(IFile file, IHashService hashService)
 {
-    private readonly IFile _file;
-
-    private readonly IHashService _hashService;
-
-    [UsedImplicitly]
-    public File(IFile file, IHashService hashService)
-    {
-        _file = file;
-        _hashService = hashService;
-    }
-
     public DateTime CreatedAt { get; set; }
     public long Size { get; set; }
     public Task<string> Hash { get; set; } = Task.FromResult("BADHASH");
@@ -29,7 +19,7 @@ public class File
     {
         Path = filePath;
 
-        _file.LoadByPath(this);
+        file.LoadByPath(this);
     }
 
     public void LoadByPath(string filePath)
@@ -40,7 +30,7 @@ public class File
         {
             var fileInfo = new FileInfo(Path);
 
-            Hash = _hashService.GetHash(Path);
+            Hash = hashService.GetHash(Path);
             Size = fileInfo.Length;
             CreatedAt = fileInfo.CreationTimeUtc;
         }
@@ -48,34 +38,34 @@ public class File
 
     public async Task Tag(Tag tag)
     {
-        await _file.Tag(this, tag);
+        await file.Tag(this, tag);
     }
 
     public void Untag(Tag tag)
     {
-        _file.Untag(this, tag);
+        file.Untag(this, tag);
     }
 
     public async Task<IEnumerable<Tag>> GetTags()
     {
-        return await _file.GetTags(this);
+        return await file.GetTags(this);
     }
 
     public async Task<IEnumerable<string>> GetPaths()
     {
-        return await _file.GetPaths(this);
+        return await file.GetPaths(this);
     }
 
     public async Task<IEnumerable<string>> GetNames()
     {
-        return await _file.GetNames(this);
+        return await file.GetNames(this);
     }
 
     public void LoadByPathFromDbWithFallback(string path)
     {
         Path = path;
 
-        if (_file.LoadByPath(this))
+        if (file.LoadByPath(this))
         {
             return;
         }
@@ -84,7 +74,7 @@ public class File
         {
             var fileInfo = new FileInfo(Path);
 
-            Hash = _hashService.GetHash(Path);
+            Hash = hashService.GetHash(Path);
             Size = fileInfo.Length;
             CreatedAt = fileInfo.CreationTimeUtc;
         }

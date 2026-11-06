@@ -9,17 +9,8 @@ using SortingHat.API.Plugin;
 namespace SortingHat.CLI.Commands;
 
 [UsedImplicitly]
-internal class PluginsCommand : ICommand
+internal class PluginsCommand(IConsoleWriter consoleWriter, IPluginLoader pluginLoader) : ICommand
 {
-    private readonly IConsoleWriter _consoleWriter;
-    private readonly IPluginLoader _pluginLoader;
-
-    public PluginsCommand(IConsoleWriter consoleWriter, IPluginLoader pluginLoader)
-    {
-        _consoleWriter = consoleWriter;
-        _pluginLoader = pluginLoader;
-    }
-
     public string LongCommand => "plugins";
     public Option<string> ShortCommand => Option<string>.None;
     public string ShortHelp => "Lists the loaded plugins";
@@ -29,7 +20,7 @@ internal class PluginsCommand : ICommand
     {
         if (arguments.Any())
         {
-            _consoleWriter.WriteLine("Too many arguments given, the plugin command does not take any arguments.");
+            consoleWriter.WriteLine("Too many arguments given, the plugin command does not take any arguments.");
             return false;
         }
 
@@ -38,20 +29,20 @@ internal class PluginsCommand : ICommand
 
     private bool ListPlugins()
     {
-        if (_pluginLoader.Plugins.Any())
+        if (pluginLoader.Plugins.Any())
         {
-            _consoleWriter.WriteLine("Loaded Plugins:");
-            foreach (var plugin in _pluginLoader.Plugins)
+            consoleWriter.WriteLine("Loaded Plugins:");
+            foreach (var plugin in pluginLoader.Plugins)
             {
-                _consoleWriter.WriteLine($"{plugin.Name} v{plugin.Version}");
-                _consoleWriter.WriteLine();
-                _consoleWriter.WriteLine($"  {plugin.Description}");
-                _consoleWriter.WriteLine();
+                consoleWriter.WriteLine($"{plugin.Name} v{plugin.Version}");
+                consoleWriter.WriteLine();
+                consoleWriter.WriteLine($"  {plugin.Description}");
+                consoleWriter.WriteLine();
             }
         }
         else
         {
-            _consoleWriter.WriteLine("No plugins loaded");
+            consoleWriter.WriteLine("No plugins loaded");
         }
 
         return true;

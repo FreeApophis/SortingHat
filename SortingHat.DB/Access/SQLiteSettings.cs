@@ -4,15 +4,8 @@ using SortingHat.API.DI;
 
 namespace SortingHat.DB.Access;
 
-internal class SQLiteSettings : ISettings
+internal class SQLiteSettings(SQLiteMainDatabase db) : ISettings
 {
-    private readonly SQLiteMainDatabase _db;
-
-    public SQLiteSettings(SQLiteMainDatabase db)
-    {
-        _db = db;
-    }
-
     public string? this[string key]
     {
         get => GetValue(key);
@@ -21,7 +14,7 @@ internal class SQLiteSettings : ISettings
 
     public bool HasValue(string key)
     {
-        var result = _db.ExecuteScalar("SELECT Id FROM [SETTINGS] WHERE Key = @key", new SqliteParameter("@key", key));
+        var result = db.ExecuteScalar("SELECT Id FROM [SETTINGS] WHERE Key = @key", new SqliteParameter("@key", key));
 
         return result != null;
     }
@@ -29,12 +22,12 @@ internal class SQLiteSettings : ISettings
     private string? GetValue(string key)
     {
         // null if the key does not exist, DBNull if the value is NULL
-        return _db.ExecuteScalar("SELECT [Value] FROM [SETTINGS] WHERE Key = @key", new SqliteParameter("@key", key)) as string;
+        return db.ExecuteScalar("SELECT [Value] FROM [SETTINGS] WHERE Key = @key", new SqliteParameter("@key", key)) as string;
     }
 
     private void SetValue(string key, string? value)
     {
-        _db.ExecuteNonQuery(
+        db.ExecuteNonQuery(
             "INSERT INTO [Settings] ([Key], [Value]) VALUES (@key, @value)",
             new SqliteParameter("@key", key),
             new SqliteParameter("@value", (object?)value ?? DBNull.Value));
