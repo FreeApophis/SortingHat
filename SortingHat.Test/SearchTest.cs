@@ -1,12 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Apophis.CLI.Writer;
-using Autofac;
-using Microsoft.Data.Sqlite;
-using SortingHat.API;
-using SortingHat.CLI;
 using Xunit;
 
 namespace SortingHat.Test;
@@ -16,141 +8,101 @@ namespace SortingHat.Test;
 /// </summary>
 public sealed class SearchTest : IDisposable
 {
-    private readonly string _root = Path.Combine(Path.GetTempPath(), $"SortingHat.Test.{Guid.NewGuid():N}");
-    private readonly List<string> _files = [];
-    private readonly MemoryConsoleWriter _writer = new();
-    private readonly IContainer _container;
-
-    public SearchTest()
-    {
-        Directory.CreateDirectory(_root);
-
-        var compositionRoot = new CompositionRoot().Register();
-        compositionRoot.Builder.RegisterInstance(_writer).As<IConsoleWriter>();
-        compositionRoot.Builder.RegisterInstance(new DatabaseSettings { Type = "sqlite", Name = "hat", Path = _root, DefaultProject = "Default" });
-        _container = compositionRoot.Build();
-    }
+    private readonly HatSandbox _hat = new();
 
     [Fact]
     public void GivenATagThenTheFilesWithThatTagAreFound()
     {
-        TaggedFile("a.txt", ":x");
-        TaggedFile("b.txt", ":y");
+        _hat.TaggedFile("a.txt", ":x");
+        _hat.TaggedFile("b.txt", ":y");
 
-        Assert.Equal(["a.txt"], FindFiles(":x"));
+        Assert.Equal(["a.txt"], _hat.FindFiles(":x"));
     }
 
     [Fact]
     public void GivenOrThenTheFilesWithEitherTagAreFound()
     {
-        TaggedFile("a.txt", ":x");
-        TaggedFile("b.txt", ":y");
-        TaggedFile("c.txt", ":z");
+        _hat.TaggedFile("a.txt", ":x");
+        _hat.TaggedFile("b.txt", ":y");
+        _hat.TaggedFile("c.txt", ":z");
 
-        Assert.Equal(["a.txt", "b.txt"], FindFiles(":x or :y"));
+        Assert.Equal(["a.txt", "b.txt"], _hat.FindFiles(":x or :y"));
     }
 
     [Fact]
     public void GivenAndThenOnlyTheFilesWithBothTagsAreFound()
     {
-        TaggedFile("a.txt", ":x", ":y");
-        TaggedFile("b.txt", ":x");
+        _hat.TaggedFile("a.txt", ":x", ":y");
+        _hat.TaggedFile("b.txt", ":x");
 
-        Assert.Equal(["a.txt"], FindFiles(":x and :y"));
+        Assert.Equal(["a.txt"], _hat.FindFiles(":x and :y"));
     }
 
     [Fact]
     public void GivenAndNotThenTheFilesWithTheExcludedTagAreNotFound()
     {
-        TaggedFile("a.txt", ":x", ":y");
-        TaggedFile("b.txt", ":x");
+        _hat.TaggedFile("a.txt", ":x", ":y");
+        _hat.TaggedFile("b.txt", ":x");
 
-        Assert.Equal(["b.txt"], FindFiles(":x and not :y"));
+        Assert.Equal(["b.txt"], _hat.FindFiles(":x and not :y"));
     }
 
     [Fact]
     public void GivenNotThenFilesWithoutAnyTagAreFound()
     {
-        TaggedFile("a.txt", ":x", ":y");
-        TaggedFile("b.txt", ":x");
-        TaggedFile("c.txt");
+        _hat.TaggedFile("a.txt", ":x", ":y");
+        _hat.TaggedFile("b.txt", ":x");
+        _hat.TaggedFile("c.txt");
 
-        Assert.Equal(["b.txt", "c.txt"], FindFiles("not :y"));
+        Assert.Equal(["b.txt", "c.txt"], _hat.FindFiles("not :y"));
     }
 
     [Fact]
     public void GivenAParentTagThenTheFilesTaggedWithItsChildTagsAreFound()
     {
-        TaggedFile("a.txt", ":photo:holiday:2018");
-        TaggedFile("b.txt", ":photo");
-        TaggedFile("c.txt", ":other");
+        _hat.TaggedFile("a.txt", ":photo:holiday:2018");
+        _hat.TaggedFile("b.txt", ":photo");
+        _hat.TaggedFile("c.txt", ":other");
 
-        Assert.Equal(["a.txt", "b.txt"], FindFiles(":photo"));
+        Assert.Equal(["a.txt", "b.txt"], _hat.FindFiles(":photo"));
     }
 
     [Fact]
     public void GivenAChildTagThenTheFilesTaggedWithItsParentTagAreNotFound()
     {
-        TaggedFile("a.txt", ":photo:holiday");
-        TaggedFile("b.txt", ":photo");
+        _hat.TaggedFile("a.txt", ":photo:holiday");
+        _hat.TaggedFile("b.txt", ":photo");
 
-        Assert.Equal(["a.txt"], FindFiles(":photo:holiday"));
+        Assert.Equal(["a.txt"], _hat.FindFiles(":photo:holiday"));
     }
 
     [Fact]
     public void GivenNotAParentTagThenTheFilesTaggedWithItsChildTagsAreNotFound()
     {
-        TaggedFile("a.txt", ":photo:holiday");
-        TaggedFile("b.txt", ":other");
+        _hat.TaggedFile("a.txt", ":photo:holiday");
+        _hat.TaggedFile("b.txt", ":other");
 
-        Assert.Equal(["b.txt"], FindFiles("not :photo"));
+        Assert.Equal(["b.txt"], _hat.FindFiles("not :photo"));
     }
 
     [Fact]
     public void GivenAnUnknownTagThenNoFilesAreFoundAndTheTagIsReported()
     {
-        TaggedFile("a.txt", ":x");
+        _hat.TaggedFile("a.txt", ":x");
 
-        Assert.Empty(FindFiles(":typo"));
-        Assert.Contains("Unknown tag: :typo", _writer.Lines);
+        Assert.Empty(_hat.FindFiles(":typo"));
+        Assert.Contains("Unknown tag: :typo", _hat.Lines);
+    }
+
+    [Fact]
+    public void GivenAChildTagWithoutItsParentThenItIsAnUnknownTag()
+    {
+        _hat.TaggedFile("a.txt", ":tax:2018");
+
+        Assert.Empty(_hat.FindFiles(":2018"));
+        Assert.Contains("Unknown tag: :2018", _hat.Lines);
     }
 
     public void Dispose()
-    {
-        _container.Dispose();
-
-        // the connection pool keeps the database files open
-        SqliteConnection.ClearAllPools();
-        Directory.Delete(_root, recursive: true);
-    }
-
-    private void TaggedFile(string name, params string[] tags)
-    {
-        var path = Path.Combine(_root, name);
-
-        // the content is unique per file, so every file has its own hash
-        File.WriteAllText(path, name);
-        _files.Add(path);
-
-        Hat(["tag-files", .. tags, path]);
-    }
-
-    private IEnumerable<string> FindFiles(string query)
-    {
-        _writer.Lines.Clear();
-
-        Hat(["find-files", query]);
-
-        return _files
-            .Where(path => _writer.Lines.Any(line => line.TrimEnd().EndsWith(path)))
-            .Select(path => Path.GetFileName(path))
-            .Order();
-    }
-
-    private void Hat(string[] arguments)
-    {
-        using var scope = _container.BeginLifetimeScope();
-
-        scope.Resolve<ArgumentParser>().Execute(arguments);
-    }
+        => _hat.Dispose();
 }

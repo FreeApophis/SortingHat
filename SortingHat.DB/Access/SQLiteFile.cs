@@ -41,12 +41,11 @@ HAVING DuplicateCount > 1";
     public async Task Untag(File file, Tag tag)
     {
         var fileId = await Find(file);
-        var tagId = sqLiteTag.Find(tag);
 
-        if (fileId.HasValue && tagId.HasValue)
-        {
-            db.ExecuteNonQuery("DELETE FROM FileTags WHERE TagId = @tagId AND FileId = @fileId;", new SqliteParameter("@fileId", fileId), new SqliteParameter("@tagId", tagId));
-        }
+        (from f in Option.FromNullable(fileId)
+         from t in sqLiteTag.Find(tag)
+         select (FileId: f, TagId: t))
+            .AndThen(ids => db.ExecuteNonQuery("DELETE FROM FileTags WHERE TagId = @tagId AND FileId = @fileId;", new SqliteParameter("@fileId", ids.FileId), new SqliteParameter("@tagId", ids.TagId)));
     }
 
     public bool Store(File file)
@@ -181,7 +180,7 @@ HAVING DuplicateCount > 1";
 
     private Option<long> FindTag(string name)
         => from tag in Option.FromNullable(tagParser.Parse(name))
-           from id in Option.FromNullable(sqLiteTag.Find(tag))
+           from id in sqLiteTag.Find(tag)
            select id;
 
     private IEnumerable<File> MetaSearch(string search)

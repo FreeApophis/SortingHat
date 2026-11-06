@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
+using Funcky.Monads;
 using JetBrains.Annotations;
 using Microsoft.Data.Sqlite;
 using SortingHat.API.DI;
@@ -32,60 +31,19 @@ SELECT id, parentId, name, level FROM tree;";
     }
 
     public bool Destroy(Tag tag)
-    {
-        var tagId = Find(tag);
-        if (tagId.HasValue)
-        {
-            var tagIdParameter = new SqliteParameter("@tagId", tagId);
-            db.ExecuteNonQuery("DELETE FROM FileTags WHERE TagId = @tagId", tagIdParameter);
-            db.ExecuteNonQuery("DELETE FROM Tags WHERE Id = @tagId", tagIdParameter);
-        }
-
-        return tagId.HasValue;
-    }
+        => Find(tag).Match(none: false, some: DestroyTag);
 
     public bool Rename(Tag tag, string newName)
-    {
-        var tagId = Find(tag);
-        if (tagId.HasValue)
-        {
-            var tagIdParameter = new SqliteParameter("@tagId", tagId);
-            var tagNameParameter = new SqliteParameter("@tagName", newName);
-
-            db.ExecuteNonQuery("UPDATE Tags SET Name = @tagName WHERE Id = @tagId", tagIdParameter, tagNameParameter);
-        }
-
-        return tagId.HasValue;
-    }
+        => Find(tag).Match(none: false, some: tagId => RenameTag(tagId, newName));
 
     public bool Move(Tag tag, Tag destinationTag)
-    {
-        var tagId = Find(tag);
-
-        if (tagId.HasValue)
-        {
-            var tagIdParameter = new SqliteParameter("@tagId", tagId);
-            if (destinationTag is null)
-            {
-                return ExecuteMoveQuery(tagIdParameter, new SqliteParameter("@destinationTagId", DBNull.Value));
-            }
-
-            var destinationTagId = Find(destinationTag);
-            if (destinationTagId.HasValue)
-            {
-                return ExecuteMoveQuery(tagIdParameter, new SqliteParameter("@destinationTagId", destinationTagId));
-            }
-        }
-
-        return false;
-    }
+        => (from tagId in Find(tag)
+            from destinationTagId in Find(destinationTag)
+            select MoveTag(tagId, destinationTagId))
+            .GetOrElse(false);
 
     public long FileCount(Tag tag)
-    {
-        var tagId = Find(tag);
-        var count = db.ExecuteScalar("SELECT COUNT(*) FROM Tags JOIN FileTags ON FileTags.TagId = Tags.Id WHERE Tags.Id = @tagId", new SqliteParameter("@tagId", tagId)) as long?;
-        return count ?? 0;
-    }
+        => Find(tag).Match(none: 0L, some: CountFiles);
 
     public IEnumerable<Tag> GetTags()
         => db.ExecuteReader(AllTags, ReadTagTree);
@@ -93,34 +51,54 @@ SELECT id, parentId, name, level FROM tree;";
     internal Tag Load(long tagId)
         => db.ExecuteReader("SELECT ParentId, Name FROM Tags WHERE Id = @tagId", ReadTag, new SqliteParameter("@tagId", tagId));
 
-    internal long? Find(Tag tag)
-    {
-        var x = TagIds(tag);
-
-        return x.Count == 0 ? null as long? : x.Last();
-    }
+    /// <summary>Finds the tag by walking its path from the root, so <c>:2018</c> never matches <c>:tax:2018</c>.</summary>
+    internal Option<long> Find(Tag tag)
+        => Option.FromNullable(tag.Parent)
+            .Match(none: () => FindChild(Option<long>.None, tag.Name), some: parent => Find(parent).SelectMany(parentId => FindChild(parentId, tag.Name)));
 
     internal long FindOrCreate(Tag tag)
     {
-        long? parentId = null;
-        if (tag.Parent != null)
-        {
-            parentId = FindOrCreate(tag.Parent);
-        }
+        var parentId = Option.FromNullable(tag.Parent).Select(FindOrCreate);
 
-        long? resultId = db.ExecuteScalar($"SELECT Id FROM Tags WHERE ParentId {DBString.ToComparison(parentId)} AND Name = '{tag.Name}'") as long?;
-        if (!resultId.HasValue)
-        {
-            resultId = db.ExecuteScalar($"INSERT INTO Tags (ParentId, Name) VALUES({DBString.ToSQL(parentId)}, '{tag.Name}'); SELECT last_insert_rowid();") as long?;
-        }
-
-        if (resultId == null)
-        {
-            throw new NotImplementedException("resultId cannot be null.");
-        }
-
-        return resultId.Value;
+        return FindChild(parentId, tag.Name).GetOrElse(() => Create(parentId, tag.Name));
     }
+
+    private static SqliteParameter ParentIdParameter(Option<long> parentId)
+        => new("@parentId", parentId.Match(none: DBNull.Value, some: id => (object)id));
+
+    private Option<long> FindChild(Option<long> parentId, string name)
+        => Option.FromNullable(db.ExecuteScalar("SELECT Id FROM Tags WHERE ParentId IS @parentId AND Name = @name", ParentIdParameter(parentId), new SqliteParameter("@name", name)) as long?);
+
+    private long Create(Option<long> parentId, string name)
+        => db.ExecuteScalar("INSERT INTO Tags (ParentId, Name) VALUES(@parentId, @name); SELECT last_insert_rowid();", ParentIdParameter(parentId), new SqliteParameter("@name", name)) is long id
+            ? id
+            : throw new InvalidOperationException($"Tag '{name}' could not be created.");
+
+    private bool DestroyTag(long tagId)
+    {
+        var tagIdParameter = new SqliteParameter("@tagId", tagId);
+        db.ExecuteNonQuery("DELETE FROM FileTags WHERE TagId = @tagId", tagIdParameter);
+        db.ExecuteNonQuery("DELETE FROM Tags WHERE Id = @tagId", tagIdParameter);
+
+        return true;
+    }
+
+    private bool RenameTag(long tagId, string newName)
+    {
+        db.ExecuteNonQuery("UPDATE Tags SET Name = @tagName WHERE Id = @tagId", new SqliteParameter("@tagId", tagId), new SqliteParameter("@tagName", newName));
+
+        return true;
+    }
+
+    private bool MoveTag(long tagId, long destinationTagId)
+    {
+        db.ExecuteNonQuery("UPDATE Tags SET ParentId = @destinationTagId WHERE Id = @tagId", new SqliteParameter("@tagId", tagId), new SqliteParameter("@destinationTagId", destinationTagId));
+
+        return true;
+    }
+
+    private long CountFiles(long tagId)
+        => db.ExecuteScalar("SELECT COUNT(*) FROM FileTags WHERE TagId = @tagId", new SqliteParameter("@tagId", tagId)) as long? ?? 0;
 
     private IEnumerable<Tag> ReadTagTree(SqliteDataReader reader)
     {
@@ -144,61 +122,6 @@ SELECT id, parentId, name, level FROM tree;";
         return reader.IsDBNull(0)
             ? new Tag(this, reader.GetString(1))
             : new Tag(this, reader.GetString(1), Load(reader.GetInt64(0)));
-    }
-
-    private static List<Tag> Ancestors(Tag tag)
-    {
-        if (tag.Parent == null)
-        {
-            return [tag];
-        }
-
-        var result = Ancestors(tag.Parent);
-        result.Add(tag);
-        return result;
-    }
-
-    private bool ExecuteMoveQuery(SqliteParameter tagIdParameter, SqliteParameter destinationTagIdParameter)
-    {
-        db.ExecuteNonQuery("UPDATE Tags SET ParentId = @destinationTagId WHERE Id = @tagId", tagIdParameter, destinationTagIdParameter);
-
-        return true;
-    }
-
-    private string TagIdsQuery(Tag tag)
-    {
-        var tags = Ancestors(tag).Select((t, id) => new { Id = id, t.Name }).ToList();
-        var query = new StringBuilder();
-
-        query.AppendLine($"SELECT {string.Join(", ", tags.Select(t => $"T{t.Id}.Id Id{t.Id}"))}");
-        query.AppendLine("FROM Tags T0");
-
-        foreach (var t in tags.Skip(1))
-        {
-            query.AppendLine($"JOIN Tags T{t.Id} ON T{t.Id}.ParentId == T{t.Id - 1}.Id");
-        }
-
-        query.AppendLine($"WHERE {string.Join(" AND ", tags.Select(t => $"T{t.Id}.Name = '{t.Name}'"))}");
-
-        return query.ToString();
-    }
-
-    private List<long> TagIds(Tag tag)
-        => db.ExecuteReader(TagIdsQuery(tag), ReadTagIds);
-
-    private static List<long> ReadTagIds(SqliteDataReader reader)
-    {
-        var result = new List<long>();
-
-        if (reader.Read())
-        {
-            for (int i = 0; i < reader.FieldCount; ++i)
-            {
-                result.Add(reader.GetInt64(i));
-            }
-        }
-
-        return result;
     }
 
     private bool GetTagTree(SqliteDataReader reader, ref List<Tag> result, Tag? parent, int level)
