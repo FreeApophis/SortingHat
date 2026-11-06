@@ -3,64 +3,64 @@ using System.Text;
 using SortingHat.API.Parser.Nodes;
 using SortingHat.API.Parser.OperatorType;
 
-namespace SortingHat.API.Parser
+namespace SortingHat.API.Parser;
+
+public class ToStringVisitor : INodeVisitor
 {
+    private readonly StringBuilder _resultBuilder = new StringBuilder();
 
-    public class ToStringVisitor : INodeVisitor
+    private readonly IOperatorType _operatorType;
+
+    public ToStringVisitor(IOperatorType operatorType)
     {
-        public ToStringVisitor(IOperatorType operatorType)
-        {
-            _operatorType = operatorType;
-        }
+        _operatorType = operatorType;
+    }
 
-        public string Result => _resultBuilder.ToString();
-        private readonly StringBuilder _resultBuilder = new StringBuilder();
-        private readonly IOperatorType _operatorType;
+    public string Result => _resultBuilder.ToString();
 
-        public void Visit(UnaryOperatorNode op)
-        {
-            throw new NotSupportedException();
-        }
+    public void Visit(UnaryOperatorNode op)
+    {
+        throw new NotSupportedException();
+    }
 
-        public void Visit(BinaryOperatorNode op)
-        {
-            throw new NotSupportedException();
-        }
+    public void Visit(BinaryOperatorNode op)
+    {
+        throw new NotSupportedException();
+    }
 
-        public void Visit(NotOperatorNode op)
-        {
-            _resultBuilder.Append(op.ToString(_operatorType));
-            _resultBuilder.Append(_operatorType.NotOpen);
-            op.Operand.Accept(this);
-            _resultBuilder.Append(_operatorType.NotClose);
-        }
+    public void Visit(NotOperatorNode op)
+    {
+        _resultBuilder.Append(op.ToString(_operatorType));
+        _resultBuilder.Append(_operatorType.NotOpen);
+        op.Operand.Accept(this);
+        _resultBuilder.Append(_operatorType.NotClose);
+    }
 
-        public void Visit(AndOperatorNode op)
-        {
-            _resultBuilder.Append("(");
-            op.LeftOperand.Accept(this);
-            _resultBuilder.Append($" {op.ToString(_operatorType)} ");
-            op.RightOperand.Accept(this);
-            _resultBuilder.Append(")");
-        }
+    public void Visit(AndOperatorNode op)
+    {
+        _resultBuilder.Append("(");
+        op.LeftOperand.Accept(this);
+        _resultBuilder.Append($" {op.ToString(_operatorType)} ");
+        op.RightOperand.Accept(this);
+        _resultBuilder.Append(")");
+    }
 
-        public void Visit(OrOperatorNode op)
-        {
-            _resultBuilder.Append("(");
-            op.LeftOperand.Accept(this);
-            _resultBuilder.Append($" {op.ToString(_operatorType)} ");
-            op.RightOperand.Accept(this);
-            _resultBuilder.Append(")");
-        }
+    public void Visit(OrOperatorNode op)
+    {
+        _resultBuilder.Append("(");
+        op.LeftOperand.Accept(this);
+        _resultBuilder.Append($" {op.ToString(_operatorType)} ");
+        op.RightOperand.Accept(this);
+        _resultBuilder.Append(")");
+    }
 
-        public void Visit(TagNode tag)
-        {
-            _resultBuilder.Append(tag);
-        }
+    public void Visit(TagNode tag)
+    {
+        _resultBuilder.Append(tag);
+    }
 
-        public void Visit(BooleanNode boolean)
-        {
-            _resultBuilder.Append(boolean);
-        }
+    public void Visit(BooleanNode boolean)
+    {
+        _resultBuilder.Append(boolean);
     }
 }

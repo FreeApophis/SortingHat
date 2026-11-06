@@ -1,16 +1,15 @@
 ﻿using SortingHat.API.Models;
 
-namespace SortingHat.Test.Mock
-{
-    internal class MockTagParser : ITagParser
-    {
-        public MockTagParser()
-        {
-        }
+namespace SortingHat.Test.Mock;
 
-        public Tag? Parse(string tagString)
-        {
-            return null;
-        }
+internal class MockTagParser : ITagParser
+{
+    public MockTagParser()
+    {
+    }
+
+    public Tag? Parse(string tagString)
+    {
+        return null;
     }
 }

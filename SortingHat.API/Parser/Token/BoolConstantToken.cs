@@ -1,31 +1,31 @@
 ﻿using Funcky.Lexer.Token;
 
-namespace SortingHat.API.Parser.Token
+namespace SortingHat.API.Parser.Token;
+
+public class BoolConstantToken : IToken
 {
-    public class BoolConstantToken : IToken
+    public BoolConstantToken(bool value)
     {
-        public BoolConstantToken(bool value)
-        {
-            Value = value;
-        }
-
-        public bool Value { get; }
-
-        public override string ToString() => $"Bool Value: {Value}";
+        Value = value;
     }
 
-    public class TrueConstantToken : BoolConstantToken
-    {
-        public TrueConstantToken() : base(true)
-        {
-        }
-    }
+    public bool Value { get; }
 
-    public class FalseConstantToken : BoolConstantToken
-    {
-        public FalseConstantToken() : base(false)
-        {
-        }
-    }
+    public override string ToString() => $"Bool Value: {Value}";
+}
 
+public class TrueConstantToken : BoolConstantToken
+{
+    public TrueConstantToken()
+        : base(true)
+    {
+    }
+}
+
+public class FalseConstantToken : BoolConstantToken
+{
+    public FalseConstantToken()
+        : base(false)
+    {
+    }
 }

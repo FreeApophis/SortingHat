@@ -1,7 +1,6 @@
-﻿namespace SortingHat.API.Models
+﻿namespace SortingHat.API.Models;
+
+public interface ITagParser
 {
-    public interface ITagParser
-    {
-        Tag? Parse(string tagString);
-    }
+    Tag? Parse(string tagString);
 }

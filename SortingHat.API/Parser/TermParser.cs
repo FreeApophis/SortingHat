@@ -3,39 +3,38 @@ using Funcky.Lexer.Extensions;
 using SortingHat.API.Parser.Nodes;
 using SortingHat.API.Parser.Token;
 
-namespace SortingHat.API.Parser
+namespace SortingHat.API.Parser;
+
+/// <summary>
+/// Parsing the following Production:
+/// Term       := Factor { And Factor }.
+/// </summary>
+public class TermParser : IParser
 {
-    /// <summary>
-    /// Parsing the following Production:
-    /// Term       := Factor { And Factor }
-    /// </summary>
-    public class TermParser : IParser
+    private readonly FactorParser _factorParser;
+
+    public TermParser(FactorParser factorParser)
     {
-        private readonly FactorParser _factorParser;
+        _factorParser = factorParser;
+    }
 
-        public TermParser(FactorParser factorParser)
+    /// <summary>
+    /// Overloaded Parse function to parse a Term.
+    /// </summary>
+    /// <param name="walker">Lexer input.</param>
+    /// <returns>The parsed term.</returns>
+    public IParseNode Parse(ILexemeWalker walker)
+    {
+        var result = _factorParser.Parse(walker);
+        while (walker.NextIs<AndToken>())
         {
-            _factorParser = factorParser;
-        }
-
-        /// <summary>
-        /// Overloaded Parse function to parse a Term
-        /// </summary>
-        /// <param name="walker">Lexer input</param>
-        /// <returns></returns>
-        public IParseNode Parse(ILexemeWalker walker)
-        {
-            var result = _factorParser.Parse(walker);
-            while (walker.NextIs<AndToken>())
+            var lexem = walker.Pop();
+            if (lexem.Token is AndToken)
             {
-                var lexem = walker.Pop();
-                if (lexem.Token is AndToken)
-                {
-                    result = new AndOperatorNode(result, _factorParser.Parse(walker));
-                }
+                result = new AndOperatorNode(result, _factorParser.Parse(walker));
             }
-
-            return result;
         }
+
+        return result;
     }
 }

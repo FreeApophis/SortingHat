@@ -1,14 +1,14 @@
 ﻿using System.Reflection;
-using apophis.CLI;
+using Apophis.CLI;
 
-namespace SortingHat.CLI
+namespace SortingHat.CLI;
+
+internal class ConsoleApplicationInformationProvider : IConsoleApplicationInformationProvider
 {
-    class ConsoleApplicationInformationProvider : IConsoleApplicationInformationProvider
-    {
-        private string FallBackName = "hat";
-        public string Name =>
-            Assembly.GetEntryAssembly() is {} entryAssembly
-                ? entryAssembly.GetName().Name ?? FallBackName
-                : FallBackName;
-    }
+    private string _FallBackName = "hat";
+
+    public string Name =>
+        Assembly.GetEntryAssembly() is { } entryAssembly
+            ? entryAssembly.GetName().Name ?? _FallBackName
+            : _FallBackName;
 }

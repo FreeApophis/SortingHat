@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 
-namespace SortingHat.API.DI
+namespace SortingHat.API.DI;
+
+public interface IProjects
 {
-    public interface IProjects
-    {
-        IEnumerable<string> GetProjects();
+    IEnumerable<string> GetProjects();
 
-        bool AddProject(string project);
+    bool AddProject(string project);
 
-        bool RemoveProject(string project);
-    }
+    bool RemoveProject(string project);
 }

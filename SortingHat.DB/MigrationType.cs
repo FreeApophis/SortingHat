@@ -1,8 +1,7 @@
-﻿namespace SortingHat.DB
+﻿namespace SortingHat.DB;
+
+internal enum MigrationType
 {
-    internal enum MigrationType
-    {
-        Main,
-        Project
-    }
+    Main,
+    Project,
 }

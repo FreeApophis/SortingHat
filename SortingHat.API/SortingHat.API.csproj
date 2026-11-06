@@ -15,9 +15,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\apophis.CLI\apophis.CLI.csproj" />
-    <ProjectReference Include="..\apophis.FileSystem\apophis.FileSystem.csproj" />
-    <ProjectReference Include="..\apophis.Utils\apophis.Utils.csproj" />
+    <ProjectReference Include="..\Apophis.CLI\Apophis.CLI.csproj" />
+    <ProjectReference Include="..\Apophis.FileSystem\Apophis.FileSystem.csproj" />
+    <ProjectReference Include="..\Apophis.Utils\Apophis.Utils.csproj" />
   </ItemGroup>
 
 </Project>

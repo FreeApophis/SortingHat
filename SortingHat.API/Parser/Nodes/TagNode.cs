@@ -1,21 +1,21 @@
-﻿namespace SortingHat.API.Parser.Nodes
+﻿namespace SortingHat.API.Parser.Nodes;
+
+public sealed class TagNode : IParseNode
 {
-    public sealed class TagNode : IParseNode
+    internal TagNode(string tag)
     {
-        internal TagNode(string tag)
-        {
-            Tag = tag;
-        }
-        public void Accept(INodeVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
+        Tag = tag;
+    }
 
-        public string Tag { get; }
+    public string Tag { get; }
 
-        public override string ToString()
-        {
-            return Tag;
-        }
+    public void Accept(INodeVisitor visitor)
+    {
+        visitor.Visit(this);
+    }
+
+    public override string ToString()
+    {
+        return Tag;
     }
 }

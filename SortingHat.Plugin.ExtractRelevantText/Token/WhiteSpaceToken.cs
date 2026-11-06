@@ -1,8 +1,7 @@
 ﻿using Funcky.Lexer.Token;
 
-namespace SortingHat.Plugin.ExtractRelevantText.Token
+namespace SortingHat.Plugin.ExtractRelevantText.Token;
+
+internal class WhiteSpaceToken : IToken
 {
-    class WhiteSpaceToken : IToken
-    {
-    }
 }

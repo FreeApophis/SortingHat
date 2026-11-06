@@ -1,28 +1,27 @@
-﻿using JetBrains.Annotations;
+﻿using System.IO;
+using JetBrains.Annotations;
 using SortingHat.API.AutoTag;
 using SortingHat.Plugin.FileType.Detectors;
-using System.IO;
 
-namespace SortingHat.Plugin.FileType.AutoTag
+namespace SortingHat.Plugin.FileType.AutoTag;
+
+[UsedImplicitly]
+internal class FileTypeCategoryAutoTag : ConstantAutoTag
 {
-    [UsedImplicitly]
-    internal class FileTypeCategoryAutoTag : ConstantAutoTag
+    private readonly IFileTypeFinder _fileTypeDetector;
+
+    public FileTypeCategoryAutoTag(IFileTypeFinder fileTypeDetector)
     {
-        public override string AutoTagKey => "FileType.Category";
-        public override string Description => "TODO";
+        _fileTypeDetector = fileTypeDetector;
+    }
 
-        private readonly IFileTypeFinder _fileTypeDetector;
+    public override string AutoTagKey => "FileType.Category";
+    public override string Description => "TODO";
 
-        public FileTypeCategoryAutoTag(IFileTypeFinder fileTypeDetector)
-        {
-            _fileTypeDetector = fileTypeDetector;
-        }
+    protected override string? HandleTag(FileInfo file)
+    {
+        var fileType = _fileTypeDetector.Identify(file);
 
-        protected override string? HandleTag(FileInfo file)
-        {
-            var fileType = _fileTypeDetector.Identify(file);
-
-            return fileType?.Category;
-        }
+        return fileType?.Category;
     }
 }

@@ -7,59 +7,59 @@ using SortingHat.API;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
 
-namespace SortingHat.CLI.Commands.Tags
+namespace SortingHat.CLI.Commands.Tags;
+
+[UsedImplicitly]
+internal class MoveTagCommand : ICommand
 {
-    [UsedImplicitly]
-    internal class MoveTagCommand : ICommand
+    private readonly ILogger<RenameTagCommand> _logger;
+    private readonly ITagParser _tagParser;
+
+    public MoveTagCommand(ILogger<RenameTagCommand> logger, ITagParser tagParser)
     {
-        private readonly ILogger<RenameTagCommand> _logger;
-        private readonly ITagParser _tagParser;
+        _logger = logger;
+        _tagParser = tagParser;
+    }
 
-        public MoveTagCommand(ILogger<RenameTagCommand> logger, ITagParser tagParser)
+    public string LongCommand => "move-tags";
+    public Option<string> ShortCommand => Option<string>.None;
+    public string ShortHelp => "this moves a tag to another parent tag, if you want to move it to the root, use the empty tag ':'";
+    public CommandGrouping CommandGrouping => CommandGrouping.Tag;
+
+    public bool Execute(IEnumerable<string> arguments, IOptionParser options)
+    {
+        var argumentList = arguments.ToList();
+        var result = false;
+
+        if (argumentList.Count >= 2)
         {
-            _logger = logger;
-            _tagParser = tagParser;
+            result = MoveTags(argumentList);
         }
-        public string LongCommand => "move-tags";
-        public Option<string> ShortCommand => Option<string>.None;
-        public string ShortHelp => "this moves a tag to another parent tag, if you want to move it to the root, use the empty tag ':'";
-        public CommandGrouping CommandGrouping => CommandGrouping.Tag;
 
-        public bool Execute(IEnumerable<string> lazyArguments, IOptionParser options)
+        if (result == false)
         {
-            var arguments = lazyArguments.ToList();
-            var result = false;
+            _logger.LogWarning("Rename failed");
+        }
 
-            if (arguments.Count >= 2)
+        return result;
+    }
+
+    private bool MoveTags(IEnumerable<string> lazyArguments)
+    {
+        var arguments = lazyArguments.ToList();
+        if (CheckArguments(arguments))
+        {
+            if (_tagParser.Parse(arguments.Last()) is { } destinationTag)
             {
-                result = MoveTags(arguments);
+                return arguments.SkipLast(1).Select(_tagParser.Parse).All(t => t != null && t.Move(destinationTag));
             }
-
-            if (result == false)
-            {
-                _logger.LogWarning("Rename failed");
-            }
-
-            return result;
         }
 
-        private bool MoveTags(IEnumerable<string> lazyArguments)
-        {
-            var arguments = lazyArguments.ToList();
-            if (CheckArguments(arguments))
-            {
-                if (_tagParser.Parse(arguments.Last()) is { } destinationTag)
-                {
-                    return arguments.SkipLast(1).Select(_tagParser.Parse).All(t => t != null && t.Move(destinationTag));
-                }
-            }
+        return false;
+    }
 
-            return false;
-        }
-
-        private bool CheckArguments(IEnumerable<string> arguments)
-        {
-            return arguments.All(a => a.IsTag);
-        }
+    private bool CheckArguments(IEnumerable<string> arguments)
+    {
+        return arguments.All(a => a.IsTag);
     }
 }

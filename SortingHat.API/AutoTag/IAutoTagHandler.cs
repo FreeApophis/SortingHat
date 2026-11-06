@@ -1,13 +1,12 @@
-﻿using SortingHat.API.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
+using SortingHat.API.Models;
 
-namespace SortingHat.API.AutoTag
+namespace SortingHat.API.AutoTag;
+
+public interface IAutoTagHandler
 {
-    public interface IAutoTagHandler
-    {
-        IEnumerable<IAutoTag> AutoTags { get; }
+    IEnumerable<IAutoTag> AutoTags { get; }
 
-        Tag? TagFromMask(string tagMask, FileInfo file);
-    }
+    Tag? TagFromMask(string tagMask, FileInfo file);
 }

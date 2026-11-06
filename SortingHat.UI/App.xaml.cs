@@ -2,24 +2,18 @@
 using System.Windows;
 using Autofac;
 
-namespace SortingHat.UI
+namespace SortingHat.UI;
+
+public partial class App : Application
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
-    public partial class App : Application
+    protected override void OnStartup(StartupEventArgs e)
     {
-        protected override void OnStartup(StartupEventArgs e)
-        {
-            base.OnStartup(e);
+        base.OnStartup(e);
 
-            CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("en-US");
+        CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("en-US");
 
-            new CompositionRoot()
-                .Build()
-                .Resolve<MainWindow>()
-                .ShowDialog();
-        }
+        using var container = new CompositionRoot().Build();
 
+        container.Resolve<MainWindow>().ShowDialog();
     }
 }

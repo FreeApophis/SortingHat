@@ -5,44 +5,43 @@ using Microsoft.Extensions.Logging;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
 
-namespace SortingHat.CLI.Commands.Tags
+namespace SortingHat.CLI.Commands.Tags;
+
+[UsedImplicitly]
+internal class RemoveTagCommand : ICommand
 {
-    [UsedImplicitly]
-    internal class RemoveTagCommand : ICommand
+    private readonly ITagParser _tagParser;
+    private readonly IMainDatabase _db;
+    private readonly ILogger<RemoveTagCommand> _logger;
+
+    public RemoveTagCommand(ITagParser tagParser, IMainDatabase db, ILogger<RemoveTagCommand> logger)
     {
-        private readonly ITagParser _tagParser;
-        private readonly IMainDatabase _db;
-        private readonly ILogger<RemoveTagCommand> _logger;
+        _tagParser = tagParser;
+        _db = db;
+        _logger = logger;
+    }
 
-        public RemoveTagCommand(ITagParser tagParser, IMainDatabase db, ILogger<RemoveTagCommand> logger)
+    public string LongCommand => "remove-tags";
+    public Option<string> ShortCommand => Option<string>.None;
+    public string ShortHelp => "Removes a tag from database";
+    public CommandGrouping CommandGrouping => CommandGrouping.Tag;
+
+    public bool Execute(IEnumerable<string> arguments, IOptionParser options)
+    {
+        foreach (var tagString in arguments)
         {
-            _tagParser = tagParser;
-            _db = db;
-            _logger = logger;
-        }
+            var tag = _tagParser.Parse(tagString);
 
-        public string LongCommand => "remove-tags";
-        public Option<string> ShortCommand => Option<string>.None;
-        public string ShortHelp => "Removes a tag from database";
-        public CommandGrouping CommandGrouping => CommandGrouping.Tag;
-
-        public bool Execute(IEnumerable<string> arguments, IOptionParser options)
-        {
-            foreach (var tagString in arguments)
+            if (tag is null)
             {
-                var tag = _tagParser.Parse(tagString);
-
-                if (tag is null)
-                {
-                    _logger.LogWarning($"Remove tag '{tagString}' failed (parse)");
-                }
-                else if (tag.Destroy() == false)
-                {
-                    _logger.LogWarning($"Remove tag '{tagString}' failed (db)");
-                }
+                _logger.LogWarning($"Remove tag '{tagString}' failed (parse)");
             }
-
-            return true;
+            else if (tag.Destroy() == false)
+            {
+                _logger.LogWarning($"Remove tag '{tagString}' failed (db)");
+            }
         }
+
+        return true;
     }
 }

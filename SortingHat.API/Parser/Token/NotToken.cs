@@ -1,7 +1,6 @@
-﻿namespace SortingHat.API.Parser.Token
+﻿namespace SortingHat.API.Parser.Token;
+
+public class NotToken : OperatorToken
 {
-    public class NotToken : OperatorToken
-    {
-        public override string ToString() => "Not Operator";
-    }
+    public override string ToString() => "Not Operator";
 }

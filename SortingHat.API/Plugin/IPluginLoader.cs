@@ -1,12 +1,11 @@
-﻿using Autofac;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Autofac;
 
-namespace SortingHat.API.Plugin
+namespace SortingHat.API.Plugin;
+
+public interface IPluginLoader
 {
-    public interface IPluginLoader
-    {
-        List<IPlugin> Plugins { get; }
+    List<IPlugin> Plugins { get; }
 
-        void RegisterModules(ContainerBuilder builder);
-    }
+    void RegisterModules(ContainerBuilder builder);
 }

@@ -1,52 +1,50 @@
-﻿using JetBrains.Annotations;
-using SortingHat.API.DI;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
-using apophis.CLI;
-using apophis.CLI.Writer;
+using Apophis.CLI;
+using Apophis.CLI.Writer;
 using Funcky.Monads;
+using JetBrains.Annotations;
+using SortingHat.API.DI;
 
-namespace SortingHat.CLI.Commands
+namespace SortingHat.CLI.Commands;
+
+[UsedImplicitly]
+internal class VersionCommand : ICommand
 {
+    private readonly IConsoleWriter _consoleWriter;
+
     [UsedImplicitly]
-    internal class VersionCommand : ICommand
+    public VersionCommand(IConsoleWriter consoleWriter)
     {
-        private readonly IConsoleWriter _consoleWriter;
+        _consoleWriter = consoleWriter;
+    }
 
-        [UsedImplicitly]
-        public VersionCommand(IConsoleWriter consoleWriter)
-        {
-            _consoleWriter = consoleWriter;
-        }
+    public string LongCommand => "version";
+    public Option<string> ShortCommand => Option.Some("v");
+    public string ShortHelp => "Shows the current Version of this program";
+    public CommandGrouping CommandGrouping => CommandGrouping.General;
 
-        public string LongCommand => "version";
-        public Option<string> ShortCommand => Option.Some("v");
-        public string ShortHelp => "Shows the current Version of this program";
-        public CommandGrouping CommandGrouping => CommandGrouping.General;
+    public bool Execute(IEnumerable<string> arguments, IOptionParser options)
+    {
+        var version = GetVersion();
 
-        public bool Execute(IEnumerable<string> arguments, IOptionParser options)
-        {
-            var version = GetVersion();
+        _consoleWriter.WriteLine($"{nameof(SortingHat)} {version.Version}");
+        _consoleWriter.WriteLine();
 
-            _consoleWriter.WriteLine($"{nameof(SortingHat)} {version.Version}");
-            _consoleWriter.WriteLine();
+        var table = new ConsoleTable(2);
 
-            var table = new ConsoleTable(2);
+        table.Columns[0].Alignment = ConsoleTableColumnAlignment.Right;
 
-            table.Columns[0].Alignment = ConsoleTableColumnAlignment.Right;
+        table.Append("Culture:", version.CultureName ?? "<NULL>");
+        table.Append("Current Culture:", CultureInfo.CurrentCulture);
 
-            table.Append("Culture:", version.CultureName ?? "<NULL>");
-            table.Append("Current Culture:", CultureInfo.CurrentCulture);
+        table.WriteTo(_consoleWriter);
+        return true;
+    }
 
-            table.WriteTo(_consoleWriter);
-            return true;
-        }
-
-        private static AssemblyName GetVersion()
-        {
-            return Assembly.GetExecutingAssembly().GetName();
-        }
-
+    private static AssemblyName GetVersion()
+    {
+        return Assembly.GetExecutingAssembly().GetName();
     }
 }

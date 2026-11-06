@@ -3,52 +3,51 @@ using Funcky.Lexer.Extensions;
 using SortingHat.API.Parser.Nodes;
 using SortingHat.API.Parser.Token;
 
-namespace SortingHat.API.Parser
+namespace SortingHat.API.Parser;
+
+public class FactorParser : IParser
 {
-    public class FactorParser : IParser
+    private readonly ExpressionParser _expressionParser;
+
+    public FactorParser(ExpressionParser expressionParser)
     {
-        private readonly ExpressionParser _expressionParser;
+        _expressionParser = expressionParser;
+    }
 
-        public FactorParser(ExpressionParser expressionParser)
+    /// <summary>
+    /// Parsing the following Production:
+    /// Factor       := Tag | BoolConstant | Not Factor | "(" Expression ").
+    /// </summary>
+    public IParseNode Parse(ILexemeWalker walker)
+    {
+        if (walker.NextIs<TagToken>())
         {
-            _expressionParser = expressionParser;
+            var lexem = walker.Pop();
+            if (lexem.Token is TagToken tagToken && tagToken.Value is { } value)
+            {
+                return new TagNode(value);
+            }
         }
 
-        /// <summary>
-        /// Parsing the following Production:
-        /// Factor       := Tag | BoolConstant | Not Factor | "(" Expression ")
-        /// </summary>
-        public IParseNode Parse(ILexemeWalker walker)
+        if (walker.NextIs<BoolConstantToken>())
         {
-            if (walker.NextIs<TagToken>())
+            var lexem = walker.Pop();
+            if (lexem.Token is BoolConstantToken boolToken)
             {
-                var lexem = walker.Pop();
-                if (lexem.Token is TagToken tagToken && tagToken.Value is { } value)
-                {
-                    return new TagNode(value);
-                }
+                return new BooleanNode(boolToken.Value);
             }
-
-            if (walker.NextIs<BoolConstantToken>())
-            {
-                var lexem = walker.Pop();
-                if (lexem.Token is BoolConstantToken boolToken)
-                {
-                    return new BooleanNode(boolToken.Value);
-                }
-            }
-
-            if (walker.NextIs<NotToken>())
-            {
-                walker.Pop();
-                return new NotOperatorNode(Parse(walker));
-            }
-
-            walker.ExpectOpeningParenthesis();
-            var result = _expressionParser.Parse(walker);
-            walker.ExpectClosingParenthesis();
-
-            return result;
         }
+
+        if (walker.NextIs<NotToken>())
+        {
+            walker.Pop();
+            return new NotOperatorNode(Parse(walker));
+        }
+
+        walker.ExpectOpeningParenthesis();
+        var result = _expressionParser.Parse(walker);
+        walker.ExpectClosingParenthesis();
+
+        return result;
     }
 }

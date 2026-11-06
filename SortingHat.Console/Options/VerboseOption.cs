@@ -1,15 +1,13 @@
 ﻿using Funcky.Monads;
-using SortingHat.API.DI;
 using IOption = SortingHat.API.DI.IOption;
 
-namespace SortingHat.CLI.Options
+namespace SortingHat.CLI.Options;
+
+internal class VerboseOption : IOption
 {
-    class VerboseOption : IOption
-    {
-        public Option<string> ShortOption => Option.Some("v");
+    public Option<string> ShortOption => Option.Some("v");
 
-        public Option<string> LongOption => Option.Some("verbose");
+    public Option<string> LongOption => Option.Some("verbose");
 
-        public string ShortHelp => "More verbose output!";
-    }
+    public string ShortHelp => "More verbose output!";
 }

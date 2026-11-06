@@ -1,7 +1,6 @@
-﻿namespace SortingHat.DB
+﻿namespace SortingHat.DB;
+
+public class Constants
 {
-    public class Constants
-    {
-        public const string ProjectDatabaseKey = "ProjectDatabaseName";
-    }
+    public const string ProjectDatabaseKey = "ProjectDatabaseName";
 }

@@ -1,19 +1,18 @@
 ﻿using Funcky.Lexer.Token;
 
-namespace SortingHat.Plugin.ExtractRelevantText.Token
+namespace SortingHat.Plugin.ExtractRelevantText.Token;
+
+internal class UnmatchedToken : IToken
 {
-    class UnmatchedToken : IToken
+    private string _unmatchedText;
+
+    public UnmatchedToken(string unmatchedText)
     {
-        private string _unmatchedText;
+        _unmatchedText = unmatchedText;
+    }
 
-        public UnmatchedToken(string unmatchedText)
-        {
-            _unmatchedText = unmatchedText;
-        }
-
-        public override string ToString()
-        {
-            return $"Unmatched: {_unmatchedText}";
-        }
+    public override string ToString()
+    {
+        return $"Unmatched: {_unmatchedText}";
     }
 }

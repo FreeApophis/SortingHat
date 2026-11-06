@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace SortingHat.API.DI
+namespace SortingHat.API.DI;
+
+public interface IFilePathExtractor
 {
-    public interface IFilePathExtractor
-    {
-        IEnumerable<string> FromFilePatterns(IEnumerable<string> filePatterns, bool recursive);
-    }
+    IEnumerable<string> FromFilePatterns(IEnumerable<string> filePatterns, bool recursive);
 }

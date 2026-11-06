@@ -1,79 +1,75 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using apophis.CLI.Writer;
-using apophis.FileSystem;
+using Apophis.CLI.Writer;
+using Apophis.FileSystem;
 using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API;
 using SortingHat.API.DI;
 
-namespace SortingHat.CLI.Commands.Projects
+namespace SortingHat.CLI.Commands.Projects;
+
+[UsedImplicitly]
+internal class ExportProjectCommand : ICommand
 {
-    [UsedImplicitly]
-    internal class ExportProjectCommand : ICommand
+    private const string CurrentDirectory = ".";
+    private readonly DatabaseSettings _databaseSettings;
+    private readonly IConsoleWriter _consoleWriter;
+    private readonly ICopyFile _copyFile;
+
+    public ExportProjectCommand(DatabaseSettings databaseSettings, IConsoleWriter consoleWriter, ICopyFile copyFile)
     {
-        private readonly DatabaseSettings _databaseSettings;
-        private readonly IConsoleWriter _consoleWriter;
-        private readonly ICopyFile _copyFile;
-        private const string CurrentDirectory = ".";
+        _databaseSettings = databaseSettings;
+        _consoleWriter = consoleWriter;
+        _copyFile = copyFile;
+    }
 
-        public ExportProjectCommand(DatabaseSettings databaseSettings, IConsoleWriter consoleWriter, ICopyFile copyFile)
+    public CommandGrouping CommandGrouping => CommandGrouping.Project;
+    public string LongCommand => "export";
+    public Option<string> ShortCommand => Option<string>.None;
+    public string ShortHelp => "Exports a project as a file.";
+
+    public bool Execute(IEnumerable<string> arguments, IOptionParser options)
+        => arguments.ToList() switch
         {
-            _databaseSettings = databaseSettings;
-            _consoleWriter = consoleWriter;
-            _copyFile = copyFile;
-        }
-        public CommandGrouping CommandGrouping => CommandGrouping.Project;
-        public string LongCommand => "export";
-        public Option<string> ShortCommand => Option<string>.None;
-        public string ShortHelp => "Exports a project as a file.";
+            [] => NotEnoughArguments(),
+            [var projectName] => ExportProject(projectName, CurrentDirectory),
+            [var projectName, var path] => ExportProject(projectName, path),
+            _ => TooManyArguments(),
+        };
 
-        public bool Execute(IEnumerable<string> lazyArguments, IOptionParser options)
-        {
-            var arguments = lazyArguments.ToList();
+    private bool TooManyArguments()
+    {
+        _consoleWriter.WriteLine("Too many arguments given, please only export one project at a time.");
 
-            return arguments.Count switch
-            {
-                0 => NotEnoughArguments(),
-                1 => ExportProject(arguments.First(), CurrentDirectory),
-                2 => ExportProject(arguments.First(), arguments.Last()),
-                _ => TooManyArguments()
-            };
-        }
+        return false;
+    }
 
-        private bool TooManyArguments()
-        {
-            _consoleWriter.WriteLine("Too many arguments given, please only export one project at a time.");
+    private bool NotEnoughArguments()
+    {
+        _consoleWriter.WriteLine("Too few arguments given, please specify which project to export.");
 
-            return false;
-        }
+        return false;
+    }
 
-        private bool NotEnoughArguments()
-        {
-            _consoleWriter.WriteLine("Too few arguments given, please specify which project to export.");
+    private bool ExportProject(string project, string destination)
+    {
+        _copyFile.Copy(DatabaseSource(project), DestinationPath(destination, project));
+        _consoleWriter.WriteLine($"Project '{project}' has been exported to: {DestinationPath(destination, project)}");
 
-            return false;
-        }
+        return true;
+    }
 
-        private bool ExportProject(string project, string destination)
-        {
-            _copyFile.Copy(DatabaseSource(project), DestinationPath(destination, project));
-            _consoleWriter.WriteLine($"Project '{project}' has been exported to: {DestinationPath(destination, project)}");
+    private string DestinationPath(string destination, string project)
+    {
+        return Directory.Exists(destination)
+            ? Path.Combine(destination, $"{project}.hdb")
+            : destination;
+    }
 
-            return true;
-        }
-
-        private string DestinationPath(string destination, string project)
-        {
-            return Directory.Exists(destination)
-                ? Path.Combine(destination, $"{project}.hdb")
-                : destination;
-        }
-
-        private string DatabaseSource(string project)
-        {
-            return Path.Combine(_databaseSettings.DbPath, $"{project}.db");
-        }
+    private string DatabaseSource(string project)
+    {
+        return Path.Combine(_databaseSettings.DbPath, $"{project}.db");
     }
 }

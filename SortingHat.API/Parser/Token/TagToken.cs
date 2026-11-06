@@ -1,16 +1,15 @@
 ﻿using Funcky.Lexer.Token;
 
-namespace SortingHat.API.Parser.Token
+namespace SortingHat.API.Parser.Token;
+
+public class TagToken : IToken
 {
-    public class TagToken : IToken
+    public TagToken(string? value)
     {
-        public TagToken(string? value)
-        {
-            Value = value;
-        }
-
-        public string? Value { get; }
-
-        public override string ToString() => $"Tag: {Value}";
+        Value = value;
     }
+
+    public string? Value { get; }
+
+    public override string ToString() => $"Tag: {Value}";
 }

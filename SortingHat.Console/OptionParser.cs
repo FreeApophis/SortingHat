@@ -1,40 +1,38 @@
-﻿using Funcky.Monads;
-using SortingHat.API.DI;
-using IOption = SortingHat.API.DI.IOption;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Funcky.Monads;
+using SortingHat.API.DI;
+using IOption = SortingHat.API.DI.IOption;
 
-namespace SortingHat.CLI
+namespace SortingHat.CLI;
+
+internal sealed class OptionParser : IOptionParser
 {
-    internal sealed class OptionParser : IOptionParser
+    private readonly IEnumerable<string> _options;
+
+    public OptionParser(IEnumerable<string> options)
     {
-        readonly IEnumerable<string> _options;
-        public OptionParser(IEnumerable<string> options)
-        {
-            _options = options.Select(ToKeys);
-        }
+        _options = options.Select(ToKeys);
+    }
 
-        public bool HasOption<TOption>()
-            where TOption : IOption, new()
-        {
-            var option = new TOption();
+    public bool HasOption<TOption>()
+        where TOption : IOption, new()
+    {
+        var option = new TOption();
 
-            return _options
-                .Any(AnyOption(option.ShortOption, option.LongOption));
-        }
+        return _options
+            .Any(AnyOption(option.ShortOption, option.LongOption));
+    }
 
-        private string ToKeys(string option)
-        {
-            return option.TrimStart('-').ToLower();
-        }
+    private string ToKeys(string option)
+    {
+        return option.TrimStart('-').ToLower();
+    }
 
-        private static Func<string, bool> AnyOption(Option<string> shortOption, Option<string> longOption)
-        {
-            return option => shortOption.Match(false, o => string.Equals(o, option, StringComparison.OrdinalIgnoreCase))
-                || longOption.Match(false, o => string.Equals(o, option, StringComparison.OrdinalIgnoreCase));
-        }
-
-
+    private static Func<string, bool> AnyOption(Option<string> shortOption, Option<string> longOption)
+    {
+        return option => shortOption.Match(none: false, some: o => string.Equals(o, option, StringComparison.OrdinalIgnoreCase))
+            || longOption.Match(none: false, some: o => string.Equals(o, option, StringComparison.OrdinalIgnoreCase));
     }
 }

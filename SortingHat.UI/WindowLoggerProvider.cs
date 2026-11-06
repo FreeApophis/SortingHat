@@ -1,18 +1,15 @@
-﻿using System;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
-namespace SortingHat.UI
+namespace SortingHat.UI;
+
+internal sealed class WindowLoggerProvider : ILoggerProvider
 {
-    class WindowLoggerProvider : ILoggerProvider
+    public void Dispose()
     {
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
+    }
 
-        public ILogger CreateLogger(string categoryName)
-        {
-            return new LoggerWindow();
-        }
+    public ILogger CreateLogger(string categoryName)
+    {
+        return new LoggerWindow();
     }
 }

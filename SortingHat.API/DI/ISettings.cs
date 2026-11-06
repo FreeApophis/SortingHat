@@ -1,8 +1,8 @@
-﻿namespace SortingHat.API.DI
+﻿namespace SortingHat.API.DI;
+
+public interface ISettings
 {
-    public interface ISettings
-    {
-        string? this[string key] { get; set; }
-        bool HasValue(string key);
-    }
+    string? this[string key] { get; set; }
+
+    bool HasValue(string key);
 }

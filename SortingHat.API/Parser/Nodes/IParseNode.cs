@@ -1,7 +1,6 @@
-﻿namespace SortingHat.API.Parser.Nodes
+﻿namespace SortingHat.API.Parser.Nodes;
+
+public interface IParseNode
 {
-    public interface IParseNode
-    {
-        void Accept(INodeVisitor visitor);
-    }
+    void Accept(INodeVisitor visitor);
 }

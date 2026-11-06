@@ -4,32 +4,32 @@ using Funcky.Lexer.Extensions;
 using SortingHat.API.Parser.Nodes;
 using SortingHat.API.Parser.Token;
 
-namespace SortingHat.API.Parser
+namespace SortingHat.API.Parser;
+
+/// <summary>
+/// Parsing the following Production:
+/// Expression   := Term { Or Term }.
+/// </summary>
+public class ExpressionParser : IParser
 {
-    /// <summary>
-    /// Parsing the following Production:
-    /// Expression   := Term { Or Term }
-    /// </summary>
-    public class ExpressionParser : IParser
+    // Break the dependency cycle
+    public TermParser? TermParser { get; set; }
+
+    public IParseNode Parse(ILexemeWalker walker)
     {
-        // Break the dependency cycle
-        public TermParser? TermParser { get; set; }
+        Debug.Assert(TermParser != null, "The TermParser must be set before parsing, it is injected as a property to break the dependency cycle.");
 
-        public IParseNode Parse(ILexemeWalker walker)
+        var result = TermParser.Parse(walker);
+
+        while (walker.NextIs<OrToken>())
         {
-            Debug.Assert(TermParser != null);
-
-            var result = TermParser.Parse(walker);
-
-            while (walker.NextIs<OrToken>())
+            var lexem = walker.Pop();
+            if (lexem.Token is OrToken)
             {
-                var lexem = walker.Pop();
-                if (lexem.Token is OrToken)
-                {
-                    result = new OrOperatorNode(result, TermParser.Parse(walker));
-                }
+                result = new OrOperatorNode(result, TermParser.Parse(walker));
             }
-            return result;
         }
+
+        return result;
     }
 }

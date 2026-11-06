@@ -1,10 +1,10 @@
 ﻿using System;
 
-namespace SortingHat.API.AutoTag
+namespace SortingHat.API.AutoTag;
+
+public class HourPart : IDateTagPart
 {
-    public class HourPart : IDateTagPart
-    {
-        public string Key => nameof(DateTime.Hour);
-        public string Select(DateTime dateTime) => $"{dateTime.Hour}";
-    }
+    public string Key => nameof(DateTime.Hour);
+
+    public string Select(DateTime dateTime) => $"{dateTime.Hour}";
 }

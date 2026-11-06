@@ -1,32 +1,31 @@
-﻿using JetBrains.Annotations;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 
-namespace SortingHat.Plugin.FileType.Detectors
+namespace SortingHat.Plugin.FileType.Detectors;
+
+[UsedImplicitly]
+internal class FileTypeFinder : IFileTypeFinder
 {
-    [UsedImplicitly]
-    internal class FileTypeFinder : IFileTypeFinder
+    private readonly IEnumerable<IFileTypeDetector> _detectors;
+
+    public FileTypeFinder(IEnumerable<IFileTypeDetector> detectors)
     {
-        private readonly IEnumerable<IFileTypeDetector> _detectors;
+        _detectors = detectors;
+    }
 
-        public FileTypeFinder(IEnumerable<IFileTypeDetector> detectors)
-        {
-            _detectors = detectors;
-        }
+    public FileType? Identify(FileInfo file)
+    {
+        using var stream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
-        public FileType? Identify(FileInfo file)
-        {
-            using var stream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        return Identify(stream);
+    }
 
-            return Identify(stream);
-        }
-
-        public FileType? Identify(Stream stream)
-        {
-            return _detectors
-                .Select(detector => detector.Detect(stream))
-                .FirstOrDefault(fileType => fileType != null);
-        }
+    public FileType? Identify(Stream stream)
+    {
+        return _detectors
+            .Select(detector => detector.Detect(stream))
+            .FirstOrDefault(fileType => fileType != null);
     }
 }

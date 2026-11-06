@@ -1,7 +1,6 @@
-﻿namespace SortingHat.API
+﻿namespace SortingHat.API;
+
+public class LoggerSettings
 {
-    public class LoggerSettings
-    {
-        public string FileName { get; set; } = "";
-    }
+    public string FileName { get; set; } = string.Empty;
 }

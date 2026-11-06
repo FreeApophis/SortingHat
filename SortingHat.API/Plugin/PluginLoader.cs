@@ -1,69 +1,68 @@
-﻿using Autofac;
-using Autofac.Core;
-using JetBrains.Annotations;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using apophis.FileSystem;
+using Apophis.FileSystem;
+using Autofac;
+using Autofac.Core;
+using JetBrains.Annotations;
 
-namespace SortingHat.API.Plugin
+namespace SortingHat.API.Plugin;
+
+[UsedImplicitly]
+public class PluginLoader : IPluginLoader
 {
-    [UsedImplicitly]
-    public class PluginLoader : IPluginLoader
+    private readonly IExistsDirectory _existsDirectory;
+
+    public PluginLoader(IExistsDirectory existsDirectory)
     {
-        private readonly IExistsDirectory _existsDirectory;
+        _existsDirectory = existsDirectory;
+    }
 
-        public PluginLoader(IExistsDirectory existsDirectory)
+    public List<IPlugin> Plugins { get; } = new List<IPlugin>();
+
+    private static string PluginDirectory => Path.Combine(AppContext.BaseDirectory, "plugins");
+
+    private static string PluginFilePattern => "*.dll";
+
+    public void RegisterModules(ContainerBuilder builder)
+    {
+        foreach (var assembly in GetPluginAssemblies())
         {
-            _existsDirectory = existsDirectory;
-        }
+            // Gets the all modules from each assembly to be registered.
+            //  Make sure that each module **MUST** have a parameterless constructor.
+            var modules = assembly.GetTypes()
+                .Where(p => typeof(IModule).IsAssignableFrom(p) && !p.IsAbstract)
+                .Select(p => Activator.CreateInstance(p))
+                .OfType<IModule>();
 
-        public List<IPlugin> Plugins { get; } = new List<IPlugin>();
-
-        private static string PluginDirectory => Path.Combine(AppContext.BaseDirectory, "plugins");
-
-        private static string PluginFilePattern => "*.dll";
-
-        public void RegisterModules(ContainerBuilder builder)
-        {
-            foreach (var assembly in GetPluginAssemblies())
+            // Registers each module.
+            foreach (var module in modules)
             {
-                //  Gets the all modules from each assembly to be registered.
-                //  Make sure that each module **MUST** have a parameterless constructor.
-                var modules = assembly.GetTypes()
-                    .Where(p => typeof(IModule).IsAssignableFrom(p) && !p.IsAbstract)
-                    .Select(p => Activator.CreateInstance(p))
-                    .OfType<IModule>();
-
-                //  Registers each module.
-                foreach (var module in modules)
-                {
-                    RegisterModule(builder, module);
-                }
+                RegisterModule(builder, module);
             }
         }
+    }
 
-        private void RegisterModule(ContainerBuilder builder, IModule module)
+    private void RegisterModule(ContainerBuilder builder, IModule module)
+    {
+        // A plugin module must also implement the IPlugin interface
+        if (module is IPlugin plugin)
         {
-            // A plugin module must also implement the IPlugin interface
-            if (module is IPlugin plugin)
-            {
-                builder.RegisterModule(module);
-                Plugins.Add(plugin);
-            }
+            builder.RegisterModule(module);
+            Plugins.Add(plugin);
+        }
+    }
+
+    private IEnumerable<Assembly> GetPluginAssemblies()
+    {
+        if (_existsDirectory.Exists(PluginDirectory))
+        {
+            return Directory.GetFiles(PluginDirectory, PluginFilePattern, SearchOption.TopDirectoryOnly)
+                .Select(Assembly.LoadFrom);
         }
 
-        private IEnumerable<Assembly> GetPluginAssemblies()
-        {
-            if (_existsDirectory.Exists(PluginDirectory))
-            {
-                return Directory.GetFiles(PluginDirectory, PluginFilePattern, SearchOption.TopDirectoryOnly)
-                    .Select(Assembly.LoadFrom);
-            }
-
-            return Enumerable.Empty<Assembly>();
-        }
+        return Enumerable.Empty<Assembly>();
     }
 }

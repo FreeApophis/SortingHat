@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" />
+    <PackageReference Include="Funcky" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Apophis.Utils\Apophis.Utils.csproj" />
+  </ItemGroup>
+
+</Project>

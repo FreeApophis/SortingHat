@@ -1,7 +1,6 @@
-﻿namespace SortingHat.API.Parser.Token
+﻿namespace SortingHat.API.Parser.Token;
+
+public class AndToken : OperatorToken
 {
-    public class AndToken : OperatorToken
-    {
-        public override string ToString() => "And Operator";
-    }
+    public override string ToString() => "And Operator";
 }

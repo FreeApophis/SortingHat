@@ -8,9 +8,9 @@
     <File Path="LICENSE" />
     <File Path="README.md" />
   </Folder>
-  <Project Path="apophis.CLI/apophis.CLI.csproj" />
-  <Project Path="apophis.FileSystem/apophis.FileSystem.csproj" />
-  <Project Path="apophis.Utils/apophis.Utils.csproj" />
+  <Project Path="Apophis.CLI/Apophis.CLI.csproj" />
+  <Project Path="Apophis.FileSystem/Apophis.FileSystem.csproj" />
+  <Project Path="Apophis.Utils/Apophis.Utils.csproj" />
   <Project Path="SortingHat.API/SortingHat.API.csproj" />
   <Project Path="SortingHat.Console/SortingHat.CLI.csproj" />
   <Project Path="SortingHat.DB/SortingHat.DB.csproj" />

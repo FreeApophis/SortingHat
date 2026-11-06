@@ -1,10 +1,10 @@
 ﻿using System;
 
-namespace SortingHat.API.AutoTag
+namespace SortingHat.API.AutoTag;
+
+public interface IDateTagPart
 {
-    public interface IDateTagPart
-    {
-        string Key { get; }
-        string Select(DateTime dateTime);
-    }
+    string Key { get; }
+
+    string Select(DateTime dateTime);
 }

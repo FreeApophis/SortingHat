@@ -1,6 +1,5 @@
-﻿namespace SortingHat.API.DI
+﻿namespace SortingHat.API.DI;
+
+public interface IProjectDatabase : IDatabase
 {
-    public interface IProjectDatabase : IDatabase
-    {
-    }
 }

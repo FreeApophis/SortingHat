@@ -2,42 +2,41 @@
 using Microsoft.Data.Sqlite;
 using SortingHat.API.DI;
 
-namespace SortingHat.DB.Access
+namespace SortingHat.DB.Access;
+
+public class SQLiteProjects : IProjects
 {
-    public class SQLiteProjects : IProjects
+    private readonly SQLiteMainDatabase _db;
+
+    public SQLiteProjects(SQLiteMainDatabase db)
     {
-        private readonly SQLiteMainDatabase _db;
+        _db = db;
+    }
 
-        public SQLiteProjects(SQLiteMainDatabase db)
+    public IEnumerable<string> GetProjects()
+    {
+        var projects = new List<string>();
+        using var reader = _db.ExecuteReader("SELECT Name FROM Projects");
+
+        while (reader.Read())
         {
-            _db = db;
+            projects.Add(reader.GetString(0));
         }
 
-        public IEnumerable<string> GetProjects()
-        {
-            var projects = new List<string>();
-            var reader = _db.ExecuteReader("SELECT Name FROM Projects");
+        return projects;
+    }
 
-            while (reader.Read())
-            {
-                projects.Add(reader.GetString(0));
-            }
+    public bool AddProject(string project)
+    {
+        _db.ExecuteNonQuery("INSERT INTO [Projects] ([Name]) VALUES (@project)", new SqliteParameter("@project", project));
 
-            return projects;
-        }
+        return true;
+    }
 
-        public bool AddProject(string project)
-        {
-            _db.ExecuteNonQuery("INSERT INTO [Projects] ([Name]) VALUES (@project)", new SqliteParameter("@project", project));
+    public bool RemoveProject(string project)
+    {
+        _db.ExecuteNonQuery("DELETE FROM [Projects] WHERE [NAME] = @project", new SqliteParameter("@project", project));
 
-            return true;
-        }
-
-        public bool RemoveProject(string project)
-        {
-            _db.ExecuteNonQuery("DELETE FROM [Projects] WHERE [NAME] = @project", new SqliteParameter("@project", project));
-
-            return true;
-        }
+        return true;
     }
 }

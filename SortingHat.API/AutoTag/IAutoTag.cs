@@ -1,13 +1,14 @@
 ﻿using System.IO;
 
-namespace SortingHat.API.AutoTag
+namespace SortingHat.API.AutoTag;
+
+public interface IAutoTag
 {
-    public interface IAutoTag
-    {
-        string AutoTagKey { get; }
-        string Description { get; }
-        string HumanReadableAutoTagsKey { get; }
-        string? FindMatch(string value);
-        string? HandleTag(FileInfo file, string? tagMatch);
-    }
+    string AutoTagKey { get; }
+    string Description { get; }
+    string HumanReadableAutoTagsKey { get; }
+
+    string? FindMatch(string value);
+
+    string? HandleTag(FileInfo file, string? tagMatch);
 }

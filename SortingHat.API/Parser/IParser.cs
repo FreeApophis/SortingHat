@@ -1,10 +1,9 @@
 ﻿using Funcky.Lexer;
 using SortingHat.API.Parser.Nodes;
 
-namespace SortingHat.API.Parser
+namespace SortingHat.API.Parser;
+
+public interface IParser
 {
-    public interface IParser
-    {
-        IParseNode Parse(ILexemeWalker walker);
-    }
+    IParseNode Parse(ILexemeWalker walker);
 }

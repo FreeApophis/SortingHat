@@ -1,9 +1,8 @@
 ﻿using System.IO;
 
-namespace SortingHat.Plugin.FileType.Detectors
+namespace SortingHat.Plugin.FileType.Detectors;
+
+internal interface IFileTypeDetector
 {
-    internal interface IFileTypeDetector
-    {
-        FileType? Detect(Stream file);
-    }
+    FileType? Detect(Stream file);
 }

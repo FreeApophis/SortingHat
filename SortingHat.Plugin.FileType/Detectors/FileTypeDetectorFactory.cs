@@ -1,21 +1,20 @@
 ﻿using System;
 
-namespace SortingHat.Plugin.FileType.Detectors
+namespace SortingHat.Plugin.FileType.Detectors;
+
+internal static class FileTypeDetectorFactory
 {
-    internal static class FileTypeDetectorFactory
+    private const int FileTypeDetectorOffset = 0;
+
+    internal static IFileTypeDetector Create(string signature)
     {
-        private const int FileTypeDetectorOffset = 0;
+        var parts = signature.Split(',');
 
-        internal static IFileTypeDetector Create(string signature)
+        return parts[FileTypeDetectorOffset] switch
         {
-            var parts = signature.Split(',');
-
-            return parts[FileTypeDetectorOffset] switch
-            {
-                "basic" => new BasicFileTypeDetector(parts),
-                "ts" => new TransportStreamDetector(parts),
-                _ => throw new NotImplementedException("Unknown FileTypeDetector")
-            };
-        }
+            "basic" => new BasicFileTypeDetector(parts),
+            "ts" => new TransportStreamDetector(parts),
+            _ => throw new NotImplementedException("Unknown FileTypeDetector"),
+        };
     }
 }

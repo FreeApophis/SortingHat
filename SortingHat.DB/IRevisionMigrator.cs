@@ -1,7 +1,6 @@
-﻿namespace SortingHat.DB
+﻿namespace SortingHat.DB;
+
+internal interface IRevisionMigrator
 {
-    internal interface IRevisionMigrator
-    {
-        void Migrate(SQLiteDatabase db);
-    }
+    void Migrate(SQLiteDatabase db);
 }

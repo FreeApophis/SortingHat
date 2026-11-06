@@ -2,51 +2,50 @@
 using SortingHat.API.DI;
 using SortingHat.API.Models;
 
-namespace SortingHat.Test.Mock
+namespace SortingHat.Test.Mock;
+
+public class MockTagStore : ITag
 {
-    public class MockTagStore : ITag
+    private MockTagStore()
     {
-        public List<Tag> Tags { get; } = new List<Tag>();
+    }
 
-        private MockTagStore()
-        {
-        }
+    public List<Tag> Tags { get; } = new List<Tag>();
 
-        public bool Destroy(Tag tag)
-        {
-            throw new System.NotImplementedException();
-        }
+    public static MockTagStore Create()
+    {
+        return new MockTagStore();
+    }
 
-        public long FileCount(Tag tag)
-        {
-            return 0;
-        }
+    public bool Destroy(Tag tag)
+    {
+        throw new System.NotImplementedException();
+    }
 
-        public IEnumerable<Tag> GetTags()
-        {
-            return Tags;
-        }
+    public long FileCount(Tag tag)
+    {
+        return 0;
+    }
 
-        public bool Move(Tag tag, Tag destinationTag)
-        {
-            throw new System.NotImplementedException();
-        }
+    public IEnumerable<Tag> GetTags()
+    {
+        return Tags;
+    }
 
-        public bool Rename(Tag tag, string newName)
-        {
-            throw new System.NotImplementedException();
-        }
+    public bool Move(Tag tag, Tag destinationTag)
+    {
+        throw new System.NotImplementedException();
+    }
 
-        public bool Store(Tag tag)
-        {
-            Tags.Add(tag);
+    public bool Rename(Tag tag, string newName)
+    {
+        throw new System.NotImplementedException();
+    }
 
-            return true;
-        }
+    public bool Store(Tag tag)
+    {
+        Tags.Add(tag);
 
-        public static MockTagStore Create()
-        {
-            return new MockTagStore();
-        }
+        return true;
     }
 }

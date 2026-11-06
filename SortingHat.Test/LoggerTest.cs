@@ -1,15 +1,13 @@
 ﻿using Xunit;
 
-namespace SortingHat.Test
+namespace SortingHat.Test;
+
+public class LoggerTest
 {
-    public class LoggerTest
+    private const string Message = "This is a message!";
+
+    [Fact]
+    public void BasicLoggerTest()
     {
-        const string message = "This is a message!";
-
-        [Fact]
-        public void BasicLoggerTest()
-        {
-
-        }
     }
 }

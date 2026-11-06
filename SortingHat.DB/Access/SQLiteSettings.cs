@@ -1,42 +1,42 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using System;
+using Microsoft.Data.Sqlite;
 using SortingHat.API.DI;
-using System;
 
-namespace SortingHat.DB.Access
+namespace SortingHat.DB.Access;
+
+internal class SQLiteSettings : ISettings
 {
-    class SQLiteSettings : ISettings
+    private readonly SQLiteMainDatabase _db;
+
+    public SQLiteSettings(SQLiteMainDatabase db)
     {
-        private readonly SQLiteMainDatabase _db;
+        _db = db;
+    }
 
-        public SQLiteSettings(SQLiteMainDatabase db)
-        {
-            _db = db;
-        }
+    public string? this[string key]
+    {
+        get => GetValue(key);
+        set => SetValue(key, value);
+    }
 
-        public string? this[string key]
-        {
-            get => GetValue(key);
-            set => SetValue(key, value);
-        }
+    public bool HasValue(string key)
+    {
+        var result = _db.ExecuteScalar("SELECT Id FROM [SETTINGS] WHERE Key = @key", new SqliteParameter("@key", key));
 
-        public bool HasValue(string key)
-        {
-            var result = _db.ExecuteScalar("SELECT Id FROM [SETTINGS] WHERE Key = @key", new SqliteParameter("@key", key));
+        return result != null;
+    }
 
-            return result != null;
-        }
+    private string? GetValue(string key)
+    {
+        // null if the key does not exist, DBNull if the value is NULL
+        return _db.ExecuteScalar("SELECT [Value] FROM [SETTINGS] WHERE Key = @key", new SqliteParameter("@key", key)) as string;
+    }
 
-        private string? GetValue(string key)
-        {
-            // null if the key does not exist, DBNull if the value is NULL
-            return _db.ExecuteScalar("SELECT [Value] FROM [SETTINGS] WHERE Key = @key", new SqliteParameter("@key", key)) as string;
-        }
-
-        private void SetValue(string key, string? value)
-        {
-            _db.ExecuteNonQuery("INSERT INTO [Settings] ([Key], [Value]) VALUES (@key, @value)",
-                new SqliteParameter("@key", key),
-                new SqliteParameter("@value", (object?)value ?? DBNull.Value));
-        }
+    private void SetValue(string key, string? value)
+    {
+        _db.ExecuteNonQuery(
+            "INSERT INTO [Settings] ([Key], [Value]) VALUES (@key, @value)",
+            new SqliteParameter("@key", key),
+            new SqliteParameter("@value", (object?)value ?? DBNull.Value));
     }
 }

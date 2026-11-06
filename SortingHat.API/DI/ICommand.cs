@@ -1,25 +1,23 @@
 ﻿using System.Collections.Generic;
 using Funcky.Monads;
 
-namespace SortingHat.API.DI
+namespace SortingHat.API.DI;
+
+public interface ICommand
 {
-    public interface ICommand
-    {
-        CommandGrouping CommandGrouping { get; }
+    CommandGrouping CommandGrouping { get; }
 
-        string LongCommand { get; }
+    string LongCommand { get; }
 
-        /// <summary>
-        /// Can be null
-        /// </summary>
-        Option<string> ShortCommand { get; }
+    /// <summary>
+    /// Can be null.
+    /// </summary>
+    Option<string> ShortCommand { get; }
 
-        /// <summary>
-        /// Should return a single line description
-        /// </summary>
-        /// <returns></returns>
-        string ShortHelp { get; }
+    /// <summary>
+    /// Should return a single line description.
+    /// </summary>
+    string ShortHelp { get; }
 
-        bool Execute(IEnumerable<string> arguments, IOptionParser options);
-    }
+    bool Execute(IEnumerable<string> arguments, IOptionParser options);
 }

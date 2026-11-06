@@ -1,10 +1,9 @@
-﻿namespace SortingHat.API.DI
+﻿namespace SortingHat.API.DI;
+
+public enum CommandGrouping
 {
-    public enum CommandGrouping
-    {
-        General,
-        Tag,
-        File,
-        Project
-    }
+    General,
+    Tag,
+    File,
+    Project,
 }

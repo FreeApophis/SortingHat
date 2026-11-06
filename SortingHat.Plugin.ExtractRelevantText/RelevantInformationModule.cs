@@ -1,0 +1,25 @@
+﻿using Autofac;
+using JetBrains.Annotations;
+using SortingHat.API.DI;
+using SortingHat.API.Plugin;
+
+namespace SortingHat.Plugin.ExtractRelevantText;
+
+[UsedImplicitly]
+internal class RelevantInformationModule : Autofac.Module, IPlugin
+{
+    public string Name => "Relevant Information Extractor";
+    public string Description => "This plugin can automatically tag files according to their text content (txt).";
+
+    protected override void Load(ContainerBuilder builder)
+    {
+        builder.RegisterType<FolderScanner>().AsSelf();
+        builder.RegisterType<ScanCommand>().As<ICommand>();
+
+        RegisterSupportedTags(builder);
+    }
+
+    private static void RegisterSupportedTags(ContainerBuilder builder)
+    {
+    }
+}

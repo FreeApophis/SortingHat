@@ -1,23 +1,21 @@
-﻿using System;
-using SortingHat.API.Parser.OperatorType;
+﻿using SortingHat.API.Parser.OperatorType;
 
-namespace SortingHat.API.Parser.Nodes
+namespace SortingHat.API.Parser.Nodes;
+
+public class NotOperatorNode : UnaryOperatorNode
 {
-    public class NotOperatorNode : UnaryOperatorNode
+    internal NotOperatorNode(IParseNode operand)
+        : base(operand)
     {
-        internal NotOperatorNode(IParseNode operand) : base(operand)
-        {
-        }
+    }
 
-        public override void Accept(INodeVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
+    public override void Accept(INodeVisitor visitor)
+    {
+        visitor.Visit(this);
+    }
 
-        internal object ToString(IOperatorType operatorType)
-        {
-            return operatorType.Not;
-        }
-
+    internal object ToString(IOperatorType operatorType)
+    {
+        return operatorType.Not;
     }
 }

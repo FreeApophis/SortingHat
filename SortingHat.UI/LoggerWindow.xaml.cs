@@ -1,45 +1,39 @@
 ﻿using System;
 using System.Windows;
-using System.Windows.Controls;
 using Microsoft.Extensions.Logging;
 
-namespace SortingHat.UI
+namespace SortingHat.UI;
+
+public partial class LoggerWindow : Window, ILogger
 {
-    internal class LogItem
+    public LoggerWindow()
     {
-        public LogLevel LogLevel { get; }
-
-        public LogItem(LogLevel logLevel)
-        {
-            LogLevel = logLevel;
-        }
-
+        InitializeComponent();
     }
 
-    /// <summary>
-    /// Interaction logic for LoggerWindow.xaml
-    /// </summary>
-    public partial class LoggerWindow : Window, ILogger
+    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {
-        public LoggerWindow()
-        {
-            InitializeComponent();
-        }
-
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
-        {
-            LogView.Items.Add(new LogItem(logLevel));
-        }
-
-        bool ILogger.IsEnabled(LogLevel logLevel)
-        {
-            return false;
-        }
-
-        public IDisposable? BeginScope<TState>(TState state)
-            where TState : notnull
-        {
-            throw new NotImplementedException();
-        }
+        LogView.Items.Add(new LogItem(logLevel));
     }
+
+    bool ILogger.IsEnabled(LogLevel logLevel)
+    {
+        return false;
+    }
+
+    public IDisposable? BeginScope<TState>(TState state)
+        where TState : notnull
+    {
+        throw new NotImplementedException();
+    }
+}
+
+internal class LogItem
+{
+    public LogItem(LogLevel logLevel)
+    {
+        LogLevel = logLevel;
+    }
+
+    public LogLevel LogLevel { get; }
 }

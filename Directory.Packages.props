@@ -4,6 +4,10 @@
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
   <ItemGroup>
+    <GlobalPackageReference Include="Funcky.Analyzers" Version="2.1.0" />
+    <GlobalPackageReference Include="Polyadic.CodeStyle" Version="1.2.3" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageVersion Include="Autofac" Version="9.3.4" />
     <PackageVersion Include="Funcky" Version="3.8.0" />
     <PackageVersion Include="Funcky.Lexer" Version="2.0.0" />

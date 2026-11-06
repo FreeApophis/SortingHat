@@ -1,7 +1,7 @@
-﻿namespace SortingHat.API.DI
+﻿namespace SortingHat.API.DI;
+
+public interface IOptionParser
 {
-    public interface IOptionParser
-    {
-        bool HasOption<TOption>() where TOption : IOption, new();
-    }
+    bool HasOption<TOption>()
+        where TOption : IOption, new();
 }

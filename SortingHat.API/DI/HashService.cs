@@ -3,39 +3,38 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
-using apophis.CLI.Writer;
+using Apophis.CLI.Writer;
 
-namespace SortingHat.API.DI
+namespace SortingHat.API.DI;
+
+public class HashService : IHashService
 {
-    public class HashService : IHashService
+    private readonly HashAlgorithm _hashAlgorithm;
+    private readonly IConsoleWriter _consoleWriter;
+    private readonly string _hashPrefix;
+
+    public HashService(HashAlgorithm hashAlgorithm, string hashPrefix, IConsoleWriter consoleWriter)
     {
-        private readonly HashAlgorithm _hashAlgorithm;
-        private readonly IConsoleWriter _consoleWriter;
-        private readonly string _hashPrefix;
+        _hashAlgorithm = hashAlgorithm;
+        _consoleWriter = consoleWriter;
+        _hashPrefix = hashPrefix.ToLower();
+    }
 
-        public HashService(HashAlgorithm hashAlgorithm, string hashPrefix, IConsoleWriter consoleWriter)
+    public Task<string> GetHash(string path)
+    {
+        return Task.Run(() =>
         {
-            _hashAlgorithm = hashAlgorithm;
-            _consoleWriter = consoleWriter;
-            _hashPrefix = hashPrefix.ToLower();
-        }
+            using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
-        public Task<string> GetHash(string path)
-        {
-            return Task.Run(() =>
-            {
-                using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            _consoleWriter.WriteLine($"Hashing: '{path}'");
+            var hash = _hashAlgorithm.ComputeHash(fileStream);
+            _consoleWriter.WriteLine($"End Hashing: '{path}'");
+            return $"{_hashPrefix}:{ToHex(hash)}";
+        });
+    }
 
-                _consoleWriter.WriteLine($"Hashing: '{path}'");
-                var hash = _hashAlgorithm.ComputeHash(fileStream);
-                _consoleWriter.WriteLine($"End Hashing: '{path}'");
-                return $"{_hashPrefix}:{ToHex(hash)}";
-            });
-        }
-
-        private static string ToHex(IEnumerable<byte> hash)
-        {
-            return string.Concat(hash.Select(x => x.ToString("x2")));
-        }
+    private static string ToHex(IEnumerable<byte> hash)
+    {
+        return string.Concat(hash.Select(x => x.ToString("x2")));
     }
 }

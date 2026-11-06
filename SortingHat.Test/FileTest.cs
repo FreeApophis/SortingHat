@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace SortingHat.Test;
 
-namespace SortingHat.Test
+internal class FileTest
 {
-    class FileTest
-    {
-        
-    }
 }

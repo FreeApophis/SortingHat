@@ -1,8 +1,7 @@
 ﻿using Funcky.Lexer.Token;
 
-namespace SortingHat.API.Parser.Token
+namespace SortingHat.API.Parser.Token;
+
+public abstract class OperatorToken : IToken
 {
-    public abstract class OperatorToken : IToken
-    {
-    }
 }

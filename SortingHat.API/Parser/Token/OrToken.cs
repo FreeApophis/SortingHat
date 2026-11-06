@@ -1,7 +1,6 @@
-﻿namespace SortingHat.API.Parser.Token
+﻿namespace SortingHat.API.Parser.Token;
+
+public class OrToken : OperatorToken
 {
-    public class OrToken : OperatorToken
-    {
-        public override string ToString() => "Or Operator";
-    }
+    public override string ToString() => "Or Operator";
 }

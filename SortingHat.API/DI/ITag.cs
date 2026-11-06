@@ -1,19 +1,19 @@
-﻿using SortingHat.API.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using SortingHat.API.Models;
 
-namespace SortingHat.API.DI
+namespace SortingHat.API.DI;
+
+public interface ITag
 {
-    public interface ITag
-    {
-        bool Store(Tag tag);
-        bool Destroy(Tag tag);
+    bool Store(Tag tag);
 
-        bool Rename(Tag tag, string newName);
-        bool Move(Tag tag, Tag destinationTag);
+    bool Destroy(Tag tag);
 
-        long FileCount(Tag tag);
+    bool Rename(Tag tag, string newName);
 
-        IEnumerable<Tag> GetTags();
+    bool Move(Tag tag, Tag destinationTag);
 
-    }
+    long FileCount(Tag tag);
+
+    IEnumerable<Tag> GetTags();
 }
