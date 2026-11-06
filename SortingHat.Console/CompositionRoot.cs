@@ -52,7 +52,6 @@ internal class CompositionRoot
         Builder.RegisterType<PluginLoader>().As<IPluginLoader>().SingleInstance();
 
         RegisterCommands();
-        RegisterOptions();
         RegisterAutoTags();
 
         RegisterConfiguration();
@@ -96,13 +95,8 @@ internal class CompositionRoot
         Builder.RegisterType<FileOperations<ICopyFile>>().AsSelf();
         Builder.RegisterType<FileOperations<IMoveFile>>().AsSelf();
 
-        var cliAssembly = GetType().Assembly;
-
-        Builder.RegisterAssemblyTypes(cliAssembly)
-            .Where(type => IsCommandClass(type) && type.IsAssignableTo<ICommand>())
-            .As<ICommand>();
-
-        Builder.RegisterAssemblyTypes(cliAssembly)
+        // every built-in command is an IDeclaredCommand, only plugins may still register an ICommand
+        Builder.RegisterAssemblyTypes(GetType().Assembly)
             .Where(type => IsCommandClass(type) && type.IsAssignableTo<IDeclaredCommand>())
             .As<IDeclaredCommand>();
     }
@@ -112,21 +106,5 @@ internal class CompositionRoot
         return type != null
             && type.Namespace != null
             && type.Namespace.Contains(nameof(Commands)) && type.Name.EndsWith("Command");
-    }
-
-    private void RegisterOptions()
-    {
-        var cliAssembly = GetType().Assembly;
-
-        Builder.RegisterAssemblyTypes(cliAssembly)
-            .Where(IsOption)
-            .As<IOption>();
-    }
-
-    private bool IsOption(Type type)
-    {
-        return type != null
-            && type.Namespace != null
-            && type.Namespace.EndsWith(nameof(Options)) && type.Name.EndsWith("Option");
     }
 }

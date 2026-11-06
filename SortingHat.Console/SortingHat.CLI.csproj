@@ -8,14 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Help\HelpCommand.help" />
-    <EmbeddedResource Include="Help\PluginsCommand.help" />
-    <EmbeddedResource Include="Help\RepairCommand.help" />
-    <EmbeddedResource Include="Help\StatisticCommand.help" />
-    <EmbeddedResource Include="Help\VersionCommand.help" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Autofac" />
     <PackageReference Include="JetBrains.Annotations" />
     <PackageReference Include="Microsoft.Extensions.Configuration" />

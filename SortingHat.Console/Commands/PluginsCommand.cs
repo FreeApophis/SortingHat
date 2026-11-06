@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Apophis.CLI.Writer;
-using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
 using SortingHat.API.Plugin;
@@ -9,25 +9,14 @@ using SortingHat.API.Plugin;
 namespace SortingHat.CLI.Commands;
 
 [UsedImplicitly]
-internal class PluginsCommand(IConsoleWriter consoleWriter, IPluginLoader pluginLoader) : ICommand
+internal class PluginsCommand(IConsoleWriter consoleWriter, IPluginLoader pluginLoader) : IDeclaredCommand
 {
-    public string LongCommand => "plugins";
-    public Option<string> ShortCommand => Option<string>.None;
-    public string ShortHelp => "Lists the loaded plugins";
     public CommandGrouping CommandGrouping => CommandGrouping.General;
+    public string Name => "plugins";
+    public string Description => "Lists the loaded plugins";
+    public string Details => "Plugins are the DLLs in the 'plugins' folder next to hat.";
 
-    public bool Execute(IEnumerable<string> arguments, IOptionParser options)
-    {
-        if (arguments.Any())
-        {
-            consoleWriter.WriteLine("Too many arguments given, the plugin command does not take any arguments.");
-            return false;
-        }
-
-        return ListPlugins();
-    }
-
-    private bool ListPlugins()
+    public Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
     {
         if (pluginLoader.Plugins.Any())
         {
@@ -45,6 +34,6 @@ internal class PluginsCommand(IConsoleWriter consoleWriter, IPluginLoader plugin
             consoleWriter.WriteLine("No plugins loaded");
         }
 
-        return true;
+        return Task.FromResult(true);
     }
 }

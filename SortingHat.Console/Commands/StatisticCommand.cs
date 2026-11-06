@@ -1,21 +1,23 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Apophis.CLI;
 using Apophis.CLI.Writer;
-using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
 
 namespace SortingHat.CLI.Commands;
 
 [UsedImplicitly]
-internal class StatisticCommand(IMainDatabase db, IConsoleWriter consoleWriter) : ICommand
+internal class StatisticCommand(IProjectDatabase db, IConsoleWriter consoleWriter) : IDeclaredCommand
 {
-    public string LongCommand => "statistics";
-    public Option<string> ShortCommand => Option.Some("stat");
-    public string ShortHelp => "Shows global statistics";
     public CommandGrouping CommandGrouping => CommandGrouping.General;
+    public string Name => "statistics";
+    public IReadOnlyList<string> Aliases => ["stat"];
+    public string Description => "Shows global statistics";
+    public string Details => "Counts the files, paths, names, tags and tag assignments of the active project.";
 
-    public bool Execute(IEnumerable<string> arguments, IOptionParser options)
+    public Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
     {
         var table = StatisticsTable();
 
@@ -28,7 +30,7 @@ internal class StatisticCommand(IMainDatabase db, IConsoleWriter consoleWriter) 
         consoleWriter.WriteLine();
         table.WriteTo(consoleWriter);
 
-        return true;
+        return Task.FromResult(true);
     }
 
     private static ConsoleTable StatisticsTable()
