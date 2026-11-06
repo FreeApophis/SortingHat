@@ -19,8 +19,11 @@ public interface IDeclaredCommand
     /// <summary>Other names for the command, for example <c>ff</c>.</summary>
     IReadOnlyList<string> Aliases => [];
 
-    /// <summary>A single line description.</summary>
+    /// <summary>A single line description, for the overview of all commands.</summary>
     string Description { get; }
+
+    /// <summary>More explanations for the help of this command, for example warnings or examples. Shown after the <see cref="Description"/>.</summary>
+    string Details => string.Empty;
 
     /// <summary>The positional arguments, in their order on the command line. Only the last one should take more than one value.</summary>
     IReadOnlyList<ArgumentDefinition> Arguments => [];

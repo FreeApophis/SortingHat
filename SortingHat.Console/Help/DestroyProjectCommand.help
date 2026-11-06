@@ -1,9 +1,0 @@
-<PROGRAMNAME> remove-project <project-name> [<project-name> ...]
-
-Removes the project with the name <project-name>, in any letter case.
-
-BE CAREFUL this deletes the project's database with all its files and tags.
-The files on disk stay where they are. hat asks before it deletes anything,
-only 'y' or 'yes' removes the project.
-
-The active project cannot be removed, switch to another project first.

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Apophis.CLI.Writer;
-using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API;
 using SortingHat.API.DI;
@@ -11,34 +11,17 @@ namespace SortingHat.CLI.Commands.Projects;
 
 [UsedImplicitly]
 [method: UsedImplicitly]
-internal class CreateProjectCommand(IProjects projects, DatabaseSettings databaseSettings, IConsoleWriter consoleWriter) : ICommand
+internal class CreateProjectCommand(IProjects projects, DatabaseSettings databaseSettings, IConsoleWriter consoleWriter) : IDeclaredCommand
 {
+    private static readonly ArgumentDefinition ProjectNameArgument = new() { Name = "project-name", Description = "The name of the new project: letters, digits, '-' and '_'." };
+
     public CommandGrouping CommandGrouping => CommandGrouping.Project;
-    public string LongCommand => "new-project";
-    public Option<string> ShortCommand => Option<string>.None;
-    public string ShortHelp => "Creates a new project database with a given name.";
+    public string Name => "new-project";
+    public string Description => "Creates a new project database with a given name.";
+    public IReadOnlyList<ArgumentDefinition> Arguments => [ProjectNameArgument];
 
-    public bool Execute(IEnumerable<string> arguments, IOptionParser options)
-        => arguments.ToList() switch
-        {
-            [] => NotEnoughArguments(),
-            [var projectName] => CreateProject(projectName),
-            _ => TooManyArguments(),
-        };
-
-    private bool TooManyArguments()
-    {
-        consoleWriter.WriteLine("Too many arguments given, only one project at a time can be created.");
-
-        return false;
-    }
-
-    private bool NotEnoughArguments()
-    {
-        consoleWriter.WriteLine("Not enough arguments given, please give a name for the project you want to create.");
-
-        return false;
-    }
+    public Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
+        => Task.FromResult(input.Value(ProjectNameArgument).Match(none: false, some: CreateProject));
 
     private bool CreateProject(string project)
         => ProjectName.ParseNew(project, projects.GetProjects(), databaseSettings.Name)

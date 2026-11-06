@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Apophis.CLI.Writer;
 using Apophis.FileSystem;
-using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API;
 using SortingHat.API.DI;
@@ -11,37 +11,23 @@ using SortingHat.API.DI;
 namespace SortingHat.CLI.Commands.Projects;
 
 [UsedImplicitly]
-internal class ExportProjectCommand(DatabaseSettings databaseSettings, IConsoleWriter consoleWriter, ICopyFile copyFile) : ICommand
+internal class ExportProjectCommand(DatabaseSettings databaseSettings, IConsoleWriter consoleWriter, ICopyFile copyFile) : IDeclaredCommand
 {
     private const string CurrentDirectory = ".";
 
+    private static readonly ArgumentDefinition ProjectNameArgument = new() { Name = "project-name", Description = "The project to export." };
+
+    private static readonly ArgumentDefinition Destination = new() { Name = "destination", Description = "A folder, where the export is named '<project-name>.hdb', or a file. Default: the current folder.", Arity = Arity.ZeroOrOne };
+
     public CommandGrouping CommandGrouping => CommandGrouping.Project;
-    public string LongCommand => "export";
-    public Option<string> ShortCommand => Option<string>.None;
-    public string ShortHelp => "Exports a project as a file.";
+    public string Name => "export";
+    public string Description => "Exports a project as a file.";
+    public IReadOnlyList<ArgumentDefinition> Arguments => [ProjectNameArgument, Destination];
 
-    public bool Execute(IEnumerable<string> arguments, IOptionParser options)
-        => arguments.ToList() switch
-        {
-            [] => NotEnoughArguments(),
-            [var projectName] => ExportProject(projectName, CurrentDirectory),
-            [var projectName, var path] => ExportProject(projectName, path),
-            _ => TooManyArguments(),
-        };
-
-    private bool TooManyArguments()
-    {
-        consoleWriter.WriteLine("Too many arguments given, please only export one project at a time.");
-
-        return false;
-    }
-
-    private bool NotEnoughArguments()
-    {
-        consoleWriter.WriteLine("Too few arguments given, please specify which project to export.");
-
-        return false;
-    }
+    public Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
+        => Task.FromResult(input.Value(ProjectNameArgument).Match(
+            none: false,
+            some: project => ExportProject(project, input.Value(Destination).GetOrElse(CurrentDirectory))));
 
     private bool ExportProject(string project, string destination)
     {
@@ -52,14 +38,10 @@ internal class ExportProjectCommand(DatabaseSettings databaseSettings, IConsoleW
     }
 
     private string DestinationPath(string destination, string project)
-    {
-        return Directory.Exists(destination)
+        => Directory.Exists(destination)
             ? Path.Combine(destination, $"{project}.hdb")
             : destination;
-    }
 
     private string DatabaseSource(string project)
-    {
-        return Path.Combine(databaseSettings.DbPath, $"{project}.db");
-    }
+        => Path.Combine(databaseSettings.DbPath, $"{project}.db");
 }

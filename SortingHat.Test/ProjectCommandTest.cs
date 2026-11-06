@@ -22,18 +22,61 @@ public sealed class ProjectCommandTest : IDisposable
     [Fact]
     public void GivenNoNameThenNewProjectAsksForOne()
     {
-        _hat.Hat(["new-project"]);
-
-        Assert.Equal(["Not enough arguments given, please give a name for the project you want to create."], _hat.Lines);
+        Assert.NotEqual(0, _hat.Hat(["new-project"]));
+        Assert.Contains(_hat.Lines, line => line.Contains("project-name"));
     }
 
     [Fact]
     public void GivenTwoNamesThenNewProjectCreatesNone()
     {
-        _hat.Hat(["new-project", "a", "b"]);
-
-        Assert.Equal(["Too many arguments given, only one project at a time can be created."], _hat.Lines);
+        Assert.NotEqual(0, _hat.Hat(["new-project", "a", "b"]));
+        Assert.Contains(_hat.Lines, line => line.Contains("'b'"));
         Assert.Equal(["* Default"], ListProjects());
+    }
+
+    [Fact]
+    public void GivenAnExistingProjectThenSwitchProjectMakesItActive()
+    {
+        _hat.Hat(["new-project", "myProject"]);
+
+        Assert.Equal(0, _hat.Hat(["switch-project", "myProject"]));
+        Assert.Equal(["  Default", "* myProject"], ListProjects());
+    }
+
+    [Fact]
+    public void GivenNoNameThenSwitchProjectAsksForOneInsteadOfCrashing()
+    {
+        Assert.NotEqual(0, _hat.Hat(["switch-project"]));
+        Assert.Contains(_hat.Lines, line => line.Contains("project-name"));
+        Assert.DoesNotContain(_hat.Lines, line => line.Contains("Sequence contains no elements"));
+    }
+
+    [Fact]
+    public void GivenNoFileThenImportAsksForOneInsteadOfCrashing()
+    {
+        Assert.NotEqual(0, _hat.Hat(["import"]));
+        Assert.Contains(_hat.Lines, line => line.Contains("project-file"));
+        Assert.DoesNotContain(_hat.Lines, line => line.Contains("not implemented"));
+    }
+
+    [Fact]
+    public void GivenAnExportedProjectThenImportAddsItUnderANewName()
+    {
+        ProjectWithDatabase("myProject");
+        var exported = _hat.ProjectDatabaseFile("exported");
+
+        Assert.Equal(0, _hat.Hat(["export", "myProject", exported]));
+        Assert.Equal(0, _hat.Hat(["import", exported, "copy"]));
+
+        _hat.Hat(["switch-project", "copy"]);
+        Assert.Equal(["myProject.txt"], _hat.FindFiles(":x"));
+    }
+
+    [Fact]
+    public void GivenTheHelpOfRemoveProjectThenItWarnsAboutDeletingTheDatabase()
+    {
+        Assert.Equal(0, _hat.Hat(["remove-project", "--help"]));
+        Assert.Contains(_hat.Lines, line => line.Contains("BE CAREFUL"));
     }
 
     [Theory]

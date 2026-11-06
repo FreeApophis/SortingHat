@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Apophis.CLI.Writer;
 using Apophis.FileSystem;
-using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API;
 using SortingHat.API.DI;
@@ -14,28 +13,21 @@ namespace SortingHat.CLI.Commands.Projects;
 
 [UsedImplicitly]
 [method: UsedImplicitly]
-internal class ImportProjectCommand(IConsoleWriter consoleWriter, ICopyFile copyFile, DatabaseSettings databaseSettings, IProjects projects) : ICommand
+internal class ImportProjectCommand(IConsoleWriter consoleWriter, ICopyFile copyFile, DatabaseSettings databaseSettings, IProjects projects) : IDeclaredCommand
 {
+    private static readonly ArgumentDefinition ProjectFile = new() { Name = "project-file", Description = "A project file, for example made with export." };
+
+    private static readonly ArgumentDefinition ProjectNameArgument = new() { Name = "project-name", Description = "The name of the new project. Default: the file name without its extension.", Arity = Arity.ZeroOrOne };
+
     public CommandGrouping CommandGrouping => CommandGrouping.Project;
-    public string LongCommand => "import";
-    public Option<string> ShortCommand => Option<string>.None;
-    public string ShortHelp => "Imports a project file into the db.";
+    public string Name => "import";
+    public string Description => "Imports a project file into the db.";
+    public IReadOnlyList<ArgumentDefinition> Arguments => [ProjectFile, ProjectNameArgument];
 
-    public bool Execute(IEnumerable<string> arguments, IOptionParser options)
-        => arguments.ToList() switch
-        {
-            [] => NotEnoughArguments(),
-            [var file] => ImportProject(file),
-            [var file, var projectName] => ImportProject(file, projectName),
-            _ => TooManyArguments(),
-        };
-
-    private bool TooManyArguments()
-    {
-        consoleWriter.WriteLine("Too many arguments given, please give only filePath and projectName.");
-
-        return false;
-    }
+    public Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
+        => Task.FromResult(input.Value(ProjectFile).Match(
+            none: false,
+            some: filePath => ImportProject(filePath, input.Value(ProjectNameArgument).GetOrElse(() => Path.GetFileNameWithoutExtension(filePath)))));
 
     private bool ImportProject(string filePath, string projectName)
         => ProjectName.ParseNew(projectName, projects.GetProjects(), databaseSettings.Name)
@@ -56,23 +48,6 @@ internal class ImportProjectCommand(IConsoleWriter consoleWriter, ICopyFile copy
         consoleWriter.WriteLine($"New project '{projectName}' imported.");
 
         return true;
-    }
-
-    private bool ImportProject(string filePath)
-    {
-        var projectName = Path.GetFileNameWithoutExtension(filePath);
-
-        if (projectName == null)
-        {
-            throw new NullReferenceException(nameof(projectName));
-        }
-
-        return ImportProject(filePath, projectName);
-    }
-
-    private bool NotEnoughArguments()
-    {
-        throw new NotImplementedException();
     }
 
     private string DestinationPath(ProjectName project)

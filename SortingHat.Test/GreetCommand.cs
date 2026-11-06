@@ -23,6 +23,8 @@ internal sealed class GreetCommand(IConsoleWriter consoleWriter) : IDeclaredComm
 
     public string Description => "Greets someone.";
 
+    public string Details => "Everyone deserves a greeting, even the Slytherins.";
+
     public IReadOnlyList<ArgumentDefinition> Arguments => [Who];
 
     public IReadOnlyList<OptionDefinition> Options => [Loud];

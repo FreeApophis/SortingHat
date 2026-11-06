@@ -10,15 +10,10 @@
   <ItemGroup>
     <EmbeddedResource Include="Help\AddTagCommand.help" />
     <EmbeddedResource Include="Help\CopyFilesCommand.help" />
-    <EmbeddedResource Include="Help\CreateProjectCommand.help" />
-    <EmbeddedResource Include="Help\DestroyProjectCommand.help" />
     <EmbeddedResource Include="Help\DuplicateFileCommand.help" />
-    <EmbeddedResource Include="Help\ExportProjectCommand.help" />
     <EmbeddedResource Include="Help\FileInfoCommand.help" />
     <EmbeddedResource Include="Help\FindFilesCommand.help" />
     <EmbeddedResource Include="Help\HelpCommand.help" />
-    <EmbeddedResource Include="Help\ImportProjectCommand.help" />
-    <EmbeddedResource Include="Help\ListProjectsCommand.help" />
     <EmbeddedResource Include="Help\ListTagsCommand.help" />
     <EmbeddedResource Include="Help\MoveFilesCommand.help" />
     <EmbeddedResource Include="Help\MoveTagCommand.help" />
@@ -27,7 +22,6 @@
     <EmbeddedResource Include="Help\RenameTagCommand.help" />
     <EmbeddedResource Include="Help\RepairCommand.help" />
     <EmbeddedResource Include="Help\StatisticCommand.help" />
-    <EmbeddedResource Include="Help\SwitchProjectCommand.help" />
     <EmbeddedResource Include="Help\TagFileCommand.help" />
     <EmbeddedResource Include="Help\UntagFileCommand.help" />
     <EmbeddedResource Include="Help\VersionCommand.help" />

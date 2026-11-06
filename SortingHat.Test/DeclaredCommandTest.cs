@@ -70,6 +70,7 @@ public sealed class DeclaredCommandTest : IDisposable
         Assert.Equal(0, _hat.Hat(["greet", "-h"]));
 
         Assert.Contains(_hat.Lines, line => line.Contains("Greets someone."));
+        Assert.Contains(_hat.Lines, line => line.Contains("Everyone deserves a greeting, even the Slytherins."));
         Assert.Contains(_hat.Lines, line => line.Contains("<who>") && line.Contains("The one to greet."));
         Assert.Contains(_hat.Lines, line => line.Contains("-l, --loud") && line.Contains("Greets in capitals."));
         Assert.DoesNotContain(_hat.Lines, line => line.Contains("--verbose"));
@@ -80,6 +81,7 @@ public sealed class DeclaredCommandTest : IDisposable
     {
         Assert.Equal(0, _hat.Hat(["help"]));
         Assert.Contains(_hat.Lines, line => line.Contains("greet") && line.Contains("hi") && line.Contains("Greets someone."));
+        Assert.DoesNotContain(_hat.Lines, line => line.Contains("Slytherins"));
     }
 
     [Fact]

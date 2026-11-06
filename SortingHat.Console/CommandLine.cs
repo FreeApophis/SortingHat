@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -40,6 +41,11 @@ internal sealed class CommandLine(Console console, IEnumerable<ICommand> command
             .OrElse(option.ShortOption.Select(name => $"-{name}"))
             .Select(name => new Flag(name, [.. Aliases(option, name)]) { Description = option.ShortHelp });
 
+    private static string HelpDescription(IDeclaredCommand command)
+        => command.Details is ""
+            ? command.Description
+            : $"{command.Description}{Environment.NewLine}{Environment.NewLine}{command.Details}";
+
     private static Flag ToFlag(OptionDefinition option)
         => new($"--{option.Name}", [.. option.ShortName.Select(shortName => $"-{shortName}").ToEnumerable()]) { Description = option.Description };
 
@@ -72,7 +78,7 @@ internal sealed class CommandLine(Console console, IEnumerable<ICommand> command
             Arity.ZeroOrOne => Cli.ArgumentArity.ZeroOrOne,
             Arity.ZeroOrMore => Cli.ArgumentArity.ZeroOrMore,
             Arity.OneOrMore => Cli.ArgumentArity.OneOrMore,
-            _ => throw new System.ArgumentOutOfRangeException(nameof(arity), arity, "Unknown arity."),
+            _ => throw new ArgumentOutOfRangeException(nameof(arity), arity, "Unknown arity."),
         };
 
     private static CommandInput Input(Cli.ParseResult parseResult, IEnumerable<ParsedArgument> arguments, IEnumerable<(OptionDefinition Definition, Flag Flag)> flags)
@@ -133,7 +139,7 @@ internal sealed class CommandLine(Console console, IEnumerable<ICommand> command
 
     private Cli.Command Command(IDeclaredCommand command)
     {
-        var result = new Cli.Command(command.Name, command.Description);
+        var result = new Cli.Command(command.Name, HelpDescription(command));
         var arguments = command.Arguments.Select(ToArgument).ToList();
         var flags = command.Options.Select(option => (Definition: option, Flag: ToFlag(option))).ToList();
 

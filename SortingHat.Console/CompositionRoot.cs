@@ -99,8 +99,12 @@ internal class CompositionRoot
         var cliAssembly = GetType().Assembly;
 
         Builder.RegisterAssemblyTypes(cliAssembly)
-            .Where(IsCommandClass)
+            .Where(type => IsCommandClass(type) && type.IsAssignableTo<ICommand>())
             .As<ICommand>();
+
+        Builder.RegisterAssemblyTypes(cliAssembly)
+            .Where(type => IsCommandClass(type) && type.IsAssignableTo<IDeclaredCommand>())
+            .As<IDeclaredCommand>();
     }
 
     private bool IsCommandClass(Type type)

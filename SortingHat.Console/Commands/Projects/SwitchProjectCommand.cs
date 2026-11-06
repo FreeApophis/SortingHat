@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Apophis.CLI.Writer;
-using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
 
@@ -9,17 +10,20 @@ namespace SortingHat.CLI.Commands.Projects;
 
 [UsedImplicitly]
 [method: UsedImplicitly]
-internal class SwitchProjectCommand(IProjects projects, ISettings settings, IConsoleWriter consoleWriter) : ICommand
+internal class SwitchProjectCommand(IProjects projects, ISettings settings, IConsoleWriter consoleWriter) : IDeclaredCommand
 {
+    private static readonly ArgumentDefinition ProjectNameArgument = new() { Name = "project-name", Description = "The project to work with from now on." };
+
     public CommandGrouping CommandGrouping => CommandGrouping.Project;
-    public string LongCommand => "switch-project";
-    public Option<string> ShortCommand => Option<string>.None;
-    public string ShortHelp => "Switches to an existing database with the given name.";
+    public string Name => "switch-project";
+    public string Description => "Switches to an existing database with the given name.";
+    public IReadOnlyList<ArgumentDefinition> Arguments => [ProjectNameArgument];
 
-    public bool Execute(IEnumerable<string> arguments, IOptionParser options)
+    public Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
+        => Task.FromResult(input.Value(ProjectNameArgument).Match(none: false, some: SwitchTo));
+
+    private bool SwitchTo(string project)
     {
-        var project = arguments.First();
-
         if (projects.GetProjects().Contains(project))
         {
             settings[DB.Constants.ProjectDatabaseKey] = project;
