@@ -1,33 +1,35 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Apophis.CLI;
 using Apophis.CLI.Writer;
-using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
 
 namespace SortingHat.CLI.Commands.Files;
 
 [UsedImplicitly]
-internal class DuplicateFileCommand(IFile fileStore, IConsoleWriter consoleWriter) : ICommand
+internal class DuplicateFileCommand(IFile fileStore, IConsoleWriter consoleWriter) : IDeclaredCommand
 {
-    public string LongCommand => "duplicate";
-    public Option<string> ShortCommand => Option.Some("d");
-    public string ShortHelp => "Find duplicate files in your dms";
     public CommandGrouping CommandGrouping => CommandGrouping.File;
+    public string Name => "duplicate";
+    public IReadOnlyList<string> Aliases => ["d"];
+    public string Description => "Find duplicate files in your dms";
+    public string Details => "Duplicates are files with the same content, stored under several paths.";
 
-    public bool Execute(IEnumerable<string> arguments, IOptionParser options)
+    public async Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
     {
         foreach (var file in fileStore.GetDuplicates())
         {
             consoleWriter.WriteLine("--- Duplicate ---");
             consoleWriter.WriteLine($"CreatedAt (oldest): {file.CreatedAt}");
             consoleWriter.WriteLine($"File Size: {file.Size}");
-            consoleWriter.WriteLine($"File Tags: {string.Join(", ", file.GetTags().Result.Select(t => t.FullName))}");
+            consoleWriter.WriteLine($"File Tags: {string.Join(", ", (await file.GetTags()).Select(t => t.FullName))}");
 
             var table = new ConsoleTable(5);
-            foreach (var path in file.GetPaths().Result)
+            foreach (var path in await file.GetPaths())
             {
                 var fileInfo = new FileInfo(path);
 

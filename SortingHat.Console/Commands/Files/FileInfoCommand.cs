@@ -1,25 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Apophis.CLI.Writer;
-using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
-using SortingHat.CLI.Options;
 
 namespace SortingHat.CLI.Commands.Files;
 
 [UsedImplicitly]
-internal class FileInfoCommand(IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor, Func<File> newFile) : ICommand
+internal class FileInfoCommand(IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor, Func<File> newFile) : IDeclaredCommand
 {
-    public string LongCommand => "file-info";
-    public Option<string> ShortCommand => Option.Some("info");
-    public string ShortHelp => "Shows all available information about the current file.";
-    public CommandGrouping CommandGrouping => CommandGrouping.File;
+    private static readonly ArgumentDefinition Files = new() { Name = "file", Description = "Files or file patterns such as '*.pdf'.", Arity = Arity.OneOrMore };
 
-    public bool Execute(IEnumerable<string> arguments, IOptionParser options)
+    public CommandGrouping CommandGrouping => CommandGrouping.File;
+    public string Name => "file-info";
+    public IReadOnlyList<string> Aliases => ["info"];
+    public string Description => "Shows all available information about the current file.";
+    public IReadOnlyList<ArgumentDefinition> Arguments => [Files];
+    public IReadOnlyList<OptionDefinition> Options => [FileOptions.Recursive];
+
+    public async Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
     {
-        foreach (var filePath in filePathExtractor.FromFilePatterns(arguments, options.HasOption<RecursiveOption>()))
+        foreach (var filePath in filePathExtractor.FromFilePatterns(input.Values(Files), input.Has(FileOptions.Recursive)))
         {
             consoleWriter.WriteLine();
             consoleWriter.WriteLine($"File: {filePath}");
@@ -35,19 +39,19 @@ internal class FileInfoCommand(IConsoleWriter consoleWriter, IFilePathExtractor 
             {
                 consoleWriter.WriteLine($"CreatedAt (oldest): {file.CreatedAt}");
                 consoleWriter.WriteLine($"File Size: {file.Size}");
-                consoleWriter.WriteLine($"File Hash: {file.Hash.Result}");
+                consoleWriter.WriteLine($"File Hash: {await file.Hash}");
 
-                foreach (var tag in file.GetTags().Result)
+                foreach (var tag in await file.GetTags())
                 {
                     consoleWriter.WriteLine($"Tag: {tag.FullName}");
                 }
 
-                foreach (var name in file.GetNames().Result)
+                foreach (var name in await file.GetNames())
                 {
                     consoleWriter.WriteLine($"Name: {name}");
                 }
 
-                foreach (var path in file.GetPaths().Result)
+                foreach (var path in await file.GetPaths())
                 {
                     consoleWriter.WriteLine($"Path: {path}");
                 }

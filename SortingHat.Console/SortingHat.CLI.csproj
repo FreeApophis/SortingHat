@@ -8,17 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Help\CopyFilesCommand.help" />
-    <EmbeddedResource Include="Help\DuplicateFileCommand.help" />
-    <EmbeddedResource Include="Help\FileInfoCommand.help" />
-    <EmbeddedResource Include="Help\FindFilesCommand.help" />
     <EmbeddedResource Include="Help\HelpCommand.help" />
-    <EmbeddedResource Include="Help\MoveFilesCommand.help" />
     <EmbeddedResource Include="Help\PluginsCommand.help" />
     <EmbeddedResource Include="Help\RepairCommand.help" />
     <EmbeddedResource Include="Help\StatisticCommand.help" />
-    <EmbeddedResource Include="Help\TagFileCommand.help" />
-    <EmbeddedResource Include="Help\UntagFileCommand.help" />
     <EmbeddedResource Include="Help\VersionCommand.help" />
   </ItemGroup>
 

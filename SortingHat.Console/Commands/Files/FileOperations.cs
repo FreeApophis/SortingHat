@@ -13,21 +13,11 @@ namespace SortingHat.CLI.Commands.Files;
 public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExistsFile existsFile, Console console, IFile fileStore)
     where TFileOperation : IFileOperation
 {
-    public bool ExportFiles(IEnumerable<string> lazyArguments, IOptionParser options, string longCommand)
+    /// <summary>Puts the files found by <paramref name="search"/> into the folder <paramref name="destination"/>, relative to the current folder.</summary>
+    public bool ExportFiles(string search, string destination)
     {
-        var arguments = lazyArguments.ToList();
+        var destinationPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), destination));
 
-        return arguments.Count switch
-        {
-            0 => NotEnoughArguments(longCommand),
-            1 => NotEnoughArguments(longCommand),
-            2 => ExportFiles(GetSearchArgument(arguments), GetDestinationPath(arguments)),
-            _ => TooManyArguments(longCommand),
-        };
-    }
-
-    public bool ExportFiles(string search, string destinationPath)
-    {
         console.Writer.WriteLine($"Find Files: {search}");
 
         var result = fileStore.Search(search);
@@ -44,22 +34,6 @@ public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExist
             0 => EmptyQuery(),
             _ => ExportEachFile(filesByHash, destinationPath),
         };
-    }
-
-    private bool TooManyArguments(string longCommand)
-    {
-        console.Writer.WriteLine("Too many arguments given, give complexes searches in quotes.");
-        console.Writer.WriteLine($"{console.Application.Name} {longCommand} search destination");
-
-        return false;
-    }
-
-    private bool NotEnoughArguments(string longCommand)
-    {
-        console.Writer.WriteLine("Too few arguments given, please specify files with a search query and give a destination.");
-        console.Writer.WriteLine($"{console.Application.Name} {longCommand} search destination");
-
-        return false;
     }
 
     private bool ExportEachFile(List<HashGroup> filesByHash, string destinationPath)
@@ -108,16 +82,6 @@ public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExist
         console.Writer.WriteLine("No files found for your search query...");
 
         return false;
-    }
-
-    private static string GetDestinationPath(IEnumerable<string> arguments)
-    {
-        return Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), arguments.Last()));
-    }
-
-    private static string GetSearchArgument(IEnumerable<string> arguments)
-    {
-        return arguments.First();
     }
 
     private bool ExportFile(File? sourceFile, string destinationPath)

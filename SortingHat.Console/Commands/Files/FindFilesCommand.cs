@@ -1,30 +1,42 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Apophis.CLI;
 using Apophis.CLI.Writer;
-using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API;
 using SortingHat.API.DI;
-using SortingHat.CLI.Options;
 
 namespace SortingHat.CLI.Commands.Files;
 
 [UsedImplicitly]
-internal class FindFilesCommand(IFile fileStore, IConsoleWriter consoleWriter) : ICommand
+internal class FindFilesCommand(IFile fileStore, IConsoleWriter consoleWriter) : IDeclaredCommand
 {
-    public string LongCommand => "find-files";
-    public Option<string> ShortCommand => Option.Some("ff");
-    public string ShortHelp => "Finds all files matching the search query";
-    public CommandGrouping CommandGrouping => CommandGrouping.File;
-
-    public bool Execute(IEnumerable<string> arguments, IOptionParser options)
+    private static readonly ArgumentDefinition Query = new()
     {
-        var search = string.Join(" ", arguments);
+        Name = "query",
+        Description = "Tags combined with and, or, not and parentheses, for example ':tax:2018 and not :bank'. The words are joined, quotes are optional.",
+        Arity = Arity.OneOrMore,
+    };
+
+    private static readonly OptionDefinition Open = new() { Name = "open", Description = "Opens the file with the associated program." };
+
+    public CommandGrouping CommandGrouping => CommandGrouping.File;
+    public string Name => "find-files";
+    public IReadOnlyList<string> Aliases => ["ff"];
+    public string Description => "Finds all files matching the search query";
+    public string Details => "A tag also finds the files tagged with its children: ':tax' finds ':tax:2018'.";
+    public IReadOnlyList<ArgumentDefinition> Arguments => [Query];
+    public IReadOnlyList<OptionDefinition> Options => [Open];
+
+    public async Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
+    {
+        var search = string.Join(" ", input.Values(Query));
         consoleWriter.WriteLine($"Find Files: {search}");
 
         var result = fileStore.Search(search);
-        var files = result.Files;
+        var files = result.Files.ToList();
 
         foreach (var unknownTag in result.UnknownTags)
         {
@@ -33,15 +45,15 @@ internal class FindFilesCommand(IFile fileStore, IConsoleWriter consoleWriter) :
 
         if (files.Any())
         {
-            var table = FileTable();
+            var table = new ConsoleTable(4);
             foreach (var file in files)
             {
-                if (options.HasOption<OpenOption>())
+                if (input.Has(Open))
                 {
                     FileHelper.OpenWithAssociatedProgram(file.Path);
                 }
 
-                var hash = file.Hash.Result;
+                var hash = await file.Hash;
                 table.Append(hash.ShortHash().GetOrElse(hash), file.CreatedAt, file.Size.HumanSize(), file.Path);
             }
 
@@ -53,12 +65,5 @@ internal class FindFilesCommand(IFile fileStore, IConsoleWriter consoleWriter) :
         }
 
         return true;
-    }
-
-    private ConsoleTable FileTable()
-    {
-        var table = new ConsoleTable(4);
-
-        return table;
     }
 }
