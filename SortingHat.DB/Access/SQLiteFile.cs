@@ -63,67 +63,23 @@ HAVING DuplicateCount > 1";
 
     public bool LoadByPath(File file)
     {
-        using var reader = db.ExecuteReader("SELECT Files.CreatedAt, Files.Hash, Files.Size, FilePaths.Path FROM Files JOIN FilePaths ON FilePaths.FileId = Files.Id WHERE FilePaths.Path = @filePath", new SqliteParameter("@filePath", file.Path));
-
-        return LoadFileFromReader(reader, file);
+        return db.ExecuteReader(
+            "SELECT Files.CreatedAt, Files.Hash, Files.Size, FilePaths.Path FROM Files JOIN FilePaths ON FilePaths.FileId = Files.Id WHERE FilePaths.Path = @filePath",
+            reader => LoadFileFromReader(reader, file),
+            new SqliteParameter("@filePath", file.Path));
     }
 
     public async Task<IEnumerable<Tag>> GetTags(File file)
-    {
-        var tags = new List<Tag>();
-
-        using var reader = db.ExecuteReader(AllFileTags, new SqliteParameter("@fileHash", await file.Hash));
-
-        while (reader.Read())
-        {
-            Tag tag = sqLiteTag.Load(reader.GetInt64(0));
-            tags.Add(tag);
-        }
-
-        return tags;
-    }
+        => db.Query(AllFileTags, reader => sqLiteTag.Load(reader.GetInt64(0)), new SqliteParameter("@fileHash", await file.Hash));
 
     public IEnumerable<string> GetPaths()
-    {
-        var paths = new List<string>();
-
-        using var reader = db.ExecuteReader("SELECT FilePaths.Path FROM FilePaths");
-
-        while (reader.Read())
-        {
-            paths.Add(reader.GetString(0));
-        }
-
-        return paths;
-    }
+        => db.Query("SELECT FilePaths.Path FROM FilePaths", reader => reader.GetString(0));
 
     public async Task<IEnumerable<string>> GetPaths(File file)
-    {
-        var paths = new List<string>();
-
-        using var reader = db.ExecuteReader("SELECT FilePaths.Path FROM FilePaths JOIN Files ON FilePaths.FileId = Files.Id WHERE Files.Hash = @fileHash", new SqliteParameter("@fileHash", await file.Hash));
-
-        while (reader.Read())
-        {
-            paths.Add(reader.GetString(0));
-        }
-
-        return paths;
-    }
+        => db.Query("SELECT FilePaths.Path FROM FilePaths JOIN Files ON FilePaths.FileId = Files.Id WHERE Files.Hash = @fileHash", reader => reader.GetString(0), new SqliteParameter("@fileHash", await file.Hash));
 
     public async Task<IEnumerable<string>> GetNames(File file)
-    {
-        var names = new List<string>();
-
-        using var reader = db.ExecuteReader("SELECT FileNames.Name FROM FileNames JOIN Files ON FileNames.FileId = Files.Id WHERE Files.Hash = @fileHash", new SqliteParameter("@fileHash", await file.Hash));
-
-        while (reader.Read())
-        {
-            names.Add(reader.GetString(0));
-        }
-
-        return names;
-    }
+        => db.Query("SELECT FileNames.Name FROM FileNames JOIN Files ON FileNames.FileId = Files.Id WHERE Files.Hash = @fileHash", reader => reader.GetString(0), new SqliteParameter("@fileHash", await file.Hash));
 
     private static bool LoadFileFromReader(DbDataReader reader, File file)
     {
@@ -197,9 +153,10 @@ HAVING DuplicateCount > 1";
     }
 
     private IEnumerable<File> MetaSearch(string search)
-    {
-        using var reader = db.ExecuteReader(search);
+        => db.ExecuteReader(search, ReadFiles);
 
+    private List<File> ReadFiles(SqliteDataReader reader)
+    {
         var files = new List<File>();
 
         while (AddFileEntry(reader, files))

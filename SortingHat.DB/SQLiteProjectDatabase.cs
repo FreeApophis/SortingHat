@@ -14,7 +14,7 @@ public sealed class SQLiteProjectDatabase(DatabaseSettings databaseSettings, ISe
 
     public Dictionary<string, long> GetStatistics()
     {
-        return TransformStatistics(ExecuteReader(StatisticsQuery()));
+        return ExecuteReader(StatisticsQuery(), TransformStatistics);
     }
 
     private static string PerTableStatisticsQuery(string table)

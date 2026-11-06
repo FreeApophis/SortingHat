@@ -88,18 +88,10 @@ SELECT id, parentId, name, level FROM tree;";
     }
 
     public IEnumerable<Tag> GetTags()
-    {
-        using var reader = db.ExecuteReader(AllTags);
+        => db.ExecuteReader(AllTags, ReadTagTree);
 
-        if (reader.Read())
-        {
-            var result = new List<Tag>();
-            GetTagTree(reader, ref result, null, 0);
-            return result;
-        }
-
-        return [];
-    }
+    internal Tag Load(long tagId)
+        => db.ExecuteReader("SELECT ParentId, Name FROM Tags WHERE Id = @tagId", ReadTag, new SqliteParameter("@tagId", tagId));
 
     internal long? Find(Tag tag)
     {
@@ -130,10 +122,20 @@ SELECT id, parentId, name, level FROM tree;";
         return resultId.Value;
     }
 
-    internal Tag Load(long tagId)
+    private IEnumerable<Tag> ReadTagTree(SqliteDataReader reader)
     {
-        using var reader = db.ExecuteReader("SELECT ParentId, Name FROM Tags WHERE Id = @tagId", new SqliteParameter("@tagId", tagId));
+        if (reader.Read())
+        {
+            var result = new List<Tag>();
+            GetTagTree(reader, ref result, null, 0);
+            return result;
+        }
 
+        return [];
+    }
+
+    private Tag ReadTag(SqliteDataReader reader)
+    {
         if (!reader.Read())
         {
             throw new NotSupportedException();
@@ -182,8 +184,10 @@ SELECT id, parentId, name, level FROM tree;";
     }
 
     private List<long> TagIds(Tag tag)
+        => db.ExecuteReader(TagIdsQuery(tag), ReadTagIds);
+
+    private static List<long> ReadTagIds(SqliteDataReader reader)
     {
-        using var reader = db.ExecuteReader(TagIdsQuery(tag));
         var result = new List<long>();
 
         if (reader.Read())

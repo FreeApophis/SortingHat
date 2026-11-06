@@ -7,17 +7,7 @@ namespace SortingHat.DB.Access;
 public class SQLiteProjects(SQLiteMainDatabase db) : IProjects
 {
     public IEnumerable<string> GetProjects()
-    {
-        var projects = new List<string>();
-        using var reader = db.ExecuteReader("SELECT Name FROM Projects");
-
-        while (reader.Read())
-        {
-            projects.Add(reader.GetString(0));
-        }
-
-        return projects;
-    }
+        => db.Query("SELECT Name FROM Projects", reader => reader.GetString(0));
 
     public bool AddProject(string project)
     {

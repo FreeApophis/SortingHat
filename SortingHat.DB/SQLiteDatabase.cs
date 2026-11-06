@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.Data.Sqlite;
 using SortingHat.API;
@@ -58,9 +59,33 @@ public abstract class SQLiteDatabase : IDisposable
         return command.ExecuteScalar();
     }
 
-    internal SqliteDataReader ExecuteReader(string commandText, params SqliteParameter[] parameters)
+    /// <summary>
+    /// Lends the reader of the query to <paramref name="read"/>. The reader and its command are disposed afterwards,
+    /// so <paramref name="read"/> must not return anything that still reads lazily from the reader.
+    /// </summary>
+    internal TResult ExecuteReader<TResult>(string commandText, Func<SqliteDataReader, TResult> read, params SqliteParameter[] parameters)
     {
-        return CreateCommand(commandText, parameters).ExecuteReader();
+        using var command = CreateCommand(commandText, parameters);
+        using var reader = command.ExecuteReader();
+        return read(reader);
+    }
+
+    /// <summary>
+    /// Maps every row of the query with <paramref name="readRow"/>.
+    /// </summary>
+    internal IReadOnlyList<TRow> Query<TRow>(string commandText, Func<SqliteDataReader, TRow> readRow, params SqliteParameter[] parameters)
+        => ExecuteReader(commandText, reader => ReadRows(reader, readRow), parameters);
+
+    private static List<TRow> ReadRows<TRow>(SqliteDataReader reader, Func<SqliteDataReader, TRow> readRow)
+    {
+        var rows = new List<TRow>();
+
+        while (reader.Read())
+        {
+            rows.Add(readRow(reader));
+        }
+
+        return rows;
     }
 
     private string ExistingDbPath()
