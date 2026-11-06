@@ -8,18 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Help\AddTagCommand.help" />
     <EmbeddedResource Include="Help\CopyFilesCommand.help" />
     <EmbeddedResource Include="Help\DuplicateFileCommand.help" />
     <EmbeddedResource Include="Help\FileInfoCommand.help" />
     <EmbeddedResource Include="Help\FindFilesCommand.help" />
     <EmbeddedResource Include="Help\HelpCommand.help" />
-    <EmbeddedResource Include="Help\ListTagsCommand.help" />
     <EmbeddedResource Include="Help\MoveFilesCommand.help" />
-    <EmbeddedResource Include="Help\MoveTagCommand.help" />
     <EmbeddedResource Include="Help\PluginsCommand.help" />
-    <EmbeddedResource Include="Help\RemoveTagCommand.help" />
-    <EmbeddedResource Include="Help\RenameTagCommand.help" />
     <EmbeddedResource Include="Help\RepairCommand.help" />
     <EmbeddedResource Include="Help\StatisticCommand.help" />
     <EmbeddedResource Include="Help\TagFileCommand.help" />

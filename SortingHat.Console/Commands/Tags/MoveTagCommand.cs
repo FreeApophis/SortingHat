@@ -1,56 +1,51 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Apophis.CLI.Writer;
 using Funcky.Monads;
 using JetBrains.Annotations;
-using Microsoft.Extensions.Logging;
-using SortingHat.API;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
 
 namespace SortingHat.CLI.Commands.Tags;
 
 [UsedImplicitly]
-internal class MoveTagCommand(ILogger<RenameTagCommand> logger, ITagParser tagParser) : ICommand
+internal class MoveTagCommand(ITagParser tagParser, IConsoleWriter consoleWriter) : IDeclaredCommand
 {
-    public string LongCommand => "move-tags";
-    public Option<string> ShortCommand => Option<string>.None;
-    public string ShortHelp => "this moves a tag to another parent tag, if you want to move it to the root, use the empty tag ':'";
+    /// <summary>Only the last argument can take many values, so the sources and the destination share one argument.</summary>
+    private static readonly ArgumentDefinition Tags = new() { Name = "tags", Description = "The tags to move, followed by their new parent tag.", Arity = Arity.OneOrMore };
+
     public CommandGrouping CommandGrouping => CommandGrouping.Tag;
+    public string Name => "move-tags";
+    public string Description => "Moves tags with their children and files under another parent tag.";
+    public string Details => "The last tag is the new parent: 'move-tags :a :b :destination' turns ':a' into ':destination:a' and ':b' into ':destination:b'.";
+    public IReadOnlyList<ArgumentDefinition> Arguments => [Tags];
 
-    public bool Execute(IEnumerable<string> arguments, IOptionParser options)
+    public Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
+        => Task.FromResult(input.Values(Tags).ToArray() switch
+        {
+            [.. var sources, var destination] when sources.Length > 0 => MoveTags(sources, destination),
+            _ => Report("Give the destination tag after the tags to move, for example 'move-tags :a :destination'."),
+        });
+
+    private bool MoveTags(IEnumerable<string> sources, string destinationText)
+        => Option.FromNullable(tagParser.Parse(destinationText)).Match(
+            none: () => NotATag(destinationText),
+            some: destination => sources.Aggregate(true, (moved, source) => MoveTag(source, destination) && moved));
+
+    private bool MoveTag(string text, Tag destination)
+        => Option.FromNullable(tagParser.Parse(text)).Match(
+            none: () => NotATag(text),
+            some: tag => tag.Move(destination) || Report($"The tag '{text}' could not be moved: it or '{destination.FullName}' does not exist, or '{destination.FullName}' already has a child named '{tag.Name}'."));
+
+    private bool NotATag(string text)
+        => Report($"'{text}' is not a tag, a tag starts with a colon, for example ':tax:2018'.");
+
+    private bool Report(string problem)
     {
-        var argumentList = arguments.ToList();
-        var result = false;
-
-        if (argumentList.Count >= 2)
-        {
-            result = MoveTags(argumentList);
-        }
-
-        if (!result)
-        {
-            logger.LogWarning("Rename failed");
-        }
-
-        return result;
-    }
-
-    private bool MoveTags(IEnumerable<string> lazyArguments)
-    {
-        var arguments = lazyArguments.ToList();
-        if (CheckArguments(arguments))
-        {
-            if (tagParser.Parse(arguments.Last()) is { } destinationTag)
-            {
-                return arguments.SkipLast(1).Select(tagParser.Parse).All(t => t != null && t.Move(destinationTag));
-            }
-        }
+        consoleWriter.WriteLine(problem);
 
         return false;
-    }
-
-    private bool CheckArguments(IEnumerable<string> arguments)
-    {
-        return arguments.All(a => a.IsTag);
     }
 }

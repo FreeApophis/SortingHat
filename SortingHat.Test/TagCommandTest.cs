@@ -86,6 +86,110 @@ public sealed class TagCommandTest : IDisposable
         Assert.Equal(["b.txt"], _hat.FindFiles(":y:2018"));
     }
 
+    [Fact]
+    public void GivenTagsThenAddTagsStoresThemAndListTagsShowsThem()
+    {
+        Assert.Equal(0, _hat.Hat(["add-tags", ":tax:2018", ":movie:good"]));
+
+        Assert.Equal(0, _hat.Hat(["list-tags"]));
+        Assert.Contains(_hat.Lines, line => line.StartsWith("* :tax:2018") && line.Contains("(0)"));
+        Assert.Contains(_hat.Lines, line => line.StartsWith("* :movie:good") && line.Contains("(0)"));
+    }
+
+    [Fact]
+    public void GivenATaggedFileThenListTagsCountsIt()
+    {
+        _hat.TaggedFile("a.txt", ":tax");
+
+        Assert.Equal(0, _hat.Hat(["tags"]));
+        Assert.Contains(_hat.Lines, line => line.StartsWith("* :tax") && line.Contains("(1)"));
+    }
+
+    [Fact]
+    public void GivenNoTagsThenListTagsSaysSo()
+    {
+        Assert.Equal(0, _hat.Hat(["list-tags"]));
+        Assert.Equal(["There are currently no tags in the database."], _hat.Lines);
+    }
+
+    [Fact]
+    public void GivenSomethingThatIsNotATagThenAddTagsReportsIt()
+    {
+        Assert.NotEqual(0, _hat.Hat(["add-tags", "tax"]));
+        Assert.Contains(_hat.Lines, line => line.Contains("'tax'"));
+    }
+
+    [Fact]
+    public void GivenNoTagThenAddTagsAsksForOne()
+    {
+        Assert.NotEqual(0, _hat.Hat(["add-tags"]));
+        Assert.Contains(_hat.Lines, line => line.Contains("<tag>"));
+    }
+
+    [Fact]
+    public void GivenAnUnknownTagThenRemoveTagsReportsIt()
+    {
+        Assert.NotEqual(0, _hat.Hat(["remove-tags", ":typo"]));
+        Assert.Contains(_hat.Lines, line => line.Contains("':typo'"));
+    }
+
+    [Fact]
+    public void GivenATagAsTheNewNameThenRenameTagReportsIt()
+    {
+        _hat.TaggedFile("a.txt", ":a");
+
+        Assert.NotEqual(0, _hat.Hat(["rename-tag", ":a", ":b"]));
+        Assert.Contains(_hat.Lines, line => line.Contains("':b'"));
+        Assert.Equal(["a.txt"], _hat.FindFiles(":a"));
+    }
+
+    [Fact]
+    public void GivenOnlyTheTagThenRenameTagAsksForTheNewName()
+    {
+        Assert.NotEqual(0, _hat.Hat(["rename-tag", ":a"]));
+        Assert.Contains(_hat.Lines, line => line.Contains("<new-name>"));
+    }
+
+    [Fact]
+    public void GivenTheNameOfASiblingThenRenameTagReportsIt()
+    {
+        _hat.TaggedFile("a.txt", ":a");
+        _hat.TaggedFile("b.txt", ":b");
+
+        Assert.NotEqual(0, _hat.Hat(["rename-tag", ":a", "b"]));
+        Assert.Contains(_hat.Lines, line => line.Contains("':a'"));
+    }
+
+    [Fact]
+    public void GivenTagsAndADestinationThenMoveTagsMovesThemUnderTheDestination()
+    {
+        _hat.TaggedFile("a.txt", ":a");
+        _hat.TaggedFile("b.txt", ":b");
+        _hat.Hat(["add-tags", ":destination"]);
+
+        Assert.Equal(0, _hat.Hat(["move-tags", ":a", ":b", ":destination"]));
+
+        Assert.Equal(["a.txt"], _hat.FindFiles(":destination:a"));
+        Assert.Equal(["b.txt"], _hat.FindFiles(":destination:b"));
+    }
+
+    [Fact]
+    public void GivenOnlyOneTagThenMoveTagsAsksForTheDestination()
+    {
+        Assert.NotEqual(0, _hat.Hat(["move-tags", ":a"]));
+        Assert.Contains(_hat.Lines, line => line.Contains("destination"));
+    }
+
+    [Fact]
+    public void GivenADestinationWithAChildOfTheSameNameThenMoveTagsReportsIt()
+    {
+        _hat.TaggedFile("a.txt", ":x:2018");
+        _hat.TaggedFile("b.txt", ":y:2018");
+
+        Assert.NotEqual(0, _hat.Hat(["move-tags", ":x:2018", ":y"]));
+        Assert.Contains(_hat.Lines, line => line.Contains("':x:2018'"));
+    }
+
     public void Dispose()
         => _hat.Dispose();
 }

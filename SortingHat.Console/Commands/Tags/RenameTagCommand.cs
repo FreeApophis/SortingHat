@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Apophis.CLI.Writer;
 using Funcky.Monads;
 using JetBrains.Annotations;
-using Microsoft.Extensions.Logging;
 using SortingHat.API;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
@@ -11,72 +11,35 @@ using SortingHat.API.Models;
 namespace SortingHat.CLI.Commands.Tags;
 
 [UsedImplicitly]
-internal class RenameTagCommand(ILogger<RenameTagCommand> logger, IConsoleWriter consoleWriter, ITagParser tagParser) : ICommand
+internal class RenameTagCommand(IConsoleWriter consoleWriter, ITagParser tagParser) : IDeclaredCommand
 {
-    public string LongCommand => "rename-tag";
-    public Option<string> ShortCommand => Option<string>.None;
-    public string ShortHelp => "Renames a tag from database";
+    private static readonly ArgumentDefinition TagArgument = new() { Name = "tag", Description = "The tag to rename, for example ':tax:2018'." };
+
+    private static readonly ArgumentDefinition NewName = new() { Name = "new-name", Description = "The new name of its last level, without colon, for example '2019'." };
+
     public CommandGrouping CommandGrouping => CommandGrouping.Tag;
+    public string Name => "rename-tag";
+    public string Description => "Renames a tag from database";
+    public string Details => "Only the last level changes: 'rename-tag :tax:2018 2019' gives ':tax:2019'. To give a tag another parent, use move-tags.";
+    public IReadOnlyList<ArgumentDefinition> Arguments => [TagArgument, NewName];
 
-    public bool Execute(IEnumerable<string> arguments, IOptionParser options)
+    public Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
+        => Task.FromResult((from tag in input.Value(TagArgument)
+                            from newName in input.Value(NewName)
+                            select RenameTag(tag, newName))
+            .GetOrElse(false));
+
+    private bool RenameTag(string text, string newName)
+        => newName.IsTag
+            ? Report($"The new name '{newName}' cannot be a tag, give only the new name of the last level, for example '2019'.")
+            : Option.FromNullable(tagParser.Parse(text)).Match(
+                none: () => Report($"'{text}' is not a tag, a tag starts with a colon, for example ':tax:2018'."),
+                some: tag => tag.Rename(newName) || Report($"The tag '{text}' does not exist, or one of its siblings is already named '{newName}'."));
+
+    private bool Report(string problem)
     {
-        var result = false;
-
-        if (arguments.Count() == 2)
-        {
-            result = RenameTag(arguments);
-        }
-        else
-        {
-            logger.LogWarning("rename tag has exactly two arguments, the tag to rename, and a new name: hat rename-tag :tag new_name");
-            consoleWriter.WriteLine("rename tag has exactly two arguments, the tag to rename, and a new name: hat rename-tag :tag new_name");
-        }
-
-        if (!result)
-        {
-            logger.LogWarning("Rename failed");
-        }
-
-        return result;
-    }
-
-    private bool RenameTag(IEnumerable<string> arguments)
-    {
-        var renamePair = arguments.ToList();
-
-        var tagString = renamePair.First();
-        var newName = renamePair.Last();
-
-        if (CheckArguments(tagString, newName))
-        {
-            var tag = tagParser.Parse(tagString);
-            if (tag != null)
-            {
-                return tag.Rename(newName);
-            }
-        }
+        consoleWriter.WriteLine(problem);
 
         return false;
-    }
-
-    private bool CheckArguments(string tagString, string newName)
-    {
-        if (!tagString.IsTag)
-        {
-            logger.LogWarning($"First Argument '{tagString}' must be a tag");
-            consoleWriter.WriteLine($"First Argument '{tagString}' must be a tag");
-
-            return false;
-        }
-
-        if (newName.IsTag)
-        {
-            logger.LogWarning($"Second Argument '{newName}' cannot be a tag");
-            consoleWriter.WriteLine($"Second Argument '{newName}' cannot be a tag");
-
-            return false;
-        }
-
-        return true;
     }
 }
