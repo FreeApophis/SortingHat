@@ -25,7 +25,7 @@ internal class ImportProjectCommand(IConsoleWriter consoleWriter, ICopyFile copy
         {
             [] => NotEnoughArguments(),
             [var file] => ImportProject(file),
-            [var projectName, var file] => ImportProject(projectName, file),
+            [var file, var projectName] => ImportProject(file, projectName),
             _ => TooManyArguments(),
         };
 

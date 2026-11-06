@@ -30,7 +30,14 @@ public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExist
     {
         console.Writer.WriteLine($"Find Files: {search}");
 
-        var filesByHash = fileStore.Search(search).GroupByHash().ToList();
+        var result = fileStore.Search(search);
+
+        foreach (var unknownTag in result.UnknownTags)
+        {
+            console.Writer.WriteLine($"Unknown tag: {unknownTag}");
+        }
+
+        var filesByHash = result.Files.GroupByHash().ToList();
 
         return filesByHash.Count switch
         {

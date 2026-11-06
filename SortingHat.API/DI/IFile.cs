@@ -22,7 +22,7 @@ public interface IFile
 
     Task<IEnumerable<string>> GetNames(File file);
 
-    IEnumerable<File> Search(string query);
+    SearchResult Search(string query);
 
     IEnumerable<File> GetDuplicates();
 }

@@ -1,17 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Linq;
 using System.Threading.Tasks;
+using Funcky.Extensions;
+using Funcky.Monads;
 using JetBrains.Annotations;
 using Microsoft.Data.Sqlite;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
 using SortingHat.API.Parser;
+using SortingHat.API.Parser.Nodes;
+using static Funcky.Functional;
 
 namespace SortingHat.DB.Access;
 
 [UsedImplicitly]
-public class SQLiteFile(Func<SearchQueryVisitor> newSearchQueryVisitor, Func<File> newFile, SQLiteProjectDatabase db, SQLiteTag sqLiteTag, Parser parser) : IFile
+public class SQLiteFile(Func<File> newFile, SQLiteProjectDatabase db, SQLiteTag sqLiteTag, Parser parser, ITagParser tagParser) : IFile
 {
     private const string AllFileTags = @"SELECT Tags.Id
 FROM Tags
@@ -51,10 +56,10 @@ HAVING DuplicateCount > 1";
         return true;
     }
 
-    public IEnumerable<File> Search(string query)
-    {
-        return MetaSearch(ParseQuery(query));
-    }
+    public SearchResult Search(string query)
+        => parser.Parse(query) is { } expression
+            ? Search(expression)
+            : new SearchResult([], []);
 
     public IEnumerable<File> GetDuplicates()
     {
@@ -152,6 +157,33 @@ HAVING DuplicateCount > 1";
         return fileId;
     }
 
+    private SearchResult Search(IParseNode expression)
+    {
+        var tags = SearchQuery.TagNames(expression)
+            .Distinct()
+            .Select(name => (Name: name, Id: FindTag(name)))
+            .ToList();
+
+        var knownTags = tags
+            .WhereSelect(tag => tag.Id.Select(id => (tag.Name, Id: id)))
+            .Select((tag, index) => (tag.Name, Parameter: new SqliteParameter($"@tag{index}", tag.Id)))
+            .ToList();
+
+        var unknownTags = tags
+            .Where(tag => tag.Id.Match(none: true, some: False))
+            .Select(tag => tag.Name)
+            .ToList();
+
+        var sql = SearchQuery.Sql(expression, knownTags.ToDictionary(tag => tag.Name, tag => tag.Parameter.ParameterName));
+
+        return new SearchResult(db.ExecuteReader(sql, ReadFiles, [.. knownTags.Select(tag => tag.Parameter)]), unknownTags);
+    }
+
+    private Option<long> FindTag(string name)
+        => from tag in Option.FromNullable(tagParser.Parse(name))
+           from id in Option.FromNullable(sqLiteTag.Find(tag))
+           select id;
+
     private IEnumerable<File> MetaSearch(string search)
         => db.ExecuteReader(search, ReadFiles);
 
@@ -177,17 +209,5 @@ HAVING DuplicateCount > 1";
         }
 
         return hasEntry;
-    }
-
-    private string ParseQuery(string query)
-    {
-        var visitor = newSearchQueryVisitor();
-
-        if (parser.Parse(query) is { } ir)
-        {
-            ir.Accept(visitor);
-        }
-
-        return visitor.Result;
     }
 }

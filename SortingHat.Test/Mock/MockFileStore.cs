@@ -51,7 +51,7 @@ public class MockFileStore : IFile
         throw new System.NotImplementedException();
     }
 
-    public IEnumerable<File> Search(string query)
+    public SearchResult Search(string query)
     {
         throw new System.NotImplementedException();
     }

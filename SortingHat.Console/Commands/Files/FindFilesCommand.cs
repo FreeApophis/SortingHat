@@ -23,7 +23,13 @@ internal class FindFilesCommand(IFile fileStore, IConsoleWriter consoleWriter) :
         var search = string.Join(" ", arguments);
         consoleWriter.WriteLine($"Find Files: {search}");
 
-        var files = fileStore.Search(search).ToList();
+        var result = fileStore.Search(search);
+        var files = result.Files;
+
+        foreach (var unknownTag in result.UnknownTags)
+        {
+            consoleWriter.WriteLine($"Unknown tag: {unknownTag}");
+        }
 
         if (files.Any())
         {

@@ -39,8 +39,6 @@ internal class CompositionRoot
         Builder.RegisterType<API.Models.Tag>().As<API.Models.Tag>().InstancePerDependency();
         Builder.RegisterType<API.Models.File>().As<API.Models.File>().InstancePerDependency();
 
-        Builder.RegisterType<SearchQueryVisitor>().As<SearchQueryVisitor>().InstancePerDependency();
-
         Builder.Register(_ => SHA256.Create()).As<HashAlgorithm>().SingleInstance();
         Builder.Register(c => new HashService(c.Resolve<HashAlgorithm>(), nameof(SHA256), c.Resolve<IConsoleWriter>())).As<IHashService>().SingleInstance();
         Builder.RegisterType<LoggerFactory>().As<ILoggerFactory>().SingleInstance();

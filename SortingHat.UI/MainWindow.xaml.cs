@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
@@ -13,7 +12,6 @@ using SortingHat.API.Models;
 using SortingHat.API.Parser;
 using SortingHat.API.Parser.OperatorType;
 using SortingHat.API.Parser.Token;
-using SortingHat.DB;
 
 namespace SortingHat.UI;
 
@@ -23,7 +21,6 @@ public partial class MainWindow : MetroWindow, INotifyPropertyChanged
 
     private readonly ITag _tag;
     private readonly ILogger<MainWindow> _logger;
-    private readonly Func<SearchQueryVisitor> _newSearchQueryVisitor;
     private readonly Parser _parser;
     private string _searchString = string.Empty;
 
@@ -31,14 +28,13 @@ public partial class MainWindow : MetroWindow, INotifyPropertyChanged
 
     private bool _popupVisible;
 
-    public MainWindow(IFile file, ITag tag, ILogger<MainWindow> logger, Func<SearchQueryVisitor> newSearchQueryVisitor, Parser parser)
+    public MainWindow(IFile file, ITag tag, ILogger<MainWindow> logger, Parser parser)
     {
         logger.LogTrace("Main Window created");
 
         _file = file;
         _tag = tag;
         _logger = logger;
-        _newSearchQueryVisitor = newSearchQueryVisitor;
         _parser = parser;
         _files = [];
 
@@ -124,7 +120,7 @@ public partial class MainWindow : MetroWindow, INotifyPropertyChanged
 
         PossibleNextArguments(search);
 
-        Files = _file.Search(search);
+        Files = _file.Search(search).Files;
 
         return search;
     }
