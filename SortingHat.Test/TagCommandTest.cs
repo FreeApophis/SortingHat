@@ -30,6 +30,40 @@ public sealed class TagCommandTest : IDisposable
         Assert.Equal(["a.txt"], _hat.FindFiles(":tax:2018"));
     }
 
+    [Fact]
+    public void GivenAFreeNameThenRenameTagRenamesTheTag()
+    {
+        _hat.TaggedFile("a.txt", ":a");
+
+        _hat.Hat(["rename-tag", ":a", "b"]);
+
+        Assert.Equal(["a.txt"], _hat.FindFiles(":b"));
+    }
+
+    [Fact]
+    public void GivenTheNameOfASiblingThenRenameTagKeepsBothTags()
+    {
+        _hat.TaggedFile("a.txt", ":a");
+        _hat.TaggedFile("b.txt", ":b");
+
+        _hat.Hat(["rename-tag", ":a", "b"]);
+
+        Assert.Equal(["a.txt"], _hat.FindFiles(":a"));
+        Assert.Equal(["b.txt"], _hat.FindFiles(":b"));
+    }
+
+    [Fact]
+    public void GivenADestinationWithAChildOfTheSameNameThenMoveTagsKeepsBothTags()
+    {
+        _hat.TaggedFile("a.txt", ":x:2018");
+        _hat.TaggedFile("b.txt", ":y:2018");
+
+        _hat.Hat(["move-tags", ":x:2018", ":y"]);
+
+        Assert.Equal(["a.txt"], _hat.FindFiles(":x:2018"));
+        Assert.Equal(["b.txt"], _hat.FindFiles(":y:2018"));
+    }
+
     public void Dispose()
         => _hat.Dispose();
 }

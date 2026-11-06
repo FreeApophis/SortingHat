@@ -1,0 +1,7 @@
+﻿/* A tag name is unique among its siblings. NULLs are distinct in a UNIQUE index, so the root tags need their own partial index. */
+
+CREATE UNIQUE INDEX TagsRootNameIndex
+ON Tags (Name) WHERE ParentId IS NULL;
+
+CREATE UNIQUE INDEX TagsChildNameIndex
+ON Tags (ParentId, Name) WHERE ParentId IS NOT NULL;

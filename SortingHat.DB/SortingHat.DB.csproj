@@ -41,6 +41,9 @@
     <EmbeddedResource Include="Migrations\Project\20180802-2030-CreateFilePaths.migration">
       <CustomToolNamespace>Migrations</CustomToolNamespace>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\Project\20261106-1200-UniqueTagNames.migration">
+      <CustomToolNamespace>Migrations</CustomToolNamespace>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

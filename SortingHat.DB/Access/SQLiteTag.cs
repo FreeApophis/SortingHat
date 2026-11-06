@@ -31,10 +31,16 @@ SELECT id, parentId, name, level FROM tree;";
     }
 
     public bool Destroy(Tag tag)
-        => Find(tag).Match(none: false, some: DestroyTag);
+        => Find(tag)
+            .Match(
+                none: false,
+                some: DestroyTag);
 
     public bool Rename(Tag tag, string newName)
-        => Find(tag).Match(none: false, some: tagId => RenameTag(tagId, newName));
+        => Find(tag)
+            .Match(
+                none: false,
+                some: RenameTag(newName));
 
     public bool Move(Tag tag, Tag destinationTag)
         => (from tagId in Find(tag)
@@ -83,18 +89,25 @@ SELECT id, parentId, name, level FROM tree;";
         return true;
     }
 
-    private bool RenameTag(long tagId, string newName)
-    {
-        db.ExecuteNonQuery("UPDATE Tags SET Name = @tagName WHERE Id = @tagId", new SqliteParameter("@tagId", tagId), new SqliteParameter("@tagName", newName));
-
-        return true;
-    }
+    private Func<long, bool> RenameTag(string newName)
+        => tagId => ExecuteUnlessSiblingExists("UPDATE Tags SET Name = @tagName WHERE Id = @tagId", new SqliteParameter("@tagId", tagId), new SqliteParameter("@tagName", newName));
 
     private bool MoveTag(long tagId, long destinationTagId)
-    {
-        db.ExecuteNonQuery("UPDATE Tags SET ParentId = @destinationTagId WHERE Id = @tagId", new SqliteParameter("@tagId", tagId), new SqliteParameter("@destinationTagId", destinationTagId));
+        => ExecuteUnlessSiblingExists("UPDATE Tags SET ParentId = @destinationTagId WHERE Id = @tagId", new SqliteParameter("@tagId", tagId), new SqliteParameter("@destinationTagId", destinationTagId));
 
-        return true;
+    /// <summary>The unique tag name indexes reject a change that would give a tag the same name as one of its siblings.</summary>
+    private bool ExecuteUnlessSiblingExists(string commandText, params SqliteParameter[] parameters)
+    {
+        try
+        {
+            db.ExecuteNonQuery(commandText, parameters);
+
+            return true;
+        }
+        catch (SqliteException exception) when (exception.SqliteExtendedErrorCode == SQLitePCL.raw.SQLITE_CONSTRAINT_UNIQUE)
+        {
+            return false;
+        }
     }
 
     private long CountFiles(long tagId)
