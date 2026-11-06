@@ -12,7 +12,6 @@ using Microsoft.Extensions.Logging;
 using SortingHat.API.AutoTag;
 using SortingHat.API.DI;
 using SortingHat.CLI.Options;
-using static Funcky.Functional;
 using Console = Apophis.CLI.Console;
 using IOption = SortingHat.API.DI.IOption;
 
@@ -33,17 +32,24 @@ internal class HelpCommand(ILogger<HelpCommand> logger, Console console, ICompon
         var firstArgument = arguments.FirstOrNone();
 
         return firstArgument.Match(
-            none: PrintOverview(options),
+            none: () => PrintOverview(options),
             some: argument => PrintSpecificHelp(argument, container.Resolve<IEnumerable<ICommand>>()));
     }
 
     private bool PrintSpecificHelp(string argument, IEnumerable<ICommand> commands)
-    {
-        var specificHelp = FindSpecificHelp(argument, commands);
+        => FindSpecificHelp(argument, commands).Match(
+            none: () => PrintDeclaredHelp(argument),
+            some: command =>
+            {
+                PrintLongHelp(command);
+                return true;
+            });
 
-        specificHelp.AndThen(PrintLongHelp);
-        return specificHelp.Match(none: false, some: True);
-    }
+    /// <summary>The help of a declared command is generated from its declaration, the same as for <c>hat &lt;command&gt; --help</c>.</summary>
+    private bool PrintDeclaredHelp(string argument)
+        => container.Resolve<IEnumerable<IDeclaredCommand>>()
+            .FirstOrNone(command => command.Name == argument)
+            .Match(none: false, some: command => container.Resolve<CommandLine>().Run([command.Name, "--help"]) == ExitCode.Success);
 
     private Option<ICommand> FindSpecificHelp(string argument, IEnumerable<ICommand> commands)
     {
@@ -82,7 +88,7 @@ internal class HelpCommand(ILogger<HelpCommand> logger, Console console, ICompon
     private bool PrintOverview(IOptionParser options)
     {
         PrintHelpHeader();
-        PrintHelpCommands(container.Resolve<IEnumerable<ICommand>>());
+        PrintHelpCommands([.. container.Resolve<IEnumerable<ICommand>>().Select(HelpRow), .. container.Resolve<IEnumerable<IDeclaredCommand>>().Select(HelpRow)]);
         PrintHelpOptions(container.Resolve<IEnumerable<IOption>>());
         PrintTagVariables(options);
         PrintHelpExamples();
@@ -137,9 +143,14 @@ internal class HelpCommand(ILogger<HelpCommand> logger, Console console, ICompon
         return table;
     }
 
-    private void PrintHelpCommands(IEnumerable<ICommand> lazyCommands)
+    private static (CommandGrouping Grouping, string Name, string Aliases, string Description) HelpRow(ICommand command)
+        => (command.CommandGrouping, command.LongCommand, command.ShortCommand.GetOrElse(string.Empty), command.ShortHelp);
+
+    private static (CommandGrouping Grouping, string Name, string Aliases, string Description) HelpRow(IDeclaredCommand command)
+        => (command.CommandGrouping, command.Name, string.Join(", ", command.Aliases), command.Description);
+
+    private void PrintHelpCommands(IReadOnlyList<(CommandGrouping Grouping, string Name, string Aliases, string Description)> commands)
     {
-        var commands = lazyCommands.ToList();
         if (commands.Any())
         {
             console.Writer.WriteLine();
@@ -149,10 +160,9 @@ internal class HelpCommand(ILogger<HelpCommand> logger, Console console, ICompon
             var table = HelpTable();
             foreach (var commandGrouping in Enum.GetValues(typeof(CommandGrouping)).Cast<CommandGrouping>())
             {
-                foreach (var command in commands.Where(c => c.CommandGrouping == commandGrouping))
+                foreach (var command in commands.Where(c => c.Grouping == commandGrouping))
                 {
-                    var shortCommand = command.ShortCommand.GetOrElse(string.Empty);
-                    table.Append(command.LongCommand, shortCommand, command.ShortHelp);
+                    table.Append(command.Name, command.Aliases, command.Description);
                 }
 
                 table.AppendSeparator();

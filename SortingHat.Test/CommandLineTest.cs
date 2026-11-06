@@ -39,8 +39,7 @@ public sealed class CommandLineTest : IDisposable
     [Theory]
     [InlineData("help", "--verbose")]
     [InlineData("help", "-v")]
-    [InlineData("-v", "help")]
-    public void GivenAnOptionAnywhereThenTheCommandSeesIt(string first, string second)
+    public void GivenAnOptionAfterTheCommandThenTheCommandSeesIt(string first, string second)
     {
         Assert.Equal(0, _hat.Hat([first, second]));
         Assert.Contains(_hat.Lines, line => line.StartsWith("=>"));

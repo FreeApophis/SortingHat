@@ -24,6 +24,12 @@ internal sealed class HatSandbox : IDisposable
     private readonly IContainer _container;
 
     public HatSandbox()
+        : this(_ => { })
+    {
+    }
+
+    /// <summary>With <paramref name="register"/>, a test adds its own registrations, the way a plugin module does.</summary>
+    public HatSandbox(Action<ContainerBuilder> register)
     {
         Directory.CreateDirectory(_root);
 
@@ -32,6 +38,7 @@ internal sealed class HatSandbox : IDisposable
         compositionRoot.Builder.RegisterInstance(_writer).As<IConsoleWriter>();
         compositionRoot.Builder.RegisterInstance(_reader).As<IConsoleReader>();
         compositionRoot.Builder.RegisterInstance(_databaseSettings);
+        register(compositionRoot.Builder);
         _container = compositionRoot.Build();
     }
 
