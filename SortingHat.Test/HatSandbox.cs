@@ -75,11 +75,12 @@ internal sealed class HatSandbox : IDisposable
             .Order();
     }
 
-    public void Hat(string[] arguments)
+    /// <summary>Runs hat with the <paramref name="arguments"/> and returns its exit code.</summary>
+    public int Hat(string[] arguments)
     {
         _writer.Lines.Clear();
 
-        InScope(scope => scope.Resolve<ArgumentParser>().Execute(arguments));
+        return InScope(scope => scope.Resolve<Application>().Run(arguments));
     }
 
     /// <summary>Runs <paramref name="run"/> in its own lifetime scope, like one invocation of hat, so it gets its own database connection.</summary>

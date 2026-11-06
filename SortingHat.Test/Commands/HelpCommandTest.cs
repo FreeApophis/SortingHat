@@ -20,7 +20,7 @@ public class HelpCommandTest
         using var container = CompositionRootWithMyWriter(writer);
 
         // Run application without a command
-        container.Resolve<ArgumentParser>().Execute([]);
+        container.Resolve<Application>().Run([]);
 
         // Test the output
         Assert.Collection(writer.Lines, line => Assert.Equal("Maybe run 'program help'", line));
@@ -34,7 +34,7 @@ public class HelpCommandTest
         using var container = CompositionRootWithMyWriter(writer);
 
         // Run application without a command
-        container.Resolve<ArgumentParser>().Execute(["help"]);
+        container.Resolve<Application>().Run(["help"]);
 
         // Test the output
         Assert.Equal("program <command> [<arguments>] [<options>]:", writer.Lines[0]);
@@ -48,7 +48,7 @@ public class HelpCommandTest
         using var container = CompositionRootWithMyWriter(writer);
 
         // Run application without a command
-        Assert.True(container.Resolve<ArgumentParser>().Execute(["help", command]));
+        Assert.Equal(0, container.Resolve<Application>().Run(["help", command]));
 
         Assert.NotEmpty(writer.Lines[0]);
     }

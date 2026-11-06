@@ -11,7 +11,7 @@ namespace SortingHat.CLI;
 [ExcludeFromCodeCoverage]
 internal static class Program
 {
-    private static void Main(string[] args)
+    private static int Main(string[] args)
     {
         // Create the composition root and build the container
         using var container = new CompositionRoot().Register().Build();
@@ -22,6 +22,6 @@ internal static class Program
             => container.Resolve<IPluginLoader>().RegisterModules(builder));
 
         // this scope includes now all the plugins, and we can run the application
-        scope.Resolve<Application>().Run(args);
+        return scope.Resolve<Application>().Run(args);
     }
 }

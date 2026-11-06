@@ -30,7 +30,7 @@ internal class CompositionRoot
         Builder.RegisterModule(new FileSystemModule());
 
         Builder.RegisterType<Application>().AsSelf();
-        Builder.RegisterType<ArgumentParser>().AsSelf();
+        Builder.RegisterType<CommandLine>().AsSelf();
 
         Builder.RegisterType<API.Models.TagParser>().As<API.Models.ITagParser>();
         Builder.RegisterType<AutoTagHandler>().As<IAutoTagHandler>();
