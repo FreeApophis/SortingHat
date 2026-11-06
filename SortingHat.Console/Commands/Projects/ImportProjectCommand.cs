@@ -8,6 +8,7 @@ using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API;
 using SortingHat.API.DI;
+using SortingHat.API.Models;
 
 namespace SortingHat.CLI.Commands.Projects;
 
@@ -37,6 +38,17 @@ internal class ImportProjectCommand(IConsoleWriter consoleWriter, ICopyFile copy
     }
 
     private bool ImportProject(string filePath, string projectName)
+        => ProjectName.ParseNew(projectName, projects.GetProjects(), databaseSettings.Name)
+            .Match(left: Reject, right: project => Import(filePath, project));
+
+    private bool Reject(string problem)
+    {
+        consoleWriter.WriteLine(problem);
+
+        return false;
+    }
+
+    private bool Import(string filePath, ProjectName projectName)
     {
         copyFile.Copy(filePath, DestinationPath(projectName));
         projects.AddProject(projectName);
@@ -63,8 +75,6 @@ internal class ImportProjectCommand(IConsoleWriter consoleWriter, ICopyFile copy
         throw new NotImplementedException();
     }
 
-    private string DestinationPath(string project)
-    {
-        return Path.Combine(databaseSettings.DbPath, $"{project}.db");
-    }
+    private string DestinationPath(ProjectName project)
+        => Path.Combine(databaseSettings.DbPath, $"{project.Value}.db");
 }
