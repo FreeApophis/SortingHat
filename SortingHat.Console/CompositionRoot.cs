@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Reflection;
 using System.Security.Cryptography;
 using Apophis.CLI;
 using Apophis.CLI.Reader;
@@ -68,11 +66,6 @@ internal class CompositionRoot
         Builder.RegisterType<FolderFromRootAutoTag>().As<IAutoTag>().SingleInstance();
     }
 
-    private static string ConfigurationPath()
-    {
-        return Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) ?? throw new NullReferenceException("Configuration path cannot be null");
-    }
-
     private void RegisterConfiguration()
     {
         // https://github.com/dotnet/cli/issues/11545
@@ -84,8 +77,9 @@ internal class CompositionRoot
 
     private static IConfigurationRoot ConfigurationRoot()
     {
+        // the folder of hat.exe, also in a single-file bundle where Assembly.Location is empty
         return new ConfigurationBuilder()
-          .SetBasePath(ConfigurationPath())
+          .SetBasePath(AppContext.BaseDirectory)
           .AddJsonFile("hat-config.json", false)
           .Build();
     }

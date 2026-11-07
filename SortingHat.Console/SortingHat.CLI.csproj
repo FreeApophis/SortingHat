@@ -28,6 +28,8 @@
   <ItemGroup>
     <None Update="hat-config.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <!-- stays next to hat.exe in a single-file publish, so the user can edit it -->
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </None>
   </ItemGroup>
 
