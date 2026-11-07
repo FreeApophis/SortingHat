@@ -1,94 +1,92 @@
-﻿using SortingHat.API.DI;
+﻿using System;
+using Funcky.Monads;
 using SortingHat.API.Models;
-using SortingHat.Test.Mock;
 using Xunit;
+using static Funcky.Functional;
 
 namespace SortingHat.Test;
 
-public class TagTest
+/// <summary>A tag is parsed once from its text; colons separate its levels. Pure rules, no database.</summary>
+public sealed class TagTest
 {
-    private readonly ITag _tag;
-    private readonly TagParser _tagParser;
-
-    public TagTest()
+    [Fact]
+    public void GivenATagWithLevelsThenItKnowsItsNameAndItsParent()
     {
-        _tag = MockTagStore.Create();
-        _tagParser = new TagParser((name, parent) => new Tag(_tag, name, parent));
+        var tag = Valid(":tax:2018");
+
+        Assert.Equal(("2018", Option.Some(":tax")), (tag.Name.Value, tag.Parent.Select(parent => parent.FullName)));
     }
 
     [Fact]
-    public void GivenTwoTagsWithTheSameValueTheyTheyShouldBeEqual()
-    {
-        var tag1 = new Tag(_tag, "2018", new Tag(_tag, "created"));
-        var tag2 = new Tag(_tag, "2018", new Tag(_tag, "created"));
-        var tag3 = new Tag(_tag, "2018");
-
-        Assert.Equal(tag1, tag2);
-        Assert.NotEqual(tag1, tag3);
-    }
+    public void GivenATagWithOneLevelThenItHasNoParent()
+        => Assert.Equal(Option<Tag>.None, Valid(":tax").Parent);
 
     [Fact]
-    public void GivenAStringRepresentingATagThenTagParseShouldReturnATagWithTheRightValue()
-    {
-        var referenceTag = new Tag(_tag, "tag");
-        var parsedTag = _tagParser.Parse(":tag");
-
-        Assert.Equal(referenceTag, parsedTag);
-    }
+    public void GivenATagThenItIsWrittenAsItWasParsed()
+        => Assert.Equal((":grandfather:father:child", ":grandfather:father:child"), (Valid(":grandfather:father:child").FullName, Valid(":grandfather:father:child").ToString()));
 
     [Fact]
-    public void ParseSimpleTagMissingColon()
-    {
-        var referenceTag = null as Tag;
-        var parsedTag = _tagParser.Parse("tag");
-
-        Assert.Equal(referenceTag, parsedTag);
-    }
+    public void GivenTheSameTextThenTheTagsAreEqual()
+        => Assert.Equal(Valid(":created:2018"), Valid(":created:2018"));
 
     [Fact]
-    public void ParseTag()
-    {
-        var referenceTag = new Tag(_tag, "child", new Tag(_tag, "father", new Tag(_tag, "grandfather")));
-        var parsedTag = _tagParser.Parse(":grandfather:father:child");
-
-        Assert.Equal(referenceTag, parsedTag);
-    }
+    public void GivenTheSameNameUnderAnotherParentThenTheTagsDiffer()
+        => Assert.NotEqual(Valid(":created:2018"), Valid(":2018"));
 
     [Fact]
-    public void ParseEmptyTag()
-    {
-        var referenceTag = null as Tag;
-        var parsedTag = _tagParser.Parse(":");
-
-        Assert.Equal(referenceTag, parsedTag);
-    }
+    public void GivenATagAndANameThenTheChildHasTheTagAsParent()
+        => Assert.Equal(Valid(":tax:2018"), Valid(":tax").Child(ValidName("2018")));
 
     [Fact]
-    public void ParseTagMissingColon()
-    {
-        var referenceTag = null as Tag;
-        var parsedTag = _tagParser.Parse("grandfather:father:child");
+    public void GivenANameThenTheRootTagHasOnlyThatLevel()
+        => Assert.Equal(Valid(":tax"), Tag.Root(ValidName("tax")));
 
-        Assert.Equal(referenceTag, parsedTag);
-    }
+    [Theory]
+    [InlineData(":tag")]
+    [InlineData(":grand father:father:child with whitespace")]
+    [InlineData(":Steuererklärung:2018")]
+    [InlineData(":Camera:NIKON CORPORATION")]
+    [InlineData(":v1.2")]
+    public void GivenAValidTagThenItIsParsed(string text)
+        => Assert.Equal(text, Valid(text).FullName);
 
-    [Fact]
-    public void ParseTagWhitespace()
-    {
-        var referenceTag = new Tag(_tag, "child with whitespace", new Tag(_tag, "father", new Tag(_tag, "grand father")));
-        var parsedTag = _tagParser.Parse(":grand father:father:child with whitespace");
+    [Theory]
+    [InlineData("")]
+    [InlineData("tag")]
+    [InlineData("grandfather:father:child")]
+    [InlineData(":")]
+    [InlineData("::")]
+    [InlineData(":a::b")]
+    [InlineData("::first:::last")]
+    [InlineData(":a:")]
+    [InlineData(": a")]
+    [InlineData(":a :b")]
+    [InlineData(":a:\tb")]
+    public void GivenTextThatIsNoTagThenItIsInvalidAndTheReasonNamesIt(string text)
+        => Assert.Contains($"'{text}'", Invalid(Tag.Parse(text)));
 
-        Assert.Equal(referenceTag, parsedTag);
-    }
+    [Theory]
+    [InlineData("2019")]
+    [InlineData("two words")]
+    public void GivenAValidNameThenItIsParsed(string text)
+        => Assert.Equal(text, ValidName(text).Value);
 
-    [Fact]
-    public void ParseMultipleColon()
-    {
-        var parsedTag = _tagParser.Parse("::first:::last");
+    [Theory]
+    [InlineData("")]
+    [InlineData(" x")]
+    [InlineData("x ")]
+    [InlineData("a:b")]
+    [InlineData(":b")]
+    public void GivenTextThatIsNoNameThenItIsInvalidAndTheReasonNamesIt(string text)
+        => Assert.Contains($"'{text}'", Invalid(TagName.Parse(text)));
 
-        Assert.NotNull(parsedTag);
+    private static Tag Valid(string text)
+        => Tag.Parse(text).GetOrElse(problem => throw new InvalidOperationException(problem));
 
-        // ReSharper disable once ConstantConditionalAccessQualifier
-        Assert.Equal(":first:last", parsedTag?.FullName);
-    }
+    private static TagName ValidName(string text)
+        => TagName.Parse(text).GetOrElse(problem => throw new InvalidOperationException(problem));
+
+    private static string Invalid<T>(Either<string, T> parsed)
+        where T : notnull
+        => parsed.Match(left: Identity, right: value => throw new InvalidOperationException($"Expected an error, but '{value}' was accepted."));
 }

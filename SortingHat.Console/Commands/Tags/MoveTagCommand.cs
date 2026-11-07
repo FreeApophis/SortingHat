@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Apophis.CLI.Writer;
-using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
@@ -11,7 +10,7 @@ using SortingHat.API.Models;
 namespace SortingHat.CLI.Commands.Tags;
 
 [UsedImplicitly]
-internal class MoveTagCommand(ITagParser tagParser, IConsoleWriter consoleWriter) : IDeclaredCommand
+internal class MoveTagCommand(ITag tagStore, IConsoleWriter consoleWriter) : IDeclaredCommand
 {
     /// <summary>Only the last argument can take many values, so the sources and the destination share one argument.</summary>
     private static readonly ArgumentDefinition Tags = new() { Name = "tags", Description = "The tags to move, followed by their new parent tag.", Arity = Arity.OneOrMore };
@@ -30,17 +29,14 @@ internal class MoveTagCommand(ITagParser tagParser, IConsoleWriter consoleWriter
         });
 
     private bool MoveTags(IEnumerable<string> sources, string destinationText)
-        => Option.FromNullable(tagParser.Parse(destinationText)).Match(
-            none: () => NotATag(destinationText),
-            some: destination => sources.Aggregate(true, (moved, source) => MoveTag(source, destination) && moved));
+        => Tag.Parse(destinationText).Match(
+            left: Report,
+            right: destination => sources.Aggregate(true, (moved, source) => MoveTag(source, destination) && moved));
 
     private bool MoveTag(string text, Tag destination)
-        => Option.FromNullable(tagParser.Parse(text)).Match(
-            none: () => NotATag(text),
-            some: tag => tag.Move(destination) || Report($"The tag '{text}' could not be moved: it or '{destination.FullName}' does not exist, or '{destination.FullName}' already has a child named '{tag.Name}'."));
-
-    private bool NotATag(string text)
-        => Report($"'{text}' is not a tag, a tag starts with a colon, for example ':tax:2018'.");
+        => Tag.Parse(text).Match(
+            left: Report,
+            right: tag => tagStore.Move(tag, destination) || Report($"The tag '{text}' could not be moved: it or '{destination.FullName}' does not exist, or '{destination.FullName}' already has a child named '{tag.Name}'."));
 
     private bool Report(string problem)
     {

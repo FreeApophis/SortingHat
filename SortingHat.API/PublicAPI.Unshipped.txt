@@ -35,6 +35,11 @@ override SortingHat.API.Models.PathState.ToString() -> string!
 override SortingHat.API.Models.SearchResult.Equals(object? obj) -> bool
 override SortingHat.API.Models.SearchResult.GetHashCode() -> int
 override SortingHat.API.Models.SearchResult.ToString() -> string!
+override SortingHat.API.Models.Tag.Equals(object? obj) -> bool
+override SortingHat.API.Models.Tag.ToString() -> string!
+override SortingHat.API.Models.TagName.Equals(object? obj) -> bool
+override SortingHat.API.Models.TagName.GetHashCode() -> int
+override SortingHat.API.Models.TagName.ToString() -> string!
 SortingHat.API.AutoTag.ConstantAutoTag
 SortingHat.API.AutoTag.ConstantAutoTag.ConstantAutoTag() -> void
 SortingHat.API.AutoTag.ConstantAutoTag.FindMatch(string! value) -> string?
@@ -53,7 +58,7 @@ SortingHat.API.AutoTag.IAutoTag.HandleTag(System.IO.FileInfo! file, string? tagM
 SortingHat.API.AutoTag.IAutoTag.HumanReadableAutoTagsKey.get -> string!
 SortingHat.API.AutoTag.IAutoTagHandler
 SortingHat.API.AutoTag.IAutoTagHandler.AutoTags.get -> System.Collections.Generic.IEnumerable<SortingHat.API.AutoTag.IAutoTag!>!
-SortingHat.API.AutoTag.IAutoTagHandler.TagFromMask(string! tagMask, System.IO.FileInfo! file) -> SortingHat.API.Models.Tag?
+SortingHat.API.AutoTag.IAutoTagHandler.TagFromMask(string! tagMask, System.IO.FileInfo! file) -> Funcky.Monads.Option<SortingHat.API.Models.Tag!>
 SortingHat.API.AutoTag.IDateTagPart
 SortingHat.API.AutoTag.IDateTagPart.Key.get -> string!
 SortingHat.API.AutoTag.IDateTagPart.Select(System.DateTime dateTime) -> string!
@@ -149,10 +154,10 @@ SortingHat.API.DI.ISettings.this[string! key].set -> void
 SortingHat.API.DI.ITag
 SortingHat.API.DI.ITag.Destroy(SortingHat.API.Models.Tag! tag) -> bool
 SortingHat.API.DI.ITag.FileCount(SortingHat.API.Models.Tag! tag) -> long
-SortingHat.API.DI.ITag.GetTags() -> System.Collections.Generic.IEnumerable<SortingHat.API.Models.Tag!>!
+SortingHat.API.DI.ITag.GetTags() -> System.Collections.Generic.IReadOnlyList<SortingHat.API.Models.Tag!>!
 SortingHat.API.DI.ITag.Move(SortingHat.API.Models.Tag! tag, SortingHat.API.Models.Tag! destinationTag) -> bool
-SortingHat.API.DI.ITag.Rename(SortingHat.API.Models.Tag! tag, string! newName) -> bool
-SortingHat.API.DI.ITag.Store(SortingHat.API.Models.Tag! tag) -> bool
+SortingHat.API.DI.ITag.Rename(SortingHat.API.Models.Tag! tag, SortingHat.API.Models.TagName! newName) -> bool
+SortingHat.API.DI.ITag.Store(SortingHat.API.Models.Tag! tag) -> void
 SortingHat.API.DI.OptionDefinition
 SortingHat.API.DI.OptionDefinition.<Clone>$() -> SortingHat.API.DI.OptionDefinition!
 SortingHat.API.DI.OptionDefinition.Description.get -> string!
@@ -202,8 +207,6 @@ SortingHat.API.Models.Hash.Algorithm.get -> string!
 SortingHat.API.Models.Hash.Digest.get -> string!
 SortingHat.API.Models.Hash.Equals(SortingHat.API.Models.Hash? other) -> bool
 SortingHat.API.Models.Hash.Short.get -> string!
-SortingHat.API.Models.ITagParser
-SortingHat.API.Models.ITagParser.Parse(string! tagString) -> SortingHat.API.Models.Tag?
 SortingHat.API.Models.PathFingerprint
 SortingHat.API.Models.PathFingerprint.<Clone>$() -> SortingHat.API.Models.PathFingerprint!
 SortingHat.API.Models.PathFingerprint.Deconstruct(out long Size, out System.DateTime ModifiedAtUtc, out System.DateTime TakenAtUtc) -> void
@@ -246,17 +249,16 @@ SortingHat.API.Models.SearchResult.SearchResult(System.Collections.Generic.IRead
 SortingHat.API.Models.SearchResult.UnknownTags.get -> System.Collections.Generic.IReadOnlyList<string!>!
 SortingHat.API.Models.SearchResult.UnknownTags.init -> void
 SortingHat.API.Models.Tag
-SortingHat.API.Models.Tag.Children.get -> System.Collections.Generic.List<SortingHat.API.Models.Tag!>!
-SortingHat.API.Models.Tag.Destroy() -> bool
-SortingHat.API.Models.Tag.FileCount.get -> long
+SortingHat.API.Models.Tag.Child(SortingHat.API.Models.TagName! name) -> SortingHat.API.Models.Tag!
+SortingHat.API.Models.Tag.Equals(SortingHat.API.Models.Tag? other) -> bool
 SortingHat.API.Models.Tag.FullName.get -> string!
-SortingHat.API.Models.Tag.Move(SortingHat.API.Models.Tag! destinationTag) -> bool
-SortingHat.API.Models.Tag.Name.get -> string!
-SortingHat.API.Models.Tag.Name.set -> void
-SortingHat.API.Models.Tag.Parent.get -> SortingHat.API.Models.Tag?
-SortingHat.API.Models.Tag.Rename(string! newName) -> bool
-SortingHat.API.Models.Tag.Store() -> bool
-SortingHat.API.Models.Tag.Tag(SortingHat.API.DI.ITag! tag, string! name, SortingHat.API.Models.Tag? parent = null) -> void
+SortingHat.API.Models.Tag.Levels.get -> System.Collections.Generic.IReadOnlyList<SortingHat.API.Models.TagName!>!
+SortingHat.API.Models.Tag.Name.get -> SortingHat.API.Models.TagName!
+SortingHat.API.Models.Tag.Parent.get -> Funcky.Monads.Option<SortingHat.API.Models.Tag!>
+SortingHat.API.Models.TagName
+SortingHat.API.Models.TagName.<Clone>$() -> SortingHat.API.Models.TagName!
+SortingHat.API.Models.TagName.Equals(SortingHat.API.Models.TagName? other) -> bool
+SortingHat.API.Models.TagName.Value.get -> string!
 SortingHat.API.Parser.INodeVisitor
 SortingHat.API.Parser.INodeVisitor.Visit(SortingHat.API.Parser.Nodes.AndOperatorNode! op) -> void
 SortingHat.API.Parser.INodeVisitor.Visit(SortingHat.API.Parser.Nodes.BinaryOperatorNode! op) -> void
@@ -358,7 +360,6 @@ override SortingHat.API.Models.PathFingerprint.ToString() -> string!
 override SortingHat.API.Models.ProjectName.Equals(object? obj) -> bool
 override SortingHat.API.Models.ProjectName.GetHashCode() -> int
 override SortingHat.API.Models.ProjectName.ToString() -> string!
-override SortingHat.API.Models.Tag.Equals(object? obj) -> bool
 override SortingHat.API.Models.Tag.GetHashCode() -> int
 override SortingHat.API.Parser.Nodes.AndOperatorNode.Accept(SortingHat.API.Parser.INodeVisitor! visitor) -> void
 override SortingHat.API.Parser.Nodes.BooleanNode.ToString() -> string!
@@ -405,9 +406,11 @@ static SortingHat.API.Models.ProjectName.operator !=(SortingHat.API.Models.Proje
 static SortingHat.API.Models.ProjectName.operator ==(SortingHat.API.Models.ProjectName? left, SortingHat.API.Models.ProjectName? right) -> bool
 static SortingHat.API.Models.SearchResult.operator !=(SortingHat.API.Models.SearchResult? left, SortingHat.API.Models.SearchResult? right) -> bool
 static SortingHat.API.Models.SearchResult.operator ==(SortingHat.API.Models.SearchResult? left, SortingHat.API.Models.SearchResult? right) -> bool
-static SortingHat.API.Models.Tag.List(SortingHat.API.DI.ITag! tag) -> System.Collections.Generic.IEnumerable<SortingHat.API.Models.Tag!>!
-static SortingHat.API.Models.Tag.operator !=(SortingHat.API.Models.Tag? lhs, SortingHat.API.Models.Tag? rhs) -> bool
-static SortingHat.API.Models.Tag.operator ==(SortingHat.API.Models.Tag? lhs, SortingHat.API.Models.Tag? rhs) -> bool
+static SortingHat.API.Models.Tag.Parse(string! text) -> Funcky.Monads.Either<string!, SortingHat.API.Models.Tag!>
+static SortingHat.API.Models.Tag.Root(SortingHat.API.Models.TagName! name) -> SortingHat.API.Models.Tag!
+static SortingHat.API.Models.TagName.operator !=(SortingHat.API.Models.TagName? left, SortingHat.API.Models.TagName? right) -> bool
+static SortingHat.API.Models.TagName.operator ==(SortingHat.API.Models.TagName? left, SortingHat.API.Models.TagName? right) -> bool
+static SortingHat.API.Models.TagName.Parse(string! name) -> Funcky.Monads.Either<string!, SortingHat.API.Models.TagName!>
 static SortingHat.API.Parser.LexerRules.Create() -> Funcky.Lexer.LexerRuleBook!
 static SortingHat.API.Parser.Parser.Create() -> SortingHat.API.Parser.Parser!
 static SortingHat.API.Plugin.PluginProblem.operator !=(SortingHat.API.Plugin.PluginProblem? left, SortingHat.API.Plugin.PluginProblem? right) -> bool
@@ -418,3 +421,6 @@ virtual SortingHat.API.Models.PathState.Equals(SortingHat.API.Models.PathState? 
 virtual SortingHat.API.Models.PathState.PrintMembers(System.Text.StringBuilder! builder) -> bool
 virtual SortingHat.API.Parser.Nodes.BinaryOperatorNode.Accept(SortingHat.API.Parser.INodeVisitor! visitor) -> void
 virtual SortingHat.API.Parser.Nodes.UnaryOperatorNode.Accept(SortingHat.API.Parser.INodeVisitor! visitor) -> void
+SortingHat.API.Models.Tag.<Clone>$() -> SortingHat.API.Models.Tag!
+static SortingHat.API.Models.Tag.operator !=(SortingHat.API.Models.Tag? left, SortingHat.API.Models.Tag? right) -> bool
+static SortingHat.API.Models.Tag.operator ==(SortingHat.API.Models.Tag? left, SortingHat.API.Models.Tag? right) -> bool

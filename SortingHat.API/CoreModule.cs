@@ -5,7 +5,6 @@ using Apophis.CLI.Writer;
 using Autofac;
 using SortingHat.API.AutoTag;
 using SortingHat.API.DI;
-using SortingHat.API.Models;
 using SortingHat.API.Parser;
 using SortingHat.API.Plugin;
 
@@ -21,11 +20,9 @@ public class CoreModule : Module
     {
         builder.RegisterModule(new ParserModule());
 
-        builder.RegisterType<TagParser>().As<ITagParser>();
         builder.RegisterType<AutoTagHandler>().As<IAutoTagHandler>();
         builder.RegisterType<FilePathExtractor>().As<IFilePathExtractor>().SingleInstance();
 
-        builder.RegisterType<Tag>().AsSelf().InstancePerDependency();
         builder.RegisterType<FileScanner>().As<IFileScanner>();
 
         // one hash algorithm per file, an instance must not be used concurrently

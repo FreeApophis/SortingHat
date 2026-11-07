@@ -16,7 +16,7 @@ using File = SortingHat.API.Models.File;
 namespace SortingHat.DB.Access;
 
 [UsedImplicitly]
-public class SQLiteFile(SQLiteProjectDatabase db, SQLiteTag sqLiteTag, Parser parser, ITagParser tagParser) : IFile
+public class SQLiteFile(SQLiteProjectDatabase db, SQLiteTag sqLiteTag, Parser parser) : IFile
 {
     private const string AllFileTags = @"SELECT Tags.Id
 FROM Tags
@@ -199,7 +199,7 @@ WHERE FilePaths.Path = @filePath";
     }
 
     private Option<long> FindTag(string name)
-        => from tag in Option.FromNullable(tagParser.Parse(name))
+        => from tag in API.Models.Tag.Parse(name).RightOrNone()
            from id in sqLiteTag.Find(tag)
            select id;
 }

@@ -120,6 +120,26 @@ public sealed class TagCommandTest : IDisposable
     }
 
     [Fact]
+    public void GivenATagWithAnEmptyLevelThenAddTagsRejectsItWithTheReason()
+    {
+        Assert.NotEqual(0, _hat.Hat(["add-tags", ":tax::2018"]));
+        Assert.Contains(_hat.Lines, line => line.Contains("':tax::2018'") && line.Contains("empty"));
+
+        Assert.Equal(0, _hat.Hat(["list-tags"]));
+        Assert.Equal(["There are currently no tags in the database."], _hat.Lines);
+    }
+
+    [Fact]
+    public void GivenANewNameWithSpacesAroundThenRenameTagRejectsItWithTheReason()
+    {
+        _hat.TaggedFile("a.txt", ":a");
+
+        Assert.NotEqual(0, _hat.Hat(["rename-tag", ":a", " b"]));
+        Assert.Contains(_hat.Lines, line => line.Contains("' b'") && line.Contains("space"));
+        Assert.Equal(["a.txt"], _hat.FindFiles(":a"));
+    }
+
+    [Fact]
     public void GivenNoTagThenAddTagsAsksForOne()
     {
         Assert.NotEqual(0, _hat.Hat(["add-tags"]));

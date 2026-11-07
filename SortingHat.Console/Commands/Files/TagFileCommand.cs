@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Apophis.CLI.Writer;
 using Funcky.Extensions;
-using Funcky.Monads;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using SortingHat.API.AutoTag;
@@ -71,5 +70,5 @@ internal class TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter con
     }
 
     private IEnumerable<Tag> ReplacedTags(IEnumerable<string> tags, FileAt file)
-        => tags.WhereSelect(tag => Option.FromNullable(autoTagHandler.TagFromMask(tag, new System.IO.FileInfo(file.Path))));
+        => tags.WhereSelect(tag => autoTagHandler.TagFromMask(tag, new System.IO.FileInfo(file.Path)));
 }

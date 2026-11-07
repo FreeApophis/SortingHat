@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Apophis.CLI.Writer;
-using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
@@ -11,7 +10,7 @@ using SortingHat.API.Models;
 namespace SortingHat.CLI.Commands.Tags;
 
 [UsedImplicitly]
-internal class AddTagCommand(ITagParser tagParser, IConsoleWriter consoleWriter) : IDeclaredCommand
+internal class AddTagCommand(ITag tagStore, IConsoleWriter consoleWriter) : IDeclaredCommand
 {
     private static readonly ArgumentDefinition Tags = new() { Name = "tag", Description = "The tags to add, for example ':tax:2018'.", Arity = Arity.OneOrMore };
 
@@ -25,9 +24,14 @@ internal class AddTagCommand(ITagParser tagParser, IConsoleWriter consoleWriter)
         => Task.FromResult(input.Values(Tags).Aggregate(true, (added, tag) => AddTag(tag) && added));
 
     private bool AddTag(string text)
-        => Option.FromNullable(tagParser.Parse(text)).Match(
-            none: () => Report($"'{text}' is not a tag, a tag starts with a colon, for example ':tax:2018'."),
-            some: tag => tag.Store());
+        => Tag.Parse(text).Match(left: Report, right: Store);
+
+    private bool Store(Tag tag)
+    {
+        tagStore.Store(tag);
+
+        return true;
+    }
 
     private bool Report(string problem)
     {

@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Apophis.CLI.Writer;
-using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
@@ -11,7 +10,7 @@ using SortingHat.API.Models;
 namespace SortingHat.CLI.Commands.Tags;
 
 [UsedImplicitly]
-internal class RemoveTagCommand(ITagParser tagParser, IConsoleWriter consoleWriter) : IDeclaredCommand
+internal class RemoveTagCommand(ITag tagStore, IConsoleWriter consoleWriter) : IDeclaredCommand
 {
     private static readonly ArgumentDefinition Tags = new() { Name = "tag", Description = "The tags to remove, for example ':tax:2018'.", Arity = Arity.OneOrMore };
 
@@ -25,9 +24,9 @@ internal class RemoveTagCommand(ITagParser tagParser, IConsoleWriter consoleWrit
         => Task.FromResult(input.Values(Tags).Aggregate(true, (removed, tag) => RemoveTag(tag) && removed));
 
     private bool RemoveTag(string text)
-        => Option.FromNullable(tagParser.Parse(text)).Match(
-            none: () => Report($"'{text}' is not a tag, a tag starts with a colon, for example ':tax:2018'."),
-            some: tag => tag.Destroy() || Report($"The tag '{text}' does not exist or still has child tags."));
+        => Tag.Parse(text).Match(
+            left: Report,
+            right: tag => tagStore.Destroy(tag) || Report($"The tag '{text}' does not exist or still has child tags."));
 
     private bool Report(string problem)
     {

@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Collections.Immutable;
+using System.IO;
+using System.Linq;
+using Funcky.Extensions;
 using Funcky.Monads;
 using JetBrains.Annotations;
 using Microsoft.Data.Sqlite;
@@ -12,23 +15,17 @@ namespace SortingHat.DB.Access;
 [UsedImplicitly]
 public class SQLiteTag(SQLiteProjectDatabase db) : ITag
 {
-    private const string AllTags = @"WITH RECURSIVE
-  tree(id, parentid, name,level) AS (
-    SELECT Tags.Id, Tags.ParentId, Tags.name, 0
-    FROM Tags
-    WHERE ParentId IS NULL
-    UNION ALL
-    SELECT Tags.Id, Tags.ParentId, Tags.name, tree.level+1
-      FROM Tags JOIN tree ON Tags.ParentId=tree.Id
-     ORDER BY 4 DESC, 3 ASC
-  )
-SELECT id, parentId, name, level FROM tree;";
+    /// <summary>Every tag reachable from a root, each parent before its children.</summary>
+    private const string AllTags = """
+        WITH RECURSIVE Tree(Id, ParentId, Name) AS (
+            SELECT Id, ParentId, Name FROM Tags WHERE ParentId IS NULL
+            UNION ALL
+            SELECT Tags.Id, Tags.ParentId, Tags.Name FROM Tags JOIN Tree ON Tags.ParentId = Tree.Id)
+        SELECT Id, ParentId, Name FROM Tree
+        """;
 
-    public bool Store(Tag tag)
-    {
-        FindOrCreate(tag);
-        return true;
-    }
+    public void Store(Tag tag)
+        => FindOrCreate(tag);
 
     public bool Destroy(Tag tag)
         => Find(tag)
@@ -36,7 +33,7 @@ SELECT id, parentId, name, level FROM tree;";
                 none: false,
                 some: DestroyTag);
 
-    public bool Rename(Tag tag, string newName)
+    public bool Rename(Tag tag, TagName newName)
         => Find(tag)
             .Match(
                 none: false,
@@ -51,32 +48,59 @@ SELECT id, parentId, name, level FROM tree;";
     public long FileCount(Tag tag)
         => Find(tag).Match(none: 0L, some: CountFiles);
 
-    public IEnumerable<Tag> GetTags()
-        => db.ExecuteReader(AllTags, ReadTagTree);
+    /// <summary>Ordered like a tree: by their levels, so every parent comes right before its children.</summary>
+    public IReadOnlyList<Tag> GetTags()
+    {
+        var tags = db.Query(AllTags, ReadRow)
+            .Aggregate(ImmutableDictionary<long, Tag>.Empty, (known, row) => known.Add(row.Id, row.ParentId.Match(none: () => Tag.Root(row.Name), some: parentId => Known(known, parentId).Child(row.Name))));
+
+        return [.. tags.Values.Order(Comparer<Tag>.Create(CompareLevels))];
+    }
 
     internal Tag Load(long tagId)
-        => db.ExecuteReader("SELECT ParentId, Name FROM Tags WHERE Id = @tagId", ReadTag, new SqliteParameter("@tagId", tagId));
+        => db.Query("SELECT Id, ParentId, Name FROM Tags WHERE Id = @tagId", ReadRow, new SqliteParameter("@tagId", tagId))
+            .FirstOrNone()
+            .Match(
+                none: () => throw new InvalidDataException($"The database is damaged: the tag {tagId} does not exist."),
+                some: row => row.ParentId.Match(none: () => Tag.Root(row.Name), some: parentId => Load(parentId).Child(row.Name)));
 
     /// <summary>Finds the tag by walking its path from the root, so <c>:2018</c> never matches <c>:tax:2018</c>.</summary>
     internal Option<long> Find(Tag tag)
-        => Option.FromNullable(tag.Parent)
+        => tag.Parent
             .Match(none: () => FindChild(Option<long>.None, tag.Name), some: parent => Find(parent).SelectMany(parentId => FindChild(parentId, tag.Name)));
 
     internal long FindOrCreate(Tag tag)
     {
-        var parentId = Option.FromNullable(tag.Parent).Select(FindOrCreate);
+        var parentId = tag.Parent.Select(FindOrCreate);
 
         return FindChild(parentId, tag.Name).GetOrElse(() => Create(parentId, tag.Name));
     }
 
+    private static (long Id, Option<long> ParentId, TagName Name) ReadRow(SqliteDataReader reader)
+        => (reader.GetInt64(0), reader.IsDBNull(1) ? Option<long>.None : Option.Some(reader.GetInt64(1)), ReadName(reader.GetString(2)));
+
+    /// <summary>Every name in the database was written from a <see cref="TagName"/>, so one that does not parse means the database is damaged.</summary>
+    private static TagName ReadName(string name)
+        => TagName.Parse(name).GetOrElse(problem => throw new InvalidDataException($"The database is damaged: {problem}"));
+
+    /// <summary>The tree query returns every parent before its children.</summary>
+    private static Tag Known(ImmutableDictionary<long, Tag> known, long tagId)
+        => known.GetValueOrNone(tagId).GetOrElse(() => throw new InvalidDataException($"The database is damaged: the tag {tagId} comes before its parent."));
+
+    private static int CompareLevels(Tag left, Tag right)
+        => left.Levels
+            .Zip(right.Levels, (leftLevel, rightLevel) => string.CompareOrdinal(leftLevel.Value, rightLevel.Value))
+            .FirstOrNone(comparison => comparison != 0)
+            .GetOrElse(left.Levels.Count.CompareTo(right.Levels.Count));
+
     private static SqliteParameter ParentIdParameter(Option<long> parentId)
         => new("@parentId", parentId.Match(none: DBNull.Value, some: id => (object)id));
 
-    private Option<long> FindChild(Option<long> parentId, string name)
-        => Option.FromNullable(db.ExecuteScalar("SELECT Id FROM Tags WHERE ParentId IS @parentId AND Name = @name", ParentIdParameter(parentId), new SqliteParameter("@name", name)) as long?);
+    private Option<long> FindChild(Option<long> parentId, TagName name)
+        => Option.FromNullable(db.ExecuteScalar("SELECT Id FROM Tags WHERE ParentId IS @parentId AND Name = @name", ParentIdParameter(parentId), new SqliteParameter("@name", name.Value)) as long?);
 
-    private long Create(Option<long> parentId, string name)
-        => db.ExecuteScalar("INSERT INTO Tags (ParentId, Name) VALUES(@parentId, @name); SELECT last_insert_rowid();", ParentIdParameter(parentId), new SqliteParameter("@name", name)) is long id
+    private long Create(Option<long> parentId, TagName name)
+        => db.ExecuteScalar("INSERT INTO Tags (ParentId, Name) VALUES(@parentId, @name); SELECT last_insert_rowid();", ParentIdParameter(parentId), new SqliteParameter("@name", name.Value)) is long id
             ? id
             : throw new InvalidOperationException($"Tag '{name}' could not be created.");
 
@@ -92,8 +116,8 @@ SELECT id, parentId, name, level FROM tree;";
         }));
 
     /// <summary>The unique tag name indexes reject a new name that one of its siblings already has.</summary>
-    private Func<long, bool> RenameTag(string newName)
-        => tagId => UnlessRejected(() => Execute("UPDATE Tags SET Name = @tagName WHERE Id = @tagId", new SqliteParameter("@tagId", tagId), new SqliteParameter("@tagName", newName)));
+    private Func<long, bool> RenameTag(TagName newName)
+        => tagId => UnlessRejected(() => Execute("UPDATE Tags SET Name = @tagName WHERE Id = @tagId", new SqliteParameter("@tagId", tagId), new SqliteParameter("@tagName", newName.Value)));
 
     /// <summary>The unique tag name indexes reject a destination that already has a child with the same name.</summary>
     private bool MoveTag(long tagId, long destinationTagId)
@@ -121,65 +145,4 @@ SELECT id, parentId, name, level FROM tree;";
 
     private long CountFiles(long tagId)
         => db.ExecuteScalar("SELECT COUNT(*) FROM FileTags WHERE TagId = @tagId", new SqliteParameter("@tagId", tagId)) as long? ?? 0;
-
-    private IEnumerable<Tag> ReadTagTree(SqliteDataReader reader)
-    {
-        if (reader.Read())
-        {
-            var result = new List<Tag>();
-            GetTagTree(reader, ref result, null, 0);
-            return result;
-        }
-
-        return [];
-    }
-
-    private Tag ReadTag(SqliteDataReader reader)
-    {
-        if (!reader.Read())
-        {
-            throw new NotSupportedException();
-        }
-
-        return reader.IsDBNull(0)
-            ? new Tag(this, reader.GetString(1))
-            : new Tag(this, reader.GetString(1), Load(reader.GetInt64(0)));
-    }
-
-    private bool GetTagTree(SqliteDataReader reader, ref List<Tag> result, Tag? parent, int level)
-    {
-        // We must be on the right level on entry into this method
-        Debug.Assert(reader.GetInt32(3) == level, "The reader must be positioned on a tag of the given level.");
-
-        // we iterate on the siblings on the same level
-        while (reader.GetInt32(3) == level)
-        {
-            var tag = new Tag(this, reader.GetString(2), parent);
-            result.Add(tag);
-            if (reader.Read())
-            {
-                var nextLevel = reader.GetInt32(3);
-
-                // A child has level + 1
-                if (nextLevel == level + 1)
-                {
-                    if (!GetTagTree(reader, ref result, tag, level + 1))
-                    {
-                        return false;
-                    }
-                }
-                else if (nextLevel < level)
-                {
-                    return true;
-                }
-            }
-            else
-            {
-                // We are at the end of the list ...
-                return false;
-            }
-        }
-
-        return true;
-    }
 }

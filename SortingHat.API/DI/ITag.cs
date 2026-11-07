@@ -3,17 +3,24 @@ using SortingHat.API.Models;
 
 namespace SortingHat.API.DI;
 
+/// <summary>The tags hat knows, with their hierarchy.</summary>
 public interface ITag
 {
-    bool Store(Tag tag);
+    /// <summary>Stores the <paramref name="tag"/> with every level above it.</summary>
+    void Store(Tag tag);
 
+    /// <summary>Removes the <paramref name="tag"/> from every file; false when it does not exist or still has children.</summary>
     bool Destroy(Tag tag);
 
-    bool Rename(Tag tag, string newName);
+    /// <summary>Renames the last level of the <paramref name="tag"/>; false when it does not exist or a sibling already has the name.</summary>
+    bool Rename(Tag tag, TagName newName);
 
+    /// <summary>Moves the <paramref name="tag"/> with its children under <paramref name="destinationTag"/>; false when one does not exist or the name is taken there.</summary>
     bool Move(Tag tag, Tag destinationTag);
 
+    /// <summary>The number of files tagged with exactly the <paramref name="tag"/>.</summary>
     long FileCount(Tag tag);
 
-    IEnumerable<Tag> GetTags();
+    /// <summary>Every tag, each parent right before its children.</summary>
+    IReadOnlyList<Tag> GetTags();
 }

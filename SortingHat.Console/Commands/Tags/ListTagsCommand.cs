@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Apophis.CLI;
 using Apophis.CLI.Writer;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
-using SortingHat.API.Models;
 
 namespace SortingHat.CLI.Commands.Tags;
 
@@ -21,15 +19,15 @@ internal class ListTagsCommand(ITag tagStore, IConsoleWriter consoleWriter) : ID
 
     public Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
     {
-        var tags = Tag.List(tagStore).ToList();
-        if (tags.Any())
+        var tags = tagStore.GetTags();
+        if (tags.Count > 0)
         {
             consoleWriter.WriteLine("Used tags: ");
 
             var table = new ConsoleTable(2);
             foreach (var tag in tags)
             {
-                table.Append($"* {tag.FullName}", $"({tag.FileCount})");
+                table.Append($"* {tag.FullName}", $"({tagStore.FileCount(tag)})");
             }
 
             table.WriteTo(consoleWriter);

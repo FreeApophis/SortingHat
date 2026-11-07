@@ -11,7 +11,7 @@ using SortingHat.API.Models;
 namespace SortingHat.CLI.Commands.Files;
 
 [UsedImplicitly]
-internal class UntagFileCommand(IFilePathExtractor filePathExtractor, ITagParser tagParser, IFileScanner fileScanner, IFile fileStore) : IDeclaredCommand
+internal class UntagFileCommand(IFilePathExtractor filePathExtractor, IFileScanner fileScanner, IFile fileStore) : IDeclaredCommand
 {
     public CommandGrouping CommandGrouping => CommandGrouping.File;
     public string Name => "untag-files";
@@ -22,7 +22,7 @@ internal class UntagFileCommand(IFilePathExtractor filePathExtractor, ITagParser
     public async Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
     {
         var arguments = input.Values(FileOptions.TagsAndFiles);
-        var tags = arguments.Where(a => a.IsTag).WhereSelect(tag => Option.FromNullable(tagParser.Parse(tag))).ToList();
+        var tags = arguments.Where(a => a.IsTag).WhereSelect(tag => Tag.Parse(tag).RightOrNone()).ToList();
         var files = arguments.Where(a => a.IsFile);
 
         foreach (var path in filePathExtractor.FromFilePatterns(files, input.Has(FileOptions.Recursive)))

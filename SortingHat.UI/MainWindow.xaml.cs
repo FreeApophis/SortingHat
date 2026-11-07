@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -8,7 +7,6 @@ using System.Windows.Controls;
 using MahApps.Metro.Controls;
 using Microsoft.Extensions.Logging;
 using SortingHat.API.DI;
-using SortingHat.API.Models;
 using SortingHat.API.Parser;
 using SortingHat.API.Parser.OperatorType;
 using SortingHat.API.Parser.Token;
@@ -42,7 +40,6 @@ public partial class MainWindow : MetroWindow, INotifyPropertyChanged
 
         DataContext = this;
 
-        LoadTags();
         LoadDrives();
     }
 
@@ -181,31 +178,6 @@ public partial class MainWindow : MetroWindow, INotifyPropertyChanged
         foreach (var driveInfo in DriveInfo.GetDrives())
         {
             FolderBrowser.Items.Add(CreateTreeItem(driveInfo));
-        }
-    }
-
-    private void LoadTags()
-    {
-        // API.Models.Tag.List(_db.ProjectDatabase);
-
-        // foreach (var tag in tags)
-        // {
-        //    if (tag.Parent is null)
-        //    {
-        //        var tagItem = new TagItem(tag);
-        //        TagHierarchy.Items.Add(tagItem);
-        //        BuildTagTree(tagItem.Items, tag.Children);
-        //    }
-        // };
-    }
-
-    private void BuildTagTree(ObservableCollection<TagItem> items, List<Tag> children)
-    {
-        foreach (var tag in children)
-        {
-            var tagItem = new TagItem(tag);
-            items.Add(tagItem);
-            BuildTagTree(tagItem.Items, tag.Children);
         }
     }
 

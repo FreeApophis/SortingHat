@@ -2,22 +2,21 @@
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API.Models;
 
 namespace SortingHat.API.AutoTag;
 
 [UsedImplicitly]
-internal class AutoTagHandler(IEnumerable<IAutoTag> autoTags, ITagParser tagParser) : IAutoTagHandler
+internal class AutoTagHandler(IEnumerable<IAutoTag> autoTags) : IAutoTagHandler
 {
     private readonly Regex _variableRegex = new("{.*?}");
 
     public IEnumerable<IAutoTag> AutoTags { get; } = autoTags;
 
-    public Tag? TagFromMask(string tagMask, FileInfo file)
-    {
-        return tagParser.Parse(ReplaceMask(tagMask, file));
-    }
+    public Option<Tag> TagFromMask(string tagMask, FileInfo file)
+        => Tag.Parse(ReplaceMask(tagMask, file)).RightOrNone();
 
     private static string RemoveFirstAndLastCharacter(string bracedString)
     {
@@ -39,7 +38,8 @@ internal class AutoTagHandler(IEnumerable<IAutoTag> autoTags, ITagParser tagPars
 
     private string ReplaceMatch(string tagMask, FileInfo file, Capture match)
     {
-        return tagMask.Replace(match.Value, GetMatchingAutoTag(RemoveFirstAndLastCharacter(match.Value), file));
+        // values read from files are often padded (EXIF strings), a level cannot start or end with whitespace
+        return tagMask.Replace(match.Value, GetMatchingAutoTag(RemoveFirstAndLastCharacter(match.Value), file)?.Trim());
     }
 
     private string? GetMatchingAutoTag(string autoTagVariable, FileInfo file)

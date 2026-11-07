@@ -190,17 +190,6 @@ GROUP BY FilePaths.Id";
         Assert.Empty(next);
     }
 
-    [Fact]
-    public void SQLQuery()
-    {
-        var root = _parser.Parse(":tax:2016 || :cool && :audio:original");
-
-        // var visitor = new DB.SearchQueryVisitor(MockProjectDatabase.Create(), MockTagStore.Create(), new MockTagParser());
-
-        // AcceptVisitor(root, visitor);
-        // Assert.Equal(SelectStatement, visitor.Result);
-    }
-
     private void AcceptVisitor(IParseNode? root, INodeVisitor visitor)
     {
         Assert.NotNull(root);
