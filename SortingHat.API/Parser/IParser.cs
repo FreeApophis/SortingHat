@@ -3,7 +3,7 @@ using SortingHat.API.Parser.Nodes;
 
 namespace SortingHat.API.Parser;
 
-public interface IParser
+internal interface IParser
 {
     IParseNode Parse(ILexemeWalker walker);
 }

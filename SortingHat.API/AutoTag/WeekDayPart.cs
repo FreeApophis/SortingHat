@@ -2,7 +2,7 @@
 
 namespace SortingHat.API.AutoTag;
 
-public class WeekDayPart : IDateTagPart
+internal class WeekDayPart : IDateTagPart
 {
     public string Key => nameof(DateTime.DayOfWeek);
 

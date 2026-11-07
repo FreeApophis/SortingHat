@@ -3,7 +3,7 @@ using System.IO;
 
 namespace SortingHat.API;
 
-public static class PathHelper
+internal static class PathHelper
 {
     public static List<string> PathElements(DirectoryInfo? directory)
     {

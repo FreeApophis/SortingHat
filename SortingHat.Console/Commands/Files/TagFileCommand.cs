@@ -8,7 +8,6 @@ using Funcky.Extensions;
 using Funcky.Monads;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
-using SortingHat.API;
 using SortingHat.API.AutoTag;
 using SortingHat.API.DI;
 using SortingHat.API.Models;

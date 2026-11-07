@@ -1,1 +1,27 @@
 ﻿#nullable enable
+Apophis.FileSystem.FileSystemModule
+Apophis.FileSystem.FileSystemModule.FileSystemModule() -> void
+Apophis.FileSystem.ICopyFile
+Apophis.FileSystem.ICopyFile.Copy(string! sourceFileName, string! destinationFileName) -> void
+Apophis.FileSystem.ICopyFile.Copy(string! sourceFileName, string! destinationFileName, bool overwrite) -> void
+Apophis.FileSystem.IExistsDirectory
+Apophis.FileSystem.IExistsDirectory.Exists(string! path) -> bool
+Apophis.FileSystem.IExistsFile
+Apophis.FileSystem.IExistsFile.Exists(string! path) -> bool
+Apophis.FileSystem.IFileOperation
+Apophis.FileSystem.IMoveFile
+Apophis.FileSystem.IMoveFile.Move(string! sourceFileName, string! destinationFileName) -> void
+Apophis.FileSystem.SystemDirectoryExists
+Apophis.FileSystem.SystemDirectoryExists.Exists(string! path) -> bool
+Apophis.FileSystem.SystemDirectoryExists.SystemDirectoryExists() -> void
+Apophis.FileSystem.SystemFileCopy
+Apophis.FileSystem.SystemFileCopy.Copy(string! sourceFileName, string! destinationFileName) -> void
+Apophis.FileSystem.SystemFileCopy.Copy(string! sourceFileName, string! destinationFileName, bool overwrite) -> void
+Apophis.FileSystem.SystemFileCopy.SystemFileCopy() -> void
+Apophis.FileSystem.SystemFileExists
+Apophis.FileSystem.SystemFileExists.Exists(string! path) -> bool
+Apophis.FileSystem.SystemFileExists.SystemFileExists() -> void
+Apophis.FileSystem.SystemFileMove
+Apophis.FileSystem.SystemFileMove.Move(string! sourceFileName, string! destinationFileName) -> void
+Apophis.FileSystem.SystemFileMove.SystemFileMove() -> void
+override Apophis.FileSystem.FileSystemModule.Load(Autofac.ContainerBuilder! builder) -> void

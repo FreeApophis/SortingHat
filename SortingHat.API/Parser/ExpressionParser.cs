@@ -10,7 +10,7 @@ namespace SortingHat.API.Parser;
 /// Parsing the following Production:
 /// Expression   := Term { Or Term }.
 /// </summary>
-public class ExpressionParser : IParser
+internal class ExpressionParser : IParser
 {
     // Break the dependency cycle
     public TermParser? TermParser { get; set; }

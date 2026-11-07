@@ -4,7 +4,7 @@ using SortingHat.API.Parser.Token;
 
 namespace SortingHat.API.Parser;
 
-public static class LexemeWalkerExtensions
+internal static class LexemeWalkerExtensions
 {
     extension(ILexemeWalker walker)
     {

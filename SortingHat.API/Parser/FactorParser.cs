@@ -5,7 +5,7 @@ using SortingHat.API.Parser.Token;
 
 namespace SortingHat.API.Parser;
 
-public class FactorParser(ExpressionParser expressionParser) : IParser
+internal class FactorParser(ExpressionParser expressionParser) : IParser
 {
     /// <summary>
     /// Parsing the following Production:

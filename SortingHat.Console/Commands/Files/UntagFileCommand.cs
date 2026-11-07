@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Funcky.Extensions;
 using Funcky.Monads;
 using JetBrains.Annotations;
-using SortingHat.API;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
 

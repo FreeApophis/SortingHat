@@ -9,7 +9,7 @@ namespace SortingHat.API.Parser;
 /// Parsing the following Production:
 /// Term       := Factor { And Factor }.
 /// </summary>
-public class TermParser(FactorParser factorParser) : IParser
+internal class TermParser(FactorParser factorParser) : IParser
 {
     /// <summary>
     /// Overloaded Parse function to parse a Term.

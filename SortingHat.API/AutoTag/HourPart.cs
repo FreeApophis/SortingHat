@@ -2,7 +2,7 @@
 
 namespace SortingHat.API.AutoTag;
 
-public class HourPart : IDateTagPart
+internal class HourPart : IDateTagPart
 {
     public string Key => nameof(DateTime.Hour);
 

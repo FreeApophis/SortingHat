@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Apophis.CLI.Writer;
 using Funcky.Monads;
 using JetBrains.Annotations;
-using SortingHat.API;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
 

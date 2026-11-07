@@ -1,6 +1,6 @@
 ﻿namespace SortingHat.API.Parser.OperatorType;
 
-public interface IOperatorType
+internal interface IOperatorType
 {
     string Not { get; }
     string NotOpen { get; }

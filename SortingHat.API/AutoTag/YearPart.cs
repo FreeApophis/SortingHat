@@ -2,7 +2,7 @@
 
 namespace SortingHat.API.AutoTag;
 
-public class YearPart : IDateTagPart
+internal class YearPart : IDateTagPart
 {
     public string Key => nameof(DateTime.Year);
 

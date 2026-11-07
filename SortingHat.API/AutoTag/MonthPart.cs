@@ -2,7 +2,7 @@
 
 namespace SortingHat.API.AutoTag;
 
-public class MonthPart : IDateTagPart
+internal class MonthPart : IDateTagPart
 {
     public string Key => nameof(DateTime.Month);
 

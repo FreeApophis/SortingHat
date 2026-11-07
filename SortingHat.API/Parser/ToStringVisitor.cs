@@ -5,7 +5,7 @@ using SortingHat.API.Parser.OperatorType;
 
 namespace SortingHat.API.Parser;
 
-public class ToStringVisitor(IOperatorType operatorType) : INodeVisitor
+internal class ToStringVisitor(IOperatorType operatorType) : INodeVisitor
 {
     private readonly StringBuilder _resultBuilder = new();
 

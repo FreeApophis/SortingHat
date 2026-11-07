@@ -22,9 +22,18 @@ namespace SortingHat.API.Parser;
 /// True         := "true" | "1"
 /// False        := "false" | "0".
 /// </summary>
-public class Parser(LexerRuleBook lexerRuleBook, ExpressionParser expressionParser) : IParser
+public class Parser : IParser
 {
     private readonly List<IToken> _nextToken = [];
+    private readonly LexerRuleBook _lexerRuleBook;
+    private readonly ExpressionParser _expressionParser;
+
+    /// <summary>The recursive descent parsers are internal, <see cref="ParserModule"/> or <see cref="Create"/> build the parser.</summary>
+    internal Parser(LexerRuleBook lexerRuleBook, ExpressionParser expressionParser)
+    {
+        _lexerRuleBook = lexerRuleBook;
+        _expressionParser = expressionParser;
+    }
 
     public bool IllegalExpression { get; private set; }
 
@@ -41,7 +50,7 @@ public class Parser(LexerRuleBook lexerRuleBook, ExpressionParser expressionPars
 
     public IParseNode Parse(ILexemeWalker walker)
     {
-        return expressionParser.Parse(walker);
+        return _expressionParser.Parse(walker);
     }
 
     public IEnumerable<IToken> NextToken()
@@ -54,7 +63,7 @@ public class Parser(LexerRuleBook lexerRuleBook, ExpressionParser expressionPars
         try
         {
             _nextToken.Clear();
-            var ast = Parse(lexerRuleBook.Scan(expression).Walker);
+            var ast = Parse(_lexerRuleBook.Scan(expression).Walker);
             _nextToken.Add(new AndToken());
             _nextToken.Add(new OrToken());
             return ast;
