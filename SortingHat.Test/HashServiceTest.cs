@@ -28,7 +28,7 @@ public sealed class HashServiceTest : IDisposable
 
         var hashes = await _hat.InScope(scope => Task.WhenAll(paths.Select(scope.Resolve<IHashService>().GetHash)));
 
-        Assert.Equal(paths.Select(ExpectedHash), hashes);
+        Assert.Equal(paths.Select(ExpectedHash), hashes.Select(hash => hash.ToString()));
     }
 
     public void Dispose()

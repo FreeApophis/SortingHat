@@ -43,7 +43,7 @@ public class File(IFile file, IHashService hashService)
         var fileInfo = new FileInfo(Path);
 
         Fingerprint = new PathFingerprint(fileInfo.Length, fileInfo.LastWriteTimeUtc, DateTime.UtcNow);
-        Hash = hashService.GetHash(Path);
+        Hash = HashOf(Path);
         Size = fileInfo.Length;
         CreatedAt = fileInfo.CreationTimeUtc;
     }
@@ -89,4 +89,7 @@ public class File(IFile file, IHashService hashService)
             LoadByPath(path);
         }
     }
+
+    private async Task<string> HashOf(string path)
+        => (await hashService.GetHash(path)).ToString();
 }

@@ -1,5 +1,8 @@
 ﻿#nullable enable
 override SortingHat.API.CoreModule.Load(Autofac.ContainerBuilder! builder) -> void
+override SortingHat.API.Models.Hash.Equals(object? obj) -> bool
+override SortingHat.API.Models.Hash.GetHashCode() -> int
+override SortingHat.API.Models.Hash.ToString() -> string!
 SortingHat.API.AutoTag.ConstantAutoTag
 SortingHat.API.AutoTag.ConstantAutoTag.ConstantAutoTag() -> void
 SortingHat.API.AutoTag.ConstantAutoTag.FindMatch(string! value) -> string?
@@ -91,7 +94,7 @@ SortingHat.API.DI.IFile.Untag(SortingHat.API.Models.File! file, SortingHat.API.M
 SortingHat.API.DI.IFilePathExtractor
 SortingHat.API.DI.IFilePathExtractor.FromFilePatterns(System.Collections.Generic.IEnumerable<string!>! filePatterns, bool recursive) -> System.Collections.Generic.IEnumerable<string!>!
 SortingHat.API.DI.IHashService
-SortingHat.API.DI.IHashService.GetHash(string! path) -> System.Threading.Tasks.Task<string!>!
+SortingHat.API.DI.IHashService.GetHash(string! path) -> System.Threading.Tasks.Task<SortingHat.API.Models.Hash!>!
 SortingHat.API.DI.IMainDatabase
 SortingHat.API.DI.IOption
 SortingHat.API.DI.IOption.LongOption.get -> Funcky.Monads.Option<string!>
@@ -158,6 +161,11 @@ SortingHat.API.Models.File.Size.get -> long
 SortingHat.API.Models.File.Size.set -> void
 SortingHat.API.Models.File.Tag(SortingHat.API.Models.Tag! tag) -> System.Threading.Tasks.Task!
 SortingHat.API.Models.File.Untag(SortingHat.API.Models.Tag! tag) -> System.Threading.Tasks.Task!
+SortingHat.API.Models.Hash
+SortingHat.API.Models.Hash.<Clone>$() -> SortingHat.API.Models.Hash!
+SortingHat.API.Models.Hash.Algorithm.get -> string!
+SortingHat.API.Models.Hash.Digest.get -> string!
+SortingHat.API.Models.Hash.Equals(SortingHat.API.Models.Hash? other) -> bool
 SortingHat.API.Models.ITagParser
 SortingHat.API.Models.ITagParser.Parse(string! tagString) -> SortingHat.API.Models.Tag?
 SortingHat.API.Models.PathFingerprint
@@ -322,6 +330,9 @@ static SortingHat.API.DI.ArgumentDefinition.operator !=(SortingHat.API.DI.Argume
 static SortingHat.API.DI.ArgumentDefinition.operator ==(SortingHat.API.DI.ArgumentDefinition? left, SortingHat.API.DI.ArgumentDefinition? right) -> bool
 static SortingHat.API.DI.OptionDefinition.operator !=(SortingHat.API.DI.OptionDefinition? left, SortingHat.API.DI.OptionDefinition? right) -> bool
 static SortingHat.API.DI.OptionDefinition.operator ==(SortingHat.API.DI.OptionDefinition? left, SortingHat.API.DI.OptionDefinition? right) -> bool
+static SortingHat.API.Models.Hash.operator !=(SortingHat.API.Models.Hash? left, SortingHat.API.Models.Hash? right) -> bool
+static SortingHat.API.Models.Hash.operator ==(SortingHat.API.Models.Hash? left, SortingHat.API.Models.Hash? right) -> bool
+static SortingHat.API.Models.Hash.Parse(string! text) -> Funcky.Monads.Either<string!, SortingHat.API.Models.Hash!>
 static SortingHat.API.Models.PathFingerprint.operator !=(SortingHat.API.Models.PathFingerprint? left, SortingHat.API.Models.PathFingerprint? right) -> bool
 static SortingHat.API.Models.PathFingerprint.operator ==(SortingHat.API.Models.PathFingerprint? left, SortingHat.API.Models.PathFingerprint? right) -> bool
 static SortingHat.API.Models.ProjectName.IsSameName(string! name, string! other) -> bool
