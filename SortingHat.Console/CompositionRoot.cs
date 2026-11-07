@@ -72,7 +72,6 @@ internal class CompositionRoot
         Builder.RegisterType<FileOperations<ICopyFile>>().AsSelf();
         Builder.RegisterType<FileOperations<IMoveFile>>().AsSelf();
 
-        // every built-in command is an IDeclaredCommand, only plugins may still register an ICommand
         Builder.RegisterAssemblyTypes(GetType().Assembly)
             .Where(type => IsCommandClass(type) && type.IsAssignableTo<IDeclaredCommand>())
             .As<IDeclaredCommand>();

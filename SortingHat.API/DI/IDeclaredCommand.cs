@@ -7,7 +7,7 @@ namespace SortingHat.API.DI;
 /// <summary>
 /// A command that declares its arguments and options. The host parses and checks the command line against them,
 /// reports mistakes before the command runs, and generates the help for <c>hat &lt;command&gt; --help</c>.
-/// Register implementations as <see cref="IDeclaredCommand"/> in a module; this is the successor of <see cref="ICommand"/>.
+/// Register implementations as <see cref="IDeclaredCommand"/> in a module.
 /// </summary>
 public interface IDeclaredCommand
 {

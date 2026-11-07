@@ -1,20 +1,18 @@
 ﻿using System;
 using System.IO;
-using Autofac;
-using SortingHat.API.DI;
 using Xunit;
 
 namespace SortingHat.Test;
 
 /// <summary>
 /// Runs the general commands (help, plugins, repair, statistics, version) through the real command line application,
-/// with a real SQLite database in a temporary folder and an old-style command like a plugin could still contribute it.
+/// with a real SQLite database in a temporary folder.
 /// </summary>
 public sealed class GeneralCommandTest : IDisposable
 {
     private const string OverviewHeader = "<command> [<arguments>] [<options>]";
 
-    private readonly HatSandbox _hat = new(builder => builder.RegisterType<EchoLegacyCommand>().As<ICommand>());
+    private readonly HatSandbox _hat = new();
 
     private static readonly string[] CommandNames =
     [
@@ -22,7 +20,6 @@ public sealed class GeneralCommandTest : IDisposable
         "add-tags", "list-tags", "move-tags", "remove-tags", "rename-tag",
         "copy-files", "duplicate", "file-info", "find-files", "move-files", "tag-files", "untag-files",
         "new-project", "remove-project", "export", "import", "list-projects", "switch-project",
-        "echo",
     ];
 
     public static TheoryData<string> Commands()
@@ -65,7 +62,7 @@ public sealed class GeneralCommandTest : IDisposable
 
     [Theory]
     [InlineData("ff", "find-files")]
-    [InlineData("e", "echo")]
+    [InlineData("tags", "list-tags")]
     public void GivenHelpWithAnAliasThenTheHelpOfItsCommandIsShown(string alias, string command)
     {
         Assert.Equal(0, _hat.Hat(["help", alias]));
@@ -77,13 +74,6 @@ public sealed class GeneralCommandTest : IDisposable
     {
         Assert.NotEqual(0, _hat.Hat(["help", "fly"]));
         Assert.Contains(_hat.Lines, line => line.Contains("'fly'"));
-    }
-
-    [Fact]
-    public void GivenAnOldStyleCommandThenItStillRuns()
-    {
-        Assert.Equal(0, _hat.Hat(["echo", "a", "b"]));
-        Assert.Equal(["a b"], _hat.Lines);
     }
 
     [Fact]

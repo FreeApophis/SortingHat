@@ -98,12 +98,6 @@ SortingHat.API.DI.CommandInput.CommandInput(System.Collections.Generic.IReadOnly
 SortingHat.API.DI.CommandInput.Has(SortingHat.API.DI.OptionDefinition! option) -> bool
 SortingHat.API.DI.CommandInput.Value(SortingHat.API.DI.ArgumentDefinition! argument) -> Funcky.Monads.Option<string!>
 SortingHat.API.DI.CommandInput.Values(SortingHat.API.DI.ArgumentDefinition! argument) -> System.Collections.Generic.IReadOnlyList<string!>!
-SortingHat.API.DI.ICommand
-SortingHat.API.DI.ICommand.CommandGrouping.get -> SortingHat.API.DI.CommandGrouping
-SortingHat.API.DI.ICommand.Execute(System.Collections.Generic.IEnumerable<string!>! arguments, SortingHat.API.DI.IOptionParser! options) -> bool
-SortingHat.API.DI.ICommand.LongCommand.get -> string!
-SortingHat.API.DI.ICommand.ShortCommand.get -> Funcky.Monads.Option<string!>
-SortingHat.API.DI.ICommand.ShortHelp.get -> string!
 SortingHat.API.DI.IDatabase
 SortingHat.API.DI.IDatabase.GetStatistics() -> System.Collections.Generic.Dictionary<string!, long>!
 SortingHat.API.DI.IDeclaredCommand
@@ -136,12 +130,6 @@ SortingHat.API.DI.IFileScanner.Scan(string! path) -> System.Threading.Tasks.Task
 SortingHat.API.DI.IHashService
 SortingHat.API.DI.IHashService.GetHash(string! path) -> System.Threading.Tasks.Task<SortingHat.API.Models.Hash!>!
 SortingHat.API.DI.IMainDatabase
-SortingHat.API.DI.IOption
-SortingHat.API.DI.IOption.LongOption.get -> Funcky.Monads.Option<string!>
-SortingHat.API.DI.IOption.ShortHelp.get -> string!
-SortingHat.API.DI.IOption.ShortOption.get -> Funcky.Monads.Option<string!>
-SortingHat.API.DI.IOptionParser
-SortingHat.API.DI.IOptionParser.HasOption<TOption>() -> bool
 SortingHat.API.DI.IProjectDatabase
 SortingHat.API.DI.IProjects
 SortingHat.API.DI.IProjects.AddProject(SortingHat.API.Models.ProjectName! project) -> bool

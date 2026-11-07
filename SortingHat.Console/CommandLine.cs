@@ -11,17 +11,15 @@ using SortingHat.API.DI;
 using Cli = System.CommandLine;
 using Console = Apophis.CLI.Console;
 using Flag = System.CommandLine.Option<bool>;
-using IOption = SortingHat.API.DI.IOption;
 
 namespace SortingHat.CLI;
 
 /// <summary>
 /// Maps every command, built-in and from plugins, onto a System.CommandLine command tree.
-/// An <see cref="IDeclaredCommand"/> gets exactly the arguments and options it declares.
-/// An <see cref="ICommand"/> keeps its contract: its arguments as strings and every <see cref="IOption"/> through <see cref="IOptionParser"/>.
+/// Every <see cref="IDeclaredCommand"/> gets exactly the arguments and options it declares.
 /// </summary>
 [UsedImplicitly]
-internal sealed class CommandLine(Console console, IEnumerable<ICommand> commands, IEnumerable<IOption> options, IEnumerable<IDeclaredCommand> declaredCommands)
+internal sealed class CommandLine(Console console, IEnumerable<IDeclaredCommand> commands)
 {
     /// <summary>Response files (<c>@file</c>) are off, so a file name starting with <c>@</c> stays an argument.</summary>
     private static readonly Cli.ParserConfiguration ParserConfiguration = new() { ResponseFileTokenReplacer = null };
@@ -34,12 +32,6 @@ internal sealed class CommandLine(Console console, IEnumerable<ICommand> command
             .Parse(arguments, ParserConfiguration)
             .Invoke(new Cli.InvocationConfiguration { Output = output, Error = output, EnableDefaultExceptionHandler = false });
     }
-
-    /// <summary>Every <see cref="IOption"/> is a flag that every <see cref="ICommand"/> accepts.</summary>
-    private static Option<Flag> ToFlag(IOption option)
-        => option.LongOption.Select(name => $"--{name}")
-            .OrElse(option.ShortOption.Select(name => $"-{name}"))
-            .Select(name => new Flag(name, [.. Aliases(option, name)]) { Description = option.ShortHelp });
 
     private static string HelpDescription(IDeclaredCommand command)
         => command.Details is ""
@@ -94,47 +86,14 @@ internal sealed class CommandLine(Console console, IEnumerable<ICommand> command
             ? ExitCode.Success
             : ExitCode.Failure;
 
-    private static IEnumerable<string> Aliases(IOption option, string name)
-        => option.ShortOption
-            .Select(shortOption => $"-{shortOption}")
-            .Where(alias => alias != name)
-            .ToEnumerable();
-
-    private static IReadOnlyList<IOption> GivenOptions(Cli.ParseResult parseResult, IEnumerable<(IOption Option, Flag Flag)> flags)
-        => [.. flags.Where(flag => parseResult.GetValue(flag.Flag)).Select(flag => flag.Option)];
-
-    private static int Execute(ICommand command, IEnumerable<string> arguments, IReadOnlyList<IOption> givenOptions)
-        => command.Execute(arguments, new OptionParser(givenOptions))
-            ? ExitCode.Success
-            : ExitCode.Failure;
-
     private Cli.RootCommand RootCommand()
     {
-        var flags = options.WhereSelect(option => ToFlag(option).Select(flag => (Option: option, Flag: flag))).ToList();
         var root = new Cli.RootCommand("SortingHat: find your documents with tags");
 
-        commands.ForEach(command => root.Add(Command(command, flags)));
-        declaredCommands.ForEach(command => root.Add(Command(command)));
+        commands.ForEach(command => root.Add(Command(command)));
         root.SetAction(_ => Hint());
 
         return root;
-    }
-
-    private Cli.Command Command(ICommand command, IReadOnlyList<(IOption Option, Flag Flag)> flags)
-    {
-        var result = new Cli.Command(command.LongCommand, command.ShortHelp);
-        var arguments = new Cli.Argument<string[]>("arguments") { Arity = Cli.ArgumentArity.ZeroOrMore };
-
-        command.ShortCommand.AndThen(result.Aliases.Add);
-        result.Add(arguments);
-        flags.ForEach(flag => result.Add(flag.Flag));
-        result.SetAction(parseResult => UnknownOptions(parseResult.Tokens) switch
-        {
-            [] => Execute(command, Values(parseResult, arguments), GivenOptions(parseResult, flags)),
-            var unknownOptions => ReportUnknown(unknownOptions),
-        });
-
-        return result;
     }
 
     private Cli.Command Command(IDeclaredCommand command)

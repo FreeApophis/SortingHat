@@ -9,7 +9,6 @@ using JetBrains.Annotations;
 using SortingHat.API.AutoTag;
 using SortingHat.API.DI;
 using Console = Apophis.CLI.Console;
-using IOption = SortingHat.API.DI.IOption;
 
 namespace SortingHat.CLI.Commands;
 
@@ -19,9 +18,7 @@ namespace SortingHat.CLI.Commands;
 [UsedImplicitly]
 internal class HelpCommand(
     Console console,
-    Lazy<IEnumerable<ICommand>> commands,
-    Lazy<IEnumerable<IDeclaredCommand>> declaredCommands,
-    IEnumerable<IOption> options,
+    Lazy<IEnumerable<IDeclaredCommand>> commands,
     Lazy<CommandLine> commandLine,
     IAutoTagHandler autoTagHandler) : IDeclaredCommand
 {
@@ -42,20 +39,11 @@ internal class HelpCommand(
             none: () => PrintOverview(input.Has(Verbose)),
             some: PrintCommandHelp));
 
-    private static (CommandGrouping Grouping, string Name, string Aliases, string Description) HelpRow(ICommand command)
-        => (command.CommandGrouping, command.LongCommand, command.ShortCommand.GetOrElse(string.Empty), command.ShortHelp);
-
     private static (CommandGrouping Grouping, string Name, string Aliases, string Description) HelpRow(IDeclaredCommand command)
         => (command.CommandGrouping, command.Name, string.Join(", ", command.Aliases), command.Description);
 
-    private static IEnumerable<string> Names(ICommand command)
-        => [command.LongCommand, .. command.ShortCommand.ToEnumerable()];
-
     private static IEnumerable<string> Names(IDeclaredCommand command)
         => [command.Name, .. command.Aliases];
-
-    private static string FormatOption(Option<string> option, string optionPrefix)
-        => option.Match(none: string.Empty, some: name => $"{optionPrefix}{name}");
 
     private static ConsoleTable HelpTable()
     {
@@ -66,9 +54,9 @@ internal class HelpCommand(
         return table;
     }
 
-    /// <summary>The help of every command, old-style or declared, is generated from what the command line knows about it.</summary>
+    /// <summary>The help of every command is generated from what the command line knows about it.</summary>
     private bool PrintCommandHelp(string name)
-        => commands.Value.SelectMany(Names).Concat(declaredCommands.Value.SelectMany(Names)).Contains(name)
+        => commands.Value.SelectMany(Names).Contains(name)
             ? commandLine.Value.Run([name, "--help"]) == ExitCode.Success
             : UnknownCommand(name);
 
@@ -82,8 +70,7 @@ internal class HelpCommand(
     private bool PrintOverview(bool verbose)
     {
         console.Writer.WriteLine($"{console.Application.Name} <command> [<arguments>] [<options>]:");
-        PrintHelpCommands([.. commands.Value.Select(HelpRow), .. declaredCommands.Value.Select(HelpRow)]);
-        PrintHelpOptions();
+        PrintHelpCommands([.. commands.Value.Select(HelpRow)]);
         PrintTagVariables(verbose);
         PrintHelpExamples();
 
@@ -108,27 +95,6 @@ internal class HelpCommand(
         }
 
         table.WriteTo(console.Writer);
-    }
-
-    /// <summary>Only plugins with old-style commands still contribute global options; the declared commands show their own options.</summary>
-    private void PrintHelpOptions()
-    {
-        var globalOptions = options.ToList();
-        if (globalOptions.Count > 0)
-        {
-            console.Writer.WriteLine();
-            console.Writer.WriteLine("Options of the old-style plugin commands");
-            console.Writer.WriteLine();
-
-            var table = HelpTable();
-            foreach (var option in globalOptions)
-            {
-                table.Append(FormatOption(option.ShortOption, "-"), FormatOption(option.LongOption, "--"), option.ShortHelp);
-            }
-
-            table.AppendSeparator();
-            table.WriteTo(console.Writer);
-        }
     }
 
     private void PrintTagVariables(bool verbose)
