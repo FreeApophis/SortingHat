@@ -35,13 +35,67 @@ public sealed class FileCommandTest : IDisposable
     [Theory]
     [InlineData("copy-files")]
     [InlineData("move-files")]
-    public void GivenTheHelpOfCopyOrMoveThenItDoesNotOfferADryRunThatDoesNothing(string command)
+    public void GivenTheHelpOfCopyOrMoveThenItOffersADryRun(string command)
     {
         Assert.Equal(0, _hat.Hat([command, "--help"]));
 
         Assert.Contains(_hat.Lines, line => line.Contains("<search>"));
         Assert.Contains(_hat.Lines, line => line.Contains("<destination>"));
-        Assert.DoesNotContain(_hat.Lines, line => line.Contains("--dry-run"));
+        Assert.Contains(_hat.Lines, line => line.Contains("-n, --dry-run"));
+    }
+
+    [Theory]
+    [InlineData("--dry-run")]
+    [InlineData("-n")]
+    public void GivenADryRunThenCopyFilesShowsWhatItWouldCopyButCopiesNothing(string dryRun)
+    {
+        var path = _hat.TaggedFile("a.txt", ":x");
+        var destination = Destination(path);
+
+        Assert.Equal(0, _hat.Hat(["cp", ":x", destination, dryRun]));
+
+        Assert.Empty(Directory.GetFiles(destination));
+        Assert.Contains(_hat.Lines, line => line.Contains(path) && line.Contains(Path.Combine(destination, "a.txt")));
+        Assert.Contains("Dry run: nothing was copied.", _hat.Lines);
+    }
+
+    [Fact]
+    public void GivenADryRunThenMoveFilesMovesNothingAndKeepsThePathsInTheDatabase()
+    {
+        var path = _hat.TaggedFile("a.txt", ":x");
+        var destination = Destination(path);
+
+        Assert.Equal(0, _hat.Hat(["mv", ":x", destination, "--dry-run"]));
+        Assert.Contains("Dry run: nothing was moved.", _hat.Lines);
+
+        Assert.True(File.Exists(path));
+        Assert.Empty(Directory.GetFiles(destination));
+        Assert.Equal(["a.txt"], _hat.FindFiles(":x"));
+    }
+
+    [Fact]
+    public void GivenADryRunWithAnExistingTargetThenItReportsTheSkipAndPredictsTheFailure()
+    {
+        var path = _hat.TaggedFile("a.txt", ":x");
+        var destination = Destination(path);
+        File.WriteAllText(Path.Combine(destination, "a.txt"), "keep me");
+
+        Assert.NotEqual(0, _hat.Hat(["cp", ":x", destination, "--dry-run"]));
+
+        Assert.Contains(_hat.Lines, line => line.Contains("skipped") && line.Contains(path));
+        Assert.Equal("keep me", File.ReadAllText(Path.Combine(destination, "a.txt")));
+    }
+
+    [Fact]
+    public void GivenADryRunWithAMissingDestinationThenItReportsItAndCreatesNothing()
+    {
+        var path = _hat.TaggedFile("a.txt", ":x");
+        var missing = Path.Combine(Path.GetDirectoryName(path) ?? string.Empty, "missing");
+
+        Assert.NotEqual(0, _hat.Hat(["cp", ":x", missing, "-n"]));
+
+        Assert.Contains(_hat.Lines, line => line.Contains("does not exist"));
+        Assert.False(Directory.Exists(missing));
     }
 
     [Theory]

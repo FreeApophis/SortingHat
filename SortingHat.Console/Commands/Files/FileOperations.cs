@@ -26,18 +26,30 @@ public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExist
 
     private string Verb => fileOperation is IMoveFile ? "move" : "copy";
 
+    private string PastVerb => fileOperation is IMoveFile ? "moved" : "copied";
+
     /// <summary>Puts the files found by <paramref name="search"/> into the folder <paramref name="destination"/>, relative to the current folder.</summary>
-    /// <returns>Whether every file was copied or moved.</returns>
-    public async Task<bool> ExportFiles(string search, string destination)
+    /// <param name="search">The search query.</param>
+    /// <param name="destination">The destination folder.</param>
+    /// <param name="dryRun">Only shows what would happen: no file and nothing in the database changes.</param>
+    /// <returns>Whether every file was (or in a dry run would be) copied or moved.</returns>
+    public async Task<bool> ExportFiles(string search, string destination, bool dryRun)
     {
         var destinationPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), destination));
 
-        return existsDirectory.Exists(destinationPath)
-            ? await ExportSearch(search, destinationPath)
+        var exported = existsDirectory.Exists(destinationPath)
+            ? await ExportSearch(search, destinationPath, dryRun)
             : Report($"The destination folder '{destinationPath}' does not exist, nothing was done.");
+
+        if (dryRun)
+        {
+            console.Writer.WriteLine($"Dry run: nothing was {PastVerb}.");
+        }
+
+        return exported;
     }
 
-    private async Task<bool> ExportSearch(string search, string destinationPath)
+    private async Task<bool> ExportSearch(string search, string destinationPath, bool dryRun)
     {
         console.Writer.WriteLine($"Find Files: {search}");
 
@@ -48,10 +60,10 @@ public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExist
 
         return filesByHash.Count == 0
             ? Report("No files found for your search query...")
-            : await Export([.. filesByHash.Select(ChooseSource)], destinationPath);
+            : await Export([.. filesByHash.Select(ChooseSource)], destinationPath, dryRun);
     }
 
-    private async Task<bool> Export(IReadOnlyList<Either<string, File>> sources, string destinationPath)
+    private async Task<bool> Export(IReadOnlyList<Either<string, File>> sources, string destinationPath, bool dryRun)
     {
         var chosen = sources.WhereSelect(source => source.RightOrNone()).ToList();
         var plan = ExportPlan.Targets(chosen.Select(file => file.Path), destinationPath, NamesInDestination(chosen, destinationPath), FileNameComparer);
@@ -62,7 +74,7 @@ public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExist
         var done = new List<bool>();
         foreach (var (file, step) in chosen.Zip(plan))
         {
-            done.Add(await step.Match(left: _ => Task.FromResult(false), right: target => ExportFile(file, target)));
+            done.Add(await step.Match(left: _ => Task.FromResult(false), right: target => dryRun ? Preview(target) : ExportFile(file, target)));
         }
 
         return skipped.Count == 0 && done.All(Identity);
@@ -97,6 +109,13 @@ public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExist
             .Match(
                 none: () => Either<string, File>.Left($"The file with hash {hash.ShortHash().GetOrElse(hash)} skipped: no valid source chosen."),
                 some: Either<string, File>.Right);
+    }
+
+    private Task<bool> Preview(ExportTarget target)
+    {
+        console.Writer.WriteLine($"would {Verb}: {target.Source} -> {target.Target}");
+
+        return Task.FromResult(true);
     }
 
     /// <summary>A moved file gets its new path in the database, but only after the move on disk has worked.</summary>

@@ -16,6 +16,7 @@ internal sealed class CopyFilesCommand(FileOperations<ICopyFile> copyFileOperati
     public string Description => "This command copies all files which match the search query to a specified folder location.";
     public string Details => FileOperationArguments.Details;
     public IReadOnlyList<ArgumentDefinition> Arguments => [FileOperationArguments.Search, FileOperationArguments.Destination];
+    public IReadOnlyList<OptionDefinition> Options => [FileOperationArguments.DryRun];
 
     public Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
         => FileOperationArguments.Run(input, copyFileOperation.ExportFiles);
