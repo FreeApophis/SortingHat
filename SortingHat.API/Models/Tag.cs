@@ -19,6 +19,12 @@ public sealed record Tag
     private Tag(ImmutableArray<TagName> levels)
         => _levels = levels;
 
+    /// <summary>
+    /// Orders tags like a tree, ignoring case: every parent right before its children, siblings by name.
+    /// Names that differ only in case are ordered by their spelling, so the order is always the same.
+    /// </summary>
+    public static IComparer<Tag> Order { get; } = Comparer<Tag>.Create(CompareLevels);
+
     /// <summary>The levels from the root, at least one.</summary>
     public IReadOnlyList<TagName> Levels
         => _levels;
@@ -55,7 +61,7 @@ public sealed record Tag
         => other is not null && _levels.SequenceEqual(other._levels);
 
     public override int GetHashCode()
-        => FullName.GetHashCode(StringComparison.Ordinal);
+        => StringComparer.OrdinalIgnoreCase.GetHashCode(FullName);
 
     public override string ToString()
         => FullName;
@@ -64,6 +70,23 @@ public sealed record Tag
         => text.StartsWith(Separator)
             ? LevelTexts(text).WhereSelect(TagName.Problem).FirstOrNone()
             : "a tag starts with a colon, for example ':tax:2018'";
+
+    private static int CompareLevels(Tag? left, Tag? right)
+        => (left, right) switch
+        {
+            (null, null) => 0,
+            (null, _) => -1,
+            (_, null) => 1,
+            _ => Compare(left, right, StringComparer.OrdinalIgnoreCase)
+                .OrElse(() => left.Levels.Count.CompareTo(right.Levels.Count) switch { 0 => Option<int>.None, var byDepth => byDepth })
+                .OrElse(() => Compare(left, right, StringComparer.Ordinal))
+                .GetOrElse(0),
+        };
+
+    private static Option<int> Compare(Tag left, Tag right, StringComparer comparer)
+        => left.Levels
+            .Zip(right.Levels, (leftLevel, rightLevel) => comparer.Compare(leftLevel.Value, rightLevel.Value))
+            .FirstOrNone(comparison => comparison != 0);
 
     private static string[] LevelTexts(string text)
         => text[1..].Split(Separator);

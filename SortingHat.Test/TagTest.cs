@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Funcky.Monads;
 using SortingHat.API.Models;
 using Xunit;
@@ -28,6 +29,29 @@ public sealed class TagTest
     [Fact]
     public void GivenTheSameTextThenTheTagsAreEqual()
         => Assert.Equal(Valid(":created:2018"), Valid(":created:2018"));
+
+    [Fact]
+    public void GivenTheSameTagInAnotherCaseThenTheTagsAreEqual()
+    {
+        Assert.Equal(Valid(":Tax:2018"), Valid(":TAX:2018"));
+        Assert.Equal(Valid(":Tax:2018").GetHashCode(), Valid(":TAX:2018").GetHashCode());
+    }
+
+    [Fact]
+    public void GivenANameInAnotherCaseThenTheNamesAreEqualAlsoBeyondAscii()
+        => Assert.Equal(ValidName("Müller"), ValidName("MÜLLER"));
+
+    [Fact]
+    public void GivenATagThenItKeepsItsSpelling()
+        => Assert.Equal(":Tax:IKEA", Valid(":Tax:IKEA").FullName);
+
+    [Fact]
+    public void GivenTagsThenTheyAreOrderedLikeATreeIgnoringCase()
+    {
+        string[] tags = [":banana", ":Apple:b", ":Cherry", ":apple", ":Apple:A"];
+
+        Assert.Equal([":apple", ":Apple:A", ":Apple:b", ":banana", ":Cherry"], tags.Select(Valid).Order(Tag.Order).Select(tag => tag.FullName));
+    }
 
     [Fact]
     public void GivenTheSameNameUnderAnotherParentThenTheTagsDiffer()

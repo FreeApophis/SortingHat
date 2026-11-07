@@ -48,13 +48,13 @@ public class SQLiteTag(SQLiteProjectDatabase db) : ITag
     public long FileCount(Tag tag)
         => Find(tag).Match(none: 0L, some: CountFiles);
 
-    /// <summary>Ordered like a tree: by their levels, so every parent comes right before its children.</summary>
+    /// <summary>Ordered like a tree (<see cref="Tag.Order"/>): every parent comes right before its children.</summary>
     public IReadOnlyList<Tag> GetTags()
     {
         var tags = db.Query(AllTags, ReadRow)
             .Aggregate(ImmutableDictionary<long, Tag>.Empty, (known, row) => known.Add(row.Id, row.ParentId.Match(none: () => Tag.Root(row.Name), some: parentId => Known(known, parentId).Child(row.Name))));
 
-        return [.. tags.Values.Order(Comparer<Tag>.Create(CompareLevels))];
+        return [.. tags.Values.Order(Tag.Order)];
     }
 
     internal Tag Load(long tagId)
@@ -86,12 +86,6 @@ public class SQLiteTag(SQLiteProjectDatabase db) : ITag
     /// <summary>The tree query returns every parent before its children.</summary>
     private static Tag Known(ImmutableDictionary<long, Tag> known, long tagId)
         => known.GetValueOrNone(tagId).GetOrElse(() => throw new InvalidDataException($"The database is damaged: the tag {tagId} comes before its parent."));
-
-    private static int CompareLevels(Tag left, Tag right)
-        => left.Levels
-            .Zip(right.Levels, (leftLevel, rightLevel) => string.CompareOrdinal(leftLevel.Value, rightLevel.Value))
-            .FirstOrNone(comparison => comparison != 0)
-            .GetOrElse(left.Levels.Count.CompareTo(right.Levels.Count));
 
     private static SqliteParameter ParentIdParameter(Option<long> parentId)
         => new("@parentId", parentId.Match(none: DBNull.Value, some: id => (object)id));

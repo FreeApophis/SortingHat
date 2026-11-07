@@ -7,6 +7,7 @@ namespace SortingHat.API.Models;
 /// <summary>
 /// The name of one level of a <see cref="Tag"/>, such as <c>2018</c> in <c>:tax:2018</c>. It contains only letters, digits, '-', '_', '+' and '.',
 /// the characters a search can contain as well: tagging and searching share this one rule.
+/// Names are equal in any case, like file names on Windows: <c>Tax</c> and <c>TAX</c> are the same name, and <see cref="Value"/> keeps the spelling.
 /// </summary>
 public sealed record TagName
 {
@@ -35,6 +36,12 @@ public sealed record TagName
             "" => Option<TagName>.None,
             var name => new TagName(name),
         };
+
+    public bool Equals(TagName? other)
+        => other is not null && StringComparer.OrdinalIgnoreCase.Equals(Value, other.Value);
+
+    public override int GetHashCode()
+        => StringComparer.OrdinalIgnoreCase.GetHashCode(Value);
 
     public override string ToString()
         => Value;

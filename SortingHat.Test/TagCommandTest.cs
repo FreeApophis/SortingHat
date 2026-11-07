@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Xunit;
 
 namespace SortingHat.Test;
@@ -110,6 +111,15 @@ public sealed class TagCommandTest : IDisposable
     {
         Assert.Equal(0, _hat.Hat(["list-tags"]));
         Assert.Equal(["There are currently no tags in the database."], _hat.Lines);
+    }
+
+    [Fact]
+    public void GivenTagsInDifferentCaseThenListTagsSortsThemIgnoringCase()
+    {
+        Assert.Equal(0, _hat.Hat(["add-tags", ":cherry", ":Banana", ":apple"]));
+
+        Assert.Equal(0, _hat.Hat(["list-tags"]));
+        Assert.Equal([":apple", ":Banana", ":cherry"], _hat.Lines.Where(line => line.StartsWith("* ")).Select(line => line[2..].Split(' ')[0]));
     }
 
     [Fact]

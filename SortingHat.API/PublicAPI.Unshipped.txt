@@ -441,3 +441,4 @@ SortingHat.API.DI.ISettings.Get(string! key) -> Funcky.Monads.Option<string!>
 SortingHat.API.DI.ISettings.Set(string! key, string! value) -> void
 static SortingHat.API.Models.TagName.FromValue(string! value) -> Funcky.Monads.Option<SortingHat.API.Models.TagName!>
 SortingHat.API.DI.IFile.Search(string! query) -> Funcky.Monads.Either<string!, SortingHat.API.Models.SearchResult!>
+static SortingHat.API.Models.Tag.Order.get -> System.Collections.Generic.IComparer<SortingHat.API.Models.Tag!>!
