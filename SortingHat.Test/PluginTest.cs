@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Autofac;
+using SortingHat.API.Plugin;
 using Xunit;
 
 namespace SortingHat.Test;
@@ -90,6 +93,21 @@ public sealed class PluginTest
         using var hat = HatSandbox.WithPluginFixtures(Broken);
 
         Assert.NotEqual(0, hat.Hat(["half-loaded"]));
+    }
+
+    [Fact]
+    public void GivenPluginsBuiltForAnotherMajorVersionOfTheApiThenHatWarnsAndRunsWithoutThem()
+    {
+        var olderHat = ContractAssemblies.Current with
+        {
+            Versions = new Dictionary<string, Version>(ContractAssemblies.Current.Versions) { ["SortingHat.API"] = new(1, 0, 0, 0) },
+        };
+        using var hat = HatSandbox.WithPluginFixtures(Working, builder => builder.RegisterInstance(olderHat));
+
+        Assert.Equal(0, hat.Hat(["plugins"]));
+
+        Assert.Contains(hat.Lines, line => line.StartsWith("Warning: plugin 'SortingHat.Plugin.FileType' not loaded") && line.Contains("built for SortingHat.API 2.x, hat has 1.0.0"));
+        Assert.Contains("No plugins loaded", hat.Lines);
     }
 
     [Fact]

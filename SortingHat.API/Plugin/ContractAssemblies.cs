@@ -1,47 +1,46 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Apophis.CLI.Writer;
+using Apophis.FileSystem;
+using Autofac;
 using Funcky.Extensions;
+using Funcky.Lexer;
 using Funcky.Monads;
 
 namespace SortingHat.API.Plugin;
 
-/// <summary>SortingHat.API and everything it references: the assemblies hat shares with every plugin.</summary>
-internal static class ContractAssemblies
+/// <summary>
+/// The assemblies hat shares with every plugin, with the versions hat has: SortingHat.API and every assembly its public types expose.
+/// A plugin always gets them from hat, so its types are hat's types, and it must have been built against a version hat can serve.
+/// </summary>
+/// <param name="Versions">The version hat has of every contract assembly, by assembly name.</param>
+/// <param name="Runtime">The .NET version hat runs on.</param>
+public sealed record ContractAssemblies(IReadOnlyDictionary<string, Version> Versions, Version Runtime)
 {
-    public static IReadOnlySet<string> Names { get; } = Closure(typeof(IPlugin).Assembly);
-
-    private static IReadOnlySet<string> Closure(Assembly root)
-    {
-        var names = new HashSet<string>();
-        var pending = new Stack<Assembly>([root]);
-
-        while (pending.TryPop(out var assembly))
-        {
-            if (assembly.GetName().Name is { } name && names.Add(name))
+    /// <summary>The contract of this hat. ContractAssembliesTest checks that it covers everything these assemblies reference outside the framework.</summary>
+    public static ContractAssemblies Current { get; } = new(
+        new Dictionary<string, Version>(
+            new[]
             {
-                assembly.GetReferencedAssemblies()
-                    .Where(reference => reference.Name is { } referenceName && !names.Contains(referenceName))
-                    .WhereSelect(LoadOrNone)
-                    .ToList()
-                    .ForEach(pending.Push);
+                typeof(IPlugin),
+                typeof(IConsoleWriter),
+                typeof(IExistsFile),
+                typeof(Apophis.Utils.EnumerableExtensions),
+                typeof(ContainerBuilder),
+                typeof(Option<>),
+                typeof(ILexemeWalker),
             }
-        }
+            .Select(type => type.Assembly.GetName())
+            .WhereSelect(NameAndVersion)),
+        Environment.Version);
 
-        return names;
-    }
+    public bool Contains(string assemblyName)
+        => Versions.ContainsKey(assemblyName);
 
-    // an optional reference that is not there is not part of the contract
-    private static Option<Assembly> LoadOrNone(AssemblyName name)
-    {
-        try
-        {
-            return Assembly.Load(name);
-        }
-        catch (FileNotFoundException)
-        {
-            return Option<Assembly>.None;
-        }
-    }
+    private static Option<KeyValuePair<string, Version>> NameAndVersion(AssemblyName assembly)
+        => from name in Option.FromNullable(assembly.Name)
+           from version in Option.FromNullable(assembly.Version)
+           select KeyValuePair.Create(name, version);
 }

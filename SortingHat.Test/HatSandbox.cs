@@ -58,7 +58,7 @@ internal sealed class HatSandbox : IDisposable
 
     /// <summary>
     /// The plugins folder of this hat: empty and writable in the temporary folder, so a test can lay out plugin folders before the first run.
-    /// Real plugins can't be deleted after loading, they come from <see cref="WithPluginFixtures"/>.
+    /// Real plugins can't be deleted after loading, they come from <see cref="WithPluginFixtures(string)"/>.
     /// </summary>
     public string PluginDirectory { get; }
 
@@ -69,7 +69,11 @@ internal sealed class HatSandbox : IDisposable
 
     /// <summary>A hat whose plugins folder is the <paramref name="fixture"/> folder of PluginFixtures, see the project file.</summary>
     public static HatSandbox WithPluginFixtures(string fixture)
-        => new(NoOperation, Path.Combine(AppContext.BaseDirectory, "PluginFixtures", fixture));
+        => WithPluginFixtures(fixture, NoOperation);
+
+    /// <summary>Like <see cref="WithPluginFixtures(string)"/>, with own registrations such as another <see cref="ContractAssemblies"/>.</summary>
+    public static HatSandbox WithPluginFixtures(string fixture, Action<ContainerBuilder> register)
+        => new(register, Path.Combine(AppContext.BaseDirectory, "PluginFixtures", fixture));
 
     public string ProjectDatabaseFile(string project)
         => Path.Combine(_databaseSettings.DbPath, $"{project}.db");

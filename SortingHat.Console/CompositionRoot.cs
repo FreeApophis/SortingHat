@@ -50,6 +50,7 @@ internal class CompositionRoot
 
         Builder.RegisterType<PluginLoader>().As<IPluginLoader>().SingleInstance();
         Builder.RegisterInstance(new PluginDirectory(Path.Combine(AppContext.BaseDirectory, "plugins")));
+        Builder.RegisterInstance(ContractAssemblies.Current);
 
         RegisterCommands();
         RegisterAutoTags();

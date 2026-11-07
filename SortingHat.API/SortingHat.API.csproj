@@ -2,7 +2,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>1.0.0.1</Version>
+    <!--
+      The version of the plugin contract (semantic versioning): a new minor version only adds, a new major version breaks plugins.
+      hat loads a plugin only when it was built against the same major version and at most the minor version hat has.
+    -->
+    <Version>2.0.0</Version>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
 

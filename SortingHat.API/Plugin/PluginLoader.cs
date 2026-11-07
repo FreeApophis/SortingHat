@@ -17,7 +17,7 @@ namespace SortingHat.API.Plugin;
 /// A plugin loads completely or not at all: whatever goes wrong becomes a <see cref="PluginProblem"/>, and hat runs without that plugin.
 /// </summary>
 [UsedImplicitly]
-public class PluginLoader(PluginDirectory pluginDirectory, IExistsDirectory existsDirectory) : IPluginLoader
+public class PluginLoader(PluginDirectory pluginDirectory, IExistsDirectory existsDirectory, ContractAssemblies contractAssemblies) : IPluginLoader
 {
     private readonly List<PluginProblem> _problems = [];
 
@@ -35,12 +35,12 @@ public class PluginLoader(PluginDirectory pluginDirectory, IExistsDirectory exis
         }
     }
 
-    private static Either<PluginProblem, IReadOnlyList<IModule>> LoadModules(PluginCandidate candidate)
-        => from assembly in Attempt(candidate, "it could not be loaded", () => new PluginLoadContext(candidate.AssemblyPath, ContractAssemblies.Names).LoadFromAssemblyPath(candidate.AssemblyPath))
-           from created in Attempt(candidate, "its modules could not be created", () => Modules(assembly))
-           from modules in AtLeastOne(candidate, created)
-           from registered in Attempt(candidate, "its modules failed to register", () => Probe(modules))
-           select registered;
+    private static Either<PluginProblem, Assembly> Compatible(PluginCandidate candidate, Assembly assembly, ContractAssemblies hat)
+        => PluginCompatibility.Incompatibilities(assembly.GetReferencedAssemblies(), hat) switch
+        {
+            [] => Either<PluginProblem, Assembly>.Right(assembly),
+            var reasons => Either<PluginProblem, Assembly>.Left(new PluginProblem(candidate.Name, string.Join("; ", reasons))),
+        };
 
     private static IReadOnlyList<IModule> Modules(Assembly assembly)
         =>
@@ -93,6 +93,15 @@ public class PluginLoader(PluginDirectory pluginDirectory, IExistsDirectory exis
             ReflectionTypeLoadException typeLoad => string.Join("; ", typeLoad.LoaderExceptions.WhereNotNull().Select(Message).Distinct()),
             _ => exception.Message,
         };
+
+    /// <summary>The plugin's references are checked before any of its types is touched, so an incompatible plugin fails with a clear reason.</summary>
+    private Either<PluginProblem, IReadOnlyList<IModule>> LoadModules(PluginCandidate candidate)
+        => from loaded in Attempt(candidate, "it could not be loaded", () => new PluginLoadContext(candidate.AssemblyPath, contractAssemblies).LoadFromAssemblyPath(candidate.AssemblyPath))
+           from assembly in Compatible(candidate, loaded, contractAssemblies)
+           from created in Attempt(candidate, "its modules could not be created", () => Modules(assembly))
+           from modules in AtLeastOne(candidate, created)
+           from registered in Attempt(candidate, "its modules failed to register", () => Probe(modules))
+           select registered;
 
     private void Register(ContainerBuilder builder, IReadOnlyList<IModule> modules)
     {

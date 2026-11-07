@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.Loader;
 
 namespace SortingHat.API.Plugin;
@@ -8,7 +7,7 @@ namespace SortingHat.API.Plugin;
 /// Every plugin gets its own load context, so it loads its own dependencies from its folder, with the versions it was built with.
 /// The contract assemblies always come from hat, otherwise the plugin's IPlugin would be another type than hat's.
 /// </summary>
-internal sealed class PluginLoadContext(string assemblyPath, IReadOnlySet<string> contractAssemblies)
+internal sealed class PluginLoadContext(string assemblyPath, ContractAssemblies contractAssemblies)
     : AssemblyLoadContext(assemblyPath)
 {
     private readonly AssemblyDependencyResolver _resolver = new(assemblyPath);
