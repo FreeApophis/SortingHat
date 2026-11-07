@@ -3,7 +3,7 @@ using Funcky.Lexer;
 
 namespace SortingHat.API.Parser;
 
-public class ParserModule : Module
+internal class ParserModule : Module
 {
     protected override void Load(ContainerBuilder builder)
     {

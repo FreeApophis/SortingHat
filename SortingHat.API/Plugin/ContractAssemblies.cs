@@ -17,7 +17,7 @@ namespace SortingHat.API.Plugin;
 /// </summary>
 /// <param name="Versions">The version hat has of every contract assembly, by assembly name.</param>
 /// <param name="Runtime">The .NET version hat runs on.</param>
-public sealed record ContractAssemblies(IReadOnlyDictionary<string, Version> Versions, Version Runtime)
+internal sealed record ContractAssemblies(IReadOnlyDictionary<string, Version> Versions, Version Runtime)
 {
     /// <summary>The contract of this hat. ContractAssembliesTest checks that it covers everything these assemblies reference outside the framework.</summary>
     public static ContractAssemblies Current { get; } = new(

@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 namespace SortingHat.API.AutoTag;
 
 [UsedImplicitly]
-public class CreatedAtAutoTag : DateAutoTag
+internal class CreatedAtAutoTag : DateAutoTag
 {
     public override string AutoTagKey => "CreatedAt.<>";
     public override string Description => "The date and time of the creation of the file.";

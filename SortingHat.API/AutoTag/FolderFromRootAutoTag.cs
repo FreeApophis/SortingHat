@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 namespace SortingHat.API.AutoTag;
 
 [UsedImplicitly]
-public class FolderFromRootAutoTag : IntegerAutoTag
+internal class FolderFromRootAutoTag : IntegerAutoTag
 {
     public override string AutoTagKey => "Folder.FromRoot.<>";
 

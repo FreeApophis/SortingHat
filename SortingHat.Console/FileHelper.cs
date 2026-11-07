@@ -1,8 +1,9 @@
 ﻿using System.Diagnostics;
 
-namespace SortingHat.API;
+namespace SortingHat.CLI;
 
-public class FileHelper
+/// <summary>Opens files the way the operating system does.</summary>
+internal static class FileHelper
 {
     public static void OpenWithAssociatedProgram(string filePath)
     {

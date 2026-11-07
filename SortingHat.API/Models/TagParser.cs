@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 namespace SortingHat.API.Models;
 
 [UsedImplicitly]
-public class TagParser(Func<string, Tag?, Tag> newTag) : ITagParser
+internal class TagParser(Func<string, Tag?, Tag> newTag) : ITagParser
 {
     /// <summary>
     /// A tag always begins with a colon (:) and can have multiple parts, each part beginning with a colon (:)

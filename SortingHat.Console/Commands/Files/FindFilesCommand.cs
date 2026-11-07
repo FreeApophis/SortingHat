@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Apophis.CLI;
 using Apophis.CLI.Writer;
 using JetBrains.Annotations;
-using SortingHat.API;
 using SortingHat.API.DI;
 
 namespace SortingHat.CLI.Commands.Files;

@@ -17,7 +17,7 @@ namespace SortingHat.API.Plugin;
 /// A plugin loads completely or not at all: whatever goes wrong becomes a <see cref="PluginProblem"/>, and hat runs without that plugin.
 /// </summary>
 [UsedImplicitly]
-public class PluginLoader(PluginDirectory pluginDirectory, IExistsDirectory existsDirectory, ContractAssemblies contractAssemblies) : IPluginLoader
+internal class PluginLoader(PluginDirectory pluginDirectory, IExistsDirectory existsDirectory, ContractAssemblies contractAssemblies) : IPluginLoader
 {
     private readonly List<PluginProblem> _problems = [];
 

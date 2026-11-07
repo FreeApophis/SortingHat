@@ -1,22 +1,15 @@
 ﻿#nullable enable
-SortingHat.API.AutoTag.AutoTagHandler
-SortingHat.API.AutoTag.AutoTagHandler.AutoTagHandler(System.Collections.Generic.IEnumerable<SortingHat.API.AutoTag.IAutoTag!>! autoTags, SortingHat.API.Models.ITagParser! tagParser) -> void
-SortingHat.API.AutoTag.AutoTagHandler.AutoTags.get -> System.Collections.Generic.IEnumerable<SortingHat.API.AutoTag.IAutoTag!>!
-SortingHat.API.AutoTag.AutoTagHandler.TagFromMask(string! tagMask, System.IO.FileInfo! file) -> SortingHat.API.Models.Tag?
+override SortingHat.API.CoreModule.Load(Autofac.ContainerBuilder! builder) -> void
 SortingHat.API.AutoTag.ConstantAutoTag
 SortingHat.API.AutoTag.ConstantAutoTag.ConstantAutoTag() -> void
 SortingHat.API.AutoTag.ConstantAutoTag.FindMatch(string! value) -> string?
 SortingHat.API.AutoTag.ConstantAutoTag.HandleTag(System.IO.FileInfo! file, string? tagMatch) -> string?
 SortingHat.API.AutoTag.ConstantAutoTag.HumanReadableAutoTagsKey.get -> string!
-SortingHat.API.AutoTag.CreatedAtAutoTag
-SortingHat.API.AutoTag.CreatedAtAutoTag.CreatedAtAutoTag() -> void
 SortingHat.API.AutoTag.DateAutoTag
 SortingHat.API.AutoTag.DateAutoTag.DateAutoTag() -> void
 SortingHat.API.AutoTag.DateAutoTag.FindMatch(string! value) -> string?
 SortingHat.API.AutoTag.DateAutoTag.HandleTag(System.IO.FileInfo! file, string? tagMatch) -> string?
 SortingHat.API.AutoTag.DateAutoTag.HumanReadableAutoTagsKey.get -> string!
-SortingHat.API.AutoTag.FolderFromRootAutoTag
-SortingHat.API.AutoTag.FolderFromRootAutoTag.FolderFromRootAutoTag() -> void
 SortingHat.API.AutoTag.IAutoTag
 SortingHat.API.AutoTag.IAutoTag.AutoTagKey.get -> string!
 SortingHat.API.AutoTag.IAutoTag.Description.get -> string!
@@ -38,6 +31,8 @@ SortingHat.API.AutoTag.StringAutoTag
 SortingHat.API.AutoTag.StringAutoTag.FindMatch(string! value) -> string?
 SortingHat.API.AutoTag.StringAutoTag.HumanReadableAutoTagsKey.get -> string!
 SortingHat.API.AutoTag.StringAutoTag.StringAutoTag() -> void
+SortingHat.API.CoreModule
+SortingHat.API.CoreModule.CoreModule() -> void
 SortingHat.API.DI.ArgumentDefinition
 SortingHat.API.DI.ArgumentDefinition.<Clone>$() -> SortingHat.API.DI.ArgumentDefinition!
 SortingHat.API.DI.ArgumentDefinition.ArgumentDefinition() -> void
@@ -63,9 +58,6 @@ SortingHat.API.DI.CommandInput.CommandInput(System.Collections.Generic.IReadOnly
 SortingHat.API.DI.CommandInput.Has(SortingHat.API.DI.OptionDefinition! option) -> bool
 SortingHat.API.DI.CommandInput.Value(SortingHat.API.DI.ArgumentDefinition! argument) -> Funcky.Monads.Option<string!>
 SortingHat.API.DI.CommandInput.Values(SortingHat.API.DI.ArgumentDefinition! argument) -> System.Collections.Generic.IReadOnlyList<string!>!
-SortingHat.API.DI.HashService
-SortingHat.API.DI.HashService.GetHash(string! path) -> System.Threading.Tasks.Task<string!>!
-SortingHat.API.DI.HashService.HashService(System.Func<System.Security.Cryptography.HashAlgorithm!>! newHashAlgorithm, string! hashPrefix, Apophis.CLI.Writer.IConsoleWriter! consoleWriter) -> void
 SortingHat.API.DI.ICommand
 SortingHat.API.DI.ICommand.CommandGrouping.get -> SortingHat.API.DI.CommandGrouping
 SortingHat.API.DI.ICommand.Execute(System.Collections.Generic.IEnumerable<string!>! arguments, SortingHat.API.DI.IOptionParser! options) -> bool
@@ -144,11 +136,6 @@ SortingHat.API.DatabaseSettings.Path.get -> string!
 SortingHat.API.DatabaseSettings.Path.set -> void
 SortingHat.API.DatabaseSettings.Type.get -> string!
 SortingHat.API.DatabaseSettings.Type.set -> void
-SortingHat.API.FileHelper
-SortingHat.API.FileHelper.FileHelper() -> void
-SortingHat.API.FilePathExtractor
-SortingHat.API.FilePathExtractor.FilePathExtractor() -> void
-SortingHat.API.FilePathExtractor.FromFilePatterns(System.Collections.Generic.IEnumerable<string!>! filePatterns, bool recursive) -> System.Collections.Generic.IEnumerable<string!>!
 SortingHat.API.Models.File
 SortingHat.API.Models.File.CreatedAt.get -> System.DateTime
 SortingHat.API.Models.File.CreatedAt.set -> void
@@ -210,9 +197,6 @@ SortingHat.API.Models.Tag.Parent.get -> SortingHat.API.Models.Tag?
 SortingHat.API.Models.Tag.Rename(string! newName) -> bool
 SortingHat.API.Models.Tag.Store() -> bool
 SortingHat.API.Models.Tag.Tag(SortingHat.API.DI.ITag! tag, string! name, SortingHat.API.Models.Tag? parent = null) -> void
-SortingHat.API.Models.TagParser
-SortingHat.API.Models.TagParser.Parse(string! tagString) -> SortingHat.API.Models.Tag?
-SortingHat.API.Models.TagParser.TagParser(System.Func<string!, SortingHat.API.Models.Tag?, SortingHat.API.Models.Tag!>! newTag) -> void
 SortingHat.API.Parser.INodeVisitor
 SortingHat.API.Parser.INodeVisitor.Visit(SortingHat.API.Parser.Nodes.AndOperatorNode! op) -> void
 SortingHat.API.Parser.INodeVisitor.Visit(SortingHat.API.Parser.Nodes.BinaryOperatorNode! op) -> void
@@ -252,8 +236,6 @@ SortingHat.API.Parser.Parser.IllegalExpression.get -> bool
 SortingHat.API.Parser.Parser.NextToken() -> System.Collections.Generic.IEnumerable<Funcky.Lexer.Token.IToken!>!
 SortingHat.API.Parser.Parser.Parse(Funcky.Lexer.ILexemeWalker! walker) -> SortingHat.API.Parser.Nodes.IParseNode!
 SortingHat.API.Parser.Parser.Parse(string! expression) -> SortingHat.API.Parser.Nodes.IParseNode?
-SortingHat.API.Parser.ParserModule
-SortingHat.API.Parser.ParserModule.ParserModule() -> void
 SortingHat.API.Parser.Token.AndToken
 SortingHat.API.Parser.Token.AndToken.AndToken() -> void
 SortingHat.API.Parser.Token.ClosedParenthesisToken
@@ -275,16 +257,6 @@ SortingHat.API.Parser.Token.TagToken.TagToken(string? value) -> void
 SortingHat.API.Parser.Token.TagToken.Value.get -> string?
 SortingHat.API.Parser.Token.WhiteSpaceToken
 SortingHat.API.Parser.Token.WhiteSpaceToken.WhiteSpaceToken() -> void
-SortingHat.API.Plugin.ContractAssemblies
-SortingHat.API.Plugin.ContractAssemblies.<Clone>$() -> SortingHat.API.Plugin.ContractAssemblies!
-SortingHat.API.Plugin.ContractAssemblies.Contains(string! assemblyName) -> bool
-SortingHat.API.Plugin.ContractAssemblies.ContractAssemblies(System.Collections.Generic.IReadOnlyDictionary<string!, System.Version!>! Versions, System.Version! Runtime) -> void
-SortingHat.API.Plugin.ContractAssemblies.Deconstruct(out System.Collections.Generic.IReadOnlyDictionary<string!, System.Version!>! Versions, out System.Version! Runtime) -> void
-SortingHat.API.Plugin.ContractAssemblies.Equals(SortingHat.API.Plugin.ContractAssemblies? other) -> bool
-SortingHat.API.Plugin.ContractAssemblies.Runtime.get -> System.Version!
-SortingHat.API.Plugin.ContractAssemblies.Runtime.init -> void
-SortingHat.API.Plugin.ContractAssemblies.Versions.get -> System.Collections.Generic.IReadOnlyDictionary<string!, System.Version!>!
-SortingHat.API.Plugin.ContractAssemblies.Versions.init -> void
 SortingHat.API.Plugin.IPlugin
 SortingHat.API.Plugin.IPlugin.Description.get -> string!
 SortingHat.API.Plugin.IPlugin.Name.get -> string!
@@ -293,18 +265,6 @@ SortingHat.API.Plugin.IPluginLoader
 SortingHat.API.Plugin.IPluginLoader.Plugins.get -> System.Collections.Generic.List<SortingHat.API.Plugin.IPlugin!>!
 SortingHat.API.Plugin.IPluginLoader.Problems.get -> System.Collections.Generic.IReadOnlyList<SortingHat.API.Plugin.PluginProblem!>!
 SortingHat.API.Plugin.IPluginLoader.RegisterModules(Autofac.ContainerBuilder! builder) -> void
-SortingHat.API.Plugin.PluginDirectory
-SortingHat.API.Plugin.PluginDirectory.<Clone>$() -> SortingHat.API.Plugin.PluginDirectory!
-SortingHat.API.Plugin.PluginDirectory.Deconstruct(out string! Path) -> void
-SortingHat.API.Plugin.PluginDirectory.Equals(SortingHat.API.Plugin.PluginDirectory? other) -> bool
-SortingHat.API.Plugin.PluginDirectory.Path.get -> string!
-SortingHat.API.Plugin.PluginDirectory.Path.init -> void
-SortingHat.API.Plugin.PluginDirectory.PluginDirectory(string! Path) -> void
-SortingHat.API.Plugin.PluginLoader
-SortingHat.API.Plugin.PluginLoader.PluginLoader(SortingHat.API.Plugin.PluginDirectory! pluginDirectory, Apophis.FileSystem.IExistsDirectory! existsDirectory, SortingHat.API.Plugin.ContractAssemblies! contractAssemblies) -> void
-SortingHat.API.Plugin.PluginLoader.Plugins.get -> System.Collections.Generic.List<SortingHat.API.Plugin.IPlugin!>!
-SortingHat.API.Plugin.PluginLoader.Problems.get -> System.Collections.Generic.IReadOnlyList<SortingHat.API.Plugin.PluginProblem!>!
-SortingHat.API.Plugin.PluginLoader.RegisterModules(Autofac.ContainerBuilder! builder) -> void
 SortingHat.API.Plugin.PluginProblem
 SortingHat.API.Plugin.PluginProblem.<Clone>$() -> SortingHat.API.Plugin.PluginProblem!
 SortingHat.API.Plugin.PluginProblem.Deconstruct(out string! Source, out string! Reason) -> void
@@ -326,12 +286,6 @@ abstract SortingHat.API.AutoTag.IntegerAutoTag.HandleTag(System.IO.FileInfo! fil
 abstract SortingHat.API.AutoTag.StringAutoTag.AutoTagKey.get -> string!
 abstract SortingHat.API.AutoTag.StringAutoTag.Description.get -> string!
 abstract SortingHat.API.AutoTag.StringAutoTag.HandleTag(System.IO.FileInfo! file, string? tagMatch) -> string?
-override SortingHat.API.AutoTag.CreatedAtAutoTag.AutoTagKey.get -> string!
-override SortingHat.API.AutoTag.CreatedAtAutoTag.Description.get -> string!
-override SortingHat.API.AutoTag.CreatedAtAutoTag.HandleTag(System.IO.FileInfo! file, SortingHat.API.AutoTag.IDateTagPart! tagPart) -> string?
-override SortingHat.API.AutoTag.FolderFromRootAutoTag.AutoTagKey.get -> string!
-override SortingHat.API.AutoTag.FolderFromRootAutoTag.Description.get -> string!
-override SortingHat.API.AutoTag.FolderFromRootAutoTag.HandleTag(System.IO.FileInfo! file, int index) -> string?
 override SortingHat.API.DI.ArgumentDefinition.Equals(object? obj) -> bool
 override SortingHat.API.DI.ArgumentDefinition.GetHashCode() -> int
 override SortingHat.API.DI.ArgumentDefinition.ToString() -> string!
@@ -354,7 +308,6 @@ override SortingHat.API.Parser.Nodes.BooleanNode.ToString() -> string!
 override SortingHat.API.Parser.Nodes.NotOperatorNode.Accept(SortingHat.API.Parser.INodeVisitor! visitor) -> void
 override SortingHat.API.Parser.Nodes.OrOperatorNode.Accept(SortingHat.API.Parser.INodeVisitor! visitor) -> void
 override SortingHat.API.Parser.Nodes.TagNode.ToString() -> string!
-override SortingHat.API.Parser.ParserModule.Load(Autofac.ContainerBuilder! builder) -> void
 override SortingHat.API.Parser.Token.AndToken.ToString() -> string!
 override SortingHat.API.Parser.Token.ClosedParenthesisToken.ToString() -> string!
 override SortingHat.API.Parser.Token.EpsilonToken.ToString() -> string!
@@ -362,12 +315,6 @@ override SortingHat.API.Parser.Token.NotToken.ToString() -> string!
 override SortingHat.API.Parser.Token.OpenParenthesisToken.ToString() -> string!
 override SortingHat.API.Parser.Token.OrToken.ToString() -> string!
 override SortingHat.API.Parser.Token.TagToken.ToString() -> string!
-override SortingHat.API.Plugin.ContractAssemblies.Equals(object? obj) -> bool
-override SortingHat.API.Plugin.ContractAssemblies.GetHashCode() -> int
-override SortingHat.API.Plugin.ContractAssemblies.ToString() -> string!
-override SortingHat.API.Plugin.PluginDirectory.Equals(object? obj) -> bool
-override SortingHat.API.Plugin.PluginDirectory.GetHashCode() -> int
-override SortingHat.API.Plugin.PluginDirectory.ToString() -> string!
 override SortingHat.API.Plugin.PluginProblem.Equals(object? obj) -> bool
 override SortingHat.API.Plugin.PluginProblem.GetHashCode() -> int
 override SortingHat.API.Plugin.PluginProblem.ToString() -> string!
@@ -375,7 +322,6 @@ static SortingHat.API.DI.ArgumentDefinition.operator !=(SortingHat.API.DI.Argume
 static SortingHat.API.DI.ArgumentDefinition.operator ==(SortingHat.API.DI.ArgumentDefinition? left, SortingHat.API.DI.ArgumentDefinition? right) -> bool
 static SortingHat.API.DI.OptionDefinition.operator !=(SortingHat.API.DI.OptionDefinition? left, SortingHat.API.DI.OptionDefinition? right) -> bool
 static SortingHat.API.DI.OptionDefinition.operator ==(SortingHat.API.DI.OptionDefinition? left, SortingHat.API.DI.OptionDefinition? right) -> bool
-static SortingHat.API.FileHelper.OpenWithAssociatedProgram(string! filePath) -> void
 static SortingHat.API.Models.PathFingerprint.operator !=(SortingHat.API.Models.PathFingerprint? left, SortingHat.API.Models.PathFingerprint? right) -> bool
 static SortingHat.API.Models.PathFingerprint.operator ==(SortingHat.API.Models.PathFingerprint? left, SortingHat.API.Models.PathFingerprint? right) -> bool
 static SortingHat.API.Models.ProjectName.IsSameName(string! name, string! other) -> bool
@@ -390,11 +336,6 @@ static SortingHat.API.Models.Tag.operator !=(SortingHat.API.Models.Tag? lhs, Sor
 static SortingHat.API.Models.Tag.operator ==(SortingHat.API.Models.Tag? lhs, SortingHat.API.Models.Tag? rhs) -> bool
 static SortingHat.API.Parser.LexerRules.Create() -> Funcky.Lexer.LexerRuleBook!
 static SortingHat.API.Parser.Parser.Create() -> SortingHat.API.Parser.Parser!
-static SortingHat.API.Plugin.ContractAssemblies.Current.get -> SortingHat.API.Plugin.ContractAssemblies!
-static SortingHat.API.Plugin.ContractAssemblies.operator !=(SortingHat.API.Plugin.ContractAssemblies? left, SortingHat.API.Plugin.ContractAssemblies? right) -> bool
-static SortingHat.API.Plugin.ContractAssemblies.operator ==(SortingHat.API.Plugin.ContractAssemblies? left, SortingHat.API.Plugin.ContractAssemblies? right) -> bool
-static SortingHat.API.Plugin.PluginDirectory.operator !=(SortingHat.API.Plugin.PluginDirectory? left, SortingHat.API.Plugin.PluginDirectory? right) -> bool
-static SortingHat.API.Plugin.PluginDirectory.operator ==(SortingHat.API.Plugin.PluginDirectory? left, SortingHat.API.Plugin.PluginDirectory? right) -> bool
 static SortingHat.API.Plugin.PluginProblem.operator !=(SortingHat.API.Plugin.PluginProblem? left, SortingHat.API.Plugin.PluginProblem? right) -> bool
 static SortingHat.API.Plugin.PluginProblem.operator ==(SortingHat.API.Plugin.PluginProblem? left, SortingHat.API.Plugin.PluginProblem? right) -> bool
 static readonly SortingHat.API.Models.PathFingerprint.TimestampResolution -> System.TimeSpan

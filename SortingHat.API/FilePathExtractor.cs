@@ -7,7 +7,7 @@ using SortingHat.API.DI;
 namespace SortingHat.API;
 
 [UsedImplicitly]
-public class FilePathExtractor : IFilePathExtractor
+internal class FilePathExtractor : IFilePathExtractor
 {
     public IEnumerable<string> FromFilePatterns(IEnumerable<string> filePatterns, bool recursive)
     {

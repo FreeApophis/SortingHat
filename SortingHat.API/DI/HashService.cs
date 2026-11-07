@@ -9,7 +9,7 @@ using Apophis.CLI.Writer;
 namespace SortingHat.API.DI;
 
 /// <summary>Hashes files with a new hash algorithm from <paramref name="newHashAlgorithm"/> per file, because one instance must not be used concurrently.</summary>
-public class HashService(Func<HashAlgorithm> newHashAlgorithm, string hashPrefix, IConsoleWriter consoleWriter) : IHashService
+internal class HashService(Func<HashAlgorithm> newHashAlgorithm, string hashPrefix, IConsoleWriter consoleWriter) : IHashService
 {
     private readonly string _hashPrefix = hashPrefix.ToLower();
 

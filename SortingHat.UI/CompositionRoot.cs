@@ -1,12 +1,8 @@
-﻿using System;
-using System.Security.Cryptography;
-using Apophis.CLI.Writer;
+﻿using Apophis.CLI.Writer;
 using Apophis.FileSystem;
 using Autofac;
 using Microsoft.Extensions.Logging;
 using SortingHat.API;
-using SortingHat.API.DI;
-using SortingHat.API.Parser;
 using SortingHat.DB;
 
 namespace SortingHat.UI;
@@ -20,18 +16,12 @@ internal class CompositionRoot
     {
         var builder = new ContainerBuilder();
 
-        builder.RegisterModule(new ParserModule());
+        builder.RegisterModule(new CoreModule());
         builder.RegisterModule(new SqliteDatabaseModule());
         builder.RegisterModule(new FileSystemModule());
 
         builder.RegisterType<MainWindow>().AsSelf();
 
-        builder.RegisterType<API.Models.TagParser>().As<API.Models.ITagParser>().SingleInstance();
-        builder.RegisterType<API.Models.Tag>().As<API.Models.Tag>().InstancePerDependency();
-        builder.RegisterType<API.Models.File>().As<API.Models.File>().InstancePerDependency();
-
-        builder.Register(_ => SHA256.Create()).As<HashAlgorithm>().InstancePerDependency().ExternallyOwned();
-        builder.Register(c => new HashService(c.Resolve<Func<HashAlgorithm>>(), nameof(SHA256), c.Resolve<IConsoleWriter>())).As<IHashService>().SingleInstance();
         builder.RegisterType<LoggerFactory>().As<ILoggerFactory>().SingleInstance();
         builder.RegisterGeneric(typeof(Logger<>)).As(typeof(ILogger<>)).SingleInstance();
         builder.RegisterType<NullWriter>().As<IConsoleWriter>();

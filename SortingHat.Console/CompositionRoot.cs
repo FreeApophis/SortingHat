@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Security.Cryptography;
 using Apophis.CLI;
 using Apophis.CLI.Reader;
 using Apophis.CLI.Writer;
@@ -9,9 +7,7 @@ using Autofac;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SortingHat.API;
-using SortingHat.API.AutoTag;
 using SortingHat.API.DI;
-using SortingHat.API.Parser;
 using SortingHat.API.Plugin;
 using SortingHat.CLI.Commands.Files;
 using SortingHat.DB;
@@ -24,22 +20,13 @@ internal class CompositionRoot
 
     public CompositionRoot Register()
     {
-        Builder.RegisterModule(new ParserModule());
+        Builder.RegisterModule(new CoreModule());
         Builder.RegisterModule(new SqliteDatabaseModule());
         Builder.RegisterModule(new FileSystemModule());
 
         Builder.RegisterType<Application>().AsSelf();
         Builder.RegisterType<CommandLine>().AsSelf();
 
-        Builder.RegisterType<API.Models.TagParser>().As<API.Models.ITagParser>();
-        Builder.RegisterType<AutoTagHandler>().As<IAutoTagHandler>();
-
-        Builder.RegisterType<FilePathExtractor>().As<IFilePathExtractor>().SingleInstance();
-        Builder.RegisterType<API.Models.Tag>().As<API.Models.Tag>().InstancePerDependency();
-        Builder.RegisterType<API.Models.File>().As<API.Models.File>().InstancePerDependency();
-
-        Builder.Register(_ => SHA256.Create()).As<HashAlgorithm>().InstancePerDependency().ExternallyOwned();
-        Builder.Register(c => new HashService(c.Resolve<Func<HashAlgorithm>>(), nameof(SHA256), c.Resolve<IConsoleWriter>())).As<IHashService>().SingleInstance();
         Builder.RegisterType<LoggerFactory>().As<ILoggerFactory>().SingleInstance();
         Builder.RegisterGeneric(typeof(Logger<>)).As(typeof(ILogger<>)).SingleInstance();
 
@@ -48,12 +35,7 @@ internal class CompositionRoot
         Builder.RegisterType<ConsoleApplicationInformationProvider>().As<IConsoleApplicationInformationProvider>();
         Builder.RegisterType<Apophis.CLI.Console>().AsSelf();
 
-        Builder.RegisterType<PluginLoader>().As<IPluginLoader>().SingleInstance();
-        Builder.RegisterInstance(new PluginDirectory(Path.Combine(AppContext.BaseDirectory, "plugins")));
-        Builder.RegisterInstance(ContractAssemblies.Current);
-
         RegisterCommands();
-        RegisterAutoTags();
 
         RegisterConfiguration();
 
@@ -66,12 +48,6 @@ internal class CompositionRoot
     /// <summary>The scope the application runs in: the <paramref name="container"/> with every plugin's modules registered.</summary>
     public static ILifetimeScope BeginPluginScope(IContainer container)
         => container.BeginLifetimeScope(builder => container.Resolve<IPluginLoader>().RegisterModules(builder));
-
-    private void RegisterAutoTags()
-    {
-        Builder.RegisterType<CreatedAtAutoTag>().As<IAutoTag>().SingleInstance();
-        Builder.RegisterType<FolderFromRootAutoTag>().As<IAutoTag>().SingleInstance();
-    }
 
     private void RegisterConfiguration()
     {

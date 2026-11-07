@@ -8,7 +8,7 @@ using SortingHat.API.Models;
 namespace SortingHat.API.AutoTag;
 
 [UsedImplicitly]
-public class AutoTagHandler(IEnumerable<IAutoTag> autoTags, ITagParser tagParser) : IAutoTagHandler
+internal class AutoTagHandler(IEnumerable<IAutoTag> autoTags, ITagParser tagParser) : IAutoTagHandler
 {
     private readonly Regex _variableRegex = new("{.*?}");
 
