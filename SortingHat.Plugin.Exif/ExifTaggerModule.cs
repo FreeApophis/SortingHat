@@ -16,7 +16,7 @@ internal class ExifTaggerModule : Autofac.Module, IPlugin
 
     protected override void Load(ContainerBuilder builder)
     {
-        builder.RegisterType<ExifCommand>().As<ICommand>();
+        builder.RegisterType<ExifCommand>().As<IDeclaredCommand>();
 
         RegisterSupportedTags(builder);
     }

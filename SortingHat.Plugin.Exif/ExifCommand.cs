@@ -1,36 +1,36 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Apophis.CLI.Writer;
-using Funcky.Monads;
 using JetBrains.Annotations;
-using MetadataExtractor;
 using SortingHat.API.DI;
 using static MetadataExtractor.ImageMetadataReader;
 
 namespace SortingHat.Plugin.Exif;
 
 [UsedImplicitly]
-internal class ExifCommand(IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor) : ICommand
+internal class ExifCommand(IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor) : IDeclaredCommand
 {
-    public string LongCommand => "exif";
-    public Option<string> ShortCommand => Option<string>.None;
-    public string ShortHelp => "Reads exif information from files.";
+    private static readonly ArgumentDefinition Files = new() { Name = "file", Description = "Files or file patterns such as '*.jpg'.", Arity = Arity.OneOrMore };
 
     public CommandGrouping CommandGrouping => CommandGrouping.General;
+    public string Name => "exif";
+    public string Description => "Reads exif information from files.";
+    public IReadOnlyList<ArgumentDefinition> Arguments => [Files];
 
-    public bool Execute(IEnumerable<string> arguments, IOptionParser options)
+    public Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
     {
-        foreach (var filePath in filePathExtractor.FromFilePatterns(arguments, false))
+        var lines = filePathExtractor
+            .FromFilePatterns(input.Values(Files), recursive: false)
+            .SelectMany(ReadMetadata)
+            .SelectMany(directory => directory.Tags.Select(tag => $"{directory.Name} - {tag.Name} ({tag.Type}) = {tag.Description}"));
+
+        foreach (var line in lines)
         {
-            IEnumerable<Directory> directories = ReadMetadata(filePath);
-            foreach (var directory in directories)
-            {
-                foreach (var tag in directory.Tags)
-                {
-                    consoleWriter.WriteLine($"{directory.Name} - {tag.Name} ({tag.Type}) = {tag.Description}");
-                }
-            }
+            consoleWriter.WriteLine(line);
         }
 
-        return true;
+        return Task.FromResult(true);
     }
 }

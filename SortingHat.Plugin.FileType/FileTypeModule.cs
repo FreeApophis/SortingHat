@@ -23,7 +23,7 @@ internal class FileTypeModule : Autofac.Module, IPlugin
     {
         builder.RegisterType<FileTypeFinder>().As<IFileTypeFinder>().SingleInstance();
 
-        builder.RegisterType<IdentifyCommand>().As<ICommand>();
+        builder.RegisterType<IdentifyCommand>().As<IDeclaredCommand>();
 
         builder.RegisterType<FileTypeCategoryAutoTag>().As<IAutoTag>().SingleInstance();
         builder.RegisterType<FileTypeAutoTag>().As<IAutoTag>().SingleInstance();

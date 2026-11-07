@@ -14,7 +14,7 @@ internal class RelevantInformationModule : Autofac.Module, IPlugin
     protected override void Load(ContainerBuilder builder)
     {
         builder.RegisterType<FolderScanner>().AsSelf();
-        builder.RegisterType<ScanCommand>().As<ICommand>();
+        builder.RegisterType<ScanCommand>().As<IDeclaredCommand>();
 
         RegisterSupportedTags(builder);
     }
