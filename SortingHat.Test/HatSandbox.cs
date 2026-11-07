@@ -67,9 +67,9 @@ internal sealed class HatSandbox : IDisposable
     /// <summary>The lines the user types when hat asks for input.</summary>
     public MemoryConsoleReader Keyboard => _reader;
 
-    /// <summary>A hat whose plugins folder holds the real plugins as their build put them, see PluginFixtures in the project file.</summary>
-    public static HatSandbox WithPluginFixtures()
-        => new(NoOperation, Path.Combine(AppContext.BaseDirectory, "PluginFixtures"));
+    /// <summary>A hat whose plugins folder is the <paramref name="fixture"/> folder of PluginFixtures, see the project file.</summary>
+    public static HatSandbox WithPluginFixtures(string fixture)
+        => new(NoOperation, Path.Combine(AppContext.BaseDirectory, "PluginFixtures", fixture));
 
     public string ProjectDatabaseFile(string project)
         => Path.Combine(_databaseSettings.DbPath, $"{project}.db");

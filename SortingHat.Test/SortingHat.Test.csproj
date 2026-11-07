@@ -34,11 +34,14 @@
 
   <!--
     The plugins are not referenced: hat loads them at run time from their own folders.
-    Their build output is copied to PluginFixtures/<plugin>/, laid out like the 'plugins' folder next to hat.
+    The target lays out their build output like 'plugins' folders next to hat:
+      PluginFixtures/Working/<plugin>/   the real plugins
+      PluginFixtures/Broken/<case>/      a real plugin next to plugins that fail in every way the loader handles
   -->
   <ItemGroup>
     <PluginFixture Include="..\SortingHat.Plugin.Exif\SortingHat.Plugin.Exif.csproj" />
     <PluginFixture Include="..\SortingHat.Plugin.FileType\SortingHat.Plugin.FileType.csproj" />
+    <PluginFixture Include="..\SortingHat.Test.Plugin\SortingHat.Test.Plugin.csproj" />
     <ProjectReference Include="@(PluginFixture)" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
@@ -46,10 +49,23 @@
     <MSBuild Projects="@(PluginFixture)" Targets="GetTargetPath" Properties="Configuration=$(Configuration)">
       <Output TaskParameter="TargetOutputs" ItemName="PluginFixtureAssembly" />
     </MSBuild>
+    <PropertyGroup>
+      <Working>$(OutDir)PluginFixtures\Working\</Working>
+      <Broken>$(OutDir)PluginFixtures\Broken\</Broken>
+    </PropertyGroup>
     <ItemGroup>
       <PluginFixtureFile Include="%(PluginFixtureAssembly.RootDir)%(PluginFixtureAssembly.Directory)*.*" Plugin="%(PluginFixtureAssembly.Filename)" />
+      <RealPluginFile Include="@(PluginFixtureFile)" Condition="'%(Plugin)' != 'SortingHat.Test.Plugin'" />
+      <FileTypePluginFile Include="@(PluginFixtureFile)" Condition="'%(Plugin)' == 'SortingHat.Plugin.FileType'" />
+      <FailingPluginAssembly Include="@(PluginFixtureAssembly)" Condition="'%(Filename)' == 'SortingHat.Test.Plugin'" />
+      <NoModuleAssembly Include="@(FileTypePluginFile)" Condition="'%(Filename)%(Extension)' == 'Apophis.Utils.dll'" />
     </ItemGroup>
-    <Copy SourceFiles="@(PluginFixtureFile)" DestinationFolder="$(OutDir)PluginFixtures\%(PluginFixtureFile.Plugin)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(RealPluginFile)" DestinationFolder="$(Working)%(Plugin)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(FileTypePluginFile)" DestinationFolder="$(Broken)%(Plugin)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(FailingPluginAssembly)" DestinationFiles="$(Broken)ThrowsInLoad\ThrowsInLoad.dll" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(FailingPluginAssembly)" DestinationFiles="$(Broken)ThrowsInConstructor\ThrowsInConstructor.dll" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(NoModuleAssembly)" DestinationFiles="$(Broken)NoModule\NoModule.dll" SkipUnchangedFiles="true" />
+    <WriteLinesToFile File="$(Broken)NotAnAssembly\NotAnAssembly.dll" Lines="not an assembly" Overwrite="true" WriteOnlyWhenDifferent="true" />
   </Target>
 
 </Project>
