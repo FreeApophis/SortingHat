@@ -8,7 +8,7 @@ using Xunit;
 namespace SortingHat.Test;
 
 /// <summary>
-/// Runs the migrations embedded in this test assembly on a real SQLite database in a temporary folder.
+/// Runs migrations, SQL scripts and migrations in C#, on a real SQLite database in a temporary folder.
 /// </summary>
 public sealed class RevisionMigratorTest : IDisposable
 {
@@ -19,7 +19,7 @@ public sealed class RevisionMigratorTest : IDisposable
     {
         _hat.InScope(scope =>
         {
-            var migrator = new RevisionMigrator(NullLogger<RevisionMigrator>.Instance, typeof(RevisionMigratorTest).Assembly);
+            var migrator = new RevisionMigrator(NullLogger<RevisionMigrator>.Instance, typeof(RevisionMigratorTest).Assembly, []);
 
             return Assert.Throws<SqliteException>(() => migrator.Migrate(scope.Resolve<SQLiteProjectDatabase>()));
         });
@@ -28,9 +28,63 @@ public sealed class RevisionMigratorTest : IDisposable
         Assert.Equal(0L, Count("SELECT COUNT(*) FROM Revisions WHERE Name LIKE '%FailsHalfway%'"));
     }
 
+    [Fact]
+    public void GivenACodeMigrationThenItRunsOnceAndIsRecorded()
+    {
+        var migration = new CodeMigration("29990101-0000-AddsARow", MigrationType.Project, db => db.ExecuteNonQuery("CREATE TABLE IF NOT EXISTS Counted (Id INTEGER); INSERT INTO Counted (Id) VALUES (1);"));
+
+        Migrate(migration);
+        Migrate(migration);
+
+        Assert.Equal(1L, Count("SELECT COUNT(*) FROM Counted"));
+        Assert.Equal(1L, Count("SELECT COUNT(*) FROM Revisions WHERE Name = '29990101-0000-AddsARow'"));
+    }
+
+    [Fact]
+    public void GivenACodeMigrationThatFailsHalfwayThenNothingOfItIsApplied()
+    {
+        var migration = new CodeMigration("29990101-0000-FailsHalfway", MigrationType.Project, db =>
+        {
+            db.ExecuteNonQuery("CREATE TABLE BrokenByCode (Id INTEGER)");
+            throw new InvalidOperationException("fails halfway");
+        });
+
+        Assert.Throws<InvalidOperationException>(() => Migrate(migration));
+
+        Assert.Equal(0L, Count("SELECT COUNT(*) FROM sqlite_master WHERE name = 'BrokenByCode'"));
+        Assert.Equal(0L, Count("SELECT COUNT(*) FROM Revisions WHERE Name = '29990101-0000-FailsHalfway'"));
+    }
+
+    [Fact]
+    public void GivenACodeMigrationForTheMainDatabaseThenTheProjectDatabaseSkipsIt()
+    {
+        Migrate(new CodeMigration("29990101-0000-MainOnly", MigrationType.Main, db => db.ExecuteNonQuery("CREATE TABLE MainOnly (Id INTEGER)")));
+
+        Assert.Equal(0L, Count("SELECT COUNT(*) FROM sqlite_master WHERE name = 'MainOnly'"));
+    }
+
     public void Dispose()
         => _hat.Dispose();
 
+    /// <summary>The real migrations of hat, which already ran in the sandbox, and the code migration of the test.</summary>
+    private void Migrate(ICodeMigration migration)
+        => _hat.InScope(scope =>
+        {
+            new RevisionMigrator(NullLogger<RevisionMigrator>.Instance, typeof(RevisionMigrator).Assembly, [migration]).Migrate(scope.Resolve<SQLiteProjectDatabase>());
+
+            return true;
+        });
+
     private object? Count(string query)
         => _hat.InScope(scope => scope.Resolve<SQLiteProjectDatabase>().ExecuteScalar(query));
+
+    private sealed class CodeMigration(string name, MigrationType migrationType, Action<SQLiteDatabase> run) : ICodeMigration
+    {
+        public string Name => name;
+
+        public MigrationType MigrationType => migrationType;
+
+        public void Run(SQLiteDatabase db)
+            => run(db);
+    }
 }
