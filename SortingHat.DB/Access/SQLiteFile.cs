@@ -86,8 +86,8 @@ HAVING DuplicateCount > 1";
     public bool LoadByPath(File file)
     {
         return db.ExecuteReader(
-            "SELECT Files.CreatedAt, Files.Hash, Files.Size, FilePaths.Path FROM Files JOIN FilePaths ON FilePaths.FileId = Files.Id WHERE FilePaths.Path = @filePath",
-            reader => LoadFileFromReader(reader, file),
+            "SELECT Files.CreatedAt, Files.Hash, Files.Size, FilePaths.Path, FilePaths.Size, FilePaths.ModifiedAt, FilePaths.VerifiedAt FROM Files JOIN FilePaths ON FilePaths.FileId = Files.Id WHERE FilePaths.Path = @filePath",
+            reader => LoadFileWithFingerprint(reader, file),
             new SqliteParameter("@filePath", file.Path));
     }
 
@@ -102,6 +102,32 @@ HAVING DuplicateCount > 1";
 
     public async Task<IEnumerable<string>> GetNames(File file)
         => db.Query("SELECT FileNames.Name FROM FileNames JOIN Files ON FileNames.FileId = Files.Id WHERE Files.Hash = @fileHash", reader => reader.GetString(0), new SqliteParameter("@fileHash", await file.Hash));
+
+    private static bool LoadFileWithFingerprint(DbDataReader reader, File file)
+    {
+        var found = LoadFileFromReader(reader, file);
+
+        if (found)
+        {
+            file.Fingerprint = ReadFingerprint(reader);
+        }
+
+        return found;
+    }
+
+    /// <summary>Paths stored before fingerprints existed have none, so their files are hashed again once.</summary>
+    private static Option<PathFingerprint> ReadFingerprint(DbDataReader reader)
+        => reader.IsDBNull(4) || reader.IsDBNull(5) || reader.IsDBNull(6)
+            ? Option<PathFingerprint>.None
+            : Option.Some(new PathFingerprint(reader.GetInt64(4), new DateTime(reader.GetInt64(5), DateTimeKind.Utc), new DateTime(reader.GetInt64(6), DateTimeKind.Utc)));
+
+    private static SqliteParameter[] FingerprintParameters(Option<PathFingerprint> fingerprint)
+        =>
+        [
+            new("@size", fingerprint.Match(none: DBNull.Value, some: f => (object)f.Size)),
+            new("@modifiedAt", fingerprint.Match(none: DBNull.Value, some: f => (object)f.ModifiedAtUtc.Ticks)),
+            new("@verifiedAt", fingerprint.Match(none: DBNull.Value, some: f => (object)f.TakenAtUtc.Ticks)),
+        ];
 
     private static bool LoadFileFromReader(DbDataReader reader, File file)
     {
@@ -153,9 +179,19 @@ HAVING DuplicateCount > 1";
         db.ExecuteNonQuery("INSERT OR IGNORE INTO FileNames (FileId, Name) VALUES(@fileId, @fileName);", new SqliteParameter("@fileId", fileId), new SqliteParameter("@fileName", fileName));
     }
 
+    /// <summary>
+    /// A path holds one content at a time: when an edited file is stored, its path leaves the old content.
+    /// The fingerprint is stored with the path, or updated when the path is already known.
+    /// </summary>
     private void InsertFilePath(File file, long fileId)
     {
-        db.ExecuteNonQuery("INSERT OR IGNORE INTO FilePaths (FileId, Path) VALUES(@fileId, @filePath);", new SqliteParameter("@fileId", fileId), new SqliteParameter("@filePath", file.Path));
+        db.ExecuteNonQuery("DELETE FROM FilePaths WHERE Path = @filePath AND FileId <> @fileId;", new SqliteParameter("@fileId", fileId), new SqliteParameter("@filePath", file.Path));
+        db.ExecuteNonQuery(
+            """
+            INSERT INTO FilePaths (FileId, Path, Size, ModifiedAt, VerifiedAt) VALUES(@fileId, @filePath, @size, @modifiedAt, @verifiedAt)
+            ON CONFLICT (FileId, Path) DO UPDATE SET Size = excluded.Size, ModifiedAt = excluded.ModifiedAt, VerifiedAt = excluded.VerifiedAt;
+            """,
+            [new SqliteParameter("@fileId", fileId), new SqliteParameter("@filePath", file.Path), .. FingerprintParameters(file.Fingerprint)]);
     }
 
     private async Task<long> FindOrCreate(File file)

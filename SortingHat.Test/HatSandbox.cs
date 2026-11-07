@@ -61,13 +61,21 @@ internal sealed class HatSandbox : IDisposable
 
     public string TaggedFile(string name, params string[] tags)
     {
-        var path = Path.Combine(_root, name);
-
         // the content is unique per file, so every file has its own hash
-        File.WriteAllText(path, name);
-        _files.Add(path);
+        var path = WriteFile(name, name);
 
         Hat(["tag-files", .. tags, path]);
+
+        return path;
+    }
+
+    /// <summary>Writes a file into the sandbox without telling hat about it; <see cref="FindFiles"/> knows it.</summary>
+    public string WriteFile(string name, string content)
+    {
+        var path = Path.Combine(_root, name);
+
+        File.WriteAllText(path, content);
+        _files.Add(path);
 
         return path;
     }

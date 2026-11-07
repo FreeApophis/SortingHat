@@ -44,6 +44,9 @@
     <EmbeddedResource Include="Migrations\Project\20261106-1200-UniqueTagNames.migration">
       <CustomToolNamespace>Migrations</CustomToolNamespace>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\Project\20261107-1200-PathFingerprints.migration">
+      <CustomToolNamespace>Migrations</CustomToolNamespace>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

@@ -21,7 +21,7 @@ internal class UntagFileCommand(IFilePathExtractor filePathExtractor, ITagParser
     public IReadOnlyList<ArgumentDefinition> Arguments => [FileOptions.TagsAndFiles];
     public IReadOnlyList<OptionDefinition> Options => [FileOptions.Recursive];
 
-    public Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
+    public async Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
     {
         var arguments = input.Values(FileOptions.TagsAndFiles);
         var tags = arguments.Where(a => a.IsTag).WhereSelect(tag => Option.FromNullable(tagParser.Parse(tag))).ToList();
@@ -29,10 +29,13 @@ internal class UntagFileCommand(IFilePathExtractor filePathExtractor, ITagParser
 
         foreach (var file in filePathExtractor.FromFilePatterns(files, input.Has(FileOptions.Recursive)).Select(FileFromPath))
         {
-            tags.ForEach(file.Untag);
+            foreach (var tag in tags)
+            {
+                await file.Untag(tag);
+            }
         }
 
-        return Task.FromResult(true);
+        return true;
     }
 
     private File FileFromPath(string filePath)

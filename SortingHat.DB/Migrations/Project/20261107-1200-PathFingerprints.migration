@@ -1,0 +1,7 @@
+﻿/* The fingerprint of a path when its content was hashed, as UTC ticks: as long as size and last write time match, the stored hash still belongs to the file. */
+
+ALTER TABLE FilePaths ADD COLUMN Size INTEGER NULL;
+
+ALTER TABLE FilePaths ADD COLUMN ModifiedAt INTEGER NULL;
+
+ALTER TABLE FilePaths ADD COLUMN VerifiedAt INTEGER NULL;

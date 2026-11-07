@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
 
@@ -15,6 +16,9 @@ public class File(IFile file, IHashService hashService)
     public Task<string> Hash { get; set; } = Task.FromResult("BADHASH");
     public string Path { get; set; } = "BADPATH";
 
+    /// <summary>The fingerprint of <see cref="Path"/> when <see cref="Hash"/> was computed, when known.</summary>
+    public Option<PathFingerprint> Fingerprint { get; set; }
+
     public void LoadByPathFromDb(string filePath)
     {
         Path = filePath;
@@ -22,18 +26,17 @@ public class File(IFile file, IHashService hashService)
         file.LoadByPath(this);
     }
 
+    /// <summary>Hashes the file at <paramref name="filePath"/>, its fingerprint is taken right before.</summary>
     public void LoadByPath(string filePath)
     {
         Path = filePath;
 
-        if (Path is { })
-        {
-            var fileInfo = new FileInfo(Path);
+        var fileInfo = new FileInfo(Path);
 
-            Hash = hashService.GetHash(Path);
-            Size = fileInfo.Length;
-            CreatedAt = fileInfo.CreationTimeUtc;
-        }
+        Fingerprint = new PathFingerprint(fileInfo.Length, fileInfo.LastWriteTimeUtc, DateTime.UtcNow);
+        Hash = hashService.GetHash(Path);
+        Size = fileInfo.Length;
+        CreatedAt = fileInfo.CreationTimeUtc;
     }
 
     public async Task Tag(Tag tag)
@@ -41,10 +44,8 @@ public class File(IFile file, IHashService hashService)
         await file.Tag(this, tag);
     }
 
-    public void Untag(Tag tag)
-    {
-        file.Untag(this, tag);
-    }
+    public Task Untag(Tag tag)
+        => file.Untag(this, tag);
 
     public async Task<IEnumerable<Tag>> GetTags()
     {
@@ -61,22 +62,21 @@ public class File(IFile file, IHashService hashService)
         return await file.GetNames(this);
     }
 
+    /// <summary>
+    /// Takes the stored hash of a known <paramref name="path"/> only while the stored fingerprint still matches the file on disk,
+    /// otherwise the file changed (or was never fingerprinted) and is hashed again.
+    /// </summary>
     public void LoadByPathFromDbWithFallback(string path)
     {
         Path = path;
 
-        if (file.LoadByPath(this))
-        {
-            return;
-        }
+        var current = new FileInfo(path);
+        var trusted = file.LoadByPath(this)
+            && Fingerprint.Match(none: false, some: fingerprint => fingerprint.StillMatches(current.Length, current.LastWriteTimeUtc));
 
-        if (Path is { })
+        if (!trusted)
         {
-            var fileInfo = new FileInfo(Path);
-
-            Hash = hashService.GetHash(Path);
-            Size = fileInfo.Length;
-            CreatedAt = fileInfo.CreationTimeUtc;
+            LoadByPath(path);
         }
     }
 }
