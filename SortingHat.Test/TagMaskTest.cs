@@ -22,6 +22,8 @@ public sealed class TagMaskTest
         new FixedAutoTag("Nothing", AutoTagParameter.None, (_, _) => Option<string>.None),
         new FixedAutoTag("Padded", "  Canon  "),
         new FixedAutoTag("Root", @"C:\"),
+        new FixedAutoTag("Spaced", "NIKON CORPORATION"),
+        new FixedAutoTag("Symbols", "&&"),
         new FixedAutoTag("Broken", AutoTagParameter.None, (_, _) => throw new IOException("the file is locked")),
     ];
 
@@ -32,6 +34,8 @@ public sealed class TagMaskTest
     [InlineData(":Year-{Camera.Year}", ":Year-2019")]
     [InlineData(":{Folder.0}:{Folder.12}", ":level0:level12")]
     [InlineData(":Photos:{Padded}", ":Photos:Canon")]
+    [InlineData(":Drives:{Root}", ":Drives:C")]
+    [InlineData(":Photos:{Spaced}", ":Photos:NIKON-CORPORATION")]
     public void GivenAMaskThenEveryVariableIsFilledForTheFile(string mask, string tag)
         => Assert.Equal(tag, Tagged(mask).FullName);
 
@@ -42,7 +46,7 @@ public sealed class TagMaskTest
     [Theory]
     [InlineData("tax", "colon")]
     [InlineData(":a::{Camera.Make}", "empty")]
-    [InlineData(": a:{Camera.Make}", "whitespace")]
+    [InlineData(": a:{Camera.Make}", "letters")]
     [InlineData(":Photos:{Camera.Mkae}", "{Camera.Mkae}")]
     [InlineData(":Photos:{Lens}", "{Lens}")]
     [InlineData(":Taken:{Camera.Yeer}", "Year, Month")]
@@ -70,8 +74,8 @@ public sealed class TagMaskTest
         => Assert.Equal("no value for {Nothing}", Problem(Mask(":Photos:{Nothing}").Apply(FixedAutoTag.AnyFile)));
 
     [Fact]
-    public void GivenAValueThatIsNoTagNameThenItCannotAddLevels()
-        => Assert.Contains(@"'C:\'", Problem(Mask(":Drives:{Root}").Apply(FixedAutoTag.AnyFile)));
+    public void GivenAValueWithoutAnyCharacterOfATagNameThenTheMaskGivesNoTagAndSaysWhich()
+        => Assert.Contains("'&&'", Problem(Mask(":x:{Symbols}").Apply(FixedAutoTag.AnyFile)));
 
     [Fact]
     public void GivenAnAutoTagThatFailsThenTheMaskGivesNoTagAndSaysWhy()

@@ -108,14 +108,14 @@ public sealed class TagMask
 
     private sealed record Variable(IAutoTag AutoTag, AutoTagArgument Argument, string Text) : Segment
     {
-        /// <summary>Values read from files are often padded, such as EXIF strings; a value must not add levels.</summary>
+        /// <summary>Values read from files rarely follow the tag grammar, such as 'NIKON CORPORATION': they become names, and never add levels.</summary>
         public override Either<string, string> Value(AutoTagFile file)
             => Read(file).SelectMany(value => value.Trim() switch
             {
                 "" => Either<string, string>.Left($"no value for {{{Text}}}"),
-                var trimmed => TagName.Problem(trimmed).Match(
-                    none: () => Either<string, string>.Right(trimmed),
-                    some: problem => Either<string, string>.Left($"{{{Text}}} gives '{trimmed}', which is no tag name: {problem}")),
+                var trimmed => TagName.FromValue(trimmed).Match(
+                    none: () => Either<string, string>.Left($"{{{Text}}} gives '{trimmed}', which has nothing a tag name can contain"),
+                    some: name => Either<string, string>.Right(name.Value)),
             });
 
         /// <summary>An auto-tag comes from a plugin: whatever it throws skips the tag for this file, the other files and tags go on.</summary>

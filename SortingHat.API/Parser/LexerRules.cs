@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Funcky.Lexer;
+using SortingHat.API.Models;
 using SortingHat.API.Parser.Token;
 
 namespace SortingHat.API.Parser;
@@ -31,14 +32,9 @@ public static class LexerRules
             .WithEpsilonToken<EpsilonToken>()
             .Build();
 
+    /// <summary>A tag in a search contains exactly what a tag name can contain, and the colons between its levels.</summary>
     private static bool IsLegalCharacter(char currentCharacter)
-    {
-        return char.IsLetter(currentCharacter)
-               || char.IsNumber(currentCharacter)
-               || currentCharacter == '-'
-               || currentCharacter == '_'
-               || currentCharacter == ':';
-    }
+        => TagName.IsAllowed(currentCharacter) || currentCharacter == ':';
 
     private static Lexeme ConsumeTag(ILexemeBuilder builder)
     {

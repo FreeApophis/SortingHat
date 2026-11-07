@@ -14,6 +14,7 @@ public class SqliteDatabaseModule : Module
     protected override void Load(ContainerBuilder builder)
     {
         builder.RegisterType<RevisionMigrator>().As<IRevisionMigrator>().InstancePerLifetimeScope();
+        builder.RegisterType<TagNameGrammarMigration>().As<ICodeMigration>().SingleInstance();
 
         // Register Databases
         builder.Register(CreateProjectDatabase()).As<SQLiteProjectDatabase>().As<IProjectDatabase>().InstancePerLifetimeScope();

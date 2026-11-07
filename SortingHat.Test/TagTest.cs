@@ -43,10 +43,10 @@ public sealed class TagTest
 
     [Theory]
     [InlineData(":tag")]
-    [InlineData(":grand father:father:child with whitespace")]
     [InlineData(":Steuererklärung:2018")]
-    [InlineData(":Camera:NIKON CORPORATION")]
+    [InlineData(":Camera:NIKON-CORPORATION")]
     [InlineData(":v1.2")]
+    [InlineData(":C++:snake_case")]
     public void GivenAValidTagThenItIsParsed(string text)
         => Assert.Equal(text, Valid(text).FullName);
 
@@ -62,12 +62,16 @@ public sealed class TagTest
     [InlineData(": a")]
     [InlineData(":a :b")]
     [InlineData(":a:\tb")]
+    [InlineData(":Camera:NIKON CORPORATION")]
+    [InlineData(":Müller & Co")]
+    [InlineData(":a/b")]
     public void GivenTextThatIsNoTagThenItIsInvalidAndTheReasonNamesIt(string text)
         => Assert.Contains($"'{text}'", Invalid(Tag.Parse(text)));
 
     [Theory]
     [InlineData("2019")]
-    [InlineData("two words")]
+    [InlineData("v1.2")]
+    [InlineData("a+b_c-d")]
     public void GivenAValidNameThenItIsParsed(string text)
         => Assert.Equal(text, ValidName(text).Value);
 
@@ -77,8 +81,28 @@ public sealed class TagTest
     [InlineData("x ")]
     [InlineData("a:b")]
     [InlineData(":b")]
+    [InlineData("two words")]
+    [InlineData("a&b")]
     public void GivenTextThatIsNoNameThenItIsInvalidAndTheReasonNamesIt(string text)
         => Assert.Contains($"'{text}'", Invalid(TagName.Parse(text)));
+
+    [Theory]
+    [InlineData("NIKON CORPORATION", "NIKON-CORPORATION")]
+    [InlineData("Portable Network Graphics", "Portable-Network-Graphics")]
+    [InlineData("Müller & Co", "Müller-Co")]
+    [InlineData("  Canon  ", "Canon")]
+    [InlineData(@"C:\", "C")]
+    [InlineData("v1.2", "v1.2")]
+    [InlineData("C++", "C++")]
+    public void GivenAValueFromAFileThenEveryRunOfOtherCharactersBecomesOneDash(string value, string name)
+        => Assert.Equal(Option.Some(name), TagName.FromValue(value).Select(tagName => tagName.Value));
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    [InlineData("&&")]
+    public void GivenAValueWithoutAnyCharacterOfATagNameThenItGivesNoName(string value)
+        => Assert.Equal(Option<TagName>.None, TagName.FromValue(value));
 
     private static Tag Valid(string text)
         => Tag.Parse(text).GetOrElse(problem => throw new InvalidOperationException(problem));

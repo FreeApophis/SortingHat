@@ -417,3 +417,4 @@ SortingHat.API.DI.IProjects.GetProjects() -> System.Collections.Generic.IReadOnl
 SortingHat.API.DI.IProjects.RemoveProject(SortingHat.API.Models.ProjectName! project) -> void
 SortingHat.API.DI.ISettings.Get(string! key) -> Funcky.Monads.Option<string!>
 SortingHat.API.DI.ISettings.Set(string! key, string! value) -> void
+static SortingHat.API.Models.TagName.FromValue(string! value) -> Funcky.Monads.Option<SortingHat.API.Models.TagName!>

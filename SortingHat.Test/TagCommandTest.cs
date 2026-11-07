@@ -135,7 +135,7 @@ public sealed class TagCommandTest : IDisposable
         _hat.TaggedFile("a.txt", ":a");
 
         Assert.NotEqual(0, _hat.Hat(["rename-tag", ":a", " b"]));
-        Assert.Contains(_hat.Lines, line => line.Contains("' b'") && line.Contains("space"));
+        Assert.Contains(_hat.Lines, line => line.Contains("' b'") && line.Contains("letters"));
         Assert.Equal(["a.txt"], _hat.FindFiles(":a"));
     }
 
