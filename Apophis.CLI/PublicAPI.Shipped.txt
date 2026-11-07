@@ -1,0 +1,64 @@
+﻿#nullable enable
+Apophis.CLI.Console
+Apophis.CLI.Console.Application.get -> Apophis.CLI.IConsoleApplicationInformationProvider!
+Apophis.CLI.Console.Console(Apophis.CLI.Reader.IConsoleReader! consoleReader, Apophis.CLI.Writer.IConsoleWriter! consoleWriter, Apophis.CLI.IConsoleApplicationInformationProvider! consoleApplicationInformationProvider) -> void
+Apophis.CLI.Console.Reader.get -> Apophis.CLI.Reader.IConsoleReader!
+Apophis.CLI.Console.Writer.get -> Apophis.CLI.Writer.IConsoleWriter!
+Apophis.CLI.ConsoleTable
+Apophis.CLI.ConsoleTable.Append(params object?[]! args) -> void
+Apophis.CLI.ConsoleTable.AppendSeparator() -> void
+Apophis.CLI.ConsoleTable.Columns.get -> System.Collections.Generic.List<Apophis.CLI.ConsoleTableColumn!>!
+Apophis.CLI.ConsoleTable.ConsoleTable(int columns = 0) -> void
+Apophis.CLI.ConsoleTable.WriteTo(Apophis.CLI.Writer.IConsoleWriter! consoleWriter) -> void
+Apophis.CLI.ConsoleTableColumn
+Apophis.CLI.ConsoleTableColumn.Alignment.get -> Apophis.CLI.ConsoleTableColumnAlignment
+Apophis.CLI.ConsoleTableColumn.Alignment.set -> void
+Apophis.CLI.ConsoleTableColumn.ConsoleTableColumn() -> void
+Apophis.CLI.ConsoleTableColumn.PaddingLeft.get -> int
+Apophis.CLI.ConsoleTableColumn.PaddingLeft.set -> void
+Apophis.CLI.ConsoleTableColumn.PaddingRight.get -> int
+Apophis.CLI.ConsoleTableColumn.PaddingRight.set -> void
+Apophis.CLI.ConsoleTableColumnAlignment
+Apophis.CLI.ConsoleTableColumnAlignment.Left = 0 -> Apophis.CLI.ConsoleTableColumnAlignment
+Apophis.CLI.ConsoleTableColumnAlignment.Right = 1 -> Apophis.CLI.ConsoleTableColumnAlignment
+Apophis.CLI.IConsoleApplicationInformationProvider
+Apophis.CLI.IConsoleApplicationInformationProvider.Name.get -> string!
+Apophis.CLI.NumberFormatter
+Apophis.CLI.NumberFormatter.extension(long)
+Apophis.CLI.NumberFormatter.extension(long).HumanSize() -> string!
+Apophis.CLI.NumberFormatter.extension(string!)
+Apophis.CLI.NumberFormatter.extension(string!).ShortHash() -> Funcky.Monads.Option<string!>
+Apophis.CLI.Reader.IConsoleReader
+Apophis.CLI.Reader.IConsoleReader.ReadInt() -> Funcky.Monads.Option<int>
+Apophis.CLI.Reader.IConsoleReader.ReadLine() -> string!
+Apophis.CLI.Reader.MemoryConsoleReader
+Apophis.CLI.Reader.MemoryConsoleReader.MemoryConsoleReader() -> void
+Apophis.CLI.Reader.MemoryConsoleReader.ReadInt() -> Funcky.Monads.Option<int>
+Apophis.CLI.Reader.MemoryConsoleReader.ReadLine() -> string!
+Apophis.CLI.Reader.MemoryConsoleReader.Type(params System.Collections.Generic.IEnumerable<string!>! lines) -> void
+Apophis.CLI.Reader.SystemConsoleReader
+Apophis.CLI.Reader.SystemConsoleReader.ReadInt() -> Funcky.Monads.Option<int>
+Apophis.CLI.Reader.SystemConsoleReader.ReadLine() -> string!
+Apophis.CLI.Reader.SystemConsoleReader.SystemConsoleReader() -> void
+Apophis.CLI.Writer.ConsoleTextWriter
+Apophis.CLI.Writer.ConsoleTextWriter.ConsoleTextWriter(Apophis.CLI.Writer.IConsoleWriter! consoleWriter) -> void
+Apophis.CLI.Writer.IConsoleWriter
+Apophis.CLI.Writer.IConsoleWriter.WriteLine() -> void
+Apophis.CLI.Writer.IConsoleWriter.WriteLine(string! line) -> void
+Apophis.CLI.Writer.MemoryConsoleWriter
+Apophis.CLI.Writer.MemoryConsoleWriter.Lines.get -> System.Collections.Generic.List<string!>!
+Apophis.CLI.Writer.MemoryConsoleWriter.MemoryConsoleWriter() -> void
+Apophis.CLI.Writer.MemoryConsoleWriter.WriteLine() -> void
+Apophis.CLI.Writer.MemoryConsoleWriter.WriteLine(string! line) -> void
+Apophis.CLI.Writer.NullWriter
+Apophis.CLI.Writer.NullWriter.NullWriter() -> void
+Apophis.CLI.Writer.NullWriter.WriteLine() -> void
+Apophis.CLI.Writer.NullWriter.WriteLine(string! line) -> void
+Apophis.CLI.Writer.SystemConsoleWriter
+Apophis.CLI.Writer.SystemConsoleWriter.SystemConsoleWriter() -> void
+Apophis.CLI.Writer.SystemConsoleWriter.WriteLine() -> void
+Apophis.CLI.Writer.SystemConsoleWriter.WriteLine(string! line) -> void
+override Apophis.CLI.Writer.ConsoleTextWriter.Encoding.get -> System.Text.Encoding!
+override Apophis.CLI.Writer.ConsoleTextWriter.Write(char value) -> void
+static Apophis.CLI.NumberFormatter.HumanSize(this long size) -> string!
+static Apophis.CLI.NumberFormatter.ShortHash(this string! hash) -> Funcky.Monads.Option<string!>

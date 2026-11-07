@@ -1,0 +1,5 @@
+﻿#nullable enable
+Apophis.Utils.EnumerableExtensions
+Apophis.Utils.EnumerableExtensions.extension<T>(System.Collections.Generic.IEnumerable<T>!)
+Apophis.Utils.EnumerableExtensions.extension<T>(System.Collections.Generic.IEnumerable<T>!).WithIndex() -> System.Collections.Generic.IEnumerable<(T Item, int Index)>!
+static Apophis.Utils.EnumerableExtensions.WithIndex<T>(this System.Collections.Generic.IEnumerable<T>! self) -> System.Collections.Generic.IEnumerable<(T Item, int Index)>!

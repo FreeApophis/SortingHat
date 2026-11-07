@@ -1,3 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <!-- the plugin contract: every public member is listed in PublicAPI.Shipped.txt / PublicAPI.Unshipped.txt, so every change shows up in review -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" PrivateAssets="all" />
+  </ItemGroup>
+
 </Project>
