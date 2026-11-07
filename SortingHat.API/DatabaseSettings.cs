@@ -14,14 +14,13 @@ public class DatabaseSettings
     public string DbPath => CalculatDbPath();
 
     private string CalculatDbPath()
-    {
-        var basePath = Path switch
+        => System.IO.Path.Combine(CalculateBasePath(), ".hat");
+
+    private string CalculateBasePath()
+        => Path switch
         {
             "#USERDOC" => Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
             "#APPDATA" => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             _ => Path,
         };
-
-        return System.IO.Path.Combine(basePath, ".hat");
-    }
 }
