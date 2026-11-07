@@ -5,9 +5,12 @@ using System.Linq;
 using Apophis.CLI.Reader;
 using Apophis.CLI.Writer;
 using Autofac;
+using Funcky.Monads;
 using Microsoft.Data.Sqlite;
 using SortingHat.API;
+using SortingHat.API.Plugin;
 using SortingHat.CLI;
+using static Funcky.Functional;
 
 namespace SortingHat.Test;
 
@@ -22,6 +25,7 @@ internal sealed class HatSandbox : IDisposable
     private readonly MemoryConsoleReader _reader = new();
     private readonly DatabaseSettings _databaseSettings;
     private readonly IContainer _container;
+    private readonly Lazy<ILifetimeScope> _pluginScope;
 
     public HatSandbox()
         : this(_ => { })
@@ -30,28 +34,53 @@ internal sealed class HatSandbox : IDisposable
 
     /// <summary>With <paramref name="register"/>, a test adds its own registrations, the way a plugin module does.</summary>
     public HatSandbox(Action<ContainerBuilder> register)
+        : this(register, Option<string>.None)
+    {
+    }
+
+    private HatSandbox(Action<ContainerBuilder> register, Option<string> pluginDirectory)
     {
         Directory.CreateDirectory(_root);
+        PluginDirectory = pluginDirectory.GetOrElse(Path.Combine(_root, "plugins"));
 
         var compositionRoot = new CompositionRoot().Register();
         _databaseSettings = new DatabaseSettings { Type = "sqlite", Name = "hat", Path = _root, DefaultProject = "Default" };
         compositionRoot.Builder.RegisterInstance(_writer).As<IConsoleWriter>();
         compositionRoot.Builder.RegisterInstance(_reader).As<IConsoleReader>();
         compositionRoot.Builder.RegisterInstance(_databaseSettings);
+        compositionRoot.Builder.RegisterInstance(new PluginDirectory(PluginDirectory));
         register(compositionRoot.Builder);
         _container = compositionRoot.Build();
+
+        // like Program.Main, the plugins are loaded once, on the first run
+        _pluginScope = new Lazy<ILifetimeScope>(() => CompositionRoot.BeginPluginScope(_container));
     }
+
+    /// <summary>
+    /// The plugins folder of this hat: empty and writable in the temporary folder, so a test can lay out plugin folders before the first run.
+    /// Real plugins can't be deleted after loading, they come from <see cref="WithPluginFixtures"/>.
+    /// </summary>
+    public string PluginDirectory { get; }
 
     public IReadOnlyList<string> Lines => _writer.Lines;
 
     /// <summary>The lines the user types when hat asks for input.</summary>
     public MemoryConsoleReader Keyboard => _reader;
 
+    /// <summary>A hat whose plugins folder holds the real plugins as their build put them, see PluginFixtures in the project file.</summary>
+    public static HatSandbox WithPluginFixtures()
+        => new(NoOperation, Path.Combine(AppContext.BaseDirectory, "PluginFixtures"));
+
     public string ProjectDatabaseFile(string project)
         => Path.Combine(_databaseSettings.DbPath, $"{project}.db");
 
     public void Dispose()
     {
+        if (_pluginScope.IsValueCreated)
+        {
+            _pluginScope.Value.Dispose();
+        }
+
         _container.Dispose();
 
         // the connection pool keeps the database files open
@@ -101,7 +130,7 @@ internal sealed class HatSandbox : IDisposable
     /// <summary>Runs <paramref name="run"/> in its own lifetime scope, like one invocation of hat, so it gets its own database connection.</summary>
     public TResult InScope<TResult>(Func<ILifetimeScope, TResult> run)
     {
-        using var scope = _container.BeginLifetimeScope();
+        using var scope = _pluginScope.Value.BeginLifetimeScope();
 
         return run(scope);
     }

@@ -30,7 +30,26 @@
     <ProjectReference Include="..\SortingHat.API\SortingHat.API.csproj" />
     <ProjectReference Include="..\SortingHat.Console\SortingHat.CLI.csproj" />
     <ProjectReference Include="..\SortingHat.DB\SortingHat.DB.csproj" />
-    <ProjectReference Include="..\SortingHat.Plugin.FileType\SortingHat.Plugin.FileType.csproj" />
   </ItemGroup>
+
+  <!--
+    The plugins are not referenced: hat loads them at run time from their own folders.
+    Their build output is copied to PluginFixtures/<plugin>/, laid out like the 'plugins' folder next to hat.
+  -->
+  <ItemGroup>
+    <PluginFixture Include="..\SortingHat.Plugin.Exif\SortingHat.Plugin.Exif.csproj" />
+    <PluginFixture Include="..\SortingHat.Plugin.FileType\SortingHat.Plugin.FileType.csproj" />
+    <ProjectReference Include="@(PluginFixture)" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <Target Name="CopyPluginFixtures" AfterTargets="Build">
+    <MSBuild Projects="@(PluginFixture)" Targets="GetTargetPath" Properties="Configuration=$(Configuration)">
+      <Output TaskParameter="TargetOutputs" ItemName="PluginFixtureAssembly" />
+    </MSBuild>
+    <ItemGroup>
+      <PluginFixtureFile Include="%(PluginFixtureAssembly.RootDir)%(PluginFixtureAssembly.Directory)*.*" Plugin="%(PluginFixtureAssembly.Filename)" />
+    </ItemGroup>
+    <Copy SourceFiles="@(PluginFixtureFile)" DestinationFolder="$(OutDir)PluginFixtures\%(PluginFixtureFile.Plugin)" SkipUnchangedFiles="true" />
+  </Target>
 
 </Project>

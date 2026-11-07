@@ -14,7 +14,7 @@ internal class PluginsCommand(IConsoleWriter consoleWriter, IPluginLoader plugin
     public CommandGrouping CommandGrouping => CommandGrouping.General;
     public string Name => "plugins";
     public string Description => "Lists the loaded plugins";
-    public string Details => "Plugins are the DLLs in the 'plugins' folder next to hat.";
+    public string Details => "Every plugin is a folder in the 'plugins' folder next to hat, named like the plugin's DLL, with all its dependencies: plugins/<name>/<name>.dll.";
 
     public Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
     {

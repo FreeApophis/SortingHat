@@ -7,5 +7,8 @@ public interface IPluginLoader
 {
     List<IPlugin> Plugins { get; }
 
+    /// <summary>What in the plugins folder was not loaded, and why.</summary>
+    IReadOnlyList<PluginProblem> Problems { get; }
+
     void RegisterModules(ContainerBuilder builder);
 }

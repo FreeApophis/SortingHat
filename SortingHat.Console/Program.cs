@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Autofac;
-using SortingHat.API.Plugin;
 
 namespace SortingHat.CLI;
 
@@ -18,8 +17,7 @@ internal static class Program
 
         // The container has all the classes loaded which are not dynamically loaded
         // at this point we resolve the plugin loader to register the missing types
-        using var scope = container.BeginLifetimeScope(builder
-            => container.Resolve<IPluginLoader>().RegisterModules(builder));
+        using var scope = CompositionRoot.BeginPluginScope(container);
 
         // this scope includes now all the plugins, and we can run the application
         return scope.Resolve<Application>().Run(args);

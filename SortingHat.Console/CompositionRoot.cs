@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Security.Cryptography;
 using Apophis.CLI;
 using Apophis.CLI.Reader;
@@ -48,6 +49,7 @@ internal class CompositionRoot
         Builder.RegisterType<Apophis.CLI.Console>().AsSelf();
 
         Builder.RegisterType<PluginLoader>().As<IPluginLoader>().SingleInstance();
+        Builder.RegisterInstance(new PluginDirectory(Path.Combine(AppContext.BaseDirectory, "plugins")));
 
         RegisterCommands();
         RegisterAutoTags();
@@ -59,6 +61,10 @@ internal class CompositionRoot
 
     public IContainer Build()
         => Builder.Build();
+
+    /// <summary>The scope the application runs in: the <paramref name="container"/> with every plugin's modules registered.</summary>
+    public static ILifetimeScope BeginPluginScope(IContainer container)
+        => container.BeginLifetimeScope(builder => container.Resolve<IPluginLoader>().RegisterModules(builder));
 
     private void RegisterAutoTags()
     {

@@ -10,52 +10,50 @@ using JetBrains.Annotations;
 
 namespace SortingHat.API.Plugin;
 
+/// <summary>Loads every plugin folder in the <see cref="PluginDirectory"/> into its own load context and registers its modules.</summary>
 [UsedImplicitly]
-public class PluginLoader(IExistsDirectory existsDirectory) : IPluginLoader
+public class PluginLoader(PluginDirectory pluginDirectory, IExistsDirectory existsDirectory) : IPluginLoader
 {
+    private readonly List<PluginProblem> _problems = [];
+
     public List<IPlugin> Plugins { get; } = [];
 
-    private static string PluginDirectory => Path.Combine(AppContext.BaseDirectory, "plugins");
-
-    private static string PluginFilePattern => "*.dll";
+    public IReadOnlyList<PluginProblem> Problems => _problems;
 
     public void RegisterModules(ContainerBuilder builder)
     {
-        foreach (var assembly in GetPluginAssemblies())
+        foreach (var plugin in PluginLayout.Find(LooseFiles(), Folders()))
         {
-            // Gets the all modules from each assembly to be registered.
-            //  Make sure that each module **MUST** have a parameterless constructor.
-            var modules = assembly.GetTypes()
-                .Where(p => typeof(IModule).IsAssignableFrom(p) && !p.IsAbstract)
-                .Select(p => Activator.CreateInstance(p))
-                .OfType<IModule>();
-
-            // Registers each module.
-            foreach (var module in modules)
-            {
-                RegisterModule(builder, module);
-            }
+            plugin.Switch(
+                left: _problems.Add,
+                right: candidate => RegisterModules(builder, candidate));
         }
     }
 
-    private void RegisterModule(ContainerBuilder builder, IModule module)
+    private static IEnumerable<IModule> Modules(Assembly assembly)
+        => assembly.GetTypes()
+            .Where(type => type is { IsAbstract: false, IsClass: true } && typeof(IModule).IsAssignableFrom(type) && typeof(IPlugin).IsAssignableFrom(type))
+            .Select(Activator.CreateInstance)
+            .OfType<IModule>();
+
+    private void RegisterModules(ContainerBuilder builder, PluginCandidate candidate)
     {
-        // A plugin module must also implement the IPlugin interface
-        if (module is IPlugin plugin)
+        var context = new PluginLoadContext(candidate.AssemblyPath, ContractAssemblies.Names);
+
+        foreach (var module in Modules(context.LoadFromAssemblyPath(candidate.AssemblyPath)))
         {
             builder.RegisterModule(module);
-            Plugins.Add(plugin);
+            Plugins.Add((IPlugin)module);
         }
     }
 
-    private IEnumerable<Assembly> GetPluginAssemblies()
-    {
-        if (existsDirectory.Exists(PluginDirectory))
-        {
-            return Directory.GetFiles(PluginDirectory, PluginFilePattern, SearchOption.TopDirectoryOnly)
-                .Select(Assembly.LoadFrom);
-        }
+    private IEnumerable<string> LooseFiles()
+        => existsDirectory.Exists(pluginDirectory.Path)
+            ? Directory.GetFiles(pluginDirectory.Path)
+            : [];
 
-        return [];
-    }
+    private IEnumerable<PluginFolder> Folders()
+        => existsDirectory.Exists(pluginDirectory.Path)
+            ? Directory.GetDirectories(pluginDirectory.Path).Select(folder => new PluginFolder(folder, Directory.GetFiles(folder)))
+            : [];
 }

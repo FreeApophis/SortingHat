@@ -2,6 +2,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <!-- the build output is a plugin folder: the plugin with all its own dependencies -->
+    <EnableDynamicLoading>true</EnableDynamicLoading>
     <Version>1.0.0.1</Version>
   </PropertyGroup>
 
@@ -10,7 +12,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SortingHat.API\SortingHat.API.csproj" />
+    <!-- the host provides SortingHat.API and its dependencies, the plugin must not ship its own copy -->
+    <ProjectReference Include="..\SortingHat.API\SortingHat.API.csproj">
+      <Private>false</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </ProjectReference>
   </ItemGroup>
 
 </Project>
