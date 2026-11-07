@@ -11,6 +11,6 @@ public static class SettingsExtensions
         /// The project database in use: the one selected with switch-project, otherwise the configured default project.
         /// </summary>
         public string ActiveProject(DatabaseSettings databaseSettings)
-            => settings[Constants.ProjectDatabaseKey] ?? databaseSettings.DefaultProject;
+            => settings.Get(Constants.ProjectDatabaseKey).GetOrElse(databaseSettings.DefaultProject);
     }
 }

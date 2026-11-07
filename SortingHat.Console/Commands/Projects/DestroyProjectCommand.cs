@@ -38,24 +38,25 @@ internal class DestroyProjectCommand(IProjects projects, ISettings settings, Dat
         => Task.FromResult(input.Values(ProjectNames).Aggregate(true, (removed, projectName) => RemoveProject(projectName) && removed));
 
     /// <summary>Only an existing project that is not in use can be removed. The name matches in any case, like the database file.</summary>
-    private static Either<string, string> Removable(string name, IEnumerable<string> existingProjects, string activeProject)
+    private static Either<string, ProjectName> Removable(string name, IEnumerable<string> existingProjects, string activeProject, string mainDatabaseName)
         => existingProjects
             .FirstOrNone(project => ProjectName.IsSameName(name, project))
             .Match(
                 none: () => Either<string, string>.Left($"There is no project with the name '{name}'."),
                 some: project => ProjectName.IsSameName(project, activeProject)
                     ? Either<string, string>.Left($"The project '{project}' is in use, switch to another project before you remove it.")
-                    : Either<string, string>.Right(project));
+                    : Either<string, string>.Right(project))
+            .SelectMany(project => ProjectName.Parse(project, mainDatabaseName));
 
     /// <summary>Anything but an explicit yes keeps the project, also an empty answer or the end of the input.</summary>
     private static bool IsYes(string answer)
         => answer.Trim().ToLowerInvariant() is "y" or "yes";
 
     private bool RemoveProject(string name)
-        => Removable(name, projects.GetProjects(), settings.ActiveProject(databaseSettings))
+        => Removable(name, projects.GetProjects(), settings.ActiveProject(databaseSettings), databaseSettings.Name)
             .Match(left: Reject, right: ConfirmAndRemove);
 
-    private bool ConfirmAndRemove(string project)
+    private bool ConfirmAndRemove(ProjectName project)
     {
         consoleWriter.WriteLine($"Removing the project '{project}' deletes its database with all its files and tags. The files on disk stay where they are.");
         consoleWriter.WriteLine($"Remove the project '{project}'? [y/N]");
@@ -65,7 +66,7 @@ internal class DestroyProjectCommand(IProjects projects, ISettings settings, Dat
             : Keep(project);
     }
 
-    private bool Remove(string project)
+    private bool Remove(ProjectName project)
     {
         projects.RemoveProject(project);
         consoleWriter.WriteLine($"Project '{project}' removed.");
@@ -73,7 +74,7 @@ internal class DestroyProjectCommand(IProjects projects, ISettings settings, Dat
         return true;
     }
 
-    private bool Keep(string project)
+    private bool Keep(ProjectName project)
     {
         consoleWriter.WriteLine($"Project '{project}' kept.");
 

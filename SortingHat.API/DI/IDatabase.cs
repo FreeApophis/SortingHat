@@ -4,5 +4,6 @@ namespace SortingHat.API.DI;
 
 public interface IDatabase
 {
-    Dictionary<string, long> GetStatistics();
+    /// <summary>The number of rows in each table of the database, by table name.</summary>
+    IReadOnlyDictionary<string, long> GetStatistics();
 }

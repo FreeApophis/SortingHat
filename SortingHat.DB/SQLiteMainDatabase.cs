@@ -8,8 +8,6 @@ public class SQLiteMainDatabase(DatabaseSettings databaseSettings) : SQLiteDatab
 {
     internal override MigrationType MigrationType => MigrationType.Main;
 
-    public Dictionary<string, long> GetStatistics()
-    {
-        throw new System.NotImplementedException();
-    }
+    public IReadOnlyDictionary<string, long> GetStatistics()
+        => CountRows(["Projects", "Settings"]);
 }

@@ -26,7 +26,7 @@ internal class SwitchProjectCommand(IProjects projects, ISettings settings, ICon
     {
         if (projects.GetProjects().Contains(project))
         {
-            settings[DB.Constants.ProjectDatabaseKey] = project;
+            settings.Set(DB.Constants.ProjectDatabaseKey, project);
             consoleWriter.WriteLine($"You switched to project '{project}'");
             return true;
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Funcky.Monads;
 using Microsoft.Data.Sqlite;
 using SortingHat.API;
@@ -85,6 +86,13 @@ public abstract class SQLiteDatabase : IDisposable
     /// </summary>
     internal IReadOnlyList<TRow> Query<TRow>(string commandText, Func<SqliteDataReader, TRow> readRow, params SqliteParameter[] parameters)
         => ExecuteReader(commandText, reader => ReadRows(reader, readRow), parameters);
+
+    /// <summary>The number of rows in each of the <paramref name="tables"/>. The table names come from the code, never from input.</summary>
+    private protected IReadOnlyDictionary<string, long> CountRows(IReadOnlyList<string> tables)
+        => Query(
+                string.Join(" UNION ALL ", tables.Select(table => $"SELECT '{table}', COUNT(*) FROM [{table}]")),
+                reader => KeyValuePair.Create(reader.GetString(0), reader.GetInt64(1)))
+            .ToDictionary();
 
     private static List<TRow> ReadRows<TRow>(SqliteDataReader reader, Func<SqliteDataReader, TRow> readRow)
     {

@@ -99,7 +99,6 @@ SortingHat.API.DI.CommandInput.Has(SortingHat.API.DI.OptionDefinition! option) -
 SortingHat.API.DI.CommandInput.Value(SortingHat.API.DI.ArgumentDefinition! argument) -> Funcky.Monads.Option<string!>
 SortingHat.API.DI.CommandInput.Values(SortingHat.API.DI.ArgumentDefinition! argument) -> System.Collections.Generic.IReadOnlyList<string!>!
 SortingHat.API.DI.IDatabase
-SortingHat.API.DI.IDatabase.GetStatistics() -> System.Collections.Generic.Dictionary<string!, long>!
 SortingHat.API.DI.IDeclaredCommand
 SortingHat.API.DI.IDeclaredCommand.Aliases.get -> System.Collections.Generic.IReadOnlyList<string!>!
 SortingHat.API.DI.IDeclaredCommand.Arguments.get -> System.Collections.Generic.IReadOnlyList<SortingHat.API.DI.ArgumentDefinition!>!
@@ -132,13 +131,7 @@ SortingHat.API.DI.IHashService.GetHash(string! path) -> System.Threading.Tasks.T
 SortingHat.API.DI.IMainDatabase
 SortingHat.API.DI.IProjectDatabase
 SortingHat.API.DI.IProjects
-SortingHat.API.DI.IProjects.AddProject(SortingHat.API.Models.ProjectName! project) -> bool
-SortingHat.API.DI.IProjects.GetProjects() -> System.Collections.Generic.IEnumerable<string!>!
-SortingHat.API.DI.IProjects.RemoveProject(string! project) -> bool
 SortingHat.API.DI.ISettings
-SortingHat.API.DI.ISettings.HasValue(string! key) -> bool
-SortingHat.API.DI.ISettings.this[string! key].get -> string?
-SortingHat.API.DI.ISettings.this[string! key].set -> void
 SortingHat.API.DI.ITag
 SortingHat.API.DI.ITag.Destroy(SortingHat.API.Models.Tag! tag) -> bool
 SortingHat.API.DI.ITag.FileCount(SortingHat.API.Models.Tag! tag) -> long
@@ -412,3 +405,9 @@ virtual SortingHat.API.Parser.Nodes.UnaryOperatorNode.Accept(SortingHat.API.Pars
 SortingHat.API.Models.Tag.<Clone>$() -> SortingHat.API.Models.Tag!
 static SortingHat.API.Models.Tag.operator !=(SortingHat.API.Models.Tag? left, SortingHat.API.Models.Tag? right) -> bool
 static SortingHat.API.Models.Tag.operator ==(SortingHat.API.Models.Tag? left, SortingHat.API.Models.Tag? right) -> bool
+SortingHat.API.DI.IDatabase.GetStatistics() -> System.Collections.Generic.IReadOnlyDictionary<string!, long>!
+SortingHat.API.DI.IProjects.AddProject(SortingHat.API.Models.ProjectName! project) -> void
+SortingHat.API.DI.IProjects.GetProjects() -> System.Collections.Generic.IReadOnlyList<string!>!
+SortingHat.API.DI.IProjects.RemoveProject(SortingHat.API.Models.ProjectName! project) -> void
+SortingHat.API.DI.ISettings.Get(string! key) -> Funcky.Monads.Option<string!>
+SortingHat.API.DI.ISettings.Set(string! key, string! value) -> void
