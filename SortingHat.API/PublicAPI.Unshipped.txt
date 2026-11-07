@@ -1,8 +1,40 @@
 ﻿#nullable enable
+abstract SortingHat.API.Models.PathState.<Clone>$() -> SortingHat.API.Models.PathState!
+abstract SortingHat.API.Models.PathState.Current.get -> SortingHat.API.Models.FileAt!
+override sealed SortingHat.API.Models.PathState.Changed.Equals(SortingHat.API.Models.PathState? other) -> bool
+override sealed SortingHat.API.Models.PathState.Known.Equals(SortingHat.API.Models.PathState? other) -> bool
+override sealed SortingHat.API.Models.PathState.New.Equals(SortingHat.API.Models.PathState? other) -> bool
 override SortingHat.API.CoreModule.Load(Autofac.ContainerBuilder! builder) -> void
+override SortingHat.API.Models.File.Equals(object? obj) -> bool
+override SortingHat.API.Models.File.GetHashCode() -> int
+override SortingHat.API.Models.File.ToString() -> string!
+override SortingHat.API.Models.FileAt.Equals(object? obj) -> bool
+override SortingHat.API.Models.FileAt.GetHashCode() -> int
+override SortingHat.API.Models.FileAt.ToString() -> string!
 override SortingHat.API.Models.Hash.Equals(object? obj) -> bool
 override SortingHat.API.Models.Hash.GetHashCode() -> int
 override SortingHat.API.Models.Hash.ToString() -> string!
+override SortingHat.API.Models.PathState.Changed.<Clone>$() -> SortingHat.API.Models.PathState.Changed!
+override SortingHat.API.Models.PathState.Changed.Current.get -> SortingHat.API.Models.FileAt!
+override SortingHat.API.Models.PathState.Changed.Equals(object? obj) -> bool
+override SortingHat.API.Models.PathState.Changed.GetHashCode() -> int
+override SortingHat.API.Models.PathState.Changed.ToString() -> string!
+override SortingHat.API.Models.PathState.Equals(object? obj) -> bool
+override SortingHat.API.Models.PathState.GetHashCode() -> int
+override SortingHat.API.Models.PathState.Known.<Clone>$() -> SortingHat.API.Models.PathState.Known!
+override SortingHat.API.Models.PathState.Known.Current.get -> SortingHat.API.Models.FileAt!
+override SortingHat.API.Models.PathState.Known.Equals(object? obj) -> bool
+override SortingHat.API.Models.PathState.Known.GetHashCode() -> int
+override SortingHat.API.Models.PathState.Known.ToString() -> string!
+override SortingHat.API.Models.PathState.New.<Clone>$() -> SortingHat.API.Models.PathState.New!
+override SortingHat.API.Models.PathState.New.Current.get -> SortingHat.API.Models.FileAt!
+override SortingHat.API.Models.PathState.New.Equals(object? obj) -> bool
+override SortingHat.API.Models.PathState.New.GetHashCode() -> int
+override SortingHat.API.Models.PathState.New.ToString() -> string!
+override SortingHat.API.Models.PathState.ToString() -> string!
+override SortingHat.API.Models.SearchResult.Equals(object? obj) -> bool
+override SortingHat.API.Models.SearchResult.GetHashCode() -> int
+override SortingHat.API.Models.SearchResult.ToString() -> string!
 SortingHat.API.AutoTag.ConstantAutoTag
 SortingHat.API.AutoTag.ConstantAutoTag.ConstantAutoTag() -> void
 SortingHat.API.AutoTag.ConstantAutoTag.FindMatch(string! value) -> string?
@@ -79,20 +111,23 @@ SortingHat.API.DI.IDeclaredCommand.ExecuteAsync(SortingHat.API.DI.CommandInput! 
 SortingHat.API.DI.IDeclaredCommand.Name.get -> string!
 SortingHat.API.DI.IDeclaredCommand.Options.get -> System.Collections.Generic.IReadOnlyList<SortingHat.API.DI.OptionDefinition!>!
 SortingHat.API.DI.IFile
-SortingHat.API.DI.IFile.GetDuplicates() -> System.Collections.Generic.IEnumerable<SortingHat.API.Models.File!>!
-SortingHat.API.DI.IFile.GetNames(SortingHat.API.Models.File! file) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<string!>!>!
-SortingHat.API.DI.IFile.GetPaths() -> System.Collections.Generic.IEnumerable<string!>!
-SortingHat.API.DI.IFile.GetPaths(SortingHat.API.Models.File! file) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<string!>!>!
-SortingHat.API.DI.IFile.GetTags(SortingHat.API.Models.File! file) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<SortingHat.API.Models.Tag!>!>!
-SortingHat.API.DI.IFile.LoadByPath(SortingHat.API.Models.File! file) -> bool
-SortingHat.API.DI.IFile.MovePath(SortingHat.API.Models.File! file, string! destinationPath) -> System.Threading.Tasks.Task!
+SortingHat.API.DI.IFile.Find(string! path) -> Funcky.Monads.Option<SortingHat.API.Models.FileAt!>
+SortingHat.API.DI.IFile.GetDuplicates() -> System.Collections.Generic.IReadOnlyList<SortingHat.API.Models.File!>!
+SortingHat.API.DI.IFile.GetNames(SortingHat.API.Models.File! file) -> System.Collections.Generic.IReadOnlyList<string!>!
+SortingHat.API.DI.IFile.GetPaths() -> System.Collections.Generic.IReadOnlyList<string!>!
+SortingHat.API.DI.IFile.GetPaths(SortingHat.API.Models.File! file) -> System.Collections.Generic.IReadOnlyList<string!>!
+SortingHat.API.DI.IFile.GetTags(SortingHat.API.Models.File! file) -> System.Collections.Generic.IReadOnlyList<SortingHat.API.Models.Tag!>!
+SortingHat.API.DI.IFile.MovePath(SortingHat.API.Models.FileAt! file, string! destinationPath) -> void
 SortingHat.API.DI.IFile.RemovePaths(System.Collections.Generic.IEnumerable<string!>! paths) -> void
 SortingHat.API.DI.IFile.Search(string! query) -> SortingHat.API.Models.SearchResult!
-SortingHat.API.DI.IFile.Store(SortingHat.API.Models.File! file) -> bool
-SortingHat.API.DI.IFile.Tag(SortingHat.API.Models.File! file, SortingHat.API.Models.Tag! tag) -> System.Threading.Tasks.Task!
-SortingHat.API.DI.IFile.Untag(SortingHat.API.Models.File! file, SortingHat.API.Models.Tag! tag) -> System.Threading.Tasks.Task!
+SortingHat.API.DI.IFile.Store(SortingHat.API.Models.FileAt! file) -> void
+SortingHat.API.DI.IFile.Tag(SortingHat.API.Models.FileAt! file, SortingHat.API.Models.Tag! tag) -> void
+SortingHat.API.DI.IFile.Untag(SortingHat.API.Models.File! file, SortingHat.API.Models.Tag! tag) -> void
 SortingHat.API.DI.IFilePathExtractor
 SortingHat.API.DI.IFilePathExtractor.FromFilePatterns(System.Collections.Generic.IEnumerable<string!>! filePatterns, bool recursive) -> System.Collections.Generic.IEnumerable<string!>!
+SortingHat.API.DI.IFileScanner
+SortingHat.API.DI.IFileScanner.Examine(string! path) -> System.Threading.Tasks.Task<SortingHat.API.Models.PathState!>!
+SortingHat.API.DI.IFileScanner.Scan(string! path) -> System.Threading.Tasks.Task<SortingHat.API.Models.FileAt!>!
 SortingHat.API.DI.IHashService
 SortingHat.API.DI.IHashService.GetHash(string! path) -> System.Threading.Tasks.Task<SortingHat.API.Models.Hash!>!
 SortingHat.API.DI.IMainDatabase
@@ -140,32 +175,33 @@ SortingHat.API.DatabaseSettings.Path.set -> void
 SortingHat.API.DatabaseSettings.Type.get -> string!
 SortingHat.API.DatabaseSettings.Type.set -> void
 SortingHat.API.Models.File
+SortingHat.API.Models.File.<Clone>$() -> SortingHat.API.Models.File!
 SortingHat.API.Models.File.CreatedAt.get -> System.DateTime
-SortingHat.API.Models.File.CreatedAt.set -> void
-SortingHat.API.Models.File.File(SortingHat.API.DI.IFile! file, SortingHat.API.DI.IHashService! hashService) -> void
-SortingHat.API.Models.File.Fingerprint.get -> Funcky.Monads.Option<SortingHat.API.Models.PathFingerprint!>
-SortingHat.API.Models.File.Fingerprint.set -> void
-SortingHat.API.Models.File.GetNames() -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<string!>!>!
-SortingHat.API.Models.File.GetPaths() -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<string!>!>!
-SortingHat.API.Models.File.GetTags() -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<SortingHat.API.Models.Tag!>!>!
-SortingHat.API.Models.File.HasChanged() -> System.Threading.Tasks.Task<bool>!
-SortingHat.API.Models.File.Hash.get -> System.Threading.Tasks.Task<string!>!
-SortingHat.API.Models.File.Hash.set -> void
-SortingHat.API.Models.File.LoadByPath(string! filePath) -> void
-SortingHat.API.Models.File.LoadByPathFromDb(string! filePath) -> bool
-SortingHat.API.Models.File.LoadByPathFromDbWithFallback(string! path) -> void
-SortingHat.API.Models.File.Path.get -> string!
-SortingHat.API.Models.File.Path.set -> void
-SortingHat.API.Models.File.PreviousHash.get -> Funcky.Monads.Option<System.Threading.Tasks.Task<string!>!>
+SortingHat.API.Models.File.CreatedAt.init -> void
+SortingHat.API.Models.File.Deconstruct(out SortingHat.API.Models.Hash! Hash, out long Size, out System.DateTime CreatedAt) -> void
+SortingHat.API.Models.File.Equals(SortingHat.API.Models.File? other) -> bool
+SortingHat.API.Models.File.File(SortingHat.API.Models.Hash! Hash, long Size, System.DateTime CreatedAt) -> void
+SortingHat.API.Models.File.Hash.get -> SortingHat.API.Models.Hash!
+SortingHat.API.Models.File.Hash.init -> void
 SortingHat.API.Models.File.Size.get -> long
-SortingHat.API.Models.File.Size.set -> void
-SortingHat.API.Models.File.Tag(SortingHat.API.Models.Tag! tag) -> System.Threading.Tasks.Task!
-SortingHat.API.Models.File.Untag(SortingHat.API.Models.Tag! tag) -> System.Threading.Tasks.Task!
+SortingHat.API.Models.File.Size.init -> void
+SortingHat.API.Models.FileAt
+SortingHat.API.Models.FileAt.<Clone>$() -> SortingHat.API.Models.FileAt!
+SortingHat.API.Models.FileAt.Deconstruct(out SortingHat.API.Models.File! File, out string! Path, out Funcky.Monads.Option<SortingHat.API.Models.PathFingerprint!> Fingerprint) -> void
+SortingHat.API.Models.FileAt.Equals(SortingHat.API.Models.FileAt? other) -> bool
+SortingHat.API.Models.FileAt.File.get -> SortingHat.API.Models.File!
+SortingHat.API.Models.FileAt.File.init -> void
+SortingHat.API.Models.FileAt.FileAt(SortingHat.API.Models.File! File, string! Path, Funcky.Monads.Option<SortingHat.API.Models.PathFingerprint!> Fingerprint) -> void
+SortingHat.API.Models.FileAt.Fingerprint.get -> Funcky.Monads.Option<SortingHat.API.Models.PathFingerprint!>
+SortingHat.API.Models.FileAt.Fingerprint.init -> void
+SortingHat.API.Models.FileAt.Path.get -> string!
+SortingHat.API.Models.FileAt.Path.init -> void
 SortingHat.API.Models.Hash
 SortingHat.API.Models.Hash.<Clone>$() -> SortingHat.API.Models.Hash!
 SortingHat.API.Models.Hash.Algorithm.get -> string!
 SortingHat.API.Models.Hash.Digest.get -> string!
 SortingHat.API.Models.Hash.Equals(SortingHat.API.Models.Hash? other) -> bool
+SortingHat.API.Models.Hash.Short.get -> string!
 SortingHat.API.Models.ITagParser
 SortingHat.API.Models.ITagParser.Parse(string! tagString) -> SortingHat.API.Models.Tag?
 SortingHat.API.Models.PathFingerprint
@@ -180,17 +216,33 @@ SortingHat.API.Models.PathFingerprint.Size.init -> void
 SortingHat.API.Models.PathFingerprint.StillMatches(long size, System.DateTime modifiedAtUtc) -> bool
 SortingHat.API.Models.PathFingerprint.TakenAtUtc.get -> System.DateTime
 SortingHat.API.Models.PathFingerprint.TakenAtUtc.init -> void
+SortingHat.API.Models.PathState
+SortingHat.API.Models.PathState.Changed
+SortingHat.API.Models.PathState.Changed.Changed(SortingHat.API.Models.FileAt! Stored, SortingHat.API.Models.FileAt! Current) -> void
+SortingHat.API.Models.PathState.Changed.Deconstruct(out SortingHat.API.Models.FileAt! Stored, out SortingHat.API.Models.FileAt! Current) -> void
+SortingHat.API.Models.PathState.Changed.Equals(SortingHat.API.Models.PathState.Changed? other) -> bool
+SortingHat.API.Models.PathState.Changed.Stored.get -> SortingHat.API.Models.FileAt!
+SortingHat.API.Models.PathState.Changed.Stored.init -> void
+SortingHat.API.Models.PathState.Known
+SortingHat.API.Models.PathState.Known.Deconstruct(out SortingHat.API.Models.FileAt! Current) -> void
+SortingHat.API.Models.PathState.Known.Equals(SortingHat.API.Models.PathState.Known? other) -> bool
+SortingHat.API.Models.PathState.Known.Known(SortingHat.API.Models.FileAt! Current) -> void
+SortingHat.API.Models.PathState.New
+SortingHat.API.Models.PathState.New.Deconstruct(out SortingHat.API.Models.FileAt! Current) -> void
+SortingHat.API.Models.PathState.New.Equals(SortingHat.API.Models.PathState.New? other) -> bool
+SortingHat.API.Models.PathState.New.New(SortingHat.API.Models.FileAt! Current) -> void
+SortingHat.API.Models.PathState.PathState(SortingHat.API.Models.PathState! original) -> void
 SortingHat.API.Models.ProjectName
 SortingHat.API.Models.ProjectName.<Clone>$() -> SortingHat.API.Models.ProjectName!
 SortingHat.API.Models.ProjectName.Equals(SortingHat.API.Models.ProjectName? other) -> bool
 SortingHat.API.Models.ProjectName.Value.get -> string!
 SortingHat.API.Models.SearchResult
 SortingHat.API.Models.SearchResult.<Clone>$() -> SortingHat.API.Models.SearchResult!
-SortingHat.API.Models.SearchResult.Deconstruct(out System.Collections.Generic.IReadOnlyList<SortingHat.API.Models.File!>! Files, out System.Collections.Generic.IReadOnlyList<string!>! UnknownTags) -> void
 SortingHat.API.Models.SearchResult.Equals(SortingHat.API.Models.SearchResult? other) -> bool
-SortingHat.API.Models.SearchResult.Files.get -> System.Collections.Generic.IReadOnlyList<SortingHat.API.Models.File!>!
+SortingHat.API.Models.SearchResult.Deconstruct(out System.Collections.Generic.IReadOnlyList<SortingHat.API.Models.FileAt!>! Files, out System.Collections.Generic.IReadOnlyList<string!>! UnknownTags) -> void
+SortingHat.API.Models.SearchResult.Files.get -> System.Collections.Generic.IReadOnlyList<SortingHat.API.Models.FileAt!>!
 SortingHat.API.Models.SearchResult.Files.init -> void
-SortingHat.API.Models.SearchResult.SearchResult(System.Collections.Generic.IReadOnlyList<SortingHat.API.Models.File!>! Files, System.Collections.Generic.IReadOnlyList<string!>! UnknownTags) -> void
+SortingHat.API.Models.SearchResult.SearchResult(System.Collections.Generic.IReadOnlyList<SortingHat.API.Models.FileAt!>! Files, System.Collections.Generic.IReadOnlyList<string!>! UnknownTags) -> void
 SortingHat.API.Models.SearchResult.UnknownTags.get -> System.Collections.Generic.IReadOnlyList<string!>!
 SortingHat.API.Models.SearchResult.UnknownTags.init -> void
 SortingHat.API.Models.Tag
@@ -306,9 +358,6 @@ override SortingHat.API.Models.PathFingerprint.ToString() -> string!
 override SortingHat.API.Models.ProjectName.Equals(object? obj) -> bool
 override SortingHat.API.Models.ProjectName.GetHashCode() -> int
 override SortingHat.API.Models.ProjectName.ToString() -> string!
-override SortingHat.API.Models.SearchResult.Equals(object? obj) -> bool
-override SortingHat.API.Models.SearchResult.GetHashCode() -> int
-override SortingHat.API.Models.SearchResult.ToString() -> string!
 override SortingHat.API.Models.Tag.Equals(object? obj) -> bool
 override SortingHat.API.Models.Tag.GetHashCode() -> int
 override SortingHat.API.Parser.Nodes.AndOperatorNode.Accept(SortingHat.API.Parser.INodeVisitor! visitor) -> void
@@ -330,11 +379,25 @@ static SortingHat.API.DI.ArgumentDefinition.operator !=(SortingHat.API.DI.Argume
 static SortingHat.API.DI.ArgumentDefinition.operator ==(SortingHat.API.DI.ArgumentDefinition? left, SortingHat.API.DI.ArgumentDefinition? right) -> bool
 static SortingHat.API.DI.OptionDefinition.operator !=(SortingHat.API.DI.OptionDefinition? left, SortingHat.API.DI.OptionDefinition? right) -> bool
 static SortingHat.API.DI.OptionDefinition.operator ==(SortingHat.API.DI.OptionDefinition? left, SortingHat.API.DI.OptionDefinition? right) -> bool
+static SortingHat.API.Models.File.operator !=(SortingHat.API.Models.File? left, SortingHat.API.Models.File? right) -> bool
+static SortingHat.API.Models.File.operator ==(SortingHat.API.Models.File? left, SortingHat.API.Models.File? right) -> bool
+static SortingHat.API.Models.FileAt.operator !=(SortingHat.API.Models.FileAt? left, SortingHat.API.Models.FileAt? right) -> bool
+static SortingHat.API.Models.FileAt.operator ==(SortingHat.API.Models.FileAt? left, SortingHat.API.Models.FileAt? right) -> bool
 static SortingHat.API.Models.Hash.operator !=(SortingHat.API.Models.Hash? left, SortingHat.API.Models.Hash? right) -> bool
 static SortingHat.API.Models.Hash.operator ==(SortingHat.API.Models.Hash? left, SortingHat.API.Models.Hash? right) -> bool
 static SortingHat.API.Models.Hash.Parse(string! text) -> Funcky.Monads.Either<string!, SortingHat.API.Models.Hash!>
 static SortingHat.API.Models.PathFingerprint.operator !=(SortingHat.API.Models.PathFingerprint? left, SortingHat.API.Models.PathFingerprint? right) -> bool
 static SortingHat.API.Models.PathFingerprint.operator ==(SortingHat.API.Models.PathFingerprint? left, SortingHat.API.Models.PathFingerprint? right) -> bool
+static SortingHat.API.Models.PathState.Changed.operator !=(SortingHat.API.Models.PathState.Changed? left, SortingHat.API.Models.PathState.Changed? right) -> bool
+static SortingHat.API.Models.PathState.Changed.operator ==(SortingHat.API.Models.PathState.Changed? left, SortingHat.API.Models.PathState.Changed? right) -> bool
+static SortingHat.API.Models.PathState.Decide(Funcky.Monads.Option<SortingHat.API.Models.FileAt!> stored, SortingHat.API.Models.FileAt! current) -> SortingHat.API.Models.PathState!
+static SortingHat.API.Models.PathState.Known.operator !=(SortingHat.API.Models.PathState.Known? left, SortingHat.API.Models.PathState.Known? right) -> bool
+static SortingHat.API.Models.PathState.Known.operator ==(SortingHat.API.Models.PathState.Known? left, SortingHat.API.Models.PathState.Known? right) -> bool
+static SortingHat.API.Models.PathState.New.operator !=(SortingHat.API.Models.PathState.New? left, SortingHat.API.Models.PathState.New? right) -> bool
+static SortingHat.API.Models.PathState.New.operator ==(SortingHat.API.Models.PathState.New? left, SortingHat.API.Models.PathState.New? right) -> bool
+static SortingHat.API.Models.PathState.operator !=(SortingHat.API.Models.PathState? left, SortingHat.API.Models.PathState? right) -> bool
+static SortingHat.API.Models.PathState.operator ==(SortingHat.API.Models.PathState? left, SortingHat.API.Models.PathState? right) -> bool
+static SortingHat.API.Models.PathState.Trust(Funcky.Monads.Option<SortingHat.API.Models.FileAt!> stored, long size, System.DateTime modifiedAtUtc) -> Funcky.Monads.Option<SortingHat.API.Models.PathState!>
 static SortingHat.API.Models.ProjectName.IsSameName(string! name, string! other) -> bool
 static SortingHat.API.Models.ProjectName.Parse(string! name, string! mainDatabaseName) -> Funcky.Monads.Either<string!, SortingHat.API.Models.ProjectName!>
 static SortingHat.API.Models.ProjectName.ParseNew(string! name, System.Collections.Generic.IEnumerable<string!>! existingProjects, string! mainDatabaseName) -> Funcky.Monads.Either<string!, SortingHat.API.Models.ProjectName!>
@@ -350,5 +413,8 @@ static SortingHat.API.Parser.Parser.Create() -> SortingHat.API.Parser.Parser!
 static SortingHat.API.Plugin.PluginProblem.operator !=(SortingHat.API.Plugin.PluginProblem? left, SortingHat.API.Plugin.PluginProblem? right) -> bool
 static SortingHat.API.Plugin.PluginProblem.operator ==(SortingHat.API.Plugin.PluginProblem? left, SortingHat.API.Plugin.PluginProblem? right) -> bool
 static readonly SortingHat.API.Models.PathFingerprint.TimestampResolution -> System.TimeSpan
+virtual SortingHat.API.Models.PathState.EqualityContract.get -> System.Type!
+virtual SortingHat.API.Models.PathState.Equals(SortingHat.API.Models.PathState? other) -> bool
+virtual SortingHat.API.Models.PathState.PrintMembers(System.Text.StringBuilder! builder) -> bool
 virtual SortingHat.API.Parser.Nodes.BinaryOperatorNode.Accept(SortingHat.API.Parser.INodeVisitor! visitor) -> void
 virtual SortingHat.API.Parser.Nodes.UnaryOperatorNode.Accept(SortingHat.API.Parser.INodeVisitor! visitor) -> void

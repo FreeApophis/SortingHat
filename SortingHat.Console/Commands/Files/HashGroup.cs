@@ -3,8 +3,7 @@ using SortingHat.API.Models;
 
 namespace SortingHat.CLI.Commands.Files;
 
-internal class HashGroup(string hash, IEnumerable<File> files)
-{
-    public string Hash { get; } = hash;
-    public IEnumerable<File> Files { get; } = files;
-}
+/// <summary>The paths of one content.</summary>
+/// <param name="Hash">The hash of the content.</param>
+/// <param name="Files">The content at each of its paths.</param>
+internal sealed record HashGroup(Hash Hash, IReadOnlyList<FileAt> Files);

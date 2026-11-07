@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SortingHat.API.Models;
 
 namespace SortingHat.CLI.Commands.Files;
 
 /// <summary>What the database knows about one content.</summary>
-internal sealed record FileDetails(DateTime CreatedAt, long Size, string Hash, IReadOnlyList<string> Tags, IReadOnlyList<string> Names, IReadOnlyList<string> Paths)
+internal sealed record FileDetails(DateTime CreatedAt, long Size, Hash Hash, IReadOnlyList<string> Tags, IReadOnlyList<string> Names, IReadOnlyList<string> Paths)
 {
     public IReadOnlyList<string> Lines
         =>

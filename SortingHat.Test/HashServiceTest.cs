@@ -10,7 +10,7 @@ using Xunit;
 namespace SortingHat.Test;
 
 /// <summary>
-/// Hashing through the real composition root: every <see cref="API.Models.File"/> starts hashing in the background as soon as it knows its path.
+/// Hashing through the real composition root: every file is hashed in the background, many at the same time.
 /// </summary>
 public sealed class HashServiceTest : IDisposable
 {

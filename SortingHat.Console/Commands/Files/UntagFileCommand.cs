@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,7 +11,7 @@ using SortingHat.API.Models;
 namespace SortingHat.CLI.Commands.Files;
 
 [UsedImplicitly]
-internal class UntagFileCommand(IFilePathExtractor filePathExtractor, ITagParser tagParser, Func<File> newFile) : IDeclaredCommand
+internal class UntagFileCommand(IFilePathExtractor filePathExtractor, ITagParser tagParser, IFileScanner fileScanner, IFile fileStore) : IDeclaredCommand
 {
     public CommandGrouping CommandGrouping => CommandGrouping.File;
     public string Name => "untag-files";
@@ -26,23 +25,13 @@ internal class UntagFileCommand(IFilePathExtractor filePathExtractor, ITagParser
         var tags = arguments.Where(a => a.IsTag).WhereSelect(tag => Option.FromNullable(tagParser.Parse(tag))).ToList();
         var files = arguments.Where(a => a.IsFile);
 
-        foreach (var file in filePathExtractor.FromFilePatterns(files, input.Has(FileOptions.Recursive)).Select(FileFromPath))
+        foreach (var path in filePathExtractor.FromFilePatterns(files, input.Has(FileOptions.Recursive)))
         {
-            foreach (var tag in tags)
-            {
-                await file.Untag(tag);
-            }
+            var file = (await fileScanner.Examine(path)).Current.File;
+
+            tags.ForEach(tag => fileStore.Untag(file, tag));
         }
 
         return true;
-    }
-
-    private File FileFromPath(string filePath)
-    {
-        var file = newFile();
-
-        file.LoadByPath(filePath);
-
-        return file;
     }
 }

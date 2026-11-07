@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,7 +14,7 @@ using SortingHat.API.Models;
 namespace SortingHat.CLI.Commands.Files;
 
 [UsedImplicitly]
-internal class TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor, Func<File> newFile, IFile fileStore, IAutoTagHandler autoTagHandler) : IDeclaredCommand
+internal class TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor, IFileScanner fileScanner, IFile fileStore, IAutoTagHandler autoTagHandler) : IDeclaredCommand
 {
     public CommandGrouping CommandGrouping => CommandGrouping.File;
     public string Name => "tag-files";
@@ -38,46 +37,39 @@ internal class TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter con
         var tags = arguments.Where(a => a.IsTag).ToList();
         var files = arguments.Where(a => a.IsFile);
 
-        foreach (var file in filePathExtractor.FromFilePatterns(files, input.Has(FileOptions.Recursive)).Select(FileFromPath))
+        foreach (var path in filePathExtractor.FromFilePatterns(files, input.Has(FileOptions.Recursive)))
         {
-            if (await file.HasChanged())
+            var state = await fileScanner.Examine(path);
+
+            if (state is PathState.Changed)
             {
-                consoleWriter.WriteLine($"'{file.Path}' has changed, its tags were carried over to the new content.");
+                consoleWriter.WriteLine($"'{path}' has changed, its tags were carried over to the new content.");
             }
 
             if (tags.Count == 0)
             {
-                fileStore.Store(file);
+                fileStore.Store(state.Current);
             }
             else
             {
-                await TagFile(tags, file);
+                TagFile(tags, state.Current);
             }
         }
 
         return true;
     }
 
-    private File FileFromPath(string filePath)
-    {
-        var file = newFile();
-
-        file.LoadByPathFromDbWithFallback(filePath);
-
-        return file;
-    }
-
-    private async Task TagFile(List<string> tags, File file)
+    private void TagFile(List<string> tags, FileAt file)
     {
         foreach (var tag in ReplacedTags(tags, file))
         {
             logger.LogInformation($"File {file.Path} tagged with {tag.FullName}");
 
             consoleWriter.WriteLine($"File {file.Path} queued with tag {tag.FullName}");
-            await file.Tag(tag);
+            fileStore.Tag(file, tag);
         }
     }
 
-    private IEnumerable<Tag> ReplacedTags(IEnumerable<string> tags, File file)
+    private IEnumerable<Tag> ReplacedTags(IEnumerable<string> tags, FileAt file)
         => tags.WhereSelect(tag => Option.FromNullable(autoTagHandler.TagFromMask(tag, new System.IO.FileInfo(file.Path))));
 }

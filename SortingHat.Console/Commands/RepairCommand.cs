@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,7 +11,7 @@ using SortingHat.API.Models;
 namespace SortingHat.CLI.Commands;
 
 [UsedImplicitly]
-internal class RepairCommand(IFile fileStore, IExistsFile existsFile, Func<File> newFile, IConsoleWriter consoleWriter) : IDeclaredCommand
+internal class RepairCommand(IFile fileStore, IExistsFile existsFile, IFileScanner fileScanner, IConsoleWriter consoleWriter) : IDeclaredCommand
 {
     private static readonly OptionDefinition DryRun = new() { Name = "dry-run", ShortName = "n", Description = "Shows what would be repaired, without changing the database." };
 
@@ -72,13 +71,9 @@ internal class RepairCommand(IFile fileStore, IExistsFile existsFile, Func<File>
 
         foreach (var path in paths)
         {
-            var stored = newFile();
-            stored.LoadByPathFromDb(path);
+            var state = PathState.Decide(fileStore.Find(path), await fileScanner.Scan(path));
 
-            var current = newFile();
-            current.LoadByPath(path);
-
-            if (await stored.Hash != await current.Hash)
+            if (state is PathState.Changed)
             {
                 changed++;
                 consoleWriter.WriteLine(dryRun
@@ -88,7 +83,7 @@ internal class RepairCommand(IFile fileStore, IExistsFile existsFile, Func<File>
 
             if (!dryRun)
             {
-                fileStore.Store(current);
+                fileStore.Store(state.Current);
             }
         }
 

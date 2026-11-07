@@ -19,17 +19,17 @@ internal class DuplicateFileCommand(IFile fileStore, IConsoleWriter consoleWrite
     public string Description => "Find duplicate files in your dms";
     public string Details => "Duplicates are files with the same content, stored under several paths.";
 
-    public async Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
+    public Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
     {
         foreach (var file in fileStore.GetDuplicates())
         {
             consoleWriter.WriteLine("--- Duplicate ---");
             consoleWriter.WriteLine($"CreatedAt (oldest): {file.CreatedAt}");
             consoleWriter.WriteLine($"File Size: {file.Size}");
-            consoleWriter.WriteLine($"File Tags: {string.Join(", ", (await file.GetTags()).Select(t => t.FullName))}");
+            consoleWriter.WriteLine($"File Tags: {string.Join(", ", fileStore.GetTags(file).Select(t => t.FullName))}");
 
             var table = new ConsoleTable(5);
-            foreach (var path in await file.GetPaths())
+            foreach (var path in fileStore.GetPaths(file))
             {
                 var fileInfo = new FileInfo(path);
 
@@ -49,6 +49,6 @@ internal class DuplicateFileCommand(IFile fileStore, IConsoleWriter consoleWrite
 
         consoleWriter.WriteLine("Files with an asterisk (*) are in the database, but at the given path they seem to be deleted.");
 
-        return true;
+        return Task.FromResult(true);
     }
 }

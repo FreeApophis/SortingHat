@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,7 +11,7 @@ using SortingHat.API.Models;
 namespace SortingHat.CLI.Commands.Files;
 
 [UsedImplicitly]
-internal class FileInfoCommand(IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor, Func<File> newFile) : IDeclaredCommand
+internal class FileInfoCommand(IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor, IFileScanner fileScanner, IFile fileStore) : IDeclaredCommand
 {
     private static readonly ArgumentDefinition Files = new() { Name = "file", Description = "Files or file patterns such as '*.pdf'.", Arity = Arity.OneOrMore };
 
@@ -39,27 +38,28 @@ internal class FileInfoCommand(IConsoleWriter consoleWriter, IFilePathExtractor 
         return true;
     }
 
-    private static async Task<FileDetails> Details(File file)
+    /// <summary>The content the database knows for the path: the content before the change when the file was edited.</summary>
+    private static Option<File> StoredContent(PathState state)
+        => state switch
+        {
+            PathState.Changed changed => changed.Stored.File,
+            PathState.Known known => known.Current.File,
+            _ => Option<File>.None,
+        };
+
+    private FileDetails Details(File file)
         => new(
             file.CreatedAt,
             file.Size,
-            await file.Hash,
-            [.. (await file.GetTags()).Select(tag => tag.FullName)],
-            [.. await file.GetNames()],
-            [.. await file.GetPaths()]);
+            file.Hash,
+            [.. fileStore.GetTags(file).Select(tag => tag.FullName)],
+            fileStore.GetNames(file),
+            fileStore.GetPaths(file));
 
     private async Task<FileInfoReport> Report(string path)
     {
-        var stored = newFile();
-        var known = stored.LoadByPathFromDb(path);
+        var state = await fileScanner.Examine(path);
 
-        // the stored hash while the file is unchanged, otherwise the file is hashed again
-        var current = newFile();
-        current.LoadByPathFromDbWithFallback(path);
-
-        return FileInfoReport.Decide(
-            known ? await Details(stored) : Option<FileDetails>.None,
-            await current.HasChanged(),
-            await Details(current));
+        return FileInfoReport.Decide(StoredContent(state).Select(Details), state is PathState.Changed, Details(state.Current.File));
     }
 }

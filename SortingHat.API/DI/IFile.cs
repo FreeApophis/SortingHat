@@ -1,32 +1,38 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+using Funcky.Monads;
 using SortingHat.API.Models;
 
 namespace SortingHat.API.DI;
 
+/// <summary>The files hat knows: their content, the paths where it lives, its names and its tags.</summary>
 public interface IFile
 {
-    bool LoadByPath(File file);
+    /// <summary>What is stored for <paramref name="path"/>, with its fingerprint.</summary>
+    Option<FileAt> Find(string path);
 
-    Task Tag(File file, Tag tag);
+    /// <summary>Stores the <paramref name="file"/> like <see cref="Store"/> and tags its content.</summary>
+    void Tag(FileAt file, Tag tag);
 
-    Task Untag(File file, Tag tag);
+    void Untag(File file, Tag tag);
 
-    bool Store(File file);
+    /// <summary>Stores the <paramref name="file"/>: its content when it is new, its name, and its path with the fingerprint.</summary>
+    void Store(FileAt file);
 
-    Task<IEnumerable<Tag>> GetTags(File file);
+    IReadOnlyList<Tag> GetTags(File file);
 
-    IEnumerable<string> GetPaths();
+    /// <summary>Every path hat knows.</summary>
+    IReadOnlyList<string> GetPaths();
 
-    Task<IEnumerable<string>> GetPaths(File file);
+    /// <summary>The paths where the <paramref name="file"/> lives.</summary>
+    IReadOnlyList<string> GetPaths(File file);
 
-    Task<IEnumerable<string>> GetNames(File file);
+    IReadOnlyList<string> GetNames(File file);
 
     /// <summary>
-    /// Records that the <paramref name="file"/>, found at its <see cref="File.Path"/>, now lives at <paramref name="destinationPath"/>.
+    /// Records that the <paramref name="file"/>, found at its <see cref="FileAt.Path"/>, now lives at <paramref name="destinationPath"/>.
     /// Only this file's path changes, its other paths stay.
     /// </summary>
-    Task MovePath(File file, string destinationPath);
+    void MovePath(FileAt file, string destinationPath);
 
     /// <summary>
     /// Forgets the <paramref name="paths"/>, for example because the files no longer exist there. The files themselves keep
@@ -36,5 +42,6 @@ public interface IFile
 
     SearchResult Search(string query);
 
-    IEnumerable<File> GetDuplicates();
+    /// <summary>The files stored at more than one path.</summary>
+    IReadOnlyList<File> GetDuplicates();
 }

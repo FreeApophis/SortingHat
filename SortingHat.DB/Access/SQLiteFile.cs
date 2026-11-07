@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Common;
+using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using Funcky.Extensions;
 using Funcky.Monads;
 using JetBrains.Annotations;
@@ -12,17 +11,18 @@ using SortingHat.API.Models;
 using SortingHat.API.Parser;
 using SortingHat.API.Parser.Nodes;
 using static Funcky.Functional;
+using File = SortingHat.API.Models.File;
 
 namespace SortingHat.DB.Access;
 
 [UsedImplicitly]
-public class SQLiteFile(Func<File> newFile, SQLiteProjectDatabase db, SQLiteTag sqLiteTag, Parser parser, ITagParser tagParser) : IFile
+public class SQLiteFile(SQLiteProjectDatabase db, SQLiteTag sqLiteTag, Parser parser, ITagParser tagParser) : IFile
 {
     private const string AllFileTags = @"SELECT Tags.Id
 FROM Tags
 JOIN FileTags ON FileTags.TagId = Tags.Id
 JOIN Files ON FileTags.FileId = Files.Id
-WHERE Files.Hash = @fileHash";
+WHERE Files.Hash = @hash";
 
     private const string DuplicateQuery = @"SELECT Files.CreatedAt, Files.Hash, Files.Size, FilePaths.Path, COUNT(FilePaths.Id) AS DuplicateCount
 FROM FilePaths
@@ -30,33 +30,30 @@ JOIN Files ON FilePaths.FileId = Files.Id
 GROUP BY FileId
 HAVING DuplicateCount > 1";
 
-    public async Task Tag(File file, Tag tag)
-    {
-        var hash = await file.Hash;
+    private const string FindByPath = @"SELECT Files.CreatedAt, Files.Hash, Files.Size, FilePaths.Path, FilePaths.Size, FilePaths.ModifiedAt, FilePaths.VerifiedAt
+FROM Files
+JOIN FilePaths ON FilePaths.FileId = Files.Id
+WHERE FilePaths.Path = @filePath";
 
-        db.InTransaction(() => InsertFileTag(FindOrCreate(file, hash), sqLiteTag.FindOrCreate(tag)));
-    }
+    public Option<FileAt> Find(string path)
+        => db.Query(FindByPath, reader => new FileAt(ReadFile(reader), reader.GetString(3), ReadFingerprint(reader)), new SqliteParameter("@filePath", path))
+            .FirstOrNone();
 
-    public async Task Untag(File file, Tag tag)
-    {
-        var fileId = Find(await file.Hash);
+    public void Tag(FileAt file, Tag tag)
+        => db.InTransaction(() => InsertFileTag(FindOrCreate(file), sqLiteTag.FindOrCreate(tag)));
 
-        (from f in fileId
-         from t in sqLiteTag.Find(tag)
-         select (FileId: f, TagId: t))
+    public void Untag(File file, Tag tag)
+        => (from fileId in FindId(file.Hash)
+            from tagId in sqLiteTag.Find(tag)
+            select (FileId: fileId, TagId: tagId))
             .AndThen(ids => db.ExecuteNonQuery("DELETE FROM FileTags WHERE TagId = @tagId AND FileId = @fileId;", new SqliteParameter("@fileId", ids.FileId), new SqliteParameter("@tagId", ids.TagId)));
-    }
 
-    public async Task MovePath(File file, string destinationPath)
-    {
-        var hash = await file.Hash;
-
-        db.ExecuteNonQuery(
+    public void MovePath(FileAt file, string destinationPath)
+        => db.ExecuteNonQuery(
             "UPDATE FilePaths SET Path = @destinationPath WHERE Path = @sourcePath AND FileId = (SELECT Id FROM Files WHERE Hash = @hash)",
             new SqliteParameter("@destinationPath", destinationPath),
             new SqliteParameter("@sourcePath", file.Path),
-            new SqliteParameter("@hash", hash));
-    }
+            HashParameter(file.File.Hash));
 
     public void RemovePaths(IEnumerable<string> paths)
         => db.InTransaction(() =>
@@ -66,57 +63,42 @@ HAVING DuplicateCount > 1";
             return true;
         });
 
-    public bool Store(File file)
-    {
-        FindOrCreate(file).Wait();
-
-        return true;
-    }
+    public void Store(FileAt file)
+        => db.InTransaction(() => FindOrCreate(file));
 
     public SearchResult Search(string query)
         => parser.Parse(query) is { } expression
             ? Search(expression)
             : new SearchResult([], []);
 
-    public IEnumerable<File> GetDuplicates()
-    {
-        return MetaSearch(DuplicateQuery);
-    }
+    public IReadOnlyList<File> GetDuplicates()
+        => db.Query(DuplicateQuery, ReadFile);
 
-    public bool LoadByPath(File file)
-    {
-        return db.ExecuteReader(
-            "SELECT Files.CreatedAt, Files.Hash, Files.Size, FilePaths.Path, FilePaths.Size, FilePaths.ModifiedAt, FilePaths.VerifiedAt FROM Files JOIN FilePaths ON FilePaths.FileId = Files.Id WHERE FilePaths.Path = @filePath",
-            reader => LoadFileWithFingerprint(reader, file),
-            new SqliteParameter("@filePath", file.Path));
-    }
+    public IReadOnlyList<Tag> GetTags(File file)
+        => db.Query(AllFileTags, reader => sqLiteTag.Load(reader.GetInt64(0)), HashParameter(file.Hash));
 
-    public async Task<IEnumerable<Tag>> GetTags(File file)
-        => db.Query(AllFileTags, reader => sqLiteTag.Load(reader.GetInt64(0)), new SqliteParameter("@fileHash", await file.Hash));
-
-    public IEnumerable<string> GetPaths()
+    public IReadOnlyList<string> GetPaths()
         => db.Query("SELECT FilePaths.Path FROM FilePaths", reader => reader.GetString(0));
 
-    public async Task<IEnumerable<string>> GetPaths(File file)
-        => db.Query("SELECT FilePaths.Path FROM FilePaths JOIN Files ON FilePaths.FileId = Files.Id WHERE Files.Hash = @fileHash", reader => reader.GetString(0), new SqliteParameter("@fileHash", await file.Hash));
+    public IReadOnlyList<string> GetPaths(File file)
+        => db.Query("SELECT FilePaths.Path FROM FilePaths JOIN Files ON FilePaths.FileId = Files.Id WHERE Files.Hash = @hash", reader => reader.GetString(0), HashParameter(file.Hash));
 
-    public async Task<IEnumerable<string>> GetNames(File file)
-        => db.Query("SELECT FileNames.Name FROM FileNames JOIN Files ON FileNames.FileId = Files.Id WHERE Files.Hash = @fileHash", reader => reader.GetString(0), new SqliteParameter("@fileHash", await file.Hash));
+    public IReadOnlyList<string> GetNames(File file)
+        => db.Query("SELECT FileNames.Name FROM FileNames JOIN Files ON FileNames.FileId = Files.Id WHERE Files.Hash = @hash", reader => reader.GetString(0), HashParameter(file.Hash));
 
-    private static bool LoadFileWithFingerprint(DbDataReader reader, File file)
-    {
-        var found = LoadFileFromReader(reader, file);
+    /// <summary>Reads the columns CreatedAt, Hash and Size. CreatedAt is written as UTC, SQLite keeps no kind, so it is read back as UTC.</summary>
+    private static File ReadFile(SqliteDataReader reader)
+        => new(ReadHash(reader.GetString(1)), reader.GetInt64(2), DateTime.SpecifyKind(reader.GetDateTime(0), DateTimeKind.Utc));
 
-        if (found)
-        {
-            file.Fingerprint = ReadFingerprint(reader);
-        }
+    /// <summary>Every hash in the database was written from a <see cref="Hash"/>, so one that does not parse means the database is damaged.</summary>
+    private static Hash ReadHash(string text)
+        => Hash.Parse(text).GetOrElse(problem => throw new InvalidDataException($"The database is damaged: {problem}"));
 
-        return found;
-    }
+    private static SqliteParameter HashParameter(Hash hash)
+        => new("@hash", hash.ToString());
 
     /// <summary>Paths stored before fingerprints existed have none, so their files are hashed again once.</summary>
-    private static Option<PathFingerprint> ReadFingerprint(DbDataReader reader)
+    private static Option<PathFingerprint> ReadFingerprint(SqliteDataReader reader)
         => reader.IsDBNull(4) || reader.IsDBNull(5) || reader.IsDBNull(6)
             ? Option<PathFingerprint>.None
             : Option.Some(new PathFingerprint(reader.GetInt64(4), new DateTime(reader.GetInt64(5), DateTimeKind.Utc), new DateTime(reader.GetInt64(6), DateTimeKind.Utc)));
@@ -129,27 +111,12 @@ HAVING DuplicateCount > 1";
             new("@verifiedAt", fingerprint.Match(none: DBNull.Value, some: f => (object)f.TakenAtUtc.Ticks)),
         ];
 
-    private static bool LoadFileFromReader(DbDataReader reader, File file)
+    private Option<long> FindId(Hash hash)
+        => Option.FromNullable(db.ExecuteScalar("SELECT Id FROM Files WHERE Hash = @hash", HashParameter(hash)) as long?);
+
+    private long Create(FileAt file)
     {
-        var hasMore = reader.Read();
-
-        if (reader.HasRows && hasMore)
-        {
-            file.CreatedAt = reader.GetDateTime(0);
-            file.Hash = Task.FromResult(reader.GetString(1));
-            file.Size = reader.GetInt64(2);
-            file.Path = reader.GetString(3);
-        }
-
-        return hasMore;
-    }
-
-    private Option<long> Find(string hash)
-        => Option.FromNullable(db.ExecuteScalar("SELECT Id FROM Files WHERE Hash = @hash", new SqliteParameter("@hash", hash)) as long?);
-
-    private long Create(File file, string hash)
-    {
-        var fileId = InsertFile(file, hash);
+        var fileId = InsertFile(file.File);
 
         InsertFileName(file, fileId);
         InsertFilePath(file, fileId);
@@ -157,10 +124,10 @@ HAVING DuplicateCount > 1";
         return fileId;
     }
 
-    private long InsertFile(File file, string hash)
+    private long InsertFile(File file)
         => db.ExecuteScalar(
             "INSERT INTO Files (Hash, Size, CreatedAt) VALUES(@hash,@size, @createdAt); SELECT last_insert_rowid();",
-            new SqliteParameter("@hash", hash),
+            HashParameter(file.Hash),
             new SqliteParameter("@size", file.Size),
             new SqliteParameter("@createdAt", file.CreatedAt)) as long?
             ?? throw new InvalidOperationException("Inserting the file did not return its id.");
@@ -173,17 +140,17 @@ HAVING DuplicateCount > 1";
         return true;
     }
 
-    private void InsertFileName(File file, long fileId)
-    {
-        var fileName = System.IO.Path.GetFileName(file.Path);
-        db.ExecuteNonQuery("INSERT OR IGNORE INTO FileNames (FileId, Name) VALUES(@fileId, @fileName);", new SqliteParameter("@fileId", fileId), new SqliteParameter("@fileName", fileName));
-    }
+    private void InsertFileName(FileAt file, long fileId)
+        => db.ExecuteNonQuery(
+            "INSERT OR IGNORE INTO FileNames (FileId, Name) VALUES(@fileId, @fileName);",
+            new SqliteParameter("@fileId", fileId),
+            new SqliteParameter("@fileName", Path.GetFileName(file.Path)));
 
     /// <summary>
     /// A path holds one content at a time: when an edited file is stored, its path leaves the old content, and the tags follow the path
     /// (the new content gets a copy, the old content keeps its own). The fingerprint is stored with the path, or updated when the path is already known.
     /// </summary>
-    private void InsertFilePath(File file, long fileId)
+    private void InsertFilePath(FileAt file, long fileId)
     {
         db.ExecuteNonQuery(
             "INSERT OR IGNORE INTO FileTags (TagId, FileId) SELECT TagId, @fileId FROM FileTags WHERE FileId IN (SELECT FileId FROM FilePaths WHERE Path = @filePath AND FileId <> @fileId);",
@@ -198,17 +165,10 @@ HAVING DuplicateCount > 1";
             [new SqliteParameter("@fileId", fileId), new SqliteParameter("@filePath", file.Path), .. FingerprintParameters(file.Fingerprint)]);
     }
 
-    private async Task<long> FindOrCreate(File file)
-    {
-        var hash = await file.Hash;
+    private long FindOrCreate(FileAt file)
+        => FindId(file.File.Hash).Match(none: () => Create(file), some: fileId => UpdateFileAttributes(file, fileId));
 
-        return db.InTransaction(() => FindOrCreate(file, hash));
-    }
-
-    private long FindOrCreate(File file, string hash)
-        => Find(hash).Match(none: () => Create(file, hash), some: fileId => UpdateFileAttributes(file, fileId));
-
-    private long UpdateFileAttributes(File file, long fileId)
+    private long UpdateFileAttributes(FileAt file, long fileId)
     {
         InsertFileName(file, fileId);
         InsertFilePath(file, fileId);
@@ -235,38 +195,11 @@ HAVING DuplicateCount > 1";
 
         var sql = SearchQuery.Sql(expression, knownTags.ToDictionary(tag => tag.Name, tag => tag.Parameter.ParameterName));
 
-        return new SearchResult(db.ExecuteReader(sql, ReadFiles, [.. knownTags.Select(tag => tag.Parameter)]), unknownTags);
+        return new SearchResult(db.Query(sql, reader => new FileAt(ReadFile(reader), reader.GetString(3), Option<PathFingerprint>.None), [.. knownTags.Select(tag => tag.Parameter)]), unknownTags);
     }
 
     private Option<long> FindTag(string name)
         => from tag in Option.FromNullable(tagParser.Parse(name))
            from id in sqLiteTag.Find(tag)
            select id;
-
-    private IEnumerable<File> MetaSearch(string search)
-        => db.ExecuteReader(search, ReadFiles);
-
-    private List<File> ReadFiles(SqliteDataReader reader)
-    {
-        var files = new List<File>();
-
-        while (AddFileEntry(reader, files))
-        {
-        }
-
-        return files;
-    }
-
-    private bool AddFileEntry(SqliteDataReader reader, List<File> files)
-    {
-        var file = newFile();
-        var hasEntry = LoadFileFromReader(reader, file);
-
-        if (hasEntry)
-        {
-            files.Add(file);
-        }
-
-        return hasEntry;
-    }
 }

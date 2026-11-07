@@ -24,7 +24,7 @@ public partial class MainWindow : MetroWindow, INotifyPropertyChanged
     private readonly Parser _parser;
     private string _searchString = string.Empty;
 
-    private IEnumerable<API.Models.File> _files;
+    private IEnumerable<API.Models.FileAt> _files;
 
     private bool _popupVisible;
 
@@ -79,7 +79,7 @@ public partial class MainWindow : MetroWindow, INotifyPropertyChanged
         }
     }
 
-    public IEnumerable<API.Models.File> Files
+    public IEnumerable<API.Models.FileAt> Files
     {
         get
         {

@@ -30,7 +30,7 @@
             <Setter Property="View">
                 <Setter.Value>
                     <GridView>
-                        <GridViewColumn Header="Size" DisplayMemberBinding="{Binding Size}" />
+                        <GridViewColumn Header="Size" DisplayMemberBinding="{Binding File.Size}" />
                         <GridViewColumn Header="Path" DisplayMemberBinding="{Binding Path}" />
                     </GridView>
                 </Setter.Value>
@@ -40,7 +40,7 @@
         <DataTemplate x:Key="TileTemplate" DataType="{x:Type models:File}">
             <StackPanel Margin="2,0" VerticalAlignment="Center">
                 <Image Height="160" Width="240" Stretch="Uniform" Source="{Binding Path}" />
-                <TextBlock Text="{Binding Size}" />
+                <TextBlock Text="{Binding File.Size}" />
             </StackPanel>
         </DataTemplate>
 

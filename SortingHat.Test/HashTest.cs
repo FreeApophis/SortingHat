@@ -31,6 +31,13 @@ public sealed class HashTest
         => Assert.Equal(Valid($"sha256:{Sha256Digest}"), Valid($"sha256:{Sha256Digest}"));
 
     [Theory]
+    [InlineData("sha256:5891b5b522d5df086d0ff0b110fbd9d21bb4fc7163af34d08286a2e846f6be03", "5891b5b5")]
+    [InlineData("md5:01234567", "01234567")]
+    [InlineData("crc:00ff", "00ff")]
+    public void GivenAHashThenItsShortFormIsTheFirstEightDigitsOfItsDigest(string text, string shortForm)
+        => Assert.Equal(shortForm, Valid(text).Short);
+
+    [Theory]
     [InlineData("")]
     [InlineData("BADHASH")]
     [InlineData("sha256")]

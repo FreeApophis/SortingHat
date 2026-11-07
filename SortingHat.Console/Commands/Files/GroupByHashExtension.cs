@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using SortingHat.API.Models;
 
 namespace SortingHat.CLI.Commands.Files;
 
 internal static class GroupByHashExtension
 {
-    extension(IEnumerable<API.Models.File> files)
+    extension(IEnumerable<FileAt> files)
     {
         public IEnumerable<HashGroup> GroupByHash()
-            => files.GroupBy(f => f.Hash.Result, (hash, file) => new HashGroup(hash, file));
+            => files.GroupBy(file => file.File.Hash, (hash, group) => new HashGroup(hash, [.. group]));
     }
 }

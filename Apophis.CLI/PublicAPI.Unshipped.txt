@@ -26,8 +26,6 @@ Apophis.CLI.IConsoleApplicationInformationProvider.Name.get -> string!
 Apophis.CLI.NumberFormatter
 Apophis.CLI.NumberFormatter.extension(long)
 Apophis.CLI.NumberFormatter.extension(long).HumanSize() -> string!
-Apophis.CLI.NumberFormatter.extension(string!)
-Apophis.CLI.NumberFormatter.extension(string!).ShortHash() -> Funcky.Monads.Option<string!>
 Apophis.CLI.Reader.IConsoleReader
 Apophis.CLI.Reader.IConsoleReader.ReadInt() -> Funcky.Monads.Option<int>
 Apophis.CLI.Reader.IConsoleReader.ReadLine() -> string!
@@ -61,4 +59,3 @@ Apophis.CLI.Writer.SystemConsoleWriter.WriteLine(string! line) -> void
 override Apophis.CLI.Writer.ConsoleTextWriter.Encoding.get -> System.Text.Encoding!
 override Apophis.CLI.Writer.ConsoleTextWriter.Write(char value) -> void
 static Apophis.CLI.NumberFormatter.HumanSize(this long size) -> string!
-static Apophis.CLI.NumberFormatter.ShortHash(this string! hash) -> Funcky.Monads.Option<string!>

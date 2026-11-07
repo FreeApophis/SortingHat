@@ -26,7 +26,7 @@ public class CoreModule : Module
         builder.RegisterType<FilePathExtractor>().As<IFilePathExtractor>().SingleInstance();
 
         builder.RegisterType<Tag>().AsSelf().InstancePerDependency();
-        builder.RegisterType<Models.File>().AsSelf().InstancePerDependency();
+        builder.RegisterType<FileScanner>().As<IFileScanner>();
 
         // one hash algorithm per file, an instance must not be used concurrently
         builder.Register(_ => SHA256.Create()).As<HashAlgorithm>().InstancePerDependency().ExternallyOwned();

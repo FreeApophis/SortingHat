@@ -14,6 +14,8 @@ public sealed record Hash
 {
     private const char Separator = ':';
 
+    private const int ShortLength = 8;
+
     /// <summary>The length of the hex digest of every algorithm hat knows.</summary>
     private static readonly ImmutableDictionary<string, int> DigestLengths = ImmutableDictionary.CreateRange([KeyValuePair.Create("sha256", 64)]);
 
@@ -25,6 +27,10 @@ public sealed record Hash
 
     /// <summary>The digest as lowercase hex.</summary>
     public string Digest { get; }
+
+    /// <summary>The first eight digits of the <see cref="Digest"/>, enough to tell files apart on screen.</summary>
+    public string Short
+        => Digest[..int.Min(ShortLength, Digest.Length)];
 
     /// <summary>Returns the hash written in <paramref name="text"/> as <c>algorithm:digest</c>, or why it is none.</summary>
     public static Either<string, Hash> Parse(string text)

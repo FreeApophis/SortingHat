@@ -29,7 +29,7 @@ internal class FindFilesCommand(IFile fileStore, IConsoleWriter consoleWriter) :
     public IReadOnlyList<ArgumentDefinition> Arguments => [Query];
     public IReadOnlyList<OptionDefinition> Options => [Open];
 
-    public async Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
+    public Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
     {
         var search = string.Join(" ", input.Values(Query));
         consoleWriter.WriteLine($"Find Files: {search}");
@@ -52,8 +52,7 @@ internal class FindFilesCommand(IFile fileStore, IConsoleWriter consoleWriter) :
                     FileHelper.OpenWithAssociatedProgram(file.Path);
                 }
 
-                var hash = await file.Hash;
-                table.Append(hash.ShortHash().GetOrElse(hash), file.CreatedAt, file.Size.HumanSize(), file.Path);
+                table.Append(file.File.Hash.Short, file.File.CreatedAt, file.File.Size.HumanSize(), file.Path);
             }
 
             table.WriteTo(consoleWriter);
@@ -63,6 +62,6 @@ internal class FindFilesCommand(IFile fileStore, IConsoleWriter consoleWriter) :
             consoleWriter.WriteLine("No files found for your search query...");
         }
 
-        return true;
+        return Task.FromResult(true);
     }
 }
