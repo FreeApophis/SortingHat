@@ -154,6 +154,105 @@ public sealed class FileCommandTest : IDisposable
     }
 
     [Fact]
+    public void GivenAMissingDestinationFolderThenNothingIsCopiedAndItIsReported()
+    {
+        var path = _hat.TaggedFile("a.txt", ":x");
+        var missing = Path.Combine(Path.GetDirectoryName(path) ?? string.Empty, "missing");
+
+        Assert.NotEqual(0, _hat.Hat(["cp", ":x", missing]));
+
+        Assert.Contains(_hat.Lines, line => line.Contains(missing) && line.Contains("does not exist"));
+        Assert.False(Directory.Exists(missing));
+    }
+
+    [Fact]
+    public void GivenAnExistingTargetThenThatFileIsSkippedAndTheOthersAreCopied()
+    {
+        var path = _hat.TaggedFile("a.txt", ":x");
+        _hat.TaggedFile("b.txt", ":x");
+        var destination = Destination(path);
+        File.WriteAllText(Path.Combine(destination, "a.txt"), "keep me");
+
+        Assert.NotEqual(0, _hat.Hat(["cp", ":x", destination]));
+
+        Assert.Equal("keep me", File.ReadAllText(Path.Combine(destination, "a.txt")));
+        Assert.True(File.Exists(Path.Combine(destination, "b.txt")));
+        Assert.Contains(_hat.Lines, line => line.Contains("skipped") && line.Contains(path));
+    }
+
+    [Fact]
+    public void GivenTwoFilesWithTheSameNameThenOnlyOneIsCopied()
+    {
+        var first = TaggedFileIn("one", "scan.txt", "first scan", ":x");
+        var second = TaggedFileIn("two", "scan.txt", "second scan", ":x");
+        var destination = Destination(first);
+
+        Assert.NotEqual(0, _hat.Hat(["cp", ":x", destination]));
+
+        Assert.Single(Directory.GetFiles(destination));
+        Assert.Contains(_hat.Lines, line => line.Contains("skipped") && (line.Contains(first) || line.Contains(second)));
+    }
+
+    [Fact]
+    public void GivenASourceDeletedOutsideHatThenItIsSkippedAndTheOthersAreCopied()
+    {
+        var path = _hat.TaggedFile("a.txt", ":x");
+        _hat.TaggedFile("b.txt", ":x");
+        var destination = Destination(path);
+        File.Delete(path);
+
+        Assert.NotEqual(0, _hat.Hat(["cp", ":x", destination]));
+
+        Assert.True(File.Exists(Path.Combine(destination, "b.txt")));
+        Assert.Contains(_hat.Lines, line => line.Contains("skipped") && line.Contains(path));
+    }
+
+    [Fact]
+    public void GivenCopiesOfAFileOfWhichOnlyOneExistsThenItIsTakenWithoutAsking()
+    {
+        var first = _hat.TaggedFile("a.txt", ":x");
+        var second = Path.Combine(Path.GetDirectoryName(first) ?? string.Empty, "copy-of-a.txt");
+        File.Copy(first, second);
+        _hat.Hat(["tag-files", ":x", second]);
+        var destination = Destination(first);
+        File.Delete(first);
+
+        Assert.Equal(0, _hat.Hat(["cp", ":x", destination]));
+
+        Assert.True(File.Exists(Path.Combine(destination, "copy-of-a.txt")));
+        Assert.DoesNotContain(_hat.Lines, line => line.Contains("multiple sources"));
+    }
+
+    [Fact]
+    public void GivenAnInvalidChoiceThenOnlyThatFileIsSkipped()
+    {
+        var first = _hat.TaggedFile("a.txt", ":x");
+        var second = Path.Combine(Path.GetDirectoryName(first) ?? string.Empty, "copy-of-a.txt");
+        File.Copy(first, second);
+        _hat.Hat(["tag-files", ":x", second]);
+        _hat.TaggedFile("b.txt", ":x");
+        var destination = Destination(first);
+        _hat.Keyboard.Type("x");
+
+        Assert.NotEqual(0, _hat.Hat(["cp", ":x", destination]));
+
+        Assert.Equal([Path.Combine(destination, "b.txt")], Directory.GetFiles(destination));
+    }
+
+    [Fact]
+    public void GivenAnExistingTargetThenMoveFilesLeavesTheFileAndItsPathAlone()
+    {
+        var path = _hat.TaggedFile("a.txt", ":x");
+        var destination = Destination(path);
+        File.WriteAllText(Path.Combine(destination, "a.txt"), "keep me");
+
+        Assert.NotEqual(0, _hat.Hat(["mv", ":x", destination]));
+
+        Assert.True(File.Exists(path));
+        Assert.Equal(["a.txt"], _hat.FindFiles(":x"));
+    }
+
+    [Fact]
     public void GivenOnlyASearchThenCopyFilesAsksForTheDestination()
     {
         Assert.NotEqual(0, _hat.Hat(["copy-files", ":x"]));
@@ -187,4 +286,15 @@ public sealed class FileCommandTest : IDisposable
 
     private static string Destination(string file)
         => Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(file) ?? string.Empty, "destination")).FullName;
+
+    /// <summary>A file in a subfolder of the sandbox, so two files can have the same name.</summary>
+    private string TaggedFileIn(string folder, string name, string content, string tag)
+    {
+        var root = Path.GetDirectoryName(_hat.TaggedFile($"{folder}-marker.txt")) ?? string.Empty;
+        var path = Path.Combine(Directory.CreateDirectory(Path.Combine(root, folder)).FullName, name);
+        File.WriteAllText(path, content);
+        _hat.Hat(["tag-files", tag, path]);
+
+        return path;
+    }
 }

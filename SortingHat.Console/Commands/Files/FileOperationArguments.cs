@@ -7,7 +7,10 @@ namespace SortingHat.CLI.Commands.Files;
 /// <summary>The arguments of copy-files and move-files, which both run a search and put the files into a folder.</summary>
 internal static class FileOperationArguments
 {
-    public const string Details = "When several files have the same content, hat asks which one to take.";
+    public const string Details
+        = "Nothing is overwritten: a file whose name already exists in the destination is skipped and reported, "
+        + "like a file that no longer exists on disk. The other files still go, the exit code says whether all of them did. "
+        + "When several copies of the same content exist, hat asks which one to take.";
 
     public static readonly ArgumentDefinition Search = new() { Name = "search", Description = "A tag or a search query in quotes, for example ':tax:2018' or \":tax and not :bank\"." };
 
