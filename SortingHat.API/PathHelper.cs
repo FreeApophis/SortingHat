@@ -1,19 +1,16 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SortingHat.API;
 
 internal static class PathHelper
 {
-    public static List<string> PathElements(DirectoryInfo? directory)
-    {
-        var result = new List<string>();
+    private static readonly char[] Separators = ['\\', '/'];
 
-        for (; directory != null; directory = directory.Parent)
-        {
-            result.Add(directory.Name);
-        }
-
-        return result;
-    }
+    /// <summary>
+    /// The folders of the <paramref name="folder"/> path from its root, each one a valid tag level: a drive is only its letter,
+    /// so <c>C:\User\Path</c> gives C, User, Path. A UNC path gives its server and share, a Unix root has no name.
+    /// </summary>
+    public static IReadOnlyList<string> Folders(string folder)
+        => [.. Array.ConvertAll(folder.Split(Separators, StringSplitOptions.RemoveEmptyEntries), part => part.TrimEnd(':'))];
 }

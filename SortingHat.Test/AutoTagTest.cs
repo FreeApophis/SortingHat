@@ -37,6 +37,17 @@ public sealed class AutoTagTest : IDisposable
     }
 
     [Fact]
+    public void GivenAMaskWithTheRootFolderThenTheFileIsTaggedWithOneLevelForIt()
+    {
+        var path = _hat.WriteFile("a.txt", "a");
+
+        Assert.Equal(0, _hat.Hat(["tag-files", ":root:{Folder.FromRoot.0}", path]));
+
+        Assert.DoesNotContain(_hat.Lines, line => line.Contains("not tagged"));
+        Assert.Equal(["a.txt"], _hat.FindFiles(":root"));
+    }
+
+    [Fact]
     public void GivenAMaskWithAnUnknownVariableThenNothingIsTaggedAndTheVariableIsNamed()
     {
         var path = _hat.WriteFile("a.txt", "a");

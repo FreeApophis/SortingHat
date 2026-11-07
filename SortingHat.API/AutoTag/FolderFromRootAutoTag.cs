@@ -11,11 +11,11 @@ internal class FolderFromRootAutoTag : IAutoTag
 
     public AutoTagParameter Parameter => AutoTagParameter.Integer;
 
-    public string Description => @"Path element counted from the left: C:\User\Path 0 => C, 1 => User, 2 => Path";
+    public string Description => @"The folder of the file, counted from the root: C:\User\Path\File.ext 0 => C, 1 => User, 2 => Path";
 
     public Option<string> Value(AutoTagFile file, AutoTagArgument argument)
         => from index in argument.Number
-           let elements = PathHelper.PathElements(file.Info.Directory)
-           from element in elements.ElementAtOrNone(elements.Count - index - 1)
-           select element;
+           from folder in Option.FromNullable(file.Info.DirectoryName)
+           from name in PathHelper.Folders(folder).ElementAtOrNone(index)
+           select name;
 }
