@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 
 namespace Apophis.CLI.Writer;
 
 public class MemoryConsoleWriter : IConsoleWriter
 {
-    private List<string> _lines = [];
+    private readonly List<string> _lines = [];
+    private readonly Lock _lock = new();
 
     public MemoryConsoleWriter()
     {
@@ -12,13 +14,15 @@ public class MemoryConsoleWriter : IConsoleWriter
 
     public List<string> Lines => _lines;
 
+    /// <summary>Thread-safe like the real console, files are hashed in parallel.</summary>
     public void WriteLine(string line)
     {
-        _lines.Add(line);
+        lock (_lock)
+        {
+            _lines.Add(line);
+        }
     }
 
     public void WriteLine()
-    {
-        _lines.Add(string.Empty);
-    }
+        => WriteLine(string.Empty);
 }

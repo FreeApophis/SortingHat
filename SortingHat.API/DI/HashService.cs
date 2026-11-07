@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -7,7 +8,8 @@ using Apophis.CLI.Writer;
 
 namespace SortingHat.API.DI;
 
-public class HashService(HashAlgorithm hashAlgorithm, string hashPrefix, IConsoleWriter consoleWriter) : IHashService
+/// <summary>Hashes files with a new hash algorithm from <paramref name="newHashAlgorithm"/> per file, because one instance must not be used concurrently.</summary>
+public class HashService(Func<HashAlgorithm> newHashAlgorithm, string hashPrefix, IConsoleWriter consoleWriter) : IHashService
 {
     private readonly string _hashPrefix = hashPrefix.ToLower();
 
@@ -15,6 +17,7 @@ public class HashService(HashAlgorithm hashAlgorithm, string hashPrefix, IConsol
     {
         return Task.Run(() =>
         {
+            using var hashAlgorithm = newHashAlgorithm();
             using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
             consoleWriter.WriteLine($"Hashing: '{path}'");

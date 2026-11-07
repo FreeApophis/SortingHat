@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System;
+using System.Security.Cryptography;
 using Apophis.CLI.Writer;
 using Apophis.FileSystem;
 using Autofac;
@@ -29,8 +30,8 @@ internal class CompositionRoot
         builder.RegisterType<API.Models.Tag>().As<API.Models.Tag>().InstancePerDependency();
         builder.RegisterType<API.Models.File>().As<API.Models.File>().InstancePerDependency();
 
-        builder.Register(_ => SHA256.Create()).As<HashAlgorithm>().SingleInstance();
-        builder.Register(c => new HashService(c.Resolve<HashAlgorithm>(), nameof(SHA256), c.Resolve<IConsoleWriter>())).As<IHashService>().SingleInstance();
+        builder.Register(_ => SHA256.Create()).As<HashAlgorithm>().InstancePerDependency().ExternallyOwned();
+        builder.Register(c => new HashService(c.Resolve<Func<HashAlgorithm>>(), nameof(SHA256), c.Resolve<IConsoleWriter>())).As<IHashService>().SingleInstance();
         builder.RegisterType<LoggerFactory>().As<ILoggerFactory>().SingleInstance();
         builder.RegisterGeneric(typeof(Logger<>)).As(typeof(ILogger<>)).SingleInstance();
         builder.RegisterType<NullWriter>().As<IConsoleWriter>();
