@@ -1,19 +1,20 @@
-﻿using System.IO;
-using System.Linq;
+﻿using Funcky.Extensions;
+using Funcky.Monads;
+using JetBrains.Annotations;
 using SortingHat.API.AutoTag;
 using SortingHat.Plugin.FileType.Detectors;
 
 namespace SortingHat.Plugin.FileType.AutoTag;
 
-internal class FileTypeExtensionAutoTag(IFileTypeFinder fileTypeDetector) : ConstantAutoTag
+[UsedImplicitly]
+internal class FileTypeExtensionAutoTag(IFileTypeFinder fileTypeFinder) : IAutoTag
 {
-    public override string AutoTagKey => "FileType.Extension";
-    public override string Description => "TODO";
+    public string Name => "FileType.Extension";
 
-    protected override string? HandleTag(FileInfo file)
-    {
-        var fileType = fileTypeDetector.Identify(file);
+    public AutoTagParameter Parameter => AutoTagParameter.None;
 
-        return fileType?.Extensions?.FirstOrDefault();
-    }
+    public string Description => "The usual extension of the file type found from the content, such as png.";
+
+    public Option<string> Value(AutoTagFile file, AutoTagArgument argument)
+        => FileTypes.Of(file, fileTypeFinder).SelectMany(fileType => fileType.Extensions.FirstOrNone());
 }

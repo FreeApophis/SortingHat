@@ -1,18 +1,19 @@
-﻿using System.IO;
+﻿using Funcky.Monads;
+using JetBrains.Annotations;
 using SortingHat.API.AutoTag;
 using SortingHat.Plugin.FileType.Detectors;
 
 namespace SortingHat.Plugin.FileType.AutoTag;
 
-internal class FileTypeAutoTag(IFileTypeFinder fileTypeDetector) : ConstantAutoTag
+[UsedImplicitly]
+internal class FileTypeAutoTag(IFileTypeFinder fileTypeFinder) : IAutoTag
 {
-    public override string AutoTagKey => "FileType.Type";
-    public override string Description => "TODO";
+    public string Name => "FileType.Type";
 
-    protected override string? HandleTag(FileInfo file)
-    {
-        var fileType = fileTypeDetector.Identify(file);
+    public AutoTagParameter Parameter => AutoTagParameter.None;
 
-        return fileType?.Name;
-    }
+    public string Description => "The name of the file type found from the content, such as Portable Network Graphics.";
+
+    public Option<string> Value(AutoTagFile file, AutoTagArgument argument)
+        => FileTypes.Of(file, fileTypeFinder).Select(fileType => fileType.Name);
 }

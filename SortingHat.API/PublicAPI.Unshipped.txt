@@ -1,9 +1,20 @@
 ﻿#nullable enable
+abstract SortingHat.API.AutoTag.AutoTagParameter.<Clone>$() -> SortingHat.API.AutoTag.AutoTagParameter!
+abstract SortingHat.API.AutoTag.AutoTagParameter.Usage(string! name) -> string!
+abstract SortingHat.API.AutoTag.DateAutoTag.Date(SortingHat.API.AutoTag.AutoTagFile! file) -> Funcky.Monads.Option<System.DateTime>
+abstract SortingHat.API.AutoTag.DateAutoTag.Name.get -> string!
 abstract SortingHat.API.Models.PathState.<Clone>$() -> SortingHat.API.Models.PathState!
 abstract SortingHat.API.Models.PathState.Current.get -> SortingHat.API.Models.FileAt!
 override sealed SortingHat.API.Models.PathState.Changed.Equals(SortingHat.API.Models.PathState? other) -> bool
 override sealed SortingHat.API.Models.PathState.Known.Equals(SortingHat.API.Models.PathState? other) -> bool
 override sealed SortingHat.API.Models.PathState.New.Equals(SortingHat.API.Models.PathState? other) -> bool
+override SortingHat.API.AutoTag.AutoTagArgument.Equals(object? obj) -> bool
+override SortingHat.API.AutoTag.AutoTagArgument.GetHashCode() -> int
+override SortingHat.API.AutoTag.AutoTagArgument.ToString() -> string!
+override SortingHat.API.AutoTag.AutoTagParameter.Equals(object? obj) -> bool
+override SortingHat.API.AutoTag.AutoTagParameter.GetHashCode() -> int
+override SortingHat.API.AutoTag.AutoTagParameter.ToString() -> string!
+override SortingHat.API.AutoTag.TagMask.ToString() -> string!
 override SortingHat.API.CoreModule.Load(Autofac.ContainerBuilder! builder) -> void
 override SortingHat.API.Models.File.Equals(object? obj) -> bool
 override SortingHat.API.Models.File.GetHashCode() -> int
@@ -40,37 +51,31 @@ override SortingHat.API.Models.Tag.ToString() -> string!
 override SortingHat.API.Models.TagName.Equals(object? obj) -> bool
 override SortingHat.API.Models.TagName.GetHashCode() -> int
 override SortingHat.API.Models.TagName.ToString() -> string!
-SortingHat.API.AutoTag.ConstantAutoTag
-SortingHat.API.AutoTag.ConstantAutoTag.ConstantAutoTag() -> void
-SortingHat.API.AutoTag.ConstantAutoTag.FindMatch(string! value) -> string?
-SortingHat.API.AutoTag.ConstantAutoTag.HandleTag(System.IO.FileInfo! file, string? tagMatch) -> string?
-SortingHat.API.AutoTag.ConstantAutoTag.HumanReadableAutoTagsKey.get -> string!
+SortingHat.API.AutoTag.AutoTagArgument
+SortingHat.API.AutoTag.AutoTagArgument.<Clone>$() -> SortingHat.API.AutoTag.AutoTagArgument!
+SortingHat.API.AutoTag.AutoTagArgument.Equals(SortingHat.API.AutoTag.AutoTagArgument? other) -> bool
+SortingHat.API.AutoTag.AutoTagArgument.Number.get -> Funcky.Monads.Option<int>
+SortingHat.API.AutoTag.AutoTagArgument.Text.get -> Funcky.Monads.Option<string!>
+SortingHat.API.AutoTag.AutoTagFile
+SortingHat.API.AutoTag.AutoTagFile.AutoTagFile(System.IO.FileInfo! info) -> void
+SortingHat.API.AutoTag.AutoTagFile.Info.get -> System.IO.FileInfo!
+SortingHat.API.AutoTag.AutoTagFile.Remember<T>(string! key, System.Func<System.IO.FileInfo!, T>! read) -> T
+SortingHat.API.AutoTag.AutoTagParameter
+SortingHat.API.AutoTag.AutoTagParameter.AutoTagParameter(SortingHat.API.AutoTag.AutoTagParameter! original) -> void
 SortingHat.API.AutoTag.DateAutoTag
 SortingHat.API.AutoTag.DateAutoTag.DateAutoTag() -> void
-SortingHat.API.AutoTag.DateAutoTag.FindMatch(string! value) -> string?
-SortingHat.API.AutoTag.DateAutoTag.HandleTag(System.IO.FileInfo! file, string? tagMatch) -> string?
-SortingHat.API.AutoTag.DateAutoTag.HumanReadableAutoTagsKey.get -> string!
+SortingHat.API.AutoTag.DateAutoTag.Parameter.get -> SortingHat.API.AutoTag.AutoTagParameter!
+SortingHat.API.AutoTag.DateAutoTag.Value(SortingHat.API.AutoTag.AutoTagFile! file, SortingHat.API.AutoTag.AutoTagArgument! argument) -> Funcky.Monads.Option<string!>
 SortingHat.API.AutoTag.IAutoTag
-SortingHat.API.AutoTag.IAutoTag.AutoTagKey.get -> string!
 SortingHat.API.AutoTag.IAutoTag.Description.get -> string!
-SortingHat.API.AutoTag.IAutoTag.FindMatch(string! value) -> string?
-SortingHat.API.AutoTag.IAutoTag.HandleTag(System.IO.FileInfo! file, string? tagMatch) -> string?
-SortingHat.API.AutoTag.IAutoTag.HumanReadableAutoTagsKey.get -> string!
+SortingHat.API.AutoTag.IAutoTag.Name.get -> string!
+SortingHat.API.AutoTag.IAutoTag.Parameter.get -> SortingHat.API.AutoTag.AutoTagParameter!
+SortingHat.API.AutoTag.IAutoTag.Value(SortingHat.API.AutoTag.AutoTagFile! file, SortingHat.API.AutoTag.AutoTagArgument! argument) -> Funcky.Monads.Option<string!>
 SortingHat.API.AutoTag.IAutoTagHandler
-SortingHat.API.AutoTag.IAutoTagHandler.AutoTags.get -> System.Collections.Generic.IEnumerable<SortingHat.API.AutoTag.IAutoTag!>!
-SortingHat.API.AutoTag.IAutoTagHandler.TagFromMask(string! tagMask, System.IO.FileInfo! file) -> Funcky.Monads.Option<SortingHat.API.Models.Tag!>
-SortingHat.API.AutoTag.IDateTagPart
-SortingHat.API.AutoTag.IDateTagPart.Key.get -> string!
-SortingHat.API.AutoTag.IDateTagPart.Select(System.DateTime dateTime) -> string!
-SortingHat.API.AutoTag.IntegerAutoTag
-SortingHat.API.AutoTag.IntegerAutoTag.FindMatch(string! value) -> string?
-SortingHat.API.AutoTag.IntegerAutoTag.HandleTag(System.IO.FileInfo! file, string? tagMatch) -> string?
-SortingHat.API.AutoTag.IntegerAutoTag.HumanReadableAutoTagsKey.get -> string!
-SortingHat.API.AutoTag.IntegerAutoTag.IntegerAutoTag() -> void
-SortingHat.API.AutoTag.StringAutoTag
-SortingHat.API.AutoTag.StringAutoTag.FindMatch(string! value) -> string?
-SortingHat.API.AutoTag.StringAutoTag.HumanReadableAutoTagsKey.get -> string!
-SortingHat.API.AutoTag.StringAutoTag.StringAutoTag() -> void
+SortingHat.API.AutoTag.IAutoTagHandler.AutoTags.get -> System.Collections.Generic.IReadOnlyList<SortingHat.API.AutoTag.IAutoTag!>!
+SortingHat.API.AutoTag.IAutoTagHandler.ParseMask(string! mask) -> Funcky.Monads.Either<string!, SortingHat.API.AutoTag.TagMask!>
+SortingHat.API.AutoTag.TagMask
+SortingHat.API.AutoTag.TagMask.Apply(SortingHat.API.AutoTag.AutoTagFile! file) -> Funcky.Monads.Either<string!, SortingHat.API.Models.Tag!>
 SortingHat.API.CoreModule
 SortingHat.API.CoreModule.CoreModule() -> void
 SortingHat.API.DI.ArgumentDefinition
@@ -317,18 +322,7 @@ SortingHat.API.Plugin.PluginProblem.Reason.get -> string!
 SortingHat.API.Plugin.PluginProblem.Reason.init -> void
 SortingHat.API.Plugin.PluginProblem.Source.get -> string!
 SortingHat.API.Plugin.PluginProblem.Source.init -> void
-abstract SortingHat.API.AutoTag.ConstantAutoTag.AutoTagKey.get -> string!
-abstract SortingHat.API.AutoTag.ConstantAutoTag.Description.get -> string!
-abstract SortingHat.API.AutoTag.ConstantAutoTag.HandleTag(System.IO.FileInfo! file) -> string?
-abstract SortingHat.API.AutoTag.DateAutoTag.AutoTagKey.get -> string!
 abstract SortingHat.API.AutoTag.DateAutoTag.Description.get -> string!
-abstract SortingHat.API.AutoTag.DateAutoTag.HandleTag(System.IO.FileInfo! file, SortingHat.API.AutoTag.IDateTagPart! tagPart) -> string?
-abstract SortingHat.API.AutoTag.IntegerAutoTag.AutoTagKey.get -> string!
-abstract SortingHat.API.AutoTag.IntegerAutoTag.Description.get -> string!
-abstract SortingHat.API.AutoTag.IntegerAutoTag.HandleTag(System.IO.FileInfo! file, int index) -> string?
-abstract SortingHat.API.AutoTag.StringAutoTag.AutoTagKey.get -> string!
-abstract SortingHat.API.AutoTag.StringAutoTag.Description.get -> string!
-abstract SortingHat.API.AutoTag.StringAutoTag.HandleTag(System.IO.FileInfo! file, string? tagMatch) -> string?
 override SortingHat.API.DI.ArgumentDefinition.Equals(object? obj) -> bool
 override SortingHat.API.DI.ArgumentDefinition.GetHashCode() -> int
 override SortingHat.API.DI.ArgumentDefinition.ToString() -> string!
@@ -357,6 +351,15 @@ override SortingHat.API.Parser.Token.TagToken.ToString() -> string!
 override SortingHat.API.Plugin.PluginProblem.Equals(object? obj) -> bool
 override SortingHat.API.Plugin.PluginProblem.GetHashCode() -> int
 override SortingHat.API.Plugin.PluginProblem.ToString() -> string!
+static SortingHat.API.AutoTag.AutoTagArgument.None.get -> SortingHat.API.AutoTag.AutoTagArgument!
+static SortingHat.API.AutoTag.AutoTagArgument.operator !=(SortingHat.API.AutoTag.AutoTagArgument? left, SortingHat.API.AutoTag.AutoTagArgument? right) -> bool
+static SortingHat.API.AutoTag.AutoTagArgument.operator ==(SortingHat.API.AutoTag.AutoTagArgument? left, SortingHat.API.AutoTag.AutoTagArgument? right) -> bool
+static SortingHat.API.AutoTag.AutoTagParameter.Integer.get -> SortingHat.API.AutoTag.AutoTagParameter!
+static SortingHat.API.AutoTag.AutoTagParameter.None.get -> SortingHat.API.AutoTag.AutoTagParameter!
+static SortingHat.API.AutoTag.AutoTagParameter.OneOf(System.Collections.Generic.IReadOnlyList<string!>! choices) -> SortingHat.API.AutoTag.AutoTagParameter!
+static SortingHat.API.AutoTag.AutoTagParameter.operator !=(SortingHat.API.AutoTag.AutoTagParameter? left, SortingHat.API.AutoTag.AutoTagParameter? right) -> bool
+static SortingHat.API.AutoTag.AutoTagParameter.operator ==(SortingHat.API.AutoTag.AutoTagParameter? left, SortingHat.API.AutoTag.AutoTagParameter? right) -> bool
+static SortingHat.API.AutoTag.TagMask.Parse(string! text, System.Collections.Generic.IReadOnlyList<SortingHat.API.AutoTag.IAutoTag!>! autoTags) -> Funcky.Monads.Either<string!, SortingHat.API.AutoTag.TagMask!>
 static SortingHat.API.DI.ArgumentDefinition.operator !=(SortingHat.API.DI.ArgumentDefinition? left, SortingHat.API.DI.ArgumentDefinition? right) -> bool
 static SortingHat.API.DI.ArgumentDefinition.operator ==(SortingHat.API.DI.ArgumentDefinition? left, SortingHat.API.DI.ArgumentDefinition? right) -> bool
 static SortingHat.API.DI.OptionDefinition.operator !=(SortingHat.API.DI.OptionDefinition? left, SortingHat.API.DI.OptionDefinition? right) -> bool
@@ -397,6 +400,9 @@ static SortingHat.API.Parser.Parser.Create() -> SortingHat.API.Parser.Parser!
 static SortingHat.API.Plugin.PluginProblem.operator !=(SortingHat.API.Plugin.PluginProblem? left, SortingHat.API.Plugin.PluginProblem? right) -> bool
 static SortingHat.API.Plugin.PluginProblem.operator ==(SortingHat.API.Plugin.PluginProblem? left, SortingHat.API.Plugin.PluginProblem? right) -> bool
 static readonly SortingHat.API.Models.PathFingerprint.TimestampResolution -> System.TimeSpan
+virtual SortingHat.API.AutoTag.AutoTagParameter.EqualityContract.get -> System.Type!
+virtual SortingHat.API.AutoTag.AutoTagParameter.Equals(SortingHat.API.AutoTag.AutoTagParameter? other) -> bool
+virtual SortingHat.API.AutoTag.AutoTagParameter.PrintMembers(System.Text.StringBuilder! builder) -> bool
 virtual SortingHat.API.Models.PathState.EqualityContract.get -> System.Type!
 virtual SortingHat.API.Models.PathState.Equals(SortingHat.API.Models.PathState? other) -> bool
 virtual SortingHat.API.Models.PathState.PrintMembers(System.Text.StringBuilder! builder) -> bool

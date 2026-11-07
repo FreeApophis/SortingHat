@@ -101,9 +101,9 @@ internal class HelpCommand(
     {
         console.Writer.WriteLine("Possible Tag Variables:");
         console.Writer.WriteLine();
-        foreach (var tag in autoTagHandler.AutoTags.OrderBy(tag => tag.AutoTagKey))
+        foreach (var tag in autoTagHandler.AutoTags.OrderBy(tag => tag.Name, System.StringComparer.Ordinal))
         {
-            console.Writer.WriteLine($"* {tag.HumanReadableAutoTagsKey}");
+            console.Writer.WriteLine($"* {tag.Parameter.Usage(tag.Name)}");
             if (verbose)
             {
                 console.Writer.WriteLine($"=>  {tag.Description}");

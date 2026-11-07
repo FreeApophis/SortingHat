@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Apophis.CLI.Writer;
 using Funcky.Extensions;
+using Funcky.Monads;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using SortingHat.API.AutoTag;
@@ -24,7 +26,7 @@ internal class TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter con
         => """
            Without tags, the files are only added to the database.
            A tag can contain variables, which are replaced per file, for example ':Files:{FileType.Category}'.
-           'hat help' lists the variables of the loaded plugins.
+           'hat help' lists the variables of the loaded plugins. A file without a value for a variable does not get that tag.
            """;
 
     public IReadOnlyList<ArgumentDefinition> Arguments => [FileOptions.TagsAndFiles];
@@ -33,42 +35,68 @@ internal class TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter con
     public async Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
     {
         var arguments = input.Values(FileOptions.TagsAndFiles);
-        var tags = arguments.Where(a => a.IsTag).ToList();
-        var files = arguments.Where(a => a.IsFile);
+        var masks = arguments.Where(argument => argument.IsTag).Select(autoTagHandler.ParseMask).ToList();
+        var problems = masks.WhereSelect(mask => mask.LeftOrNone()).ToList();
 
-        foreach (var path in filePathExtractor.FromFilePatterns(files, input.Has(FileOptions.Recursive)))
+        if (problems.Count > 0)
         {
-            var state = await fileScanner.Examine(path);
+            problems.ForEach(consoleWriter.WriteLine);
+            consoleWriter.WriteLine("Nothing was tagged.");
 
-            if (state is PathState.Changed)
-            {
-                consoleWriter.WriteLine($"'{path}' has changed, its tags were carried over to the new content.");
-            }
-
-            if (tags.Count == 0)
-            {
-                fileStore.Store(state.Current);
-            }
-            else
-            {
-                TagFile(tags, state.Current);
-            }
+            return false;
         }
+
+        var skipped = new List<(TagMask Mask, string Reason)>();
+
+        foreach (var path in filePathExtractor.FromFilePatterns(arguments.Where(argument => argument.IsFile), input.Has(FileOptions.Recursive)))
+        {
+            skipped.AddRange(await TagFile(path, [.. masks.WhereSelect(mask => mask.RightOrNone())]));
+        }
+
+        Summary(skipped).ForEach(consoleWriter.WriteLine);
 
         return true;
     }
 
-    private void TagFile(List<string> tags, FileAt file)
-    {
-        foreach (var tag in ReplacedTags(tags, file))
-        {
-            logger.LogInformation($"File {file.Path} tagged with {tag.FullName}");
+    /// <summary>One line per mask and reason, not per file: tagging a folder of documents with a camera variable skips every document.</summary>
+    private static IEnumerable<string> Summary(IEnumerable<(TagMask Mask, string Reason)> skipped)
+        => skipped
+            .GroupBy(skip => (Mask: skip.Mask.ToString(), skip.Reason))
+            .Select(group => $"'{group.Key.Mask}': {Files(group.Count())} not tagged, {group.Key.Reason}.");
 
-            consoleWriter.WriteLine($"File {file.Path} queued with tag {tag.FullName}");
-            fileStore.Tag(file, tag);
+    private static string Files(int count)
+        => count == 1 ? "1 file" : $"{count} files";
+
+    /// <returns>The masks that gave no tag for this file, and why.</returns>
+    private async Task<IReadOnlyList<(TagMask Mask, string Reason)>> TagFile(string path, IReadOnlyList<TagMask> masks)
+    {
+        var state = await fileScanner.Examine(path);
+
+        if (state is PathState.Changed)
+        {
+            consoleWriter.WriteLine($"'{path}' has changed, its tags were carried over to the new content.");
         }
+
+        if (masks.Count == 0)
+        {
+            fileStore.Store(state.Current);
+
+            return [];
+        }
+
+        var file = new AutoTagFile(new FileInfo(path));
+        var tags = masks.Select(mask => (Mask: mask, Tag: mask.Apply(file))).ToList();
+
+        tags.WhereSelect(tag => tag.Tag.RightOrNone()).ForEach(tag => Tag(state.Current, tag));
+
+        return [.. tags.WhereSelect(tag => tag.Tag.LeftOrNone().Select(reason => (tag.Mask, reason)))];
     }
 
-    private IEnumerable<Tag> ReplacedTags(IEnumerable<string> tags, FileAt file)
-        => tags.WhereSelect(tag => autoTagHandler.TagFromMask(tag, new System.IO.FileInfo(file.Path)));
+    private void Tag(FileAt file, Tag tag)
+    {
+        logger.LogInformation($"File {file.Path} tagged with {tag.FullName}");
+
+        consoleWriter.WriteLine($"File {file.Path} queued with tag {tag.FullName}");
+        fileStore.Tag(file, tag);
+    }
 }

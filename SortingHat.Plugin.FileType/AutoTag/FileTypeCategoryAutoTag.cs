@@ -1,4 +1,4 @@
-﻿using System.IO;
+﻿using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API.AutoTag;
 using SortingHat.Plugin.FileType.Detectors;
@@ -6,15 +6,14 @@ using SortingHat.Plugin.FileType.Detectors;
 namespace SortingHat.Plugin.FileType.AutoTag;
 
 [UsedImplicitly]
-internal class FileTypeCategoryAutoTag(IFileTypeFinder fileTypeDetector) : ConstantAutoTag
+internal class FileTypeCategoryAutoTag(IFileTypeFinder fileTypeFinder) : IAutoTag
 {
-    public override string AutoTagKey => "FileType.Category";
-    public override string Description => "TODO";
+    public string Name => "FileType.Category";
 
-    protected override string? HandleTag(FileInfo file)
-    {
-        var fileType = fileTypeDetector.Identify(file);
+    public AutoTagParameter Parameter => AutoTagParameter.None;
 
-        return fileType?.Category;
-    }
+    public string Description => "The category of the file type found from the content, such as image or document.";
+
+    public Option<string> Value(AutoTagFile file, AutoTagArgument argument)
+        => FileTypes.Of(file, fileTypeFinder).Select(fileType => fileType.Category);
 }

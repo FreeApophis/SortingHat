@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using Funcky.Monads;
-using SortingHat.API.Models;
 
 namespace SortingHat.API.AutoTag;
 
+/// <summary>The auto-tags of hat and its plugins.</summary>
 public interface IAutoTagHandler
 {
-    IEnumerable<IAutoTag> AutoTags { get; }
+    IReadOnlyList<IAutoTag> AutoTags { get; }
 
-    Option<Tag> TagFromMask(string tagMask, FileInfo file);
+    /// <summary>Parses a tag mask against every registered auto-tag.</summary>
+    Either<string, TagMask> ParseMask(string mask);
 }

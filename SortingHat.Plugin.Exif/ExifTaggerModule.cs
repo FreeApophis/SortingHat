@@ -23,8 +23,8 @@ internal class ExifTaggerModule : Autofac.Module, IPlugin
 
     private static void RegisterSupportedTags(ContainerBuilder builder)
     {
-        builder.Register(c => new ConstantExifAutoTag<ExifIfd0Directory>(ExifDirectoryBase.TagMake, "Camera.Make", "TODO")).As<IAutoTag>();
-        builder.Register(c => new ConstantExifAutoTag<ExifIfd0Directory>(ExifDirectoryBase.TagModel, "Camera.Model", "TODO")).As<IAutoTag>();
-        builder.Register(c => new DateExifAutoTag<ExifSubIfdDirectory>(ExifDirectoryBase.TagDateTimeOriginal, "Camera.Taken", "TODO")).As<IAutoTag>();
+        builder.RegisterInstance(new ConstantExifAutoTag<ExifIfd0Directory>(ExifDirectoryBase.TagMake, "Camera.Make", "The maker of the camera that took the photo.")).As<IAutoTag>();
+        builder.RegisterInstance(new ConstantExifAutoTag<ExifIfd0Directory>(ExifDirectoryBase.TagModel, "Camera.Model", "The model of the camera that took the photo.")).As<IAutoTag>();
+        builder.RegisterInstance(new DateExifAutoTag<ExifSubIfdDirectory>(ExifDirectoryBase.TagDateTimeOriginal, "Camera.Taken", "When the photo was taken.")).As<IAutoTag>();
     }
 }

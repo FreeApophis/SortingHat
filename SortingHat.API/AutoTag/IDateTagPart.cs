@@ -2,7 +2,7 @@
 
 namespace SortingHat.API.AutoTag;
 
-public interface IDateTagPart
+internal interface IDateTagPart
 {
     string Key { get; }
 

@@ -1,39 +1,24 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
+﻿using System;
+using Funcky.Monads;
 
 namespace SortingHat.API.AutoTag;
 
+/// <summary>A helper for auto-tags that give a part of a date: <c>{Name.Year}</c>, <c>{Name.Month}</c>, ... The plugin only finds the date.</summary>
 public abstract class DateAutoTag : IAutoTag
 {
-    private readonly List<IDateTagPart> _selectableDateParts = [new YearPart(), new MonthPart(), new DayPart(), new WeekDayPart(), new HourPart(), new MinutePart(), new SecondPart()];
+    public abstract string Name { get; }
 
-    public abstract string AutoTagKey { get; }
     public abstract string Description { get; }
 
-    public string HumanReadableAutoTagsKey =>
-        AutoTagKey.Replace("<>", "<DatePart> Possible values: " + string.Join(", ", _selectableDateParts.Select(part => part.Key)));
+    public AutoTagParameter Parameter
+        => DateParts.Parameter;
 
-    public string? HandleTag(FileInfo file, string? tagMatch)
-    {
-        return HandleTag(file, _selectableDateParts.First(part => part.Key == tagMatch));
-    }
+    public Option<string> Value(AutoTagFile file, AutoTagArgument argument)
+        => from key in argument.Text
+           from part in DateParts.Find(key)
+           from date in Date(file)
+           select part.Select(date);
 
-    public string? FindMatch(string value)
-    {
-        var findString = new Regex(AutoTagKey.Replace("<>", @"(\w+)"));
-        var match = findString.Match(value);
-
-        if (!match.Success)
-        {
-            return null;
-        }
-
-        return _selectableDateParts
-            .Select(parts => parts.Key)
-            .FirstOrDefault(parts => parts == match.Groups[1].Value);
-    }
-
-    protected abstract string? HandleTag(FileInfo file, IDateTagPart tagPart);
+    /// <summary>The date of the <paramref name="file"/>, none when it has none.</summary>
+    protected abstract Option<DateTime> Date(AutoTagFile file);
 }

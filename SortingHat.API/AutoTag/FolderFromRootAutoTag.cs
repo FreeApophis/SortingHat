@@ -1,25 +1,21 @@
-﻿using System.IO;
+﻿using Funcky.Extensions;
+using Funcky.Monads;
 using JetBrains.Annotations;
 
 namespace SortingHat.API.AutoTag;
 
 [UsedImplicitly]
-internal class FolderFromRootAutoTag : IntegerAutoTag
+internal class FolderFromRootAutoTag : IAutoTag
 {
-    public override string AutoTagKey => "Folder.FromRoot.<>";
+    public string Name => "Folder.FromRoot";
 
-    public override string Description =>
-        @"Path element counted from the left: C:\User\Path 0 => C, 1 => User, 2 => Path";
+    public AutoTagParameter Parameter => AutoTagParameter.Integer;
 
-    protected override string? HandleTag(FileInfo file, int index)
-    {
-        var pathElements = PathHelper.PathElements(file.Directory);
+    public string Description => @"Path element counted from the left: C:\User\Path 0 => C, 1 => User, 2 => Path";
 
-        if (index < 0 || index >= pathElements.Count)
-        {
-            return null;
-        }
-
-        return pathElements[pathElements.Count - index - 1];
-    }
+    public Option<string> Value(AutoTagFile file, AutoTagArgument argument)
+        => from index in argument.Number
+           let elements = PathHelper.PathElements(file.Info.Directory)
+           from element in elements.ElementAtOrNone(elements.Count - index - 1)
+           select element;
 }

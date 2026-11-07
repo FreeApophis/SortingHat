@@ -1,25 +1,27 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
+using Funcky.Extensions;
+using Funcky.Monads;
 using JetBrains.Annotations;
 using MetadataExtractor;
 using SortingHat.API.AutoTag;
+using Directory = MetadataExtractor.Directory;
 
 namespace SortingHat.Plugin.Exif.AutoTag;
 
+/// <summary>A text entry of the metadata, such as the camera make.</summary>
 [UsedImplicitly]
-public class ConstantExifAutoTag<TDirectory>(int directoryEntryId, string baseKey, string description) : ConstantAutoTag
+public class ConstantExifAutoTag<TDirectory>(int directoryEntryId, string name, string description) : IAutoTag
     where TDirectory : Directory
 {
-    public override string AutoTagKey => $"{baseKey}";
-    public override string Description { get; } = description;
+    public string Name => name;
 
-    protected override string? HandleTag(System.IO.FileInfo file)
-    {
-        IEnumerable<Directory> directories = ImageMetadataReader.ReadMetadata(file.FullName);
+    public AutoTagParameter Parameter => AutoTagParameter.None;
 
-        // obtain the Exif SubIFD directory
-        var directory = directories.OfType<TDirectory>().FirstOrDefault();
+    public string Description => description;
 
-        return directory?.GetString(directoryEntryId);
-    }
+    public Option<string> Value(AutoTagFile file, AutoTagArgument argument)
+        => ExifMetadata.Of(file)
+            .OfType<TDirectory>()
+            .FirstOrNone()
+            .SelectMany(directory => Option.FromNullable(directory.GetString(directoryEntryId)));
 }

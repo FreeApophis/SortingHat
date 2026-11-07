@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using Funcky.Monads;
 using JetBrains.Annotations;
 
 namespace SortingHat.API.AutoTag;
@@ -6,11 +7,10 @@ namespace SortingHat.API.AutoTag;
 [UsedImplicitly]
 internal class CreatedAtAutoTag : DateAutoTag
 {
-    public override string AutoTagKey => "CreatedAt.<>";
+    public override string Name => "CreatedAt";
+
     public override string Description => "The date and time of the creation of the file.";
 
-    protected override string? HandleTag(FileInfo file, IDateTagPart tagPart)
-    {
-        return tagPart.Select(file.CreationTime);
-    }
+    protected override Option<DateTime> Date(AutoTagFile file)
+        => file.Info.CreationTime;
 }
