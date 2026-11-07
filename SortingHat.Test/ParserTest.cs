@@ -4,6 +4,7 @@ using SortingHat.API.Parser.Nodes;
 using SortingHat.API.Parser.OperatorType;
 using SortingHat.API.Parser.Token;
 using Xunit;
+using static Funcky.Functional;
 
 namespace SortingHat.Test;
 
@@ -25,6 +26,32 @@ GROUP BY FilePaths.Id";
         Assert.True(_parser.IllegalExpression);
         Assert.Null(root);
     }
+
+    [Theory]
+    [InlineData(":a :b", "':b'")]
+    [InlineData(":a )", "')'")]
+    [InlineData(":a and :b :c", "':c'")]
+    [InlineData("(:a or :b) :c", "':c'")]
+    public void GivenSomethingAfterACompleteQueryThenTheQueryIsIllegal(string query, string rest)
+    {
+        var problem = _parser.ParseQuery(query).Match(left: Identity, right: _ => string.Empty);
+
+        Assert.Contains($"'{query}'", problem);
+        Assert.Contains(rest, problem);
+    }
+
+    [Theory]
+    [InlineData(":a and", "end")]
+    [InlineData("(:a or :b", "'('")]
+    [InlineData("", "end")]
+    public void GivenAnIncompleteQueryThenTheProblemSaysWhatIsMissing(string query, string missing)
+        => Assert.Contains(missing, _parser.ParseQuery(query).Match(left: Identity, right: _ => string.Empty));
+
+    [Theory]
+    [InlineData(":a and :b")]
+    [InlineData("(:a or :b) and not :c")]
+    public void GivenACompleteQueryThenItParses(string query)
+        => Assert.True(_parser.ParseQuery(query).Match(left: False, right: True));
 
     [Fact]
     public void SingleTag()

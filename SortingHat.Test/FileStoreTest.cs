@@ -19,7 +19,7 @@ public sealed class FileStoreTest : IDisposable
     {
         var path = _hat.TaggedFile("a.txt", ":x");
 
-        var found = _hat.InScope(scope => scope.Resolve<IFile>().Search(":x").Files.Single());
+        var found = _hat.InScope(scope => scope.Resolve<IFile>().Search(":x")).Match(left: problem => throw new InvalidOperationException(problem), right: result => result.Files.Single());
 
         Assert.Equal((DateTimeKind.Utc, File.GetCreationTimeUtc(path)), (found.File.CreatedAt.Kind, found.File.CreatedAt));
     }

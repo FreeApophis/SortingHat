@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Funcky.Lexer;
+using Funcky.Lexer.Extensions;
 using Funcky.Lexer.Token;
+using Funcky.Monads;
 using SortingHat.API.Parser.Nodes;
 using SortingHat.API.Parser.Token;
 
@@ -58,12 +60,29 @@ public class Parser : IParser
         return _nextToken;
     }
 
+    /// <summary>The <paramref name="query"/> as a syntax tree, or why it is no valid query.</summary>
+    public Either<string, IParseNode> ParseQuery(string query)
+    {
+        try
+        {
+            return Either<string, IParseNode>.Right(ParseAll(query));
+        }
+        catch (ExpectedTokenException exception)
+        {
+            return Either<string, IParseNode>.Left($"'{query}' is not a valid query: {Problem(exception)}.");
+        }
+        catch (Exception exception)
+        {
+            return Either<string, IParseNode>.Left($"'{query}' is not a valid query: {exception.Message}");
+        }
+    }
+
     public IParseNode? Parse(string expression)
     {
         try
         {
             _nextToken.Clear();
-            var ast = Parse(_lexerRuleBook.Scan(expression).Walker);
+            var ast = ParseAll(expression);
             _nextToken.Add(new AndToken());
             _nextToken.Add(new OrToken());
             return ast;
@@ -92,5 +111,39 @@ public class Parser : IParser
             IllegalExpression = true;
             return null;
         }
+    }
+
+    private static string Problem(ExpectedTokenException exception)
+        => (exception.ExpectedToken, exception.FoundToken) switch
+        {
+            (EpsilonToken, var found) => $"{Describe(found)} follows a complete query, combine the parts with 'and' or 'or'",
+            (ClosedParenthesisToken, EpsilonToken) => "a '(' is not closed",
+            (ClosedParenthesisToken, var found) => $"{Describe(found)} is where an operator or ')' belongs",
+            (_, EpsilonToken) => "the query ends where a tag, 'not' or '(' is expected",
+            (_, var found) => $"{Describe(found)} is where a tag, 'not' or '(' is expected",
+        };
+
+    private static string Describe(IToken token)
+        => token switch
+        {
+            TagToken tag => $"'{tag.Value}'",
+            AndToken => "'and'",
+            OrToken => "'or'",
+            NotToken => "'not'",
+            OpenParenthesisToken => "'('",
+            ClosedParenthesisToken => "')'",
+            BoolConstantToken constant => constant.Value ? "'true'" : "'false'",
+            _ => $"'{token}'",
+        };
+
+    /// <summary>The whole query is one expression: anything after it makes the query illegal instead of being ignored.</summary>
+    private IParseNode ParseAll(string query)
+    {
+        var walker = _lexerRuleBook.Scan(query).Walker;
+        var ast = Parse(walker);
+
+        return walker.NextIs<EpsilonToken>()
+            ? ast
+            : throw new ExpectedTokenException(new EpsilonToken(), walker.Peek().Token);
     }
 }

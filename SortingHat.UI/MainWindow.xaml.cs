@@ -117,7 +117,7 @@ public partial class MainWindow : MetroWindow, INotifyPropertyChanged
 
         PossibleNextArguments(search);
 
-        Files = _file.Search(search).Files;
+        Files = _file.Search(search).Match(left: _ => [], right: result => result.Files);
 
         return search;
     }

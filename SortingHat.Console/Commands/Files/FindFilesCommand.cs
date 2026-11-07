@@ -6,6 +6,7 @@ using Apophis.CLI;
 using Apophis.CLI.Writer;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
+using SortingHat.API.Models;
 
 namespace SortingHat.CLI.Commands.Files;
 
@@ -34,7 +35,18 @@ internal class FindFilesCommand(IFile fileStore, IConsoleWriter consoleWriter) :
         var search = string.Join(" ", input.Values(Query));
         consoleWriter.WriteLine($"Find Files: {search}");
 
-        var result = fileStore.Search(search);
+        return Task.FromResult(fileStore.Search(search).Match(left: Report, right: result => Show(result, input.Has(Open))));
+    }
+
+    private bool Report(string problem)
+    {
+        consoleWriter.WriteLine(problem);
+
+        return false;
+    }
+
+    private bool Show(SearchResult result, bool open)
+    {
         var files = result.Files.ToList();
 
         foreach (var unknownTag in result.UnknownTags)
@@ -47,7 +59,7 @@ internal class FindFilesCommand(IFile fileStore, IConsoleWriter consoleWriter) :
             var table = new ConsoleTable(4);
             foreach (var file in files)
             {
-                if (input.Has(Open))
+                if (open)
                 {
                     FileHelper.OpenWithAssociatedProgram(file.Path);
                 }
@@ -62,6 +74,6 @@ internal class FindFilesCommand(IFile fileStore, IConsoleWriter consoleWriter) :
             consoleWriter.WriteLine("No files found for your search query...");
         }
 
-        return Task.FromResult(true);
+        return true;
     }
 }

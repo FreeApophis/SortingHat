@@ -52,7 +52,11 @@ public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExist
     {
         console.Writer.WriteLine($"Find Files: {search}");
 
-        var result = fileStore.Search(search);
+        return fileStore.Search(search).Match(left: Report, right: result => ExportResult(result, destinationPath, dryRun));
+    }
+
+    private bool ExportResult(SearchResult result, string destinationPath, bool dryRun)
+    {
         result.UnknownTags.ForEach(unknownTag => console.Writer.WriteLine($"Unknown tag: {unknownTag}"));
 
         var filesByHash = result.Files.GroupByHash().ToList();

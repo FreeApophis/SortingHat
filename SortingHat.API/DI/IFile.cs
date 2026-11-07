@@ -40,7 +40,8 @@ public interface IFile
     /// </summary>
     void RemovePaths(IEnumerable<string> paths);
 
-    SearchResult Search(string query);
+    /// <summary>The files matching the <paramref name="query"/>, or why it is no valid query.</summary>
+    Either<string, SearchResult> Search(string query);
 
     /// <summary>The files stored at more than one path.</summary>
     IReadOnlyList<File> GetDuplicates();

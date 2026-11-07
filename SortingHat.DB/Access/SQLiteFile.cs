@@ -66,10 +66,8 @@ WHERE FilePaths.Path = @filePath";
     public void Store(FileAt file)
         => db.InTransaction(() => FindOrCreate(file));
 
-    public SearchResult Search(string query)
-        => parser.Parse(query) is { } expression
-            ? Search(expression)
-            : new SearchResult([], []);
+    public Either<string, SearchResult> Search(string query)
+        => parser.ParseQuery(query).Select(Search);
 
     public IReadOnlyList<File> GetDuplicates()
         => db.Query(DuplicateQuery, ReadFile);

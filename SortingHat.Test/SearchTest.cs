@@ -103,6 +103,31 @@ public sealed class SearchTest : IDisposable
         Assert.Contains("Unknown tag: :2018", _hat.Lines);
     }
 
+    [Theory]
+    [InlineData(":a :b")]
+    [InlineData(":a and")]
+    [InlineData("(:a or :b")]
+    public void GivenAnIllegalQueryThenFindFilesReportsItInsteadOfFindingNothing(string query)
+    {
+        _hat.TaggedFile("a.txt", ":a");
+
+        Assert.NotEqual(0, _hat.Hat(["find-files", query]));
+
+        Assert.Contains(_hat.Lines, line => line.Contains($"'{query}' is not a valid query"));
+        Assert.DoesNotContain(_hat.Lines, line => line.Contains("No files found"));
+    }
+
+    [Fact]
+    public void GivenAnIllegalQueryThenCopyFilesReportsIt()
+    {
+        var path = _hat.TaggedFile("a.txt", ":a");
+        var destination = System.IO.Directory.CreateDirectory(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(path) ?? string.Empty, "out")).FullName;
+
+        Assert.NotEqual(0, _hat.Hat(["copy-files", ":a :b", destination]));
+
+        Assert.Contains(_hat.Lines, line => line.Contains("':a :b' is not a valid query"));
+    }
+
     public void Dispose()
         => _hat.Dispose();
 }
