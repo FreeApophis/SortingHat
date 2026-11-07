@@ -41,6 +41,11 @@ internal class TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter con
 
         foreach (var file in filePathExtractor.FromFilePatterns(files, input.Has(FileOptions.Recursive)).Select(FileFromPath))
         {
+            if (await file.HasChanged())
+            {
+                consoleWriter.WriteLine($"'{file.Path}' has changed, its tags were carried over to the new content.");
+            }
+
             if (tags.Count == 0)
             {
                 fileStore.Store(file);

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,13 +7,16 @@ using Apophis.CLI.Writer;
 using Apophis.FileSystem;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
+using SortingHat.API.Models;
 
 namespace SortingHat.CLI.Commands;
 
 [UsedImplicitly]
-internal class RepairCommand(IFile fileStore, IExistsFile existsFile, IConsoleWriter consoleWriter) : IDeclaredCommand
+internal class RepairCommand(IFile fileStore, IExistsFile existsFile, Func<File> newFile, IConsoleWriter consoleWriter) : IDeclaredCommand
 {
-    private static readonly OptionDefinition DryRun = new() { Name = "dry-run", ShortName = "n", Description = "Shows the missing paths, without changing the database." };
+    private static readonly OptionDefinition DryRun = new() { Name = "dry-run", ShortName = "n", Description = "Shows what would be repaired, without changing the database." };
+
+    private static readonly OptionDefinition Rehash = new() { Name = "rehash", Description = "Also reads every existing file and hashes it again, to find changes that kept the size and the timestamp." };
 
     public CommandGrouping CommandGrouping => CommandGrouping.General;
     public string Name => "repair";
@@ -22,19 +26,33 @@ internal class RepairCommand(IFile fileStore, IExistsFile existsFile, IConsoleWr
         => """
            The files keep their tags and names: when the same content turns up at a new place,
            'tag-files <path>' links it to them again.
+           With --rehash, a file whose content has changed keeps its path, and its tags are carried over to the new content.
            """;
 
-    public IReadOnlyList<OptionDefinition> Options => [DryRun];
+    public IReadOnlyList<OptionDefinition> Options => [DryRun, Rehash];
 
-    public Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
+    public async Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
     {
-        var missingPaths = fileStore.GetPaths().Where(path => !existsFile.Exists(path)).Distinct().ToList();
+        var paths = fileStore.GetPaths().Distinct().ToList();
+        var missingPaths = paths.Where(path => !existsFile.Exists(path)).ToList();
 
+        RemoveMissingPaths(missingPaths, input.Has(DryRun));
+
+        if (input.Has(Rehash))
+        {
+            await RehashPaths([.. paths.Except(missingPaths)], input.Has(DryRun));
+        }
+
+        return true;
+    }
+
+    private void RemoveMissingPaths(List<string> missingPaths, bool dryRun)
+    {
         if (missingPaths.Count == 0)
         {
             consoleWriter.WriteLine("Every path in the database exists.");
         }
-        else if (input.Has(DryRun))
+        else if (dryRun)
         {
             missingPaths.ForEach(path => consoleWriter.WriteLine($"would remove: {path}"));
             consoleWriter.WriteLine("Dry run: nothing was removed.");
@@ -45,7 +63,37 @@ internal class RepairCommand(IFile fileStore, IExistsFile existsFile, IConsoleWr
             missingPaths.ForEach(path => consoleWriter.WriteLine($"removed: {path}"));
             consoleWriter.WriteLine($"{missingPaths.Count} missing paths removed, the files keep their tags.");
         }
+    }
 
-        return Task.FromResult(true);
+    /// <summary>Storing a file hashed from disk moves its path to the new content and carries the tags over.</summary>
+    private async Task RehashPaths(IReadOnlyList<string> paths, bool dryRun)
+    {
+        var changed = 0;
+
+        foreach (var path in paths)
+        {
+            var stored = newFile();
+            stored.LoadByPathFromDb(path);
+
+            var current = newFile();
+            current.LoadByPath(path);
+
+            if (await stored.Hash != await current.Hash)
+            {
+                changed++;
+                consoleWriter.WriteLine(dryRun
+                    ? $"'{path}' has changed, its tags would be carried over to the new content."
+                    : $"'{path}' has changed, its tags were carried over to the new content.");
+            }
+
+            if (!dryRun)
+            {
+                fileStore.Store(current);
+            }
+        }
+
+        consoleWriter.WriteLine(dryRun
+            ? $"Dry run: {paths.Count} files hashed again, {changed} changed, no hash was updated."
+            : $"{paths.Count} files hashed again, {changed} changed.");
     }
 }

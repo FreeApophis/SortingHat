@@ -19,6 +19,13 @@ public class File(IFile file, IHashService hashService)
     /// <summary>The fingerprint of <see cref="Path"/> when <see cref="Hash"/> was computed, when known.</summary>
     public Option<PathFingerprint> Fingerprint { get; set; }
 
+    /// <summary>The hash stored for <see cref="Path"/>, when the file was hashed again because it might have changed.</summary>
+    public Option<Task<string>> PreviousHash { get; private set; }
+
+    /// <summary>Whether the file at <see cref="Path"/> was hashed again and its content differs from the stored one.</summary>
+    public Task<bool> HasChanged()
+        => PreviousHash.Match(none: () => Task.FromResult(false), some: async previous => await previous != await Hash);
+
     public void LoadByPathFromDb(string filePath)
     {
         Path = filePath;
@@ -71,11 +78,12 @@ public class File(IFile file, IHashService hashService)
         Path = path;
 
         var current = new FileInfo(path);
-        var trusted = file.LoadByPath(this)
-            && Fingerprint.Match(none: false, some: fingerprint => fingerprint.StillMatches(current.Length, current.LastWriteTimeUtc));
+        var known = file.LoadByPath(this);
+        var trusted = known && Fingerprint.Match(none: false, some: fingerprint => fingerprint.StillMatches(current.Length, current.LastWriteTimeUtc));
 
         if (!trusted)
         {
+            PreviousHash = known ? Option.Some(Hash) : Option<Task<string>>.None;
             LoadByPath(path);
         }
     }

@@ -86,8 +86,113 @@ public sealed class StaleHashTest : IDisposable
         Assert.Contains(_hat.Lines, IsHashing);
     }
 
+    [Fact]
+    public void GivenAnEditedFileThenItKeepsItsTags()
+    {
+        var path = OldFile("a.txt", "content");
+        _hat.Hat(["tag-files", ":x", path]);
+        File.WriteAllText(path, "edited and longer content");
+
+        _hat.Hat(["tag-files", path]);
+
+        Assert.Equal(["a.txt"], _hat.FindFiles(":x"));
+    }
+
+    [Fact]
+    public void GivenAnEditedFileTaggedAgainThenItHasItsOldAndItsNewTags()
+    {
+        var path = OldFile("a.txt", "content");
+        _hat.Hat(["tag-files", ":x", path]);
+        File.WriteAllText(path, "edited and longer content");
+
+        _hat.Hat(["tag-files", ":y", path]);
+
+        Assert.Equal(["a.txt"], _hat.FindFiles(":x and :y"));
+    }
+
+    [Fact]
+    public void GivenAnEditedFileThenTaggingReportsTheChange()
+    {
+        var path = OldFile("a.txt", "content");
+        _hat.Hat(["tag-files", ":x", path]);
+        File.WriteAllText(path, "edited and longer content");
+
+        _hat.Hat(["tag-files", ":y", path]);
+
+        Assert.Contains(_hat.Lines, line => line.Contains(path) && line.Contains("has changed"));
+    }
+
+    [Fact]
+    public void GivenAFileWithANewTimestampButTheSameContentThenNoChangeIsReported()
+    {
+        var path = OldFile("a.txt", "content");
+        _hat.Hat(["tag-files", ":x", path]);
+        File.SetLastWriteTimeUtc(path, DateTime.UtcNow.AddMinutes(-30));
+
+        _hat.Hat(["tag-files", ":y", path]);
+
+        Assert.Contains(_hat.Lines, IsHashing);
+        Assert.DoesNotContain(_hat.Lines, line => line.Contains("has changed"));
+    }
+
+    [Fact]
+    public void GivenAnEditThatKeepsSizeAndTimestampThenRepairRehashFindsIt()
+    {
+        var path = HiddenEdit("a.txt", ":x");
+
+        Assert.Equal(0, _hat.Hat(["repair", "--rehash"]));
+        Assert.Contains(_hat.Lines, line => line.Contains(path) && line.Contains("has changed"));
+
+        _hat.Hat(["tag-files", ":y", path]);
+        _hat.Hat(["untag-files", ":y", path]);
+        Assert.Empty(_hat.FindFiles(":y"));
+        Assert.Equal(["a.txt"], _hat.FindFiles(":x"));
+    }
+
+    [Fact]
+    public void GivenADryRunThenRepairRehashReportsTheChangeButKeepsTheOldHash()
+    {
+        var path = HiddenEdit("a.txt", ":x");
+
+        Assert.Equal(0, _hat.Hat(["repair", "--rehash", "--dry-run"]));
+        Assert.Contains(_hat.Lines, line => line.Contains(path) && line.Contains("has changed"));
+
+        _hat.Hat(["repair", "--rehash"]);
+        Assert.Contains(_hat.Lines, line => line.Contains(path) && line.Contains("has changed"));
+    }
+
+    [Fact]
+    public void GivenUnchangedFilesThenRepairRehashReportsNoChange()
+    {
+        var path = OldFile("a.txt", "content");
+        _hat.Hat(["tag-files", ":x", path]);
+
+        Assert.Equal(0, _hat.Hat(["repair", "--rehash"]));
+        Assert.DoesNotContain(_hat.Lines, line => line.Contains("has changed"));
+    }
+
+    [Fact]
+    public void GivenTheHelpOfRepairThenItOffersToRehash()
+    {
+        Assert.Equal(0, _hat.Hat(["repair", "--help"]));
+        Assert.Contains(_hat.Lines, line => line.Contains("--rehash"));
+    }
+
     public void Dispose()
         => _hat.Dispose();
+
+    /// <summary>A tagged file whose content changes while its size and timestamp stay, like with tools that keep the date.</summary>
+    private string HiddenEdit(string name, string tag)
+    {
+        var path = OldFile(name, "content");
+        _hat.Hat(["tag-files", tag, path]);
+
+        var timestamp = File.GetLastWriteTimeUtc(path);
+        File.WriteAllText(path, "CONTENT");
+        File.SetLastWriteTimeUtc(path, timestamp);
+
+        return path;
+    }
 
     private static bool IsHashing(string line)
         => line.StartsWith("Hashing:");

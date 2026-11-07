@@ -180,11 +180,15 @@ HAVING DuplicateCount > 1";
     }
 
     /// <summary>
-    /// A path holds one content at a time: when an edited file is stored, its path leaves the old content.
-    /// The fingerprint is stored with the path, or updated when the path is already known.
+    /// A path holds one content at a time: when an edited file is stored, its path leaves the old content, and the tags follow the path
+    /// (the new content gets a copy, the old content keeps its own). The fingerprint is stored with the path, or updated when the path is already known.
     /// </summary>
     private void InsertFilePath(File file, long fileId)
     {
+        db.ExecuteNonQuery(
+            "INSERT OR IGNORE INTO FileTags (TagId, FileId) SELECT TagId, @fileId FROM FileTags WHERE FileId IN (SELECT FileId FROM FilePaths WHERE Path = @filePath AND FileId <> @fileId);",
+            new SqliteParameter("@fileId", fileId),
+            new SqliteParameter("@filePath", file.Path));
         db.ExecuteNonQuery("DELETE FROM FilePaths WHERE Path = @filePath AND FileId <> @fileId;", new SqliteParameter("@fileId", fileId), new SqliteParameter("@filePath", file.Path));
         db.ExecuteNonQuery(
             """
