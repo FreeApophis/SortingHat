@@ -26,11 +26,13 @@ public class File(IFile file, IHashService hashService)
     public Task<bool> HasChanged()
         => PreviousHash.Match(none: () => Task.FromResult(false), some: async previous => await previous != await Hash);
 
-    public void LoadByPathFromDb(string filePath)
+    /// <summary>Loads what the database knows about <paramref name="filePath"/>.</summary>
+    /// <returns>Whether the database knows the path; when it does not, nothing is loaded.</returns>
+    public bool LoadByPathFromDb(string filePath)
     {
         Path = filePath;
 
-        file.LoadByPath(this);
+        return file.LoadByPath(this);
     }
 
     /// <summary>Hashes the file at <paramref name="filePath"/>, its fingerprint is taken right before.</summary>

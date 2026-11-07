@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Apophis.CLI.Writer;
+using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
@@ -28,36 +30,36 @@ internal class FileInfoCommand(IConsoleWriter consoleWriter, IFilePathExtractor 
             consoleWriter.WriteLine();
             consoleWriter.WriteLine($"File: {filePath}");
 
-            var file = newFile();
-
-            file.LoadByPathFromDb(filePath);
-            if (file.Hash == null)
+            foreach (var line in (await Report(filePath)).Lines)
             {
-                consoleWriter.WriteLine("File not in index!");
-            }
-            else
-            {
-                consoleWriter.WriteLine($"CreatedAt (oldest): {file.CreatedAt}");
-                consoleWriter.WriteLine($"File Size: {file.Size}");
-                consoleWriter.WriteLine($"File Hash: {await file.Hash}");
-
-                foreach (var tag in await file.GetTags())
-                {
-                    consoleWriter.WriteLine($"Tag: {tag.FullName}");
-                }
-
-                foreach (var name in await file.GetNames())
-                {
-                    consoleWriter.WriteLine($"Name: {name}");
-                }
-
-                foreach (var path in await file.GetPaths())
-                {
-                    consoleWriter.WriteLine($"Path: {path}");
-                }
+                consoleWriter.WriteLine(line);
             }
         }
 
         return true;
+    }
+
+    private static async Task<FileDetails> Details(File file)
+        => new(
+            file.CreatedAt,
+            file.Size,
+            await file.Hash,
+            [.. (await file.GetTags()).Select(tag => tag.FullName)],
+            [.. await file.GetNames()],
+            [.. await file.GetPaths()]);
+
+    private async Task<FileInfoReport> Report(string path)
+    {
+        var stored = newFile();
+        var known = stored.LoadByPathFromDb(path);
+
+        // the stored hash while the file is unchanged, otherwise the file is hashed again
+        var current = newFile();
+        current.LoadByPathFromDbWithFallback(path);
+
+        return FileInfoReport.Decide(
+            known ? await Details(stored) : Option<FileDetails>.None,
+            await current.HasChanged(),
+            await Details(current));
     }
 }
