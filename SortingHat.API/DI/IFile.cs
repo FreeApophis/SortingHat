@@ -28,6 +28,12 @@ public interface IFile
     /// </summary>
     Task MovePath(File file, string destinationPath);
 
+    /// <summary>
+    /// Forgets the <paramref name="paths"/>, for example because the files no longer exist there. The files themselves keep
+    /// their tags and names: storing or tagging the same content at a new place links it to them again.
+    /// </summary>
+    void RemovePaths(IEnumerable<string> paths);
+
     SearchResult Search(string query);
 
     IEnumerable<File> GetDuplicates();

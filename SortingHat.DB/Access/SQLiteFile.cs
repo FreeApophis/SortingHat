@@ -58,6 +58,14 @@ HAVING DuplicateCount > 1";
             new SqliteParameter("@hash", hash));
     }
 
+    public void RemovePaths(IEnumerable<string> paths)
+        => db.InTransaction(() =>
+        {
+            paths.ForEach(path => db.ExecuteNonQuery("DELETE FROM FilePaths WHERE Path = @path", new SqliteParameter("@path", path)));
+
+            return true;
+        });
+
     public bool Store(File file)
     {
         FindOrCreate(file).Wait();

@@ -114,14 +114,65 @@ public sealed class GeneralCommandTest : IDisposable
     }
 
     [Fact]
-    public void GivenADeletedFileThenRepairReportsItAsMissingWithoutClaimingToRemoveIt()
+    public void GivenADeletedFileThenRepairRemovesItsPath()
     {
         var path = _hat.TaggedFile("a.txt", ":x");
+        _hat.TaggedFile("b.txt", ":x");
         File.Delete(path);
 
         Assert.Equal(0, _hat.Hat(["repair"]));
-        Assert.Contains(_hat.Lines, line => line.Contains(path) && line.Contains("missing"));
-        Assert.DoesNotContain(_hat.Lines, line => line.Contains("removed"));
+        Assert.Contains(_hat.Lines, line => line.Contains("removed") && line.Contains(path));
+
+        Assert.Equal(["b.txt"], _hat.FindFiles(":x"));
+    }
+
+    [Fact]
+    public void GivenARepairedDatabaseThenRepairFindsNothingMore()
+    {
+        var path = _hat.TaggedFile("a.txt", ":x");
+        File.Delete(path);
+        _hat.Hat(["repair"]);
+
+        Assert.Equal(0, _hat.Hat(["repair"]));
+        Assert.Contains("Every path in the database exists.", _hat.Lines);
+    }
+
+    [Theory]
+    [InlineData("--dry-run")]
+    [InlineData("-n")]
+    public void GivenADryRunThenRepairShowsTheMissingPathsButKeepsThem(string dryRun)
+    {
+        var path = _hat.TaggedFile("a.txt", ":x");
+        _hat.TaggedFile("b.txt", ":x");
+        File.Delete(path);
+
+        Assert.Equal(0, _hat.Hat(["repair", dryRun]));
+        Assert.Contains(_hat.Lines, line => line.Contains("would remove") && line.Contains(path));
+        Assert.Contains("Dry run: nothing was removed.", _hat.Lines);
+
+        Assert.Equal(["a.txt", "b.txt"], _hat.FindFiles(":x"));
+    }
+
+    [Fact]
+    public void GivenAFileMovedOutsideHatThenAfterRepairStoringItAgainBringsBackItsTags()
+    {
+        var path = _hat.TaggedFile("a.txt", ":x");
+        var newPath = Path.Combine(Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(path) ?? string.Empty, "elsewhere")).FullName, "a.txt");
+        File.Move(path, newPath);
+
+        _hat.Hat(["repair"]);
+        _hat.Hat(["tag-files", newPath]);
+
+        _hat.Hat(["ff", ":x"]);
+        Assert.Contains(_hat.Lines, line => line.TrimEnd().EndsWith(newPath));
+        Assert.DoesNotContain(_hat.Lines, line => line.TrimEnd().EndsWith(path));
+    }
+
+    [Fact]
+    public void GivenTheHelpOfRepairThenItOffersADryRun()
+    {
+        Assert.Equal(0, _hat.Hat(["repair", "--help"]));
+        Assert.Contains(_hat.Lines, line => line.Contains("-n, --dry-run"));
     }
 
     public void Dispose()
