@@ -9,7 +9,7 @@ internal class FolderFromFileAutoTag : IntegerAutoTag
     public override string AutoTagKey => "Folder.FromFile.<>";
 
     public override string Description =>
-        @"Path element counted from the right: C:\User\File.ext 0 => File.ext, 1 => User, 2 => C:";
+        @"Folder counted from the file: C:\User\Path\File.ext 0 => Path, 1 => User, 2 => C:\";
 
     protected override string? HandleTag(FileInfo file, int index)
     {

@@ -33,7 +33,9 @@ public class CoreModule : Module
         builder.Register(context => new HashService(context.Resolve<Func<HashAlgorithm>>(), nameof(SHA256), context.Resolve<IConsoleWriter>())).As<IHashService>().SingleInstance();
 
         builder.RegisterType<CreatedAtAutoTag>().As<IAutoTag>().SingleInstance();
+        builder.RegisterType<UpdatedAtAutoTag>().As<IAutoTag>().SingleInstance();
         builder.RegisterType<FolderFromRootAutoTag>().As<IAutoTag>().SingleInstance();
+        builder.RegisterType<FolderFromFileAutoTag>().As<IAutoTag>().SingleInstance();
 
         builder.RegisterType<PluginLoader>().As<IPluginLoader>().SingleInstance();
         builder.RegisterInstance(new PluginDirectory(Path.Combine(AppContext.BaseDirectory, "plugins")));
