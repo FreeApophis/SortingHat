@@ -20,6 +20,10 @@ public sealed record TagName
 
     public string Value { get; }
 
+    /// <summary>The name in upper case: names with the same key are the same name. The database finds and keeps tags unique by it.</summary>
+    public string Key
+        => KeyOf(Value);
+
     /// <summary>Returns the name, or why <paramref name="name"/> cannot be one.</summary>
     public static Either<string, TagName> Parse(string name)
         => Problem(name).Match(
@@ -45,6 +49,10 @@ public sealed record TagName
 
     public override string ToString()
         => Value;
+
+    /// <summary>The key of a name, also for names in older databases that are no <see cref="TagName"/> yet.</summary>
+    public static string KeyOf(string name)
+        => name.ToUpperInvariant();
 
     /// <summary>Whether a tag name can contain the <paramref name="character"/>. The query lexer reads tags with the same rule.</summary>
     internal static bool IsAllowed(char character)

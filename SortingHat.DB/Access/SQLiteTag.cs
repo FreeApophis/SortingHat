@@ -91,10 +91,10 @@ public class SQLiteTag(SQLiteProjectDatabase db) : ITag
         => new("@parentId", parentId.Match(none: DBNull.Value, some: id => (object)id));
 
     private Option<long> FindChild(Option<long> parentId, TagName name)
-        => Option.FromNullable(db.ExecuteScalar("SELECT Id FROM Tags WHERE ParentId IS @parentId AND Name = @name", ParentIdParameter(parentId), new SqliteParameter("@name", name.Value)) as long?);
+        => Option.FromNullable(db.ExecuteScalar("SELECT Id FROM Tags WHERE ParentId IS @parentId AND NameKey = @key", ParentIdParameter(parentId), new SqliteParameter("@key", name.Key)) as long?);
 
     private long Create(Option<long> parentId, TagName name)
-        => db.ExecuteScalar("INSERT INTO Tags (ParentId, Name) VALUES(@parentId, @name); SELECT last_insert_rowid();", ParentIdParameter(parentId), new SqliteParameter("@name", name.Value)) is long id
+        => db.ExecuteScalar("INSERT INTO Tags (ParentId, Name, NameKey) VALUES(@parentId, @name, @key); SELECT last_insert_rowid();", ParentIdParameter(parentId), new SqliteParameter("@name", name.Value), new SqliteParameter("@key", name.Key)) is long id
             ? id
             : throw new InvalidOperationException($"Tag '{name}' could not be created.");
 
@@ -111,7 +111,7 @@ public class SQLiteTag(SQLiteProjectDatabase db) : ITag
 
     /// <summary>The unique tag name indexes reject a new name that one of its siblings already has.</summary>
     private Func<long, bool> RenameTag(TagName newName)
-        => tagId => UnlessRejected(() => Execute("UPDATE Tags SET Name = @tagName WHERE Id = @tagId", new SqliteParameter("@tagId", tagId), new SqliteParameter("@tagName", newName.Value)));
+        => tagId => UnlessRejected(() => Execute("UPDATE Tags SET Name = @tagName, NameKey = @key WHERE Id = @tagId", new SqliteParameter("@tagId", tagId), new SqliteParameter("@tagName", newName.Value), new SqliteParameter("@key", newName.Key)));
 
     /// <summary>The unique tag name indexes reject a destination that already has a child with the same name.</summary>
     private bool MoveTag(long tagId, long destinationTagId)

@@ -15,6 +15,7 @@ public class SqliteDatabaseModule : Module
     {
         builder.RegisterType<RevisionMigrator>().As<IRevisionMigrator>().InstancePerLifetimeScope();
         builder.RegisterType<TagNameGrammarMigration>().As<ICodeMigration>().SingleInstance();
+        builder.RegisterType<TagNameKeyMigration>().As<ICodeMigration>().SingleInstance();
 
         // Register Databases
         builder.Register(CreateProjectDatabase()).As<SQLiteProjectDatabase>().As<IProjectDatabase>().InstancePerLifetimeScope();

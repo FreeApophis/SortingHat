@@ -81,9 +81,11 @@ public sealed class TagGrammarTest : IDisposable
         {
             var db = scope.Resolve<SQLiteProjectDatabase>();
 
+            // an older database runs both migrations, in their order
             return db.InTransaction(() =>
             {
                 new TagNameGrammarMigration().Run(db);
+                new TagNameKeyMigration().Run(db);
 
                 return true;
             });

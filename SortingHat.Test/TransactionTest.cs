@@ -46,7 +46,7 @@ public sealed class TransactionTest : IDisposable
 
     private static bool InsertTag(ILifetimeScope scope, string name)
     {
-        scope.Resolve<SQLiteProjectDatabase>().ExecuteNonQuery("INSERT INTO Tags (Name) VALUES (@name)", new Microsoft.Data.Sqlite.SqliteParameter("@name", name));
+        scope.Resolve<SQLiteProjectDatabase>().ExecuteNonQuery("INSERT INTO Tags (Name, NameKey) VALUES (@name, upper(@name))", new Microsoft.Data.Sqlite.SqliteParameter("@name", name));
 
         return true;
     }
