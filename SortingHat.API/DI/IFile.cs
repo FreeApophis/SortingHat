@@ -22,6 +22,12 @@ public interface IFile
 
     Task<IEnumerable<string>> GetNames(File file);
 
+    /// <summary>
+    /// Records that the <paramref name="file"/>, found at its <see cref="File.Path"/>, now lives at <paramref name="destinationPath"/>.
+    /// Only this file's path changes, its other paths stay.
+    /// </summary>
+    Task MovePath(File file, string destinationPath);
+
     SearchResult Search(string query);
 
     IEnumerable<File> GetDuplicates();

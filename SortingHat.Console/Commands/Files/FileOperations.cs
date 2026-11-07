@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Apophis.CLI;
 using Apophis.FileSystem;
+using Funcky.Extensions;
 using SortingHat.API.DI;
 using Console = Apophis.CLI.Console;
 using File = SortingHat.API.Models.File;
@@ -14,7 +16,7 @@ public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExist
     where TFileOperation : IFileOperation
 {
     /// <summary>Puts the files found by <paramref name="search"/> into the folder <paramref name="destination"/>, relative to the current folder.</summary>
-    public bool ExportFiles(string search, string destination)
+    public async Task<bool> ExportFiles(string search, string destination)
     {
         var destinationPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), destination));
 
@@ -32,39 +34,41 @@ public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExist
         return filesByHash.Count switch
         {
             0 => EmptyQuery(),
-            _ => ExportEachFile(filesByHash, destinationPath),
+            _ => await ExportEachFile(filesByHash, destinationPath),
         };
     }
 
-    private bool ExportEachFile(List<HashGroup> filesByHash, string destinationPath)
+    /// <summary>Stops at the first file that fails, the files before it are already exported.</summary>
+    private async Task<bool> ExportEachFile(List<HashGroup> filesByHash, string destinationPath)
     {
-        bool result = true;
-        foreach (var file in filesByHash)
+        foreach (var fileGroup in filesByHash)
         {
-            result = result && file.Files.Count() switch
+            if (!await ExportFileGroup(fileGroup, destinationPath))
             {
-                0 => throw new NotImplementedException("How did that happen?"),
-                1 => ExportFile(file.Files.First(), destinationPath),
-                _ => ChoseFileToExport(file, destinationPath),
-            };
+                console.Writer.WriteLine("Last file failed, process aborted...");
+
+                return false;
+            }
         }
 
-        if (!result)
-        {
-            console.Writer.WriteLine("Last file failed, process aborted...");
-        }
-
-        return result;
+        return true;
     }
 
-    private bool ChoseFileToExport(HashGroup fileGroup, string destinationPath)
+    private Task<bool> ExportFileGroup(HashGroup fileGroup, string destinationPath)
+        => fileGroup.Files.ToList() switch
+        {
+            [var file] => ExportFile(file, destinationPath),
+            var files => ChooseFileToExport(fileGroup.Hash, files, destinationPath),
+        };
+
+    private Task<bool> ChooseFileToExport(string hash, IReadOnlyList<File> files, string destinationPath)
     {
         console.Writer.WriteLine();
-        console.Writer.WriteLine($" The file with hash {fileGroup.Hash.ShortHash().GetOrElse(fileGroup.Hash)} has multiple sources, which one you want to copy:");
+        console.Writer.WriteLine($" The file with hash {hash.ShortHash().GetOrElse(hash)} has multiple sources, which one you want to copy:");
 
         var consoleTable = new ConsoleTable(2);
 
-        foreach (var (file, index) in fileGroup.Files.Select((f, i) => (f, i)))
+        foreach (var (file, index) in files.Select((file, index) => (file, index)))
         {
             consoleTable.Append(FileSelectionIndex(file.Path, index), file.Path);
         }
@@ -73,8 +77,15 @@ public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExist
 
         return console.Reader
             .ReadInt()
-            .AndThen(selectedFileIndex => ExportFile(fileGroup.Files.Skip(selectedFileIndex).FirstOrDefault(), destinationPath))
-            .GetOrElse(false);
+            .SelectMany(index => files.ElementAtOrNone(index))
+            .Match(none: NoFileChosen, some: file => ExportFile(file, destinationPath));
+    }
+
+    private Task<bool> NoFileChosen()
+    {
+        console.Writer.WriteLine("No file chosen.");
+
+        return Task.FromResult(false);
     }
 
     private bool EmptyQuery()
@@ -84,37 +95,31 @@ public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExist
         return false;
     }
 
-    private bool ExportFile(File? sourceFile, string destinationPath)
+    /// <summary>A moved file gets its new path in the database, but only after the move on disk has worked.</summary>
+    private async Task<bool> ExportFile(File sourceFile, string destinationPath)
     {
-        if (sourceFile is { } && Path.GetFileName(sourceFile.Path) is { } fileName)
+        var destinationFilePath = Path.Combine(destinationPath, Path.GetFileName(sourceFile.Path));
+
+        switch (fileOperation)
         {
-            var destinationFilePath = Path.Combine(destinationPath, fileName);
-
-            switch (fileOperation)
-            {
-                case ICopyFile copyFile:
-                    console.Writer.WriteLine($"cp {sourceFile.Path} {destinationFilePath}");
-                    copyFile.Copy(sourceFile.Path, destinationFilePath);
-                    break;
-                case IMoveFile moveFile:
-                    console.Writer.WriteLine($"mv {sourceFile.Path} {destinationFilePath}");
-                    moveFile.Move(sourceFile.Path, destinationFilePath);
-                    break;
-                default:
-                    throw new NotImplementedException("Unknown file operation");
-            }
-
-            return true;
+            case ICopyFile copyFile:
+                console.Writer.WriteLine($"cp {sourceFile.Path} {destinationFilePath}");
+                copyFile.Copy(sourceFile.Path, destinationFilePath);
+                break;
+            case IMoveFile moveFile:
+                console.Writer.WriteLine($"mv {sourceFile.Path} {destinationFilePath}");
+                moveFile.Move(sourceFile.Path, destinationFilePath);
+                await fileStore.MovePath(sourceFile, destinationFilePath);
+                break;
+            default:
+                throw new NotImplementedException("Unknown file operation");
         }
 
-        console.Writer.WriteLine("Source unusable.");
-        return false;
+        return true;
     }
 
-    private string FileSelectionIndex(string filePath, in int index)
-    {
-        return existsFile.Exists(filePath)
+    private string FileSelectionIndex(string filePath, int index)
+        => existsFile.Exists(filePath)
             ? $"[{index}]"
             : "[-]";
-    }
 }

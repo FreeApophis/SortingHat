@@ -18,5 +18,5 @@ internal sealed class CopyFilesCommand(FileOperations<ICopyFile> copyFileOperati
     public IReadOnlyList<ArgumentDefinition> Arguments => [FileOperationArguments.Search, FileOperationArguments.Destination];
 
     public Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
-        => Task.FromResult(FileOperationArguments.Run(input, copyFileOperation.ExportFiles));
+        => FileOperationArguments.Run(input, copyFileOperation.ExportFiles);
 }

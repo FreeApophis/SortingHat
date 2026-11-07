@@ -47,6 +47,17 @@ HAVING DuplicateCount > 1";
             .AndThen(ids => db.ExecuteNonQuery("DELETE FROM FileTags WHERE TagId = @tagId AND FileId = @fileId;", new SqliteParameter("@fileId", ids.FileId), new SqliteParameter("@tagId", ids.TagId)));
     }
 
+    public async Task MovePath(File file, string destinationPath)
+    {
+        var hash = await file.Hash;
+
+        db.ExecuteNonQuery(
+            "UPDATE FilePaths SET Path = @destinationPath WHERE Path = @sourcePath AND FileId = (SELECT Id FROM Files WHERE Hash = @hash)",
+            new SqliteParameter("@destinationPath", destinationPath),
+            new SqliteParameter("@sourcePath", file.Path),
+            new SqliteParameter("@hash", hash));
+    }
+
     public bool Store(File file)
     {
         FindOrCreate(file).Wait();

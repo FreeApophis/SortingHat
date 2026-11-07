@@ -99,6 +99,61 @@ public sealed class FileCommandTest : IDisposable
     }
 
     [Fact]
+    public void GivenAMovedFileThenFindFilesShowsItsNewPath()
+    {
+        var path = _hat.TaggedFile("a.txt", ":x");
+        var destination = Destination(path);
+
+        _hat.Hat(["mv", ":x", destination]);
+
+        _hat.Hat(["ff", ":x"]);
+        Assert.Contains(_hat.Lines, line => line.TrimEnd().EndsWith(Path.Combine(destination, "a.txt")));
+        Assert.DoesNotContain(_hat.Lines, line => line.TrimEnd().EndsWith(path));
+    }
+
+    [Fact]
+    public void GivenAMovedFileThenCopyFilesCopiesItFromItsNewPath()
+    {
+        var path = _hat.TaggedFile("a.txt", ":x");
+        var destination = Destination(path);
+        var copies = Directory.CreateDirectory(Path.Combine(destination, "copies")).FullName;
+
+        _hat.Hat(["mv", ":x", destination]);
+
+        Assert.Equal(0, _hat.Hat(["cp", ":x", copies]));
+        Assert.True(File.Exists(Path.Combine(copies, "a.txt")));
+    }
+
+    [Fact]
+    public void GivenAMovedFileThenRepairDoesNotReportItMissing()
+    {
+        var path = _hat.TaggedFile("a.txt", ":x");
+
+        _hat.Hat(["mv", ":x", Destination(path)]);
+
+        _hat.Hat(["repair"]);
+        Assert.DoesNotContain(_hat.Lines, line => line.Contains("missing"));
+    }
+
+    [Fact]
+    public void GivenTwoCopiesOfAFileThenMoveFilesMovesOnlyTheChosenOneInTheDatabase()
+    {
+        var first = _hat.TaggedFile("a.txt", ":x");
+        var second = Path.Combine(Path.GetDirectoryName(first) ?? string.Empty, "copy-of-a.txt");
+        File.Copy(first, second);
+        _hat.Hat(["tag-files", ":x", second]);
+        var destination = Destination(first);
+        _hat.Keyboard.Type("0");
+
+        Assert.Equal(0, _hat.Hat(["mv", ":x", destination]));
+
+        _hat.Hat(["ff", ":x"]);
+        Assert.Contains(_hat.Lines, line => line.TrimEnd().EndsWith(Path.Combine(destination, "a.txt")));
+        Assert.Contains(_hat.Lines, line => line.TrimEnd().EndsWith(second));
+        Assert.DoesNotContain(_hat.Lines, line => line.TrimEnd().EndsWith(first));
+    }
+
+    [Fact]
     public void GivenOnlyASearchThenCopyFilesAsksForTheDestination()
     {
         Assert.NotEqual(0, _hat.Hat(["copy-files", ":x"]));

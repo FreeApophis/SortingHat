@@ -18,5 +18,5 @@ internal class MoveFilesCommand(FileOperations<IMoveFile> moveFileOperation) : I
     public IReadOnlyList<ArgumentDefinition> Arguments => [FileOperationArguments.Search, FileOperationArguments.Destination];
 
     public Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
-        => Task.FromResult(FileOperationArguments.Run(input, moveFileOperation.ExportFiles));
+        => FileOperationArguments.Run(input, moveFileOperation.ExportFiles);
 }
