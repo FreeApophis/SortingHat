@@ -1,228 +1,119 @@
-﻿using System.Linq;
+﻿using System;
 using SortingHat.API.Parser;
 using SortingHat.API.Parser.Nodes;
 using SortingHat.API.Parser.OperatorType;
-using SortingHat.API.Parser.Token;
 using Xunit;
 using static Funcky.Functional;
 
 namespace SortingHat.Test;
 
-public class ParserTest
+/// <summary>The query parser is a pure function: a query gives its syntax tree, or the error with its position and what was expected there.</summary>
+public sealed class ParserTest
 {
-    private const string SelectStatement = @"SELECT Files.CreatedAt, Files.Hash, Files.Size, FilePaths.Path
-FROM Files
-JOIN FilePaths ON FilePaths.FileId = Files.Id
-WHERE (0 OR (0 AND 0))
-GROUP BY FilePaths.Id";
-
     private readonly Parser _parser = Parser.Create();
 
     [Fact]
-    public void EmptySearch()
-    {
-        var root = _parser.Parse(" ");
+    public void GivenATagThenItIsATagNode()
+        => Assert.Equal(":tax:2018", Assert.IsType<TagNode>(Valid(":tax:2018")).Tag);
 
-        Assert.True(_parser.IllegalExpression);
-        Assert.Null(root);
+    [Theory]
+    [InlineData(":test or true and (:movie or not :blue)", "(:test ∨ (true ∧ (:movie ∨ ¬:blue)))")]
+    [InlineData(":A || :B && :C", "(:A ∨ (:B ∧ :C))")]
+    [InlineData("(:A or :B) and :C", "((:A ∨ :B) ∧ :C)")]
+    public void GivenAQueryThenAndBindsStrongerThanOr(string query, string tree)
+        => Assert.Equal(tree, Written(Valid(query), new LogicalOperatorType()));
+
+    [Theory]
+    [InlineData(":A || :B || :C || :D", "(((:A || :B) || :C) || :D)")]
+    [InlineData(":A && :B && :C && :D", "(((:A && :B) && :C) && :D)")]
+    public void GivenTheSameOperatorSeveralTimesThenItGroupsFromTheLeft(string query, string tree)
+        => Assert.Equal(tree, Written(Valid(query), new ProgrammingOperatorType()));
+
+    [Fact]
+    public void GivenSeveralNotsThenEachOneNegates()
+        => Assert.Equal("(not(not(not(:A))) and not(not(:B)))", Written(Valid("!!!:A && !!:B"), new TextOperatorType()));
+
+    [Fact]
+    public void GivenTheSameQueryTwiceThenTheParserGivesTheSameResultBecauseItKeepsNoState()
+    {
+        _ = _parser.Parse(":a :b");
+
+        Assert.Equal(":a", Assert.IsType<TagNode>(Valid(":a")).Tag);
     }
 
     [Theory]
-    [InlineData(":a :b", "':b'")]
-    [InlineData(":a )", "')'")]
-    [InlineData(":a and :b :c", "':c'")]
-    [InlineData("(:a or :b) :c", "':c'")]
-    public void GivenSomethingAfterACompleteQueryThenTheQueryIsIllegal(string query, string rest)
+    [InlineData(":a :b", "':b'", 3)]
+    [InlineData(":a )", "')'", 3)]
+    [InlineData(":a and :b :c", "':c'", 10)]
+    [InlineData("(:a or :b) :c", "':c'", 11)]
+    public void GivenSomethingAfterACompleteQueryThenTheQueryIsIllegalAtThatPosition(string query, string rest, int position)
     {
-        var problem = _parser.ParseQuery(query).Match(left: Identity, right: _ => string.Empty);
+        var error = Error(query);
 
-        Assert.Contains($"'{query}'", problem);
-        Assert.Contains(rest, problem);
+        Assert.Contains($"'{query}'", error.Message);
+        Assert.Contains(rest, error.Message);
+        Assert.Equal((position, false), (error.Position, error.IsIncomplete));
     }
 
     [Theory]
     [InlineData(":a and", "end")]
     [InlineData("(:a or :b", "'('")]
     [InlineData("", "end")]
-    public void GivenAnIncompleteQueryThenTheProblemSaysWhatIsMissing(string query, string missing)
-        => Assert.Contains(missing, _parser.ParseQuery(query).Match(left: Identity, right: _ => string.Empty));
+    public void GivenAnIncompleteQueryThenTheErrorSaysWhatIsMissing(string query, string missing)
+        => Assert.Contains(missing, Error(query).Message);
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    [InlineData("(:tag and ")]
+    [InlineData("not ")]
+    [InlineData("(not ")]
+    public void GivenAQueryThatEndsWhereAnOperandBelongsThenATagNotOrParenthesisIsExpected(string query)
+    {
+        Assert.True(Error(query).IsIncomplete);
+        Assert.Equal([QueryPart.Tag, QueryPart.Not, QueryPart.OpenParenthesis], Error(query).Expected);
+    }
+
+    [Theory]
+    [InlineData("(:tag")]
+    [InlineData("(:test or ((:tag or :bla and :fun) and :x")]
+    public void GivenAQueryThatEndsInsideParenthesesThenAnOperatorOrTheClosingParenthesisIsExpected(string query)
+    {
+        Assert.True(Error(query).IsIncomplete);
+        Assert.Equal([QueryPart.And, QueryPart.Or, QueryPart.ClosedParenthesis], Error(query).Expected);
+    }
+
+    [Fact]
+    public void GivenAnErrorInTheMiddleThenTheQueryIsNotIncomplete()
+        => Assert.Equal((0, false), (Error(")").Position, Error(")").IsIncomplete));
+
+    [Fact]
+    public void GivenACharacterNoQueryCanContainThenTheQueryIsIllegalAtThatCharacter()
+    {
+        var error = Error(":a and #");
+
+        Assert.Contains("'#' cannot be part of a query", error.Message);
+        Assert.Equal(7, error.Position);
+    }
 
     [Theory]
     [InlineData(":a and :b")]
     [InlineData("(:a or :b) and not :c")]
+    [InlineData("true")]
     public void GivenACompleteQueryThenItParses(string query)
-        => Assert.True(_parser.ParseQuery(query).Match(left: False, right: True));
+        => Assert.True(_parser.Parse(query).Match(left: False, right: True));
 
-    [Fact]
-    public void SingleTag()
+    private static string Written(IParseNode node, IOperatorType operatorType)
     {
-        var root = _parser.Parse(":tax:2018");
+        var visitor = new ToStringVisitor(operatorType);
+        node.Accept(visitor);
 
-        Assert.IsType<TagNode>(root);
-        Assert.False(_parser.IllegalExpression);
-        Assert.Equal(":tax:2018", (root as TagNode)?.Tag);
+        return visitor.Result;
     }
 
-    [Fact]
-    public void SimpleQuery()
-    {
-        var root = _parser.Parse(":test or true and (:movie or not :blue)");
-        var visitor = new ToStringVisitor(new LogicalOperatorType());
+    private IParseNode Valid(string query)
+        => _parser.Parse(query).GetOrElse(error => throw new InvalidOperationException(error.Message));
 
-        AcceptVisitor(root, visitor);
-
-        Assert.Equal("(:test ∨ (true ∧ (:movie ∨ ¬:blue)))", visitor.Result);
-        Assert.False(_parser.IllegalExpression);
-    }
-
-    [Fact]
-    public void PrecedenceTest()
-    {
-        var root = _parser.Parse(":A || :B && :C");
-        var visitor = new ToStringVisitor(new LogicalOperatorType());
-
-        AcceptVisitor(root, visitor);
-        Assert.Equal("(:A ∨ (:B ∧ :C))", visitor.Result);
-    }
-
-    [Fact]
-    public void OrAssociativityTest()
-    {
-        var root = _parser.Parse(":A || :B || :C || :D");
-        var visitor = new ToStringVisitor(new ProgrammingOperatorType());
-
-        AcceptVisitor(root, visitor);
-        Assert.Equal("(((:A || :B) || :C) || :D)", visitor.Result);
-    }
-
-    [Fact]
-    public void AndAssociativityTest()
-    {
-        var root = _parser.Parse(":A && :B && :C && :D");
-        var visitor = new ToStringVisitor(new ProgrammingOperatorType());
-
-        AcceptVisitor(root, visitor);
-        Assert.Equal("(((:A && :B) && :C) && :D)", visitor.Result);
-    }
-
-    [Fact]
-    public void MultipleNotTest()
-    {
-        var root = _parser.Parse("!!!:A && !!:B");
-        var visitor = new ToStringVisitor(new TextOperatorType());
-
-        AcceptVisitor(root, visitor);
-        Assert.Equal("(not(not(not(:A))) and not(not(:B)))", visitor.Result);
-    }
-
-    [Fact]
-    public void EmptyStringNextNode()
-    {
-        _ = _parser.Parse(string.Empty);
-        var next = _parser.NextToken().ToList();
-
-        Assert.Equal(3, next.Count);
-        Assert.Contains(next, node => node is TagToken);
-        Assert.Contains(next, node => node is NotToken);
-        Assert.Contains(next, node => node is OpenParenthesisToken);
-    }
-
-    [Fact]
-    public void TagNextNode()
-    {
-        _ = _parser.Parse(":tag");
-        var next = _parser.NextToken().ToList();
-
-        Assert.Equal(2, next.Count);
-        Assert.Contains(next, node => node is AndToken);
-        Assert.Contains(next, node => node is OrToken);
-    }
-
-    [Fact]
-    public void TagOpenParanthesisNextNode()
-    {
-        _ = _parser.Parse("(:tag");
-        var next = _parser.NextToken().ToList();
-
-        Assert.Equal(3, next.Count);
-        Assert.Contains(next, node => node is AndToken);
-        Assert.Contains(next, node => node is OrToken);
-        Assert.Contains(next, node => node is ClosedParenthesisToken);
-    }
-
-    [Fact]
-    public void TagAndNextNode()
-    {
-        _ = _parser.Parse("(:tag and ");
-        var next = _parser.NextToken().ToList();
-        Assert.Equal(3, next.Count);
-        Assert.Contains(next, node => node is TagToken);
-        Assert.Contains(next, node => node is NotToken);
-        Assert.Contains(next, node => node is OpenParenthesisToken);
-    }
-
-    [Fact]
-    public void NotNextNode()
-    {
-        _ = _parser.Parse("not ");
-        var next = _parser.NextToken().ToList();
-
-        Assert.Equal(3, next.Count);
-        Assert.Contains(next, node => node is TagToken);
-        Assert.Contains(next, node => node is NotToken);
-        Assert.Contains(next, node => node is OpenParenthesisToken);
-    }
-
-    [Fact]
-    public void OpenParentesisNotNextNode()
-    {
-        _ = _parser.Parse("(not ");
-        var next = _parser.NextToken().ToList();
-
-        Assert.Equal(3, next.Count);
-        Assert.Contains(next, node => node is TagToken);
-        Assert.Contains(next, node => node is NotToken);
-        Assert.Contains(next, node => node is OpenParenthesisToken);
-    }
-
-    [Fact]
-    public void TagComplexNextNode()
-    {
-        _ = _parser.Parse("(:test or ((:tag or :bla and :fun) and :x");
-        var next = _parser.NextToken().ToList();
-
-        Assert.Equal(3, next.Count);
-        Assert.Contains(next, node => node is AndToken);
-        Assert.Contains(next, node => node is OrToken);
-        Assert.Contains(next, node => node is ClosedParenthesisToken);
-    }
-
-    [Fact]
-    public void CompleteExpressionNextNode()
-    {
-        _ = _parser.Parse("(:tag and :fun)");
-        var next = _parser.NextToken().ToList();
-
-        Assert.Equal(2, next.Count);
-        Assert.Contains(next, node => node is AndToken);
-        Assert.Contains(next, node => node is OrToken);
-    }
-
-    [Fact]
-    public void IllegalNextNode()
-    {
-        _ = _parser.Parse(")");
-        var next = _parser.NextToken();
-
-        Assert.Empty(next);
-    }
-
-    private void AcceptVisitor(IParseNode? root, INodeVisitor visitor)
-    {
-        Assert.NotNull(root);
-
-        // ReSharper understands, this cannot be null, but the VisualStudio Code analyzer does not...
-        // ReSharper disable once ConstantConditionalAccessQualifier
-        root?.Accept(visitor);
-    }
+    private ParseError Error(string query)
+        => _parser.Parse(query).Match(left: Identity, right: node => throw new InvalidOperationException($"Expected an error, but '{query}' parsed to {node}."));
 }

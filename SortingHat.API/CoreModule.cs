@@ -5,7 +5,6 @@ using Apophis.CLI.Writer;
 using Autofac;
 using SortingHat.API.AutoTag;
 using SortingHat.API.DI;
-using SortingHat.API.Parser;
 using SortingHat.API.Plugin;
 
 namespace SortingHat.API;
@@ -18,7 +17,7 @@ public class CoreModule : Module
 {
     protected override void Load(ContainerBuilder builder)
     {
-        builder.RegisterModule(new ParserModule());
+        builder.RegisterInstance(Parser.Parser.Create());
 
         builder.RegisterType<AutoTagHandler>().As<IAutoTagHandler>();
         builder.RegisterType<FilePathExtractor>().As<IFilePathExtractor>().SingleInstance();

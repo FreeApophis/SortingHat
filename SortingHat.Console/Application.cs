@@ -2,7 +2,6 @@
 using JetBrains.Annotations;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
-using SortingHat.API.Parser;
 using SortingHat.API.Plugin;
 using Console = Apophis.CLI.Console;
 
@@ -24,13 +23,6 @@ internal class Application(ILogger<Application> logger, Console console, Command
             logger.LogTrace($"Running application instance with args: {string.Join(" ", args)}");
 
             return commandLine.Run(args);
-        }
-        catch (ParseException e)
-        {
-            console.Writer.WriteLine("Parser is not happy with your input, maybe find a ravenclaw...");
-            console.Writer.WriteLine(e.Message);
-
-            return ExitCode.Failure;
         }
         catch (SqliteException e)
         {

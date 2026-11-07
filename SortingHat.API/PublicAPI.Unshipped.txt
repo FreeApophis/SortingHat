@@ -51,6 +51,9 @@ override SortingHat.API.Models.Tag.ToString() -> string!
 override SortingHat.API.Models.TagName.Equals(object? obj) -> bool
 override SortingHat.API.Models.TagName.GetHashCode() -> int
 override SortingHat.API.Models.TagName.ToString() -> string!
+override SortingHat.API.Parser.ParseError.Equals(object? obj) -> bool
+override SortingHat.API.Parser.ParseError.GetHashCode() -> int
+override SortingHat.API.Parser.ParseError.ToString() -> string!
 SortingHat.API.AutoTag.AutoTagArgument
 SortingHat.API.AutoTag.AutoTagArgument.<Clone>$() -> SortingHat.API.AutoTag.AutoTagArgument!
 SortingHat.API.AutoTag.AutoTagArgument.Equals(SortingHat.API.AutoTag.AutoTagArgument? other) -> bool
@@ -276,13 +279,31 @@ SortingHat.API.Parser.OperatorType.TextOperatorType.NotClose.get -> string!
 SortingHat.API.Parser.OperatorType.TextOperatorType.NotOpen.get -> string!
 SortingHat.API.Parser.OperatorType.TextOperatorType.Or.get -> string!
 SortingHat.API.Parser.OperatorType.TextOperatorType.TextOperatorType() -> void
-SortingHat.API.Parser.ParseException
-SortingHat.API.Parser.ParseException.ParseException(string! message) -> void
+SortingHat.API.Parser.ParseError
+SortingHat.API.Parser.ParseError.<Clone>$() -> SortingHat.API.Parser.ParseError!
+SortingHat.API.Parser.ParseError.Deconstruct(out string! Query, out int Position, out string! Reason, out System.Collections.Generic.IReadOnlyList<SortingHat.API.Parser.QueryPart>! Expected, out bool IsIncomplete) -> void
+SortingHat.API.Parser.ParseError.Equals(SortingHat.API.Parser.ParseError? other) -> bool
+SortingHat.API.Parser.ParseError.Expected.get -> System.Collections.Generic.IReadOnlyList<SortingHat.API.Parser.QueryPart>!
+SortingHat.API.Parser.ParseError.Expected.init -> void
+SortingHat.API.Parser.ParseError.IsIncomplete.get -> bool
+SortingHat.API.Parser.ParseError.IsIncomplete.init -> void
+SortingHat.API.Parser.ParseError.Message.get -> string!
+SortingHat.API.Parser.ParseError.ParseError(string! Query, int Position, string! Reason, System.Collections.Generic.IReadOnlyList<SortingHat.API.Parser.QueryPart>! Expected, bool IsIncomplete) -> void
+SortingHat.API.Parser.ParseError.Position.get -> int
+SortingHat.API.Parser.ParseError.Position.init -> void
+SortingHat.API.Parser.ParseError.Query.get -> string!
+SortingHat.API.Parser.ParseError.Query.init -> void
+SortingHat.API.Parser.ParseError.Reason.get -> string!
+SortingHat.API.Parser.ParseError.Reason.init -> void
 SortingHat.API.Parser.Parser
-SortingHat.API.Parser.Parser.IllegalExpression.get -> bool
-SortingHat.API.Parser.Parser.NextToken() -> System.Collections.Generic.IEnumerable<Funcky.Lexer.Token.IToken!>!
-SortingHat.API.Parser.Parser.Parse(Funcky.Lexer.ILexemeWalker! walker) -> SortingHat.API.Parser.Nodes.IParseNode!
-SortingHat.API.Parser.Parser.Parse(string! expression) -> SortingHat.API.Parser.Nodes.IParseNode?
+SortingHat.API.Parser.Parser.Parse(string! query) -> Funcky.Monads.Either<SortingHat.API.Parser.ParseError!, SortingHat.API.Parser.Nodes.IParseNode!>
+SortingHat.API.Parser.QueryPart
+SortingHat.API.Parser.QueryPart.And = 1 -> SortingHat.API.Parser.QueryPart
+SortingHat.API.Parser.QueryPart.ClosedParenthesis = 5 -> SortingHat.API.Parser.QueryPart
+SortingHat.API.Parser.QueryPart.Not = 3 -> SortingHat.API.Parser.QueryPart
+SortingHat.API.Parser.QueryPart.OpenParenthesis = 4 -> SortingHat.API.Parser.QueryPart
+SortingHat.API.Parser.QueryPart.Or = 2 -> SortingHat.API.Parser.QueryPart
+SortingHat.API.Parser.QueryPart.Tag = 0 -> SortingHat.API.Parser.QueryPart
 SortingHat.API.Parser.Token.AndToken
 SortingHat.API.Parser.Token.AndToken.AndToken() -> void
 SortingHat.API.Parser.Token.ClosedParenthesisToken
@@ -395,6 +416,8 @@ static SortingHat.API.Models.TagName.operator !=(SortingHat.API.Models.TagName? 
 static SortingHat.API.Models.TagName.operator ==(SortingHat.API.Models.TagName? left, SortingHat.API.Models.TagName? right) -> bool
 static SortingHat.API.Models.TagName.Parse(string! name) -> Funcky.Monads.Either<string!, SortingHat.API.Models.TagName!>
 static SortingHat.API.Parser.LexerRules.Create() -> Funcky.Lexer.LexerRuleBook!
+static SortingHat.API.Parser.ParseError.operator !=(SortingHat.API.Parser.ParseError? left, SortingHat.API.Parser.ParseError? right) -> bool
+static SortingHat.API.Parser.ParseError.operator ==(SortingHat.API.Parser.ParseError? left, SortingHat.API.Parser.ParseError? right) -> bool
 static SortingHat.API.Parser.Parser.Create() -> SortingHat.API.Parser.Parser!
 static SortingHat.API.Plugin.PluginProblem.operator !=(SortingHat.API.Plugin.PluginProblem? left, SortingHat.API.Plugin.PluginProblem? right) -> bool
 static SortingHat.API.Plugin.PluginProblem.operator ==(SortingHat.API.Plugin.PluginProblem? left, SortingHat.API.Plugin.PluginProblem? right) -> bool
@@ -418,4 +441,3 @@ SortingHat.API.DI.ISettings.Get(string! key) -> Funcky.Monads.Option<string!>
 SortingHat.API.DI.ISettings.Set(string! key, string! value) -> void
 static SortingHat.API.Models.TagName.FromValue(string! value) -> Funcky.Monads.Option<SortingHat.API.Models.TagName!>
 SortingHat.API.DI.IFile.Search(string! query) -> Funcky.Monads.Either<string!, SortingHat.API.Models.SearchResult!>
-SortingHat.API.Parser.Parser.ParseQuery(string! query) -> Funcky.Monads.Either<string!, SortingHat.API.Parser.Nodes.IParseNode!>

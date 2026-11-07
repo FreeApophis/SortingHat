@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using SortingHat.API.DI;
 using SortingHat.API.Parser;
 using SortingHat.API.Parser.OperatorType;
-using SortingHat.API.Parser.Token;
 
 namespace SortingHat.UI;
 
@@ -122,37 +121,37 @@ public partial class MainWindow : MetroWindow, INotifyPropertyChanged
         return search;
     }
 
+    /// <summary>What can come next: after a valid query an operator, after an incomplete one what the parser expected.</summary>
     private void PossibleNextArguments(string search)
     {
         var operatorType = new TextOperatorType();
         IntelliSense.Items.Clear();
 
-        _parser.Parse(search);
+        var next = _parser.Parse(search).Match(
+            left: error => error.IsIncomplete ? error.Expected : [],
+            right: _ => [QueryPart.And, QueryPart.Or]);
 
-        foreach (var token in _parser.NextToken())
+        foreach (var part in next)
         {
-            switch (token)
+            switch (part)
             {
-                case AndToken t:
+                case QueryPart.And:
                     IntelliSense.Items.Add(new IntellisenseItem { Title = operatorType.And });
                     break;
-                case OrToken t:
+                case QueryPart.Or:
                     IntelliSense.Items.Add(new IntellisenseItem { Title = operatorType.Or });
                     break;
-                case NotToken t:
+                case QueryPart.Not:
                     IntelliSense.Items.Add(new IntellisenseItem { Title = operatorType.Not });
                     break;
-                case OpenParenthesisToken t:
+                case QueryPart.OpenParenthesis:
                     IntelliSense.Items.Add(new IntellisenseItem { Title = "(" });
                     break;
-                case ClosedParenthesisToken t:
+                case QueryPart.ClosedParenthesis:
                     IntelliSense.Items.Add(new IntellisenseItem { Title = ")" });
                     break;
-                case TagToken t:
-                    SelectPossibleTokens(t);
-                    break;
-                default:
-                    IntelliSense.Items.Add(new IntellisenseItem { Title = "???" });
+                case QueryPart.Tag:
+                    SelectPossibleTags();
                     break;
             }
 
@@ -160,16 +159,11 @@ public partial class MainWindow : MetroWindow, INotifyPropertyChanged
         }
     }
 
-    private void SelectPossibleTokens(TagToken tagToken)
+    private void SelectPossibleTags()
     {
-        var partial = (tagToken == null ? string.Empty : tagToken.Value) ?? string.Empty;
-        foreach (var possibleTag in _tag.GetTags().Select(t => t.FullName).Where(f => f.StartsWith(partial)))
+        foreach (var possibleTag in _tag.GetTags().Select(t => t.FullName).Take(9))
         {
             IntelliSense.Items.Add(new IntellisenseItem { Title = possibleTag });
-            if (IntelliSense.Items.Count > 8)
-            {
-                break;
-            }
         }
     }
 

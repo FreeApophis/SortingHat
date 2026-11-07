@@ -67,7 +67,9 @@ WHERE FilePaths.Path = @filePath";
         => db.InTransaction(() => FindOrCreate(file));
 
     public Either<string, SearchResult> Search(string query)
-        => parser.ParseQuery(query).Select(Search);
+        => parser.Parse(query).Match(
+            left: error => Either<string, SearchResult>.Left(error.Message),
+            right: expression => Either<string, SearchResult>.Right(Search(expression)));
 
     public IReadOnlyList<File> GetDuplicates()
         => db.Query(DuplicateQuery, ReadFile);
