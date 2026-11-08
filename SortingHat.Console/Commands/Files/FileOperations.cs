@@ -94,22 +94,14 @@ public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExist
             var files => AskForSource(fileGroup.Hash, files),
         };
 
+    /// <summary>The user chooses with the arrow keys; where hat cannot ask, such as in a script, the file is skipped.</summary>
     private Either<string, FileAt> AskForSource(Hash hash, IReadOnlyList<FileAt> files)
-    {
-        console.Writer.WriteLine();
-        console.Writer.WriteLine($" The file with hash {hash.Short} has multiple sources, which one do you want to {Verb}:");
-
-        var table = LightTable.Create(LightTable.Column("Choice").RightAligned(), LightTable.Column("Path"));
-        files.Select((file, index) => (file, index)).ForEach(choice => table.AddCells($"{choice.index}", choice.file.Path));
-        ansiConsole.Write(table);
-
-        return console.Reader
-            .ReadInt()
-            .SelectMany(index => files.ElementAtOrNone(index))
-            .Match(
-                none: () => Either<string, FileAt>.Left($"The file with hash {hash.Short} skipped: no valid source chosen."),
-                some: Either<string, FileAt>.Right);
-    }
+        => ansiConsole.Profile.Capabilities.Interactive
+            ? Either<string, FileAt>.Right(ansiConsole.Prompt(new SelectionPrompt<FileAt>()
+                .Title(Markup.Escape($"The file with hash {hash.Short} has several copies, which one do you want to {Verb}?"))
+                .UseConverter(file => Markup.Escape(file.Path))
+                .AddChoices(files)))
+            : Either<string, FileAt>.Left($"The file with hash {hash.Short} skipped: it has several copies, and hat can only ask which one in an interactive terminal.");
 
     private bool Preview(ExportTarget target)
     {

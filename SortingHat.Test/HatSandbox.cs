@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Apophis.CLI.Reader;
 using Autofac;
+using Funcky.Extensions;
 using Funcky.Monads;
 using Microsoft.Data.Sqlite;
 using SortingHat.API;
@@ -24,7 +24,6 @@ internal sealed class HatSandbox : IDisposable
     private readonly string _root = Path.Combine(Path.GetTempPath(), $"SortingHat.Test.{Guid.NewGuid():N}");
     private readonly List<string> _files = [];
     private readonly TestConsole _console = new();
-    private readonly MemoryConsoleReader _reader = new();
     private readonly DatabaseSettings _databaseSettings;
     private readonly IContainer _container;
     private readonly Lazy<ILifetimeScope> _pluginScope;
@@ -52,7 +51,6 @@ internal sealed class HatSandbox : IDisposable
         // like hat with its output redirected: no colours, not interactive, no wrapping
         _console.Profile.Width = HatConsole.RedirectedWidth;
         compositionRoot.Builder.RegisterInstance(_console).As<IAnsiConsole>();
-        compositionRoot.Builder.RegisterInstance(_reader).As<IConsoleReader>();
         compositionRoot.Builder.RegisterInstance(_databaseSettings);
         compositionRoot.Builder.RegisterInstance(new PluginDirectory(PluginDirectory));
         register(compositionRoot.Builder);
@@ -83,8 +81,19 @@ internal sealed class HatSandbox : IDisposable
     public IReadOnlyList<string> Rows
         => [.. Lines.Select(line => Regex.Split(line.Trim(), " {3,}")).Where(cells => cells.Length > 1).Select(cells => string.Join('|', cells))];
 
-    /// <summary>The lines the user types when hat asks for input.</summary>
-    public MemoryConsoleReader Keyboard => _reader;
+    /// <summary>The <paramref name="lines"/> the user types, each with Enter, when hat asks; hat runs in an interactive terminal from now on.</summary>
+    public void Type(params IEnumerable<string> lines)
+    {
+        _console.Profile.Capabilities.Interactive = true;
+        lines.ForEach(_console.Input.PushTextWithEnter);
+    }
+
+    /// <summary>The <paramref name="keys"/> the user presses when hat asks; hat runs in an interactive terminal from now on.</summary>
+    public void Press(params IEnumerable<ConsoleKey> keys)
+    {
+        _console.Profile.Capabilities.Interactive = true;
+        keys.ForEach(_console.Input.PushKey);
+    }
 
     /// <summary>A hat whose plugins folder is the <paramref name="fixture"/> folder of PluginFixtures, see the project file.</summary>
     public static HatSandbox WithPluginFixtures(string fixture)

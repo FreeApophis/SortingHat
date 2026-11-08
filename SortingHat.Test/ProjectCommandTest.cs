@@ -106,12 +106,11 @@ public sealed class ProjectCommandTest : IDisposable
 
     [Theory]
     [InlineData("y")]
-    [InlineData("yes")]
     [InlineData("Y")]
     public void GivenConfirmationThenRemoveProjectDeletesTheProjectAndItsDatabase(string answer)
     {
         ProjectWithDatabase("myProject");
-        _hat.Keyboard.Type(answer);
+        _hat.Type(answer);
 
         _hat.Hat(["remove-project", "myProject"]);
 
@@ -123,11 +122,10 @@ public sealed class ProjectCommandTest : IDisposable
     [Theory]
     [InlineData("n")]
     [InlineData("")]
-    [InlineData("yep")]
     public void GivenNoConfirmationThenRemoveProjectKeepsTheProjectAndItsDatabase(string answer)
     {
         ProjectWithDatabase("myProject");
-        _hat.Keyboard.Type(answer);
+        _hat.Type(answer);
 
         _hat.Hat(["remove-project", "myProject"]);
 
@@ -136,9 +134,10 @@ public sealed class ProjectCommandTest : IDisposable
     }
 
     [Fact]
-    public void GivenNoInputThenRemoveProjectKeepsTheProject()
+    public void GivenAnAnswerThatIsNeitherYesNorNoThenRemoveProjectAsksAgain()
     {
         ProjectWithDatabase("myProject");
+        _hat.Type("yep", "n");
 
         _hat.Hat(["remove-project", "myProject"]);
 
@@ -146,10 +145,32 @@ public sealed class ProjectCommandTest : IDisposable
     }
 
     [Fact]
+    public void GivenNoInteractiveTerminalThenRemoveProjectKeepsTheProjectAndNamesTheOption()
+    {
+        ProjectWithDatabase("myProject");
+
+        Assert.NotEqual(0, _hat.Hat(["remove-project", "myProject"]));
+
+        Assert.Contains(_hat.Lines, line => line.Contains("interactive terminal") && line.Contains("--yes"));
+        Assert.Equal(["* Default", "  myProject"], ListProjects());
+    }
+
+    [Fact]
+    public void GivenYesThenRemoveProjectRemovesWithoutAsking()
+    {
+        ProjectWithDatabase("myProject");
+
+        Assert.Equal(0, _hat.Hat(["remove-project", "--yes", "myProject"]));
+
+        Assert.Equal(["* Default"], ListProjects());
+        Assert.False(File.Exists(_hat.ProjectDatabaseFile("myProject")));
+    }
+
+    [Fact]
     public void GivenAProjectWithoutDatabaseThenRemoveProjectRemovesIt()
     {
         _hat.Hat(["new-project", "myProject"]);
-        _hat.Keyboard.Type("y");
+        _hat.Type("y");
 
         _hat.Hat(["remove-project", "myProject"]);
 
@@ -160,7 +181,7 @@ public sealed class ProjectCommandTest : IDisposable
     public void GivenTheNameInAnotherCaseThenRemoveProjectRemovesTheProject()
     {
         ProjectWithDatabase("myProject");
-        _hat.Keyboard.Type("y");
+        _hat.Type("y");
 
         _hat.Hat(["remove-project", "MYPROJECT"]);
 
@@ -171,7 +192,7 @@ public sealed class ProjectCommandTest : IDisposable
     [Fact]
     public void GivenTheActiveProjectThenRemoveProjectRefusesWithoutAsking()
     {
-        _hat.Keyboard.Type("y");
+        _hat.Type("y");
 
         _hat.Hat(["remove-project", "Default"]);
 

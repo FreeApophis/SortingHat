@@ -1,26 +1,13 @@
 ﻿#nullable enable
 Apophis.CLI.Console
+Apophis.CLI.Console.Console(Apophis.CLI.Writer.IConsoleWriter! consoleWriter, Apophis.CLI.IConsoleApplicationInformationProvider! consoleApplicationInformationProvider) -> void
 Apophis.CLI.Console.Application.get -> Apophis.CLI.IConsoleApplicationInformationProvider!
-Apophis.CLI.Console.Console(Apophis.CLI.Reader.IConsoleReader! consoleReader, Apophis.CLI.Writer.IConsoleWriter! consoleWriter, Apophis.CLI.IConsoleApplicationInformationProvider! consoleApplicationInformationProvider) -> void
-Apophis.CLI.Console.Reader.get -> Apophis.CLI.Reader.IConsoleReader!
 Apophis.CLI.Console.Writer.get -> Apophis.CLI.Writer.IConsoleWriter!
 Apophis.CLI.IConsoleApplicationInformationProvider
 Apophis.CLI.IConsoleApplicationInformationProvider.Name.get -> string!
 Apophis.CLI.NumberFormatter
 Apophis.CLI.NumberFormatter.extension(long)
 Apophis.CLI.NumberFormatter.extension(long).HumanSize() -> string!
-Apophis.CLI.Reader.IConsoleReader
-Apophis.CLI.Reader.IConsoleReader.ReadInt() -> Funcky.Monads.Option<int>
-Apophis.CLI.Reader.IConsoleReader.ReadLine() -> string!
-Apophis.CLI.Reader.MemoryConsoleReader
-Apophis.CLI.Reader.MemoryConsoleReader.MemoryConsoleReader() -> void
-Apophis.CLI.Reader.MemoryConsoleReader.ReadInt() -> Funcky.Monads.Option<int>
-Apophis.CLI.Reader.MemoryConsoleReader.ReadLine() -> string!
-Apophis.CLI.Reader.MemoryConsoleReader.Type(params System.Collections.Generic.IEnumerable<string!>! lines) -> void
-Apophis.CLI.Reader.SystemConsoleReader
-Apophis.CLI.Reader.SystemConsoleReader.ReadInt() -> Funcky.Monads.Option<int>
-Apophis.CLI.Reader.SystemConsoleReader.ReadLine() -> string!
-Apophis.CLI.Reader.SystemConsoleReader.SystemConsoleReader() -> void
 Apophis.CLI.Writer.IConsoleWriter
 Apophis.CLI.Writer.IConsoleWriter.WriteLine() -> void
 Apophis.CLI.Writer.IConsoleWriter.WriteLine(string! line) -> void

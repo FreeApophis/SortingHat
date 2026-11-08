@@ -197,7 +197,7 @@ public sealed class FileCommandTest : IDisposable
         File.Copy(first, second);
         _hat.Hat(["tag-files", ":x", second]);
         var destination = Destination(first);
-        _hat.Keyboard.Type("0");
+        _hat.Press(ConsoleKey.Enter);
 
         Assert.Equal(0, _hat.Hat(["mv", ":x", destination]));
 
@@ -274,11 +274,26 @@ public sealed class FileCommandTest : IDisposable
         Assert.Equal(0, _hat.Hat(["cp", ":x", destination]));
 
         Assert.True(File.Exists(Path.Combine(destination, "copy-of-a.txt")));
-        Assert.DoesNotContain(_hat.Lines, line => line.Contains("multiple sources"));
+        Assert.DoesNotContain(_hat.Lines, line => line.Contains("several copies"));
     }
 
     [Fact]
-    public void GivenAnInvalidChoiceThenOnlyThatFileIsSkipped()
+    public void GivenTwoCopiesOfAFileThenTheArrowKeysChooseTheOneToCopy()
+    {
+        var first = _hat.TaggedFile("a.txt", ":x");
+        var second = Path.Combine(Path.GetDirectoryName(first) ?? string.Empty, "copy-of-a.txt");
+        File.Copy(first, second);
+        _hat.Hat(["tag-files", ":x", second]);
+        var destination = Destination(first);
+        _hat.Press(ConsoleKey.DownArrow, ConsoleKey.Enter);
+
+        Assert.Equal(0, _hat.Hat(["cp", ":x", destination]));
+
+        Assert.Equal([Path.Combine(destination, "copy-of-a.txt")], Directory.GetFiles(destination));
+    }
+
+    [Fact]
+    public void GivenTwoCopiesOfAFileWithoutAnInteractiveTerminalThenOnlyThatFileIsSkipped()
     {
         var first = _hat.TaggedFile("a.txt", ":x");
         var second = Path.Combine(Path.GetDirectoryName(first) ?? string.Empty, "copy-of-a.txt");
@@ -286,11 +301,11 @@ public sealed class FileCommandTest : IDisposable
         _hat.Hat(["tag-files", ":x", second]);
         _hat.TaggedFile("b.txt", ":x");
         var destination = Destination(first);
-        _hat.Keyboard.Type("x");
 
         Assert.NotEqual(0, _hat.Hat(["cp", ":x", destination]));
 
         Assert.Equal([Path.Combine(destination, "b.txt")], Directory.GetFiles(destination));
+        Assert.Contains(_hat.Lines, line => line.Contains("several copies") && line.Contains("interactive terminal"));
     }
 
     [Fact]
