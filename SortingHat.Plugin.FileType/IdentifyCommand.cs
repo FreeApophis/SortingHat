@@ -19,7 +19,7 @@ internal class IdentifyCommand(IConsoleWriter consoleWriter, IFileTypeFinder fil
     public CommandGrouping CommandGrouping => CommandGrouping.General;
     public string Name => "identify";
     public IReadOnlyList<string> Aliases => ["id"];
-    public string Description => "This command identifies the real file type (ignoring the file-extension)";
+    public string Description => "Identifies the real type of files from their content, whatever their extension.";
     public IReadOnlyList<ArgumentDefinition> Arguments => [Files];
     public IReadOnlyList<OptionDefinition> Options => [Recursive];
 

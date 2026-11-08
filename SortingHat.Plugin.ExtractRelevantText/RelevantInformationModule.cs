@@ -9,7 +9,7 @@ namespace SortingHat.Plugin.ExtractRelevantText;
 internal class RelevantInformationModule : Autofac.Module, IPlugin
 {
     public string Name => "Relevant Information Extractor";
-    public string Description => "This plugin can automatically tag files according to their text content (txt).";
+    public string Description => "Finds the most frequent words in text files, with the scan command.";
 
     protected override void Load(ContainerBuilder builder)
     {
