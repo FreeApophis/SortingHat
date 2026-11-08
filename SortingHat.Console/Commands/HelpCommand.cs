@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Apophis.CLI.Writer;
 using Funcky.Extensions;
 using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API.AutoTag;
 using SortingHat.API.DI;
 using Spectre.Console;
-using Console = Apophis.CLI.Console;
 
 namespace SortingHat.CLI.Commands;
 
@@ -18,8 +18,9 @@ namespace SortingHat.CLI.Commands;
 /// </summary>
 [UsedImplicitly]
 internal class HelpCommand(
-    Console console,
-    IAnsiConsole ansiConsole,
+    IConsoleWriter consoleWriter,
+    ApplicationName application,
+    IAnsiConsole console,
     Lazy<IEnumerable<IDeclaredCommand>> commands,
     Lazy<CommandLine> commandLine,
     IAutoTagHandler autoTagHandler) : IDeclaredCommand
@@ -55,14 +56,14 @@ internal class HelpCommand(
 
     private bool UnknownCommand(string name)
     {
-        console.Writer.WriteLine($"Unknown command '{name}', '{console.Application.Name} help' lists all commands.");
+        consoleWriter.WriteLine($"Unknown command '{name}', '{application.Name} help' lists all commands.");
 
         return false;
     }
 
     private bool PrintOverview(bool verbose)
     {
-        console.Writer.WriteLine($"{console.Application.Name} <command> [<arguments>] [<options>]:");
+        consoleWriter.WriteLine($"{application.Name} <command> [<arguments>] [<options>]:");
         PrintHelpCommands([.. commands.Value.Select(HelpRow)]);
         PrintTagVariables(verbose);
         PrintHelpExamples();
@@ -72,7 +73,7 @@ internal class HelpCommand(
 
     private void PrintHelpCommands(IReadOnlyList<(CommandGrouping Grouping, string Name, string Aliases, string Description)> rows)
     {
-        console.Writer.WriteLine();
+        consoleWriter.WriteLine();
 
         var table = LightTable.Create(LightTable.Column("Command"), LightTable.Column("Aliases"), LightTable.Column("Description"));
         foreach (var (group, index) in Enum.GetValues<CommandGrouping>().Select(group => rows.Where(row => row.Grouping == group).ToList()).Where(group => group is not []).Select((group, index) => (group, index)))
@@ -85,34 +86,34 @@ internal class HelpCommand(
             group.ForEach(row => table.AddCells(row.Name, row.Aliases, row.Description));
         }
 
-        ansiConsole.Write(table);
-        console.Writer.WriteLine();
+        console.Write(table);
+        consoleWriter.WriteLine();
     }
 
     private void PrintTagVariables(bool verbose)
     {
-        console.Writer.WriteLine("Possible Tag Variables:");
-        console.Writer.WriteLine();
+        consoleWriter.WriteLine("Possible Tag Variables:");
+        consoleWriter.WriteLine();
         foreach (var tag in autoTagHandler.AutoTags.OrderBy(tag => tag.Name, System.StringComparer.Ordinal))
         {
-            console.Writer.WriteLine($"* {tag.Parameter.Usage(tag.Name)}");
+            consoleWriter.WriteLine($"* {tag.Parameter.Usage(tag.Name)}");
             if (verbose)
             {
-                console.Writer.WriteLine($"=>  {tag.Description}");
-                console.Writer.WriteLine();
+                consoleWriter.WriteLine($"=>  {tag.Description}");
+                consoleWriter.WriteLine();
             }
         }
     }
 
     private void PrintHelpExamples()
     {
-        console.Writer.WriteLine();
-        console.Writer.WriteLine("Examples:");
-        console.Writer.WriteLine();
-        console.Writer.WriteLine($"  {console.Application.Name} find-files (:tax:2018 or :tax:2017) and :bank");
-        console.Writer.WriteLine("    This will output all files which are tagged as bank documents for tax in 2017 or 2018.");
-        console.Writer.WriteLine();
-        console.Writer.WriteLine($"  {console.Application.Name} tag-files :Files:{{FileType.Category}}:{{Camera.Make}} :Taken:{{Camera.Taken.Year}} *");
-        console.Writer.WriteLine("    This will tag all files in the current directory, the possible automatic tags depend on your plugins.");
+        consoleWriter.WriteLine();
+        consoleWriter.WriteLine("Examples:");
+        consoleWriter.WriteLine();
+        consoleWriter.WriteLine($"  {application.Name} find-files (:tax:2018 or :tax:2017) and :bank");
+        consoleWriter.WriteLine("    This will output all files which are tagged as bank documents for tax in 2017 or 2018.");
+        consoleWriter.WriteLine();
+        consoleWriter.WriteLine($"  {application.Name} tag-files :Files:{{FileType.Category}}:{{Camera.Make}} :Taken:{{Camera.Taken.Year}} *");
+        consoleWriter.WriteLine("    This will tag all files in the current directory, the possible automatic tags depend on your plugins.");
     }
 }

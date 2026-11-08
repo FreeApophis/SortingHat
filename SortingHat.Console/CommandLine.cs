@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Apophis.CLI.Writer;
 using Funcky.Extensions;
 using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
 using Spectre.Console;
 using Cli = System.CommandLine;
-using Console = Apophis.CLI.Console;
 using Flag = System.CommandLine.Option<bool>;
 
 namespace SortingHat.CLI;
@@ -19,14 +19,14 @@ namespace SortingHat.CLI;
 /// Every <see cref="IDeclaredCommand"/> gets exactly the arguments and options it declares.
 /// </summary>
 [UsedImplicitly]
-internal sealed class CommandLine(Console console, IAnsiConsole ansiConsole, IEnumerable<IDeclaredCommand> commands)
+internal sealed class CommandLine(IConsoleWriter consoleWriter, ApplicationName application, IAnsiConsole console, IEnumerable<IDeclaredCommand> commands)
 {
     /// <summary>Response files (<c>@file</c>) are off, so a file name starting with <c>@</c> stays an argument.</summary>
     private static readonly Cli.ParserConfiguration ParserConfiguration = new() { ResponseFileTokenReplacer = null };
 
     internal int Run(IReadOnlyList<string> arguments)
     {
-        var output = ansiConsole.Profile.Out.Writer;
+        var output = console.Profile.Out.Writer;
 
         return RootCommand()
             .Parse(arguments, ParserConfiguration)
@@ -129,14 +129,14 @@ internal sealed class CommandLine(Console console, IAnsiConsole ansiConsole, IEn
 
     private int ReportUnknown(IEnumerable<string> unknownOptions)
     {
-        unknownOptions.ForEach(option => console.Writer.WriteLine($"Unknown option '{option}', use '--' before an argument that starts with '-'."));
+        unknownOptions.ForEach(option => consoleWriter.WriteLine($"Unknown option '{option}', use '--' before an argument that starts with '-'."));
 
         return ExitCode.Failure;
     }
 
     private int Hint()
     {
-        console.Writer.WriteLine($"Maybe run '{console.Application.Name} help'");
+        consoleWriter.WriteLine($"Maybe run '{application.Name} help'");
 
         return ExitCode.Failure;
     }

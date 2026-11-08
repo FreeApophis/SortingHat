@@ -1,18 +1,8 @@
 ﻿#nullable enable
-Apophis.CLI.Console
-Apophis.CLI.Console.Console(Apophis.CLI.Writer.IConsoleWriter! consoleWriter, Apophis.CLI.IConsoleApplicationInformationProvider! consoleApplicationInformationProvider) -> void
-Apophis.CLI.Console.Application.get -> Apophis.CLI.IConsoleApplicationInformationProvider!
-Apophis.CLI.Console.Writer.get -> Apophis.CLI.Writer.IConsoleWriter!
-Apophis.CLI.IConsoleApplicationInformationProvider
-Apophis.CLI.IConsoleApplicationInformationProvider.Name.get -> string!
 Apophis.CLI.NumberFormatter
 Apophis.CLI.NumberFormatter.extension(long)
 Apophis.CLI.NumberFormatter.extension(long).HumanSize() -> string!
 Apophis.CLI.Writer.IConsoleWriter
 Apophis.CLI.Writer.IConsoleWriter.WriteLine() -> void
 Apophis.CLI.Writer.IConsoleWriter.WriteLine(string! line) -> void
-Apophis.CLI.Writer.NullWriter
-Apophis.CLI.Writer.NullWriter.NullWriter() -> void
-Apophis.CLI.Writer.NullWriter.WriteLine() -> void
-Apophis.CLI.Writer.NullWriter.WriteLine(string! line) -> void
 static Apophis.CLI.NumberFormatter.HumanSize(this long size) -> string!

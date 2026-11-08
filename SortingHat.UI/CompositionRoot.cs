@@ -1,5 +1,4 @@
-﻿using Apophis.CLI.Writer;
-using Apophis.FileSystem;
+﻿using Apophis.FileSystem;
 using Autofac;
 using Microsoft.Extensions.Logging;
 using SortingHat.API;
@@ -24,7 +23,6 @@ internal class CompositionRoot
 
         builder.RegisterType<LoggerFactory>().As<ILoggerFactory>().SingleInstance();
         builder.RegisterGeneric(typeof(Logger<>)).As(typeof(ILogger<>)).SingleInstance();
-        builder.RegisterType<NullWriter>().As<IConsoleWriter>();
 
         builder.Register(c => new DatabaseSettings { Type = "sqlite", Name = "hat", Path = "#USERDOC", DefaultProject = "Default" });
 

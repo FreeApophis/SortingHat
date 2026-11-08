@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Apophis.CLI.Writer;
 using Apophis.FileSystem;
 using Funcky.Extensions;
 using Funcky.Monads;
@@ -9,7 +10,6 @@ using SortingHat.API.DI;
 using SortingHat.API.Models;
 using Spectre.Console;
 using static Funcky.Functional;
-using Console = Apophis.CLI.Console;
 
 namespace SortingHat.CLI.Commands.Files;
 
@@ -17,7 +17,7 @@ namespace SortingHat.CLI.Commands.Files;
 /// Puts the files of a search into a folder: choose a source per file (asking when several copies exist), let <see cref="ExportPlan"/> decide the targets,
 /// then copy or move. One file that cannot be done is reported and skipped, the others still go.
 /// </summary>
-public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExistsFile existsFile, IExistsDirectory existsDirectory, Console console, IAnsiConsole ansiConsole, IFile fileStore)
+public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExistsFile existsFile, IExistsDirectory existsDirectory, IConsoleWriter consoleWriter, IAnsiConsole console, IFile fileStore)
     where TFileOperation : IFileOperation
 {
     /// <summary>Windows ignores the case of file names, other systems do not.</summary>
@@ -42,7 +42,7 @@ public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExist
 
         if (dryRun)
         {
-            console.Writer.WriteLine($"Dry run: nothing was {PastVerb}.");
+            consoleWriter.WriteLine($"Dry run: nothing was {PastVerb}.");
         }
 
         return exported;
@@ -50,14 +50,14 @@ public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExist
 
     private bool ExportSearch(string search, string destinationPath, bool dryRun)
     {
-        console.Writer.WriteLine($"Find Files: {search}");
+        consoleWriter.WriteLine($"Find Files: {search}");
 
         return fileStore.Search(search).Match(left: Report, right: result => ExportResult(result, destinationPath, dryRun));
     }
 
     private bool ExportResult(SearchResult result, string destinationPath, bool dryRun)
     {
-        result.UnknownTags.ForEach(unknownTag => console.Writer.WriteLine($"Unknown tag: {unknownTag}"));
+        result.UnknownTags.ForEach(unknownTag => consoleWriter.WriteLine($"Unknown tag: {unknownTag}"));
 
         var filesByHash = result.Files.GroupByHash().ToList();
 
@@ -72,7 +72,7 @@ public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExist
         var plan = ExportPlan.Targets(chosen.Select(file => file.Path), destinationPath, NamesInDestination(chosen, destinationPath), FileNameComparer);
 
         var skipped = sources.WhereSelect(source => source.LeftOrNone()).Concat(plan.WhereSelect(step => step.LeftOrNone())).ToList();
-        skipped.ForEach(problem => console.Writer.WriteLine(problem));
+        skipped.ForEach(problem => consoleWriter.WriteLine(problem));
 
         // every file is tried, also after one failed
         var done = chosen.Zip(plan, (file, step) => step.Match(left: False, right: target => dryRun ? Preview(target) : ExportFile(file, target))).ToList();
@@ -96,8 +96,8 @@ public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExist
 
     /// <summary>The user chooses with the arrow keys; where hat cannot ask, such as in a script, the file is skipped.</summary>
     private Either<string, FileAt> AskForSource(Hash hash, IReadOnlyList<FileAt> files)
-        => ansiConsole.Profile.Capabilities.Interactive
-            ? Either<string, FileAt>.Right(ansiConsole.Prompt(new SelectionPrompt<FileAt>()
+        => console.Profile.Capabilities.Interactive
+            ? Either<string, FileAt>.Right(console.Prompt(new SelectionPrompt<FileAt>()
                 .Title(Markup.Escape($"The file with hash {hash.Short} has several copies, which one do you want to {Verb}?"))
                 .UseConverter(file => Markup.Escape(file.Path))
                 .AddChoices(files)))
@@ -105,7 +105,7 @@ public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExist
 
     private bool Preview(ExportTarget target)
     {
-        console.Writer.WriteLine($"would {Verb}: {target.Source} -> {target.Target}");
+        consoleWriter.WriteLine($"would {Verb}: {target.Source} -> {target.Target}");
 
         return true;
     }
@@ -118,11 +118,11 @@ public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExist
             switch (fileOperation)
             {
                 case ICopyFile copyFile:
-                    console.Writer.WriteLine($"cp {target.Source} {target.Target}");
+                    consoleWriter.WriteLine($"cp {target.Source} {target.Target}");
                     copyFile.Copy(target.Source, target.Target);
                     break;
                 case IMoveFile moveFile:
-                    console.Writer.WriteLine($"mv {target.Source} {target.Target}");
+                    consoleWriter.WriteLine($"mv {target.Source} {target.Target}");
                     moveFile.Move(target.Source, target.Target);
                     fileStore.MovePath(source, target.Target);
                     break;
@@ -140,7 +140,7 @@ public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExist
 
     private bool Report(string problem)
     {
-        console.Writer.WriteLine(problem);
+        consoleWriter.WriteLine(problem);
 
         return false;
     }

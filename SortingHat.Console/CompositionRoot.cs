@@ -1,5 +1,4 @@
 ﻿using System;
-using Apophis.CLI;
 using Apophis.CLI.Writer;
 using Apophis.FileSystem;
 using Autofac;
@@ -33,8 +32,7 @@ internal class CompositionRoot
         Builder.Register(_ => HatConsole.Create()).As<IAnsiConsole>().SingleInstance();
         Builder.RegisterType<PlainLineWriter>().As<IConsoleWriter>().SingleInstance();
         Builder.RegisterType<FileProgress>().AsSelf().SingleInstance();
-        Builder.RegisterType<ConsoleApplicationInformationProvider>().As<IConsoleApplicationInformationProvider>();
-        Builder.RegisterType<Apophis.CLI.Console>().AsSelf();
+        Builder.RegisterType<ApplicationName>().AsSelf().SingleInstance();
 
         RegisterCommands();
 
