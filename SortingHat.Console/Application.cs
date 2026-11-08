@@ -8,7 +8,7 @@ using SortingHat.API.Plugin;
 namespace SortingHat.CLI;
 
 [UsedImplicitly]
-internal class Application(ILogger<Application> logger, IConsoleWriter consoleWriter, CommandLine commandLine, IPluginLoader pluginLoader)
+internal class Application(ILogger<Application> logger, IConsoleWriter consoleWriter, CommandLine commandLine, CommandNames commandNames, IPluginLoader pluginLoader)
 {
     /// <summary>Runs hat with the command line <paramref name="args"/> and returns its exit code.</summary>
     internal int Run(string[] args)
@@ -17,6 +17,8 @@ internal class Application(ILogger<Application> logger, IConsoleWriter consoleWr
         {
             consoleWriter.WriteLine($"Warning: plugin '{problem.Source}' not loaded: {problem.Reason}.");
         }
+
+        commandNames.Warnings.ForEach(consoleWriter.WriteLine);
 
         try
         {

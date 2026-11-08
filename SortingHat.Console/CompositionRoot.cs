@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Apophis.CLI.Writer;
 using Apophis.FileSystem;
 using Autofac;
@@ -70,6 +71,9 @@ internal class CompositionRoot
     {
         Builder.RegisterType<FileOperations<ICopyFile>>().AsSelf();
         Builder.RegisterType<FileOperations<IMoveFile>>().AsSelf();
+
+        // once per run of hat, with the commands of the plugins
+        Builder.Register(context => CommandNames.Assign(context.Resolve<IEnumerable<IDeclaredCommand>>())).AsSelf().InstancePerLifetimeScope();
 
         Builder.RegisterAssemblyTypes(GetType().Assembly)
             .Where(type => IsCommandClass(type) && type.IsAssignableTo<IDeclaredCommand>())

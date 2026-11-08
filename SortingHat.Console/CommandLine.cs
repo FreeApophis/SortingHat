@@ -19,7 +19,7 @@ namespace SortingHat.CLI;
 /// Every <see cref="IDeclaredCommand"/> gets exactly the arguments and options it declares.
 /// </summary>
 [UsedImplicitly]
-internal sealed class CommandLine(IConsoleWriter consoleWriter, ApplicationName application, IAnsiConsole console, IEnumerable<IDeclaredCommand> commands)
+internal sealed class CommandLine(IConsoleWriter consoleWriter, ApplicationName application, IAnsiConsole console, CommandNames commandNames)
 {
     /// <summary>Response files (<c>@file</c>) are off, so a file name starting with <c>@</c> stays an argument.</summary>
     private static readonly Cli.ParserConfiguration ParserConfiguration = new() { ResponseFileTokenReplacer = null };
@@ -90,19 +90,20 @@ internal sealed class CommandLine(IConsoleWriter consoleWriter, ApplicationName 
     {
         var root = new Cli.RootCommand("SortingHat: find your documents with tags");
 
-        commands.ForEach(command => root.Add(Command(command)));
+        commandNames.Offered.ForEach(offered => root.Add(Command(offered)));
         root.SetAction(_ => Hint());
 
         return root;
     }
 
-    private Cli.Command Command(IDeclaredCommand command)
+    private Cli.Command Command(OfferedCommand offered)
     {
+        var command = offered.Command;
         var result = new Cli.Command(command.Name, HelpDescription(command));
         var arguments = command.Arguments.Select(ToArgument).ToList();
         var flags = command.Options.Select(option => (Definition: option, Flag: ToFlag(option))).ToList();
 
-        command.Aliases.ForEach(result.Aliases.Add);
+        offered.Aliases.ForEach(result.Aliases.Add);
         arguments.ForEach(argument => result.Add(argument.Argument));
         flags.ForEach(flag => result.Add(flag.Flag));
         result.SetAction((parseResult, cancellationToken) => UnknownOptions(parseResult.Tokens) switch

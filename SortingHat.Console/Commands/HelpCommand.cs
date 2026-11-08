@@ -14,14 +14,14 @@ using Spectre.Console;
 namespace SortingHat.CLI.Commands;
 
 /// <summary>
-/// The overview of all commands, and the generated help of a single command. The commands are lazy, because this command is one of them.
+/// The overview of all commands, and the generated help of a single command. The command names are lazy, because this command is one of the commands.
 /// </summary>
 [UsedImplicitly]
 internal class HelpCommand(
     IConsoleWriter consoleWriter,
     ApplicationName application,
     IAnsiConsole console,
-    Lazy<IEnumerable<IDeclaredCommand>> commands,
+    Lazy<CommandNames> commandNames,
     Lazy<CommandLine> commandLine,
     IAutoTagHandler autoTagHandler) : IDeclaredCommand
 {
@@ -42,15 +42,15 @@ internal class HelpCommand(
             none: () => PrintOverview(input.Has(Verbose)),
             some: PrintCommandHelp));
 
-    private static (CommandGrouping Grouping, string Name, string Aliases, string Description) HelpRow(IDeclaredCommand command)
-        => (command.CommandGrouping, command.Name, string.Join(", ", command.Aliases), command.Description);
+    private static (CommandGrouping Grouping, string Name, string Aliases, string Description) HelpRow(OfferedCommand offered)
+        => (offered.Command.CommandGrouping, offered.Command.Name, string.Join(", ", offered.Aliases), offered.Command.Description);
 
-    private static IEnumerable<string> Names(IDeclaredCommand command)
-        => [command.Name, .. command.Aliases];
+    private static IEnumerable<string> Names(OfferedCommand offered)
+        => [offered.Command.Name, .. offered.Aliases];
 
     /// <summary>The help of every command is generated from what the command line knows about it.</summary>
     private bool PrintCommandHelp(string name)
-        => commands.Value.SelectMany(Names).Contains(name)
+        => commandNames.Value.Offered.SelectMany(Names).Contains(name)
             ? commandLine.Value.Run([name, "--help"]) == ExitCode.Success
             : UnknownCommand(name);
 
@@ -64,7 +64,7 @@ internal class HelpCommand(
     private bool PrintOverview(bool verbose)
     {
         consoleWriter.WriteLine($"{application.Name} <command> [<arguments>] [<options>]:");
-        PrintHelpCommands([.. commands.Value.Select(HelpRow)]);
+        PrintHelpCommands([.. commandNames.Value.Offered.Select(HelpRow)]);
         PrintTagVariables(verbose);
         PrintHelpExamples();
 
