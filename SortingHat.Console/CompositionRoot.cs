@@ -11,6 +11,7 @@ using SortingHat.API.DI;
 using SortingHat.API.Plugin;
 using SortingHat.CLI.Commands.Files;
 using SortingHat.DB;
+using Spectre.Console;
 
 namespace SortingHat.CLI;
 
@@ -30,7 +31,8 @@ internal class CompositionRoot
         Builder.RegisterType<LoggerFactory>().As<ILoggerFactory>().SingleInstance();
         Builder.RegisterGeneric(typeof(Logger<>)).As(typeof(ILogger<>)).SingleInstance();
 
-        Builder.RegisterType<SystemConsoleWriter>().As<IConsoleWriter>();
+        Builder.Register(_ => HatConsole.Create()).As<IAnsiConsole>().SingleInstance();
+        Builder.RegisterType<PlainLineWriter>().As<IConsoleWriter>().SingleInstance();
         Builder.RegisterType<SystemConsoleReader>().As<IConsoleReader>();
         Builder.RegisterType<ConsoleApplicationInformationProvider>().As<IConsoleApplicationInformationProvider>();
         Builder.RegisterType<Apophis.CLI.Console>().AsSelf();

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Apophis.CLI.Writer;
 using Funcky.Extensions;
 using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
+using Spectre.Console;
 using Cli = System.CommandLine;
 using Console = Apophis.CLI.Console;
 using Flag = System.CommandLine.Option<bool>;
@@ -19,14 +19,14 @@ namespace SortingHat.CLI;
 /// Every <see cref="IDeclaredCommand"/> gets exactly the arguments and options it declares.
 /// </summary>
 [UsedImplicitly]
-internal sealed class CommandLine(Console console, IEnumerable<IDeclaredCommand> commands)
+internal sealed class CommandLine(Console console, IAnsiConsole ansiConsole, IEnumerable<IDeclaredCommand> commands)
 {
     /// <summary>Response files (<c>@file</c>) are off, so a file name starting with <c>@</c> stays an argument.</summary>
     private static readonly Cli.ParserConfiguration ParserConfiguration = new() { ResponseFileTokenReplacer = null };
 
     internal int Run(IReadOnlyList<string> arguments)
     {
-        using var output = new ConsoleTextWriter(console.Writer);
+        var output = ansiConsole.Profile.Out.Writer;
 
         return RootCommand()
             .Parse(arguments, ParserConfiguration)

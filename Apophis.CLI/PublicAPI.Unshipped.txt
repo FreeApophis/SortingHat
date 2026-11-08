@@ -38,24 +38,11 @@ Apophis.CLI.Reader.SystemConsoleReader
 Apophis.CLI.Reader.SystemConsoleReader.ReadInt() -> Funcky.Monads.Option<int>
 Apophis.CLI.Reader.SystemConsoleReader.ReadLine() -> string!
 Apophis.CLI.Reader.SystemConsoleReader.SystemConsoleReader() -> void
-Apophis.CLI.Writer.ConsoleTextWriter
-Apophis.CLI.Writer.ConsoleTextWriter.ConsoleTextWriter(Apophis.CLI.Writer.IConsoleWriter! consoleWriter) -> void
 Apophis.CLI.Writer.IConsoleWriter
 Apophis.CLI.Writer.IConsoleWriter.WriteLine() -> void
 Apophis.CLI.Writer.IConsoleWriter.WriteLine(string! line) -> void
-Apophis.CLI.Writer.MemoryConsoleWriter
-Apophis.CLI.Writer.MemoryConsoleWriter.Lines.get -> System.Collections.Generic.List<string!>!
-Apophis.CLI.Writer.MemoryConsoleWriter.MemoryConsoleWriter() -> void
-Apophis.CLI.Writer.MemoryConsoleWriter.WriteLine() -> void
-Apophis.CLI.Writer.MemoryConsoleWriter.WriteLine(string! line) -> void
 Apophis.CLI.Writer.NullWriter
 Apophis.CLI.Writer.NullWriter.NullWriter() -> void
 Apophis.CLI.Writer.NullWriter.WriteLine() -> void
 Apophis.CLI.Writer.NullWriter.WriteLine(string! line) -> void
-Apophis.CLI.Writer.SystemConsoleWriter
-Apophis.CLI.Writer.SystemConsoleWriter.SystemConsoleWriter() -> void
-Apophis.CLI.Writer.SystemConsoleWriter.WriteLine() -> void
-Apophis.CLI.Writer.SystemConsoleWriter.WriteLine(string! line) -> void
-override Apophis.CLI.Writer.ConsoleTextWriter.Encoding.get -> System.Text.Encoding!
-override Apophis.CLI.Writer.ConsoleTextWriter.Write(char value) -> void
 static Apophis.CLI.NumberFormatter.HumanSize(this long size) -> string!

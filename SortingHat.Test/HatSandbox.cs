@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Apophis.CLI.Reader;
-using Apophis.CLI.Writer;
 using Autofac;
 using Funcky.Monads;
 using Microsoft.Data.Sqlite;
 using SortingHat.API;
 using SortingHat.API.Plugin;
 using SortingHat.CLI;
+using Spectre.Console;
+using Spectre.Console.Testing;
 using static Funcky.Functional;
 
 namespace SortingHat.Test;
@@ -21,11 +22,12 @@ internal sealed class HatSandbox : IDisposable
 {
     private readonly string _root = Path.Combine(Path.GetTempPath(), $"SortingHat.Test.{Guid.NewGuid():N}");
     private readonly List<string> _files = [];
-    private readonly MemoryConsoleWriter _writer = new();
+    private readonly TestConsole _console = new();
     private readonly MemoryConsoleReader _reader = new();
     private readonly DatabaseSettings _databaseSettings;
     private readonly IContainer _container;
     private readonly Lazy<ILifetimeScope> _pluginScope;
+    private int _outputStart;
 
     public HatSandbox()
         : this(_ => { })
@@ -45,7 +47,10 @@ internal sealed class HatSandbox : IDisposable
 
         var compositionRoot = new CompositionRoot().Register();
         _databaseSettings = new DatabaseSettings { Type = "sqlite", Name = "hat", Path = _root, DefaultProject = "Default" };
-        compositionRoot.Builder.RegisterInstance(_writer).As<IConsoleWriter>();
+
+        // like hat with its output redirected: no colours, not interactive, no wrapping
+        _console.Profile.Width = HatConsole.RedirectedWidth;
+        compositionRoot.Builder.RegisterInstance(_console).As<IAnsiConsole>();
         compositionRoot.Builder.RegisterInstance(_reader).As<IConsoleReader>();
         compositionRoot.Builder.RegisterInstance(_databaseSettings);
         compositionRoot.Builder.RegisterInstance(new PluginDirectory(PluginDirectory));
@@ -62,7 +67,13 @@ internal sealed class HatSandbox : IDisposable
     /// </summary>
     public string PluginDirectory { get; }
 
-    public IReadOnlyList<string> Lines => _writer.Lines;
+    /// <summary>The lines hat wrote in the last run.</summary>
+    public IReadOnlyList<string> Lines
+        => _console.Output[_outputStart..] switch
+        {
+            "" => [],
+            var output => [.. output.TrimEnd('\n').Split('\n').Select(line => line.TrimEnd('\r'))],
+        };
 
     /// <summary>The lines the user types when hat asks for input.</summary>
     public MemoryConsoleReader Keyboard => _reader;
@@ -86,6 +97,7 @@ internal sealed class HatSandbox : IDisposable
         }
 
         _container.Dispose();
+        _console.Dispose();
 
         // the connection pool keeps the database files open
         SqliteConnection.ClearAllPools();
@@ -131,7 +143,7 @@ internal sealed class HatSandbox : IDisposable
         Hat(["find-files", query]);
 
         return _files
-            .Where(path => _writer.Lines.Any(line => line.TrimEnd().EndsWith(path)))
+            .Where(path => Lines.Any(line => line.TrimEnd().EndsWith(path)))
             .Select(path => Path.GetFileName(path))
             .Order();
     }
@@ -139,7 +151,7 @@ internal sealed class HatSandbox : IDisposable
     /// <summary>Runs hat with the <paramref name="arguments"/> and returns its exit code.</summary>
     public int Hat(string[] arguments)
     {
-        _writer.Lines.Clear();
+        _outputStart = _console.Output.Length;
 
         return InScope(scope => scope.Resolve<Application>().Run(arguments));
     }
