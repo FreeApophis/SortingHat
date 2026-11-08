@@ -4,22 +4,22 @@ using System.Text.Json;
 using Funcky.Extensions;
 using Funcky.Monads;
 using JetBrains.Annotations;
-using SortingHat.API.DI;
 using SortingHat.API.Models;
+using SortingHat.API.Plugin;
 
 namespace SortingHat.Plugin.MoveOnTag;
 
-/// <summary>Keeps the move rules as JSON under one key of the settings of hat, so they apply in every project.</summary>
+/// <summary>Keeps the move rules as JSON in the settings of the active project: rules name tags, and tags belong to a project.</summary>
 [UsedImplicitly]
-internal sealed class MoveRuleStore(ISettings settings)
+internal sealed class MoveRuleStore(IPluginSettings<MoveOnTagModule> settings)
 {
-    private const string Key = "MoveOnTag.Rules";
+    private const string Key = "Rules";
 
     public MoveRules Load()
-        => settings.Get(Key).Select(Parse).GetOrElse(MoveRules.Empty);
+        => settings.Project.Get(Key).Select(Parse).GetOrElse(MoveRules.Empty);
 
     public void Save(MoveRules rules)
-        => settings.Set(Key, JsonSerializer.Serialize(rules.Rules.Select(rule => new StoredRule(rule.Tag.FullName, rule.Folder))));
+        => settings.Project.Set(Key, JsonSerializer.Serialize(rules.Rules.Select(rule => new StoredRule(rule.Tag.FullName, rule.Folder))));
 
     /// <summary>A stored tag that is no tag any more is left out.</summary>
     private static MoveRules Parse(string json)

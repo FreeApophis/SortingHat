@@ -8,7 +8,7 @@ The plugins in this repository are working examples:
 |---|---|
 | `SortingHat.Plugin.FileType` | tag variables (`{FileType.Category}`), a command (`identify`), an embedded resource |
 | `SortingHat.Plugin.Exif` | tag variables from a third-party library (MetadataExtractor), a command with file patterns |
-| `SortingHat.Plugin.MoveOnTag` | a file event handler, commands that keep settings |
+| `SortingHat.Plugin.MoveOnTag` | a file event handler, commands that keep settings per project |
 | `SortingHat.Plugin.ExtractRelevantText` | a command with its own services |
 
 ## The project
@@ -239,12 +239,12 @@ Inject these into your services; they are the same ones hat's own commands use. 
 | `IHashService` | the content hash of a file |
 | `IFilePathExtractor` | files, wildcards and folders from command line arguments |
 | `IProjects` | the projects: list, create, remove, export, import |
-| `ISettings` | string settings that hat keeps between runs, in every project |
+| `IPluginSettings<TPlugin>` | your plugin's own settings: `Global` for every project, `Project` for the active project |
 | `IConsoleWriter` | output lines |
 | `ICopyFile`, `IMoveFile`, `IExistsFile`, `IExistsDirectory` | the file system, replaceable in tests |
 
 - Values with rules have their own types: `Tag.Parse(":tax:2018")`, `TagName`, `Hash.Parse(...)`, `ProjectName.Parse(...)` return `Either<string, T>` with the reason on the left. Parse user input once, then work with the type.
-- **Settings are shared by everything**, so prefix your keys with your plugin's name, such as `MoveOnTag.Rules`. Store structured values as JSON.
+- **Settings** come from `IPluginSettings<YourModule>`. hat keeps them apart from its own settings and from every other plugin, so any key is yours, such as `Rules`. Use `Project` for whatever names tags or files, because those belong to a project; `Global` for the rest. Values are strings; store structured values as JSON.
 
 ## Testing
 

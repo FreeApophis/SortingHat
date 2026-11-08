@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using SortingHat.API;
 using SortingHat.API.DI;
+using SortingHat.API.Plugin;
 using SortingHat.DB.Access;
 using Module = Autofac.Module;
 
@@ -23,7 +24,8 @@ public class SqliteDatabaseModule : Module
         // Register DataAccess
         builder.RegisterType<SQLiteFile>().As<IFile>().InstancePerLifetimeScope();
         builder.RegisterType<SQLiteTag>().As<ITag>().AsSelf().InstancePerLifetimeScope();
-        builder.RegisterType<SQLiteSettings>().As<ISettings>().InstancePerLifetimeScope();
+        builder.Register(context => new SQLiteSettings(context.Resolve<SQLiteMainDatabase>())).As<ISettings>().InstancePerLifetimeScope();
+        builder.RegisterGeneric(typeof(SQLitePluginSettings<>)).As(typeof(IPluginSettings<>)).InstancePerLifetimeScope();
         builder.RegisterType<SQLiteProjects>().As<IProjects>().InstancePerLifetimeScope();
     }
 }

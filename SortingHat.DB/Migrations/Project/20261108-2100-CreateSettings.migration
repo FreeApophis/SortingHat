@@ -1,0 +1,9 @@
+﻿/* Settings of the project, such as the settings of plugins in this project */
+
+CREATE TABLE `Settings` (
+    `Id`                        INTEGER PRIMARY KEY AUTOINCREMENT,
+    `Key`                       VARCHAR (255) NOT NULL,
+    `Value`                     TEXT NULL,
+
+    UNIQUE (Key)                ON CONFLICT REPLACE
+);

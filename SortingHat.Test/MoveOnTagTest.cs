@@ -107,6 +107,31 @@ public sealed class MoveOnTagTest : IDisposable
     }
 
     [Fact]
+    public void GivenARuleInOneProjectThenAnotherProjectHasNoRules()
+    {
+        _hat.Hat(["move-rule", ":tax", _hat.CreateFolder("tax")]);
+        _hat.Hat(["new-project", "other"]);
+        _hat.Hat(["switch-project", "other"]);
+
+        _hat.Hat(["move-rules"]);
+
+        Assert.Equal(["There are no move rules."], _hat.Lines);
+    }
+
+    [Fact]
+    public void GivenARuleInAnotherProjectThenTaggingDoesNotMoveTheFile()
+    {
+        _hat.Hat(["move-rule", ":tax", _hat.CreateFolder("tax")]);
+        _hat.Hat(["new-project", "other"]);
+        _hat.Hat(["switch-project", "other"]);
+        var path = _hat.WriteFile("a.txt", "a");
+
+        _hat.Hat(["tag-files", ":tax", path]);
+
+        Assert.True(File.Exists(path));
+    }
+
+    [Fact]
     public void GivenRulesThenMoveRulesListsThem()
     {
         var tax = _hat.CreateFolder("tax");

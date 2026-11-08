@@ -348,6 +348,9 @@ SortingHat.API.Plugin.IPluginLoader
 SortingHat.API.Plugin.IPluginLoader.Plugins.get -> System.Collections.Generic.List<SortingHat.API.Plugin.IPlugin!>!
 SortingHat.API.Plugin.IPluginLoader.Problems.get -> System.Collections.Generic.IReadOnlyList<SortingHat.API.Plugin.PluginProblem!>!
 SortingHat.API.Plugin.IPluginLoader.RegisterModules(Autofac.ContainerBuilder! builder) -> void
+SortingHat.API.Plugin.IPluginSettings<TPlugin>
+SortingHat.API.Plugin.IPluginSettings<TPlugin>.Global.get -> SortingHat.API.DI.ISettings!
+SortingHat.API.Plugin.IPluginSettings<TPlugin>.Project.get -> SortingHat.API.DI.ISettings!
 SortingHat.API.Plugin.PluginProblem
 SortingHat.API.Plugin.PluginProblem.<Clone>$() -> SortingHat.API.Plugin.PluginProblem!
 SortingHat.API.Plugin.PluginProblem.Deconstruct(out string! Source, out string! Reason) -> void

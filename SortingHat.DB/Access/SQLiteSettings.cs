@@ -4,7 +4,8 @@ using SortingHat.API.DI;
 
 namespace SortingHat.DB.Access;
 
-internal class SQLiteSettings(SQLiteMainDatabase db) : ISettings
+/// <summary>The Settings table of the <paramref name="db"/>: hat's own settings in the main database, the settings of a project in its database.</summary>
+internal sealed class SQLiteSettings(SQLiteDatabase db) : ISettings
 {
     /// <summary>A key without a row and a key whose value is NULL both have no value.</summary>
     public Option<string> Get(string key)
