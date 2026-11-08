@@ -10,12 +10,13 @@ using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using SortingHat.API.AutoTag;
 using SortingHat.API.DI;
+using SortingHat.API.Events;
 using SortingHat.API.Models;
 
 namespace SortingHat.CLI.Commands.Files;
 
 [UsedImplicitly]
-internal class TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor, IFileScanner fileScanner, IFile fileStore, IAutoTagHandler autoTagHandler, FileProgress progress) : IDeclaredCommand
+internal class TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor, IFileScanner fileScanner, IFile fileStore, IAutoTagHandler autoTagHandler, FileProgress progress, IFileEvents<FileTagged> fileTagged) : IDeclaredCommand
 {
     public CommandGrouping CommandGrouping => CommandGrouping.File;
     public string Name => "tag-files";
@@ -50,7 +51,7 @@ internal class TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter con
         var skipped = new List<(TagMask Mask, string Reason)>();
         IReadOnlyList<TagMask> validMasks = [.. masks.WhereSelect(mask => mask.RightOrNone())];
 
-        await progress.ForEach("Tagging", paths.RightOrNone().GetOrElse([]), async path => skipped.AddRange(await TagFile(path, validMasks)));
+        await progress.ForEach("Tagging", paths.RightOrNone().GetOrElse([]), async path => skipped.AddRange(await TagFile(path, validMasks, cancellationToken)));
 
         Summary(skipped).ForEach(consoleWriter.WriteLine);
 
@@ -66,8 +67,9 @@ internal class TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter con
     private static string Files(int count)
         => count == 1 ? "1 file" : $"{count} files";
 
+    /// <summary>The handlers of plugins hear of the file once, with all its new tags, after they are stored.</summary>
     /// <returns>The masks that gave no tag for this file, and why.</returns>
-    private async Task<IReadOnlyList<(TagMask Mask, string Reason)>> TagFile(string path, IReadOnlyList<TagMask> masks)
+    private async Task<IReadOnlyList<(TagMask Mask, string Reason)>> TagFile(string path, IReadOnlyList<TagMask> masks, CancellationToken cancellationToken)
     {
         var state = await fileScanner.Examine(path);
 
@@ -86,7 +88,13 @@ internal class TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter con
         var file = new AutoTagFile(new FileInfo(path));
         var tags = masks.Select(mask => (Mask: mask, Tag: mask.Apply(file))).ToList();
 
-        tags.WhereSelect(tag => tag.Tag.RightOrNone()).ForEach(tag => Tag(state.Current, tag));
+        IReadOnlyList<Tag> applied = [.. tags.WhereSelect(tag => tag.Tag.RightOrNone())];
+        applied.ForEach(tag => Tag(state.Current, tag));
+
+        if (applied.Count > 0)
+        {
+            (await fileTagged.Publish(new FileTagged(state.Current, applied), cancellationToken)).ForEach(consoleWriter.WriteLine);
+        }
 
         return [.. tags.WhereSelect(tag => tag.Tag.LeftOrNone().Select(reason => (tag.Mask, reason)))];
     }

@@ -4,12 +4,13 @@ using System.Security.Cryptography;
 using Autofac;
 using SortingHat.API.AutoTag;
 using SortingHat.API.DI;
+using SortingHat.API.Events;
 using SortingHat.API.Plugin;
 
 namespace SortingHat.API;
 
 /// <summary>
-/// Registers the core of SortingHat: the query parser, tag parsing, auto-tags, hashing, the models and the plugin loader.
+/// Registers the core of SortingHat: the query parser, tag parsing, auto-tags, hashing, file events, the models and the plugin loader.
 /// A host registers this module, its database module and what is its own: the console or window, logging, configuration and commands.
 /// </summary>
 public class CoreModule : Module
@@ -26,6 +27,8 @@ public class CoreModule : Module
         // one hash algorithm per file, an instance must not be used concurrently
         builder.Register(_ => SHA256.Create()).As<HashAlgorithm>().InstancePerDependency().ExternallyOwned();
         builder.Register(context => new HashService(context.Resolve<Func<HashAlgorithm>>(), nameof(SHA256))).As<IHashService>().SingleInstance();
+
+        builder.RegisterGeneric(typeof(FileEvents<>)).As(typeof(IFileEvents<>));
 
         builder.RegisterType<CreatedAtAutoTag>().As<IAutoTag>().SingleInstance();
         builder.RegisterType<UpdatedAtAutoTag>().As<IAutoTag>().SingleInstance();

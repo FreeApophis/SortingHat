@@ -16,6 +16,9 @@ override SortingHat.API.AutoTag.AutoTagParameter.GetHashCode() -> int
 override SortingHat.API.AutoTag.AutoTagParameter.ToString() -> string!
 override SortingHat.API.AutoTag.TagMask.ToString() -> string!
 override SortingHat.API.CoreModule.Load(Autofac.ContainerBuilder! builder) -> void
+override SortingHat.API.Events.FileTagged.Equals(object? obj) -> bool
+override SortingHat.API.Events.FileTagged.GetHashCode() -> int
+override SortingHat.API.Events.FileTagged.ToString() -> string!
 override SortingHat.API.Models.File.Equals(object? obj) -> bool
 override SortingHat.API.Models.File.GetHashCode() -> int
 override SortingHat.API.Models.File.ToString() -> string!
@@ -166,6 +169,19 @@ SortingHat.API.DatabaseSettings.Path.get -> string!
 SortingHat.API.DatabaseSettings.Path.set -> void
 SortingHat.API.DatabaseSettings.Type.get -> string!
 SortingHat.API.DatabaseSettings.Type.set -> void
+SortingHat.API.Events.FileTagged
+SortingHat.API.Events.FileTagged.<Clone>$() -> SortingHat.API.Events.FileTagged!
+SortingHat.API.Events.FileTagged.Deconstruct(out SortingHat.API.Models.FileAt! File, out System.Collections.Generic.IReadOnlyList<SortingHat.API.Models.Tag!>! Tags) -> void
+SortingHat.API.Events.FileTagged.Equals(SortingHat.API.Events.FileTagged? other) -> bool
+SortingHat.API.Events.FileTagged.File.get -> SortingHat.API.Models.FileAt!
+SortingHat.API.Events.FileTagged.File.init -> void
+SortingHat.API.Events.FileTagged.FileTagged(SortingHat.API.Models.FileAt! File, System.Collections.Generic.IReadOnlyList<SortingHat.API.Models.Tag!>! Tags) -> void
+SortingHat.API.Events.FileTagged.Tags.get -> System.Collections.Generic.IReadOnlyList<SortingHat.API.Models.Tag!>!
+SortingHat.API.Events.FileTagged.Tags.init -> void
+SortingHat.API.Events.IFileEventHandler<TEvent>
+SortingHat.API.Events.IFileEventHandler<TEvent>.Handle(TEvent fileEvent, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
+SortingHat.API.Events.IFileEvents<TEvent>
+SortingHat.API.Events.IFileEvents<TEvent>.Publish(TEvent fileEvent, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<string!>!>!
 SortingHat.API.Models.File
 SortingHat.API.Models.File.<Clone>$() -> SortingHat.API.Models.File!
 SortingHat.API.Models.File.CreatedAt.get -> System.DateTime
@@ -383,6 +399,8 @@ static SortingHat.API.DI.ArgumentDefinition.operator !=(SortingHat.API.DI.Argume
 static SortingHat.API.DI.ArgumentDefinition.operator ==(SortingHat.API.DI.ArgumentDefinition? left, SortingHat.API.DI.ArgumentDefinition? right) -> bool
 static SortingHat.API.DI.OptionDefinition.operator !=(SortingHat.API.DI.OptionDefinition? left, SortingHat.API.DI.OptionDefinition? right) -> bool
 static SortingHat.API.DI.OptionDefinition.operator ==(SortingHat.API.DI.OptionDefinition? left, SortingHat.API.DI.OptionDefinition? right) -> bool
+static SortingHat.API.Events.FileTagged.operator !=(SortingHat.API.Events.FileTagged? left, SortingHat.API.Events.FileTagged? right) -> bool
+static SortingHat.API.Events.FileTagged.operator ==(SortingHat.API.Events.FileTagged? left, SortingHat.API.Events.FileTagged? right) -> bool
 static SortingHat.API.Models.File.operator !=(SortingHat.API.Models.File? left, SortingHat.API.Models.File? right) -> bool
 static SortingHat.API.Models.File.operator ==(SortingHat.API.Models.File? left, SortingHat.API.Models.File? right) -> bool
 static SortingHat.API.Models.FileAt.operator !=(SortingHat.API.Models.FileAt? left, SortingHat.API.Models.FileAt? right) -> bool
