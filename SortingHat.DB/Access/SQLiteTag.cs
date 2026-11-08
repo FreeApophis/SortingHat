@@ -14,7 +14,7 @@ using SortingHat.API.Models;
 namespace SortingHat.DB.Access;
 
 [UsedImplicitly]
-public class SQLiteTag(SQLiteProjectDatabase db) : ITag
+internal sealed class SQLiteTag(SQLiteProjectDatabase db) : ITag
 {
     /// <summary>Every tag reachable from a root, each parent before its children.</summary>
     private const string AllTags = """

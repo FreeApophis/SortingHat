@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Autofac;
-using Autofac.Core;
+﻿using Autofac;
 using SortingHat.API;
 using SortingHat.API.DI;
 using SortingHat.DB.Access;
@@ -17,44 +14,16 @@ public class SqliteDatabaseModule : Module
         builder.RegisterType<TagNameGrammarMigration>().As<ICodeMigration>().SingleInstance();
         builder.RegisterType<TagNameKeyMigration>().As<ICodeMigration>().SingleInstance();
 
-        // Register Databases
-        builder.Register(CreateProjectDatabase()).As<SQLiteProjectDatabase>().As<IProjectDatabase>().InstancePerLifetimeScope();
-        builder.Register(CreateMainDatabase()).As<SQLiteMainDatabase>().As<IMainDatabase>().InstancePerLifetimeScope();
+        // the databases open and migrate on their first use
+        builder.Register(context => new SQLiteProjectDatabase(context.Resolve<DatabaseSettings>(), context.Resolve<ISettings>(), context.Resolve<IRevisionMigrator>()))
+            .As<SQLiteProjectDatabase>().As<IProjectDatabase>().InstancePerLifetimeScope();
+        builder.Register(context => new SQLiteMainDatabase(context.Resolve<DatabaseSettings>(), context.Resolve<IRevisionMigrator>()))
+            .As<SQLiteMainDatabase>().As<IMainDatabase>().InstancePerLifetimeScope();
 
         // Register DataAccess
         builder.RegisterType<SQLiteFile>().As<IFile>().InstancePerLifetimeScope();
         builder.RegisterType<SQLiteTag>().As<ITag>().AsSelf().InstancePerLifetimeScope();
         builder.RegisterType<SQLiteSettings>().As<ISettings>().InstancePerLifetimeScope();
         builder.RegisterType<SQLiteProjects>().As<IProjects>().InstancePerLifetimeScope();
-    }
-
-    private Func<IComponentContext, SQLiteMainDatabase> CreateMainDatabase()
-    {
-        return context =>
-        {
-            var db = new SQLiteMainDatabase(context.Resolve<DatabaseSettings>());
-
-            return RunDatabaseSetup(context.Resolve<IRevisionMigrator>(), db);
-        };
-    }
-
-    private static Func<IComponentContext, IEnumerable<Parameter>, SQLiteProjectDatabase> CreateProjectDatabase()
-    {
-        return (context, parameters) =>
-        {
-            var db = new SQLiteProjectDatabase(
-                context.Resolve<DatabaseSettings>(),
-                context.Resolve<ISettings>());
-
-            return RunDatabaseSetup(context.Resolve<IRevisionMigrator>(), db);
-        };
-    }
-
-    private static TDatabase RunDatabaseSetup<TDatabase>(IRevisionMigrator migrator, TDatabase db)
-        where TDatabase : SQLiteDatabase
-    {
-        migrator.Migrate(db);
-
-        return db;
     }
 }

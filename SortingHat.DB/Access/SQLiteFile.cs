@@ -16,7 +16,7 @@ using File = SortingHat.API.Models.File;
 namespace SortingHat.DB.Access;
 
 [UsedImplicitly]
-public class SQLiteFile(SQLiteProjectDatabase db, SQLiteTag sqLiteTag, Parser parser) : IFile
+internal sealed class SQLiteFile(SQLiteProjectDatabase db, SQLiteTag sqLiteTag, Parser parser) : IFile
 {
     private const string AllFileTags = @"SELECT Tags.Id
 FROM Tags

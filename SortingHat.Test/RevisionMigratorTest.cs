@@ -77,14 +77,4 @@ public sealed class RevisionMigratorTest : IDisposable
 
     private object? Count(string query)
         => _hat.InScope(scope => scope.Resolve<SQLiteProjectDatabase>().ExecuteScalar(query));
-
-    private sealed class CodeMigration(string name, MigrationType migrationType, Action<SQLiteDatabase> run) : ICodeMigration
-    {
-        public string Name => name;
-
-        public MigrationType MigrationType => migrationType;
-
-        public void Run(SQLiteDatabase db)
-            => run(db);
-    }
 }

@@ -8,37 +8,42 @@ using SortingHat.API;
 
 namespace SortingHat.DB;
 
+/// <summary>
+/// A SQLite database that opens on its first use: only then is its name decided, its file created when it is missing,
+/// and its migrations run. A command that never touches the database leaves no file behind.
+/// </summary>
 public abstract class SQLiteDatabase : IDisposable
 {
     private readonly string _path;
+    private readonly Lazy<string> _dbName;
+    private readonly IRevisionMigrator _migrator;
 
     private bool _disposedValue;
+    private Option<SqliteConnection> _connection;
     private Option<SqliteTransaction> _transaction;
 
-    protected SQLiteDatabase(DatabaseSettings databaseSettings, string dbName)
+    /// <param name="databaseSettings">Where the database files are.</param>
+    /// <param name="dbName">The name of the database file, asked for on the first use.</param>
+    /// <param name="migrator">Brings the database up to date when it opens.</param>
+    private protected SQLiteDatabase(DatabaseSettings databaseSettings, Func<string> dbName, IRevisionMigrator migrator)
     {
-        if (databaseSettings.Type == "sqlite")
-        {
-            _path = databaseSettings.DbPath;
-            DbName = dbName;
-
-            // without the pool, disposing the database closes its file, so a removed project's file can be deleted
-            Connection = new SqliteConnection($"Filename={DbFile()};Pooling=False");
-            Connection.Open();
-
-            ExecuteNonQuery("PRAGMA foreign_keys=ON;");
-        }
-        else
+        if (databaseSettings.Type != "sqlite")
         {
             throw new NotSupportedException("Only SQLite is currently supported as Database Type");
         }
+
+        _path = databaseSettings.DbPath;
+        _dbName = new Lazy<string>(dbName);
+        _migrator = migrator;
     }
 
-    public string DbName { get; }
+    public string DbName
+        => _dbName.Value;
 
     internal abstract MigrationType MigrationType { get; }
 
-    private SqliteConnection Connection { get; }
+    private SqliteConnection Connection
+        => _connection.GetOrElse(Open);
 
     public void Dispose()
     {
@@ -147,14 +152,40 @@ public abstract class SQLiteDatabase : IDisposable
         return command;
     }
 
+    /// <summary>
+    /// The connection is known before the migrations run, because they use it. When opening or a migration fails,
+    /// the connection is closed again, so the file is not kept open, and the next use tries again.
+    /// </summary>
+    private SqliteConnection Open()
+    {
+        // without the pool, disposing the database closes its file, so a removed project's file can be deleted
+        var connection = new SqliteConnection($"Filename={DbFile()};Pooling=False");
+        _connection = connection;
+
+        try
+        {
+            connection.Open();
+            ExecuteNonQuery("PRAGMA foreign_keys=ON;");
+            _migrator.Migrate(this);
+
+            return connection;
+        }
+        catch
+        {
+            _connection = Option<SqliteConnection>.None;
+            connection.Dispose();
+
+            throw;
+        }
+    }
+
     private void Dispose(bool disposing)
     {
         if (!_disposedValue)
         {
             if (disposing)
             {
-                Connection.Close();
-                Connection.Dispose();
+                _connection.AndThen(connection => connection.Dispose());
             }
 
             _disposedValue = true;

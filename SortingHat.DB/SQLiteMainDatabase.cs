@@ -4,7 +4,9 @@ using SortingHat.API.DI;
 
 namespace SortingHat.DB;
 
-public class SQLiteMainDatabase(DatabaseSettings databaseSettings) : SQLiteDatabase(databaseSettings, databaseSettings.Name), IMainDatabase
+/// <summary>The database of hat itself: the projects and the settings.</summary>
+internal sealed class SQLiteMainDatabase(DatabaseSettings databaseSettings, IRevisionMigrator migrator)
+    : SQLiteDatabase(databaseSettings, () => databaseSettings.Name, migrator), IMainDatabase
 {
     internal override MigrationType MigrationType => MigrationType.Main;
 
