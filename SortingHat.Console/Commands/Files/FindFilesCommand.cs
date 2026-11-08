@@ -7,11 +7,12 @@ using Apophis.CLI.Writer;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
+using Spectre.Console;
 
 namespace SortingHat.CLI.Commands.Files;
 
 [UsedImplicitly]
-internal class FindFilesCommand(IFile fileStore, IConsoleWriter consoleWriter) : IDeclaredCommand
+internal class FindFilesCommand(IFile fileStore, IConsoleWriter consoleWriter, IAnsiConsole console) : IDeclaredCommand
 {
     private static readonly ArgumentDefinition Query = new()
     {
@@ -56,7 +57,7 @@ internal class FindFilesCommand(IFile fileStore, IConsoleWriter consoleWriter) :
 
         if (files.Any())
         {
-            var table = new ConsoleTable(4);
+            var table = LightTable.Create(LightTable.Column("Hash"), LightTable.Column("Created"), LightTable.Column("Size").RightAligned(), LightTable.Column("Path"));
             foreach (var file in files)
             {
                 if (open)
@@ -64,10 +65,10 @@ internal class FindFilesCommand(IFile fileStore, IConsoleWriter consoleWriter) :
                     FileHelper.OpenWithAssociatedProgram(file.Path);
                 }
 
-                table.Append(file.File.Hash.Short, file.File.CreatedAt, file.File.Size.HumanSize(), file.Path);
+                table.AddCells(file.File.Hash.Short, $"{file.File.CreatedAt}", file.File.Size.HumanSize(), file.Path);
             }
 
-            table.WriteTo(consoleWriter);
+            console.Write(table);
         }
         else
         {

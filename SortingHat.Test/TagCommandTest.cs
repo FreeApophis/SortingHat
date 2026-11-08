@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Xunit;
 
 namespace SortingHat.Test;
@@ -93,8 +92,8 @@ public sealed class TagCommandTest : IDisposable
         Assert.Equal(0, _hat.Hat(["add-tags", ":tax:2018", ":movie:good"]));
 
         Assert.Equal(0, _hat.Hat(["list-tags"]));
-        Assert.Contains(_hat.Lines, line => line.StartsWith("* :tax:2018") && line.Contains("(0)"));
-        Assert.Contains(_hat.Lines, line => line.StartsWith("* :movie:good") && line.Contains("(0)"));
+        Assert.Contains(":tax:2018|0", _hat.Rows);
+        Assert.Contains(":movie:good|0", _hat.Rows);
     }
 
     [Fact]
@@ -103,7 +102,7 @@ public sealed class TagCommandTest : IDisposable
         _hat.TaggedFile("a.txt", ":tax");
 
         Assert.Equal(0, _hat.Hat(["tags"]));
-        Assert.Contains(_hat.Lines, line => line.StartsWith("* :tax") && line.Contains("(1)"));
+        Assert.Contains(":tax|1", _hat.Rows);
     }
 
     [Fact]
@@ -119,7 +118,7 @@ public sealed class TagCommandTest : IDisposable
         Assert.Equal(0, _hat.Hat(["add-tags", ":cherry", ":Banana", ":apple"]));
 
         Assert.Equal(0, _hat.Hat(["list-tags"]));
-        Assert.Equal([":apple", ":Banana", ":cherry"], _hat.Lines.Where(line => line.StartsWith("* ")).Select(line => line[2..].Split(' ')[0]));
+        Assert.Equal(["Tag|Files", ":apple|0", ":Banana|0", ":cherry|0"], _hat.Rows);
     }
 
     [Fact]

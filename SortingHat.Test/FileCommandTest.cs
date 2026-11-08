@@ -335,6 +335,36 @@ public sealed class FileCommandTest : IDisposable
         Assert.Contains(_hat.Lines, line => line.Contains("copy-of-a.txt"));
     }
 
+    [Fact]
+    public void GivenADuplicateWhosePathIsGoneThenDuplicateMarksItMissing()
+    {
+        var first = _hat.TaggedFile("a.txt");
+        var second = Path.Combine(Path.GetDirectoryName(first) ?? string.Empty, "copy-of-a.txt");
+        File.Copy(first, second);
+        _hat.Hat(["tag-files", second]);
+        File.Delete(second);
+
+        Assert.Equal(0, _hat.Hat(["duplicate"]));
+        Assert.Contains(_hat.Rows, row => row.StartsWith("missing|") && row.EndsWith("|copy-of-a.txt"));
+    }
+
+    [Fact]
+    public void GivenNoDuplicatesThenDuplicateSaysSo()
+    {
+        _hat.TaggedFile("a.txt");
+
+        Assert.Equal(0, _hat.Hat(["duplicate"]));
+        Assert.Equal(["There are no duplicates."], _hat.Lines);
+    }
+
+    [Fact]
+    public void GivenAFileNameWithBracketsThenFindFilesShowsItAsItIs()
+    {
+        _hat.TaggedFile("scan [1].txt", ":x");
+
+        Assert.Equal(["scan [1].txt"], _hat.FindFiles(":x"));
+    }
+
     public void Dispose()
         => _hat.Dispose();
 

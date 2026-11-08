@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Apophis.CLI.Reader;
 using Autofac;
 using Funcky.Monads;
@@ -74,6 +75,13 @@ internal sealed class HatSandbox : IDisposable
             "" => [],
             var output => [.. output.TrimEnd('\n').Split('\n').Select(line => line.TrimEnd('\r'))],
         };
+
+    /// <summary>
+    /// The rows of the tables hat wrote in the last run, headers included, with their cells joined by '|', such as ':tax|1'.
+    /// The cells of a table are at least three spaces apart.
+    /// </summary>
+    public IReadOnlyList<string> Rows
+        => [.. Lines.Select(line => Regex.Split(line.Trim(), " {3,}")).Where(cells => cells.Length > 1).Select(cells => string.Join('|', cells))];
 
     /// <summary>The lines the user types when hat asks for input.</summary>
     public MemoryConsoleReader Keyboard => _reader;

@@ -32,7 +32,7 @@ public sealed class TagCaseTest : IDisposable
         _hat.TaggedFile("a.txt", ":Tax");
         _hat.TaggedFile("b.txt", ":TAX");
 
-        Assert.Equal(["* :Tax"], TagLines());
+        Assert.Equal([":Tax"], TagNames());
         Assert.Equal(["a.txt", "b.txt"], _hat.FindFiles(":tax"));
     }
 
@@ -51,7 +51,7 @@ public sealed class TagCaseTest : IDisposable
 
         Assert.Equal(0, _hat.Hat(["rename-tag", ":TAX", "Tax"]));
 
-        Assert.Equal(["* :Tax"], TagLines());
+        Assert.Equal([":Tax"], TagNames());
     }
 
     [Fact]
@@ -64,7 +64,7 @@ public sealed class TagCaseTest : IDisposable
 
         Convert();
 
-        Assert.Equal(["* :tax", "* :tax:Q1"], TagLines());
+        Assert.Equal([":tax", ":tax:Q1"], TagNames());
         Assert.Equal(["a.txt", "b.txt"], _hat.FindFiles(":tax:q1"));
         Assert.Equal(["a.txt", "b.txt", "c.txt"], _hat.FindFiles(":TAX"));
     }
@@ -72,11 +72,11 @@ public sealed class TagCaseTest : IDisposable
     public void Dispose()
         => _hat.Dispose();
 
-    private string[] TagLines()
+    private string[] TagNames()
     {
         _hat.Hat(["list-tags"]);
 
-        return [.. _hat.Lines.Where(line => line.StartsWith("* ")).Select(line => line.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2)).Select(parts => string.Join(' ', parts))];
+        return [.. _hat.Rows.Skip(1).Select(row => row[..row.IndexOf('|')])];
     }
 
     /// <summary>Older hat versions kept tags that differ only in case apart; the name changes, its key stays as it was.</summary>

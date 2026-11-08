@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Apophis.CLI;
 using Apophis.FileSystem;
 using Funcky.Extensions;
 using Funcky.Monads;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
+using Spectre.Console;
 using static Funcky.Functional;
 using Console = Apophis.CLI.Console;
 
@@ -17,7 +17,7 @@ namespace SortingHat.CLI.Commands.Files;
 /// Puts the files of a search into a folder: choose a source per file (asking when several copies exist), let <see cref="ExportPlan"/> decide the targets,
 /// then copy or move. One file that cannot be done is reported and skipped, the others still go.
 /// </summary>
-public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExistsFile existsFile, IExistsDirectory existsDirectory, Console console, IFile fileStore)
+public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExistsFile existsFile, IExistsDirectory existsDirectory, Console console, IAnsiConsole ansiConsole, IFile fileStore)
     where TFileOperation : IFileOperation
 {
     /// <summary>Windows ignores the case of file names, other systems do not.</summary>
@@ -99,9 +99,9 @@ public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExist
         console.Writer.WriteLine();
         console.Writer.WriteLine($" The file with hash {hash.Short} has multiple sources, which one do you want to {Verb}:");
 
-        var table = new ConsoleTable(2);
-        files.Select((file, index) => (file, index)).ForEach(choice => table.Append($"[{choice.index}]", choice.file.Path));
-        table.WriteTo(console.Writer);
+        var table = LightTable.Create(LightTable.Column("Choice").RightAligned(), LightTable.Column("Path"));
+        files.Select((file, index) => (file, index)).ForEach(choice => table.AddCells($"{choice.index}", choice.file.Path));
+        ansiConsole.Write(table);
 
         return console.Reader
             .ReadInt()

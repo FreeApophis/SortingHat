@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Apophis.CLI;
-using Apophis.CLI.Writer;
+using Funcky.Extensions;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
+using Spectre.Console;
 
 namespace SortingHat.CLI.Commands;
 
 [UsedImplicitly]
-internal class StatisticCommand(IProjectDatabase db, IConsoleWriter consoleWriter) : IDeclaredCommand
+internal class StatisticCommand(IProjectDatabase db, IAnsiConsole console) : IDeclaredCommand
 {
     public CommandGrouping CommandGrouping => CommandGrouping.General;
     public string Name => "statistics";
@@ -19,27 +19,11 @@ internal class StatisticCommand(IProjectDatabase db, IConsoleWriter consoleWrite
 
     public Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
     {
-        var table = StatisticsTable();
+        var table = LightTable.Create(LightTable.Column("Statistic"), LightTable.Column("Count").RightAligned());
+        db.GetStatistics().ForEach(statistic => table.AddCells(statistic.Key, $"{statistic.Value}"));
 
-        foreach (var (key, value) in db.GetStatistics())
-        {
-            table.Append(key, "=", value);
-        }
-
-        consoleWriter.WriteLine("Statistics:");
-        consoleWriter.WriteLine();
-        table.WriteTo(consoleWriter);
+        console.Write(table);
 
         return Task.FromResult(true);
-    }
-
-    private static ConsoleTable StatisticsTable()
-    {
-        var table = new ConsoleTable(3);
-
-        table.Columns[0].Alignment = ConsoleTableColumnAlignment.Right;
-        table.Columns[0].PaddingLeft = 2;
-
-        return table;
     }
 }

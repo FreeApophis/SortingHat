@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Apophis.CLI;
+using Funcky.Extensions;
 using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API.AutoTag;
 using SortingHat.API.DI;
+using Spectre.Console;
 using Console = Apophis.CLI.Console;
 
 namespace SortingHat.CLI.Commands;
@@ -18,6 +19,7 @@ namespace SortingHat.CLI.Commands;
 [UsedImplicitly]
 internal class HelpCommand(
     Console console,
+    IAnsiConsole ansiConsole,
     Lazy<IEnumerable<IDeclaredCommand>> commands,
     Lazy<CommandLine> commandLine,
     IAutoTagHandler autoTagHandler) : IDeclaredCommand
@@ -45,15 +47,6 @@ internal class HelpCommand(
     private static IEnumerable<string> Names(IDeclaredCommand command)
         => [command.Name, .. command.Aliases];
 
-    private static ConsoleTable HelpTable()
-    {
-        var table = new ConsoleTable(3);
-
-        table.Columns[0].PaddingLeft = 2;
-
-        return table;
-    }
-
     /// <summary>The help of every command is generated from what the command line knows about it.</summary>
     private bool PrintCommandHelp(string name)
         => commands.Value.SelectMany(Names).Contains(name)
@@ -80,21 +73,20 @@ internal class HelpCommand(
     private void PrintHelpCommands(IReadOnlyList<(CommandGrouping Grouping, string Name, string Aliases, string Description)> rows)
     {
         console.Writer.WriteLine();
-        console.Writer.WriteLine("Commands");
-        console.Writer.WriteLine();
 
-        var table = HelpTable();
-        foreach (var commandGrouping in Enum.GetValues<CommandGrouping>())
+        var table = LightTable.Create(LightTable.Column("Command"), LightTable.Column("Aliases"), LightTable.Column("Description"));
+        foreach (var (group, index) in Enum.GetValues<CommandGrouping>().Select(group => rows.Where(row => row.Grouping == group).ToList()).Where(group => group is not []).Select((group, index) => (group, index)))
         {
-            foreach (var row in rows.Where(row => row.Grouping == commandGrouping))
+            if (index > 0)
             {
-                table.Append(row.Name, row.Aliases, row.Description);
+                table.AddEmptyRow();
             }
 
-            table.AppendSeparator();
+            group.ForEach(row => table.AddCells(row.Name, row.Aliases, row.Description));
         }
 
-        table.WriteTo(console.Writer);
+        ansiConsole.Write(table);
+        console.Writer.WriteLine();
     }
 
     private void PrintTagVariables(bool verbose)

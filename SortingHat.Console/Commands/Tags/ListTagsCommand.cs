@@ -1,15 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Apophis.CLI;
 using Apophis.CLI.Writer;
+using Funcky.Extensions;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
+using Spectre.Console;
 
 namespace SortingHat.CLI.Commands.Tags;
 
 [UsedImplicitly]
-internal class ListTagsCommand(ITag tagStore, IConsoleWriter consoleWriter) : IDeclaredCommand
+internal class ListTagsCommand(ITag tagStore, IConsoleWriter consoleWriter, IAnsiConsole console) : IDeclaredCommand
 {
     public CommandGrouping CommandGrouping => CommandGrouping.Tag;
     public string Name => "list-tags";
@@ -22,15 +23,10 @@ internal class ListTagsCommand(ITag tagStore, IConsoleWriter consoleWriter) : ID
         var tags = tagStore.GetTags();
         if (tags.Count > 0)
         {
-            consoleWriter.WriteLine("Used tags: ");
+            var table = LightTable.Create(LightTable.Column("Tag"), LightTable.Column("Files").RightAligned());
+            tags.ForEach(tag => table.AddCells(tag.FullName, $"{tagStore.FileCount(tag)}"));
 
-            var table = new ConsoleTable(2);
-            foreach (var tag in tags)
-            {
-                table.Append($"* {tag.FullName}", $"({tagStore.FileCount(tag)})");
-            }
-
-            table.WriteTo(consoleWriter);
+            console.Write(table);
         }
         else
         {

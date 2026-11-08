@@ -100,7 +100,7 @@ public sealed class GeneralCommandTest : IDisposable
         _hat.TaggedFile("a.txt", ":x");
 
         Assert.Equal(0, _hat.Hat(["stat"]));
-        Assert.Contains(_hat.Lines, line => line.Contains("Files") && line.TrimEnd().EndsWith("= 1"));
+        Assert.Contains("Files|1", _hat.Rows);
     }
 
     [Fact]

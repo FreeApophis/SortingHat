@@ -4,23 +4,6 @@ Apophis.CLI.Console.Application.get -> Apophis.CLI.IConsoleApplicationInformatio
 Apophis.CLI.Console.Console(Apophis.CLI.Reader.IConsoleReader! consoleReader, Apophis.CLI.Writer.IConsoleWriter! consoleWriter, Apophis.CLI.IConsoleApplicationInformationProvider! consoleApplicationInformationProvider) -> void
 Apophis.CLI.Console.Reader.get -> Apophis.CLI.Reader.IConsoleReader!
 Apophis.CLI.Console.Writer.get -> Apophis.CLI.Writer.IConsoleWriter!
-Apophis.CLI.ConsoleTable
-Apophis.CLI.ConsoleTable.Append(params object?[]! args) -> void
-Apophis.CLI.ConsoleTable.AppendSeparator() -> void
-Apophis.CLI.ConsoleTable.Columns.get -> System.Collections.Generic.List<Apophis.CLI.ConsoleTableColumn!>!
-Apophis.CLI.ConsoleTable.ConsoleTable(int columns = 0) -> void
-Apophis.CLI.ConsoleTable.WriteTo(Apophis.CLI.Writer.IConsoleWriter! consoleWriter) -> void
-Apophis.CLI.ConsoleTableColumn
-Apophis.CLI.ConsoleTableColumn.Alignment.get -> Apophis.CLI.ConsoleTableColumnAlignment
-Apophis.CLI.ConsoleTableColumn.Alignment.set -> void
-Apophis.CLI.ConsoleTableColumn.ConsoleTableColumn() -> void
-Apophis.CLI.ConsoleTableColumn.PaddingLeft.get -> int
-Apophis.CLI.ConsoleTableColumn.PaddingLeft.set -> void
-Apophis.CLI.ConsoleTableColumn.PaddingRight.get -> int
-Apophis.CLI.ConsoleTableColumn.PaddingRight.set -> void
-Apophis.CLI.ConsoleTableColumnAlignment
-Apophis.CLI.ConsoleTableColumnAlignment.Left = 0 -> Apophis.CLI.ConsoleTableColumnAlignment
-Apophis.CLI.ConsoleTableColumnAlignment.Right = 1 -> Apophis.CLI.ConsoleTableColumnAlignment
 Apophis.CLI.IConsoleApplicationInformationProvider
 Apophis.CLI.IConsoleApplicationInformationProvider.Name.get -> string!
 Apophis.CLI.NumberFormatter

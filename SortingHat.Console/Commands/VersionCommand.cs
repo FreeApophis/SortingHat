@@ -3,16 +3,16 @@ using System.Globalization;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Apophis.CLI;
-using Apophis.CLI.Writer;
+using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
+using Spectre.Console;
 
 namespace SortingHat.CLI.Commands;
 
 [UsedImplicitly]
 [method: UsedImplicitly]
-internal class VersionCommand(IConsoleWriter consoleWriter) : IDeclaredCommand
+internal class VersionCommand(IAnsiConsole console) : IDeclaredCommand
 {
     public CommandGrouping CommandGrouping => CommandGrouping.General;
     public string Name => "version";
@@ -37,17 +37,13 @@ internal class VersionCommand(IConsoleWriter consoleWriter) : IDeclaredCommand
     {
         var version = Assembly.GetExecutingAssembly().GetName();
 
-        consoleWriter.WriteLine($"{nameof(SortingHat)} {version.Version}");
-        consoleWriter.WriteLine();
-
-        var table = new ConsoleTable(2);
-
-        table.Columns[0].Alignment = ConsoleTableColumnAlignment.Right;
-
-        table.Append("Culture:", version.CultureName ?? "<NULL>");
-        table.Append("Current Culture:", CultureInfo.CurrentCulture);
-
-        table.WriteTo(consoleWriter);
+        console.WriteLine($"{nameof(SortingHat)} {version.Version}");
+        console.WriteLine();
+        console.Write(new Grid()
+            .AddColumn(new GridColumn().RightAligned())
+            .AddColumn()
+            .AddRow(new Text("Culture:"), new Text(Option.FromNullable(version.CultureName).Where(name => name is not "").GetOrElse("neutral")))
+            .AddRow(new Text("Current Culture:"), new Text(CultureInfo.CurrentCulture.Name)));
 
         return Task.FromResult(true);
     }
