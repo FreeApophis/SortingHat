@@ -80,6 +80,8 @@ dotnet test
 
 # Plugins
 
+How to write a plugin: [docs/writing-plugins.md](docs/writing-plugins.md).
+
 ## Exif
 
 * Read exif information from images
@@ -93,7 +95,11 @@ dotnet test
 
 ## ExtractRelevantText
 
-not working yet
+* Find the most frequent words in text files (`hat scan <folder>`)
+
+## MoveOnTag
+
+* Move a file into a folder when it gets a tag with a move rule (`hat move-rule :tax D:\Tax`)
 
 # Similar Products
 
