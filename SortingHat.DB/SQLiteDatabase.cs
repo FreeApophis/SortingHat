@@ -11,7 +11,6 @@ namespace SortingHat.DB;
 public abstract class SQLiteDatabase : IDisposable
 {
     private readonly string _path;
-    private readonly string _encryptionKey = "Encrypted";
 
     private bool _disposedValue;
     private Option<SqliteTransaction> _transaction;
@@ -28,11 +27,6 @@ public abstract class SQLiteDatabase : IDisposable
             Connection.Open();
 
             ExecuteNonQuery("PRAGMA foreign_keys=ON;");
-
-            if (_encryptionKey != null)
-            {
-                ExecuteNonQuery("PRAGMA key='{_encryptionKey}';");
-            }
         }
         else
         {
