@@ -19,7 +19,7 @@ internal class FileInfoCommand(IConsoleWriter consoleWriter, IFilePathExtractor 
     public CommandGrouping CommandGrouping => CommandGrouping.File;
     public string Name => "file-info";
     public IReadOnlyList<string> Aliases => ["info"];
-    public string Description => "Shows all available information about the current file.";
+    public string Description => "Shows what the database knows about the given files.";
     public IReadOnlyList<ArgumentDefinition> Arguments => [Files];
     public IReadOnlyList<OptionDefinition> Options => [FileOptions.Recursive];
 

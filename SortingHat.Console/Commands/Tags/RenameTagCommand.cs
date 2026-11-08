@@ -17,7 +17,7 @@ internal class RenameTagCommand(IConsoleWriter consoleWriter, ITag tagStore) : I
 
     public CommandGrouping CommandGrouping => CommandGrouping.Tag;
     public string Name => "rename-tag";
-    public string Description => "Renames a tag from database";
+    public string Description => "Renames a tag.";
     public string Details => "Only the last level changes: 'rename-tag :tax:2018 2019' gives ':tax:2019'. To give a tag another parent, use move-tags.";
     public IReadOnlyList<ArgumentDefinition> Arguments => [TagArgument, NewName];
 

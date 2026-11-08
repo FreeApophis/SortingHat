@@ -21,7 +21,7 @@ internal class ImportProjectCommand(IConsoleWriter consoleWriter, ICopyFile copy
 
     public CommandGrouping CommandGrouping => CommandGrouping.Project;
     public string Name => "import";
-    public string Description => "Imports a project file into the db.";
+    public string Description => "Imports an exported project file as a new project.";
     public IReadOnlyList<ArgumentDefinition> Arguments => [ProjectFile, ProjectNameArgument];
 
     public Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)

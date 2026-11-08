@@ -59,7 +59,7 @@ public sealed class CommandLineTest : IDisposable
     public void GivenTheHelpOptionOnACommandThenItsHelpIsShownInsteadOfRunningIt(string help)
     {
         Assert.Equal(0, _hat.Hat(["new-project", "myProject", help]));
-        Assert.Contains(_hat.Lines, line => line.Contains("Creates a new project database with a given name."));
+        Assert.Contains(_hat.Lines, line => line.Contains("Creates a new project with its own database."));
 
         _hat.Hat(["list-projects"]);
         Assert.Equal(["* Default"], _hat.Lines);

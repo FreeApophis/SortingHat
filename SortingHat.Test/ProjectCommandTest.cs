@@ -20,6 +20,16 @@ public sealed class ProjectCommandTest : IDisposable
     }
 
     [Fact]
+    public void GivenANewProjectThenTheActiveProjectStaysAndHatSaysHowToSwitch()
+    {
+        Assert.Equal(0, _hat.Hat(["new-project", "myProject"]));
+
+        Assert.Contains(_hat.Lines, line => line.StartsWith("Project 'myProject' created.") && line.Contains("switch-project myProject"));
+        Assert.DoesNotContain(_hat.Lines, line => line.Contains("switched"));
+        Assert.Equal(["* Default", "  myProject"], ListProjects());
+    }
+
+    [Fact]
     public void GivenNoNameThenNewProjectAsksForOne()
     {
         Assert.NotEqual(0, _hat.Hat(["new-project"]));

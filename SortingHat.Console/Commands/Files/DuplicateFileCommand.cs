@@ -19,7 +19,7 @@ internal class DuplicateFileCommand(IFile fileStore, IConsoleWriter consoleWrite
     public CommandGrouping CommandGrouping => CommandGrouping.File;
     public string Name => "duplicate";
     public IReadOnlyList<string> Aliases => ["d"];
-    public string Description => "Find duplicate files in your dms";
+    public string Description => "Lists the files whose content is stored under several paths.";
     public string Details => "Duplicates are files with the same content, stored under several paths.";
 
     public Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)

@@ -13,7 +13,7 @@ internal sealed class CopyFilesCommand(FileOperations<ICopyFile> copyFileOperati
     public CommandGrouping CommandGrouping => CommandGrouping.File;
     public string Name => "copy-files";
     public IReadOnlyList<string> Aliases => ["cp"];
-    public string Description => "This command copies all files which match the search query to a specified folder location.";
+    public string Description => "Copies the files that match a search query into a folder.";
     public string Details => FileOperationArguments.Details;
     public IReadOnlyList<ArgumentDefinition> Arguments => [FileOperationArguments.Search, FileOperationArguments.Destination];
     public IReadOnlyList<OptionDefinition> Options => [FileOperationArguments.DryRun];

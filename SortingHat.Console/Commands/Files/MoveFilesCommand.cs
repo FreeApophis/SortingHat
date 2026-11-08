@@ -13,7 +13,7 @@ internal class MoveFilesCommand(FileOperations<IMoveFile> moveFileOperation) : I
     public CommandGrouping CommandGrouping => CommandGrouping.File;
     public string Name => "move-files";
     public IReadOnlyList<string> Aliases => ["mv"];
-    public string Description => "This moves all files which match the search query to a specified folder location";
+    public string Description => "Moves the files that match a search query into a folder.";
     public string Details => FileOperationArguments.Details;
     public IReadOnlyList<ArgumentDefinition> Arguments => [FileOperationArguments.Search, FileOperationArguments.Destination];
     public IReadOnlyList<OptionDefinition> Options => [FileOperationArguments.DryRun];

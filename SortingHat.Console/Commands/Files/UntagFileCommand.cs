@@ -16,7 +16,7 @@ internal class UntagFileCommand(IConsoleWriter consoleWriter, IFilePathExtractor
 {
     public CommandGrouping CommandGrouping => CommandGrouping.File;
     public string Name => "untag-files";
-    public string Description => "Remove tags from the indicated files";
+    public string Description => "Removes tags from files.";
     public IReadOnlyList<ArgumentDefinition> Arguments => [FileOptions.TagsAndFiles];
     public IReadOnlyList<OptionDefinition> Options => [FileOptions.Recursive];
 

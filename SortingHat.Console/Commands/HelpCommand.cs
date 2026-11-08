@@ -32,7 +32,7 @@ internal class HelpCommand(
     public CommandGrouping CommandGrouping => CommandGrouping.General;
     public string Name => "help";
     public IReadOnlyList<string> Aliases => ["?"];
-    public string Description => "This is the help command, it shows a list of the available commands.";
+    public string Description => "Lists the available commands, or shows the help of one command.";
     public string Details => "Without a command, it shows the overview of all commands. With a command, it shows the help of that command, the same as '<command> --help'.";
     public IReadOnlyList<ArgumentDefinition> Arguments => [CommandArgument];
     public IReadOnlyList<OptionDefinition> Options => [Verbose];

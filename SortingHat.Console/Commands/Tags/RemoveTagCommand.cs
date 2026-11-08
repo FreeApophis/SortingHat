@@ -16,7 +16,7 @@ internal class RemoveTagCommand(ITag tagStore, IConsoleWriter consoleWriter) : I
 
     public CommandGrouping CommandGrouping => CommandGrouping.Tag;
     public string Name => "remove-tags";
-    public string Description => "Removes a tag from database";
+    public string Description => "Removes tags from the database.";
     public string Details => "The files keep existing, they only lose the tag. A tag that still has child tags cannot be removed, remove its children first.";
     public IReadOnlyList<ArgumentDefinition> Arguments => [Tags];
 

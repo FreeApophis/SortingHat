@@ -26,7 +26,7 @@ internal class FindFilesCommand(IFile fileStore, IConsoleWriter consoleWriter, I
     public CommandGrouping CommandGrouping => CommandGrouping.File;
     public string Name => "find-files";
     public IReadOnlyList<string> Aliases => ["ff"];
-    public string Description => "Finds all files matching the search query";
+    public string Description => "Finds the files that match a search query.";
     public string Details => "A tag also finds the files tagged with its children: ':tax' finds ':tax:2018'.";
     public IReadOnlyList<ArgumentDefinition> Arguments => [Query];
     public IReadOnlyList<OptionDefinition> Options => [Open];

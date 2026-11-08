@@ -17,7 +17,7 @@ internal class VersionCommand(IAnsiConsole console) : IDeclaredCommand
     public CommandGrouping CommandGrouping => CommandGrouping.General;
     public string Name => "version";
     public IReadOnlyList<string> Aliases => ["v"];
-    public string Description => "Shows the current Version of this program";
+    public string Description => "Shows the version of hat.";
 
     public string Details
         => """

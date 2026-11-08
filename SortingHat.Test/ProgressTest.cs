@@ -30,7 +30,7 @@ public sealed class ProgressTest : IDisposable
 
         _hat.Hat(["tag-files", ":x", path]);
 
-        Assert.Contains(_hat.Lines, line => line.Contains($"File {path} queued with tag :x"));
+        Assert.Contains(_hat.Lines, line => line.Contains($"{path} tagged with :x"));
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public sealed class ProgressTest : IDisposable
 
         Assert.Equal(0, _hat.Hat(["tag-files", ":x", path]));
 
-        Assert.Equal([$"File {path} queued with tag :x"], _hat.Lines);
+        Assert.Equal([$"{path} tagged with :x"], _hat.Lines);
     }
 
     public void Dispose()

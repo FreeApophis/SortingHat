@@ -15,7 +15,7 @@ internal class ListTagsCommand(ITag tagStore, IConsoleWriter consoleWriter, IAns
     public CommandGrouping CommandGrouping => CommandGrouping.Tag;
     public string Name => "list-tags";
     public IReadOnlyList<string> Aliases => ["tags"];
-    public string Description => "Lists all available tags in hierarchical form";
+    public string Description => "Lists all tags with the number of their files.";
     public string Details => "The number after each tag counts the files tagged with exactly that tag.";
 
     public Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)

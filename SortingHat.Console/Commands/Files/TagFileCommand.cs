@@ -20,7 +20,7 @@ internal class TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter con
     public CommandGrouping CommandGrouping => CommandGrouping.File;
     public string Name => "tag-files";
     public IReadOnlyList<string> Aliases => ["tag"];
-    public string Description => "Is tagging the files the given tags";
+    public string Description => "Tags files and adds them to the database.";
 
     public string Details
         => """
@@ -95,7 +95,7 @@ internal class TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter con
     {
         logger.LogInformation($"File {file.Path} tagged with {tag.FullName}");
 
-        consoleWriter.WriteLine($"File {file.Path} queued with tag {tag.FullName}");
+        consoleWriter.WriteLine($"{file.Path} tagged with {tag.FullName}");
         fileStore.Tag(file, tag);
     }
 }
