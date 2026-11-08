@@ -85,6 +85,31 @@ public sealed class ProjectTransferTest : IDisposable
     }
 
     [Fact]
+    public void GivenAFolderThenExportNamesTheFileAfterTheProject()
+    {
+        ProjectWithDatabase("myProject");
+        var folder = _hat.CreateFolder("exports");
+
+        Assert.Equal(0, _hat.Hat(["export", "myProject", folder]));
+
+        Assert.True(File.Exists(Path.Combine(folder, "myProject.hdb")));
+    }
+
+    [Fact]
+    public void GivenNoNameThenImportNamesTheProjectAfterTheFile()
+    {
+        ProjectWithDatabase("myProject");
+        var archive = Path.Combine(_hat.CreateFolder("exports"), "archive.hdb");
+        _hat.Hat(["export", "myProject", archive]);
+
+        Assert.Equal(0, _hat.Hat(["import", archive]));
+
+        Assert.Equal(["* Default", "  myProject", "  archive"], ListProjects());
+        _hat.Hat(["switch-project", "archive"]);
+        Assert.Equal(["myProject.txt"], _hat.FindFiles(":x"));
+    }
+
+    [Fact]
     public void GivenAFileThatIsNoDatabaseThenImportRefusesAndAddsNoProject()
     {
         var text = _hat.WriteFile("notes.hdb", "no database at all");
