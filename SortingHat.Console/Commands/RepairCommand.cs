@@ -4,14 +4,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using Apophis.CLI.Writer;
 using Apophis.FileSystem;
+using Funcky.Extensions;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
+using SortingHat.API.Events;
 using SortingHat.API.Models;
 
 namespace SortingHat.CLI.Commands;
 
 [UsedImplicitly]
-internal class RepairCommand(IFile fileStore, IExistsFile existsFile, IFileScanner fileScanner, IConsoleWriter consoleWriter, FileProgress progress) : IDeclaredCommand
+internal class RepairCommand(IFile fileStore, IExistsFile existsFile, IFileScanner fileScanner, IConsoleWriter consoleWriter, FileProgress progress, IFileEvents<FileChanged> fileChanged) : IDeclaredCommand
 {
     private static readonly OptionDefinition DryRun = new() { Name = "dry-run", ShortName = "n", Description = "Shows what would be repaired, without changing the database." };
 
@@ -39,7 +41,7 @@ internal class RepairCommand(IFile fileStore, IExistsFile existsFile, IFileScann
 
         if (input.Has(Rehash))
         {
-            await RehashPaths([.. paths.Except(missingPaths)], input.Has(DryRun));
+            await RehashPaths([.. paths.Except(missingPaths)], input.Has(DryRun), cancellationToken);
         }
 
         return true;
@@ -65,7 +67,7 @@ internal class RepairCommand(IFile fileStore, IExistsFile existsFile, IFileScann
     }
 
     /// <summary>Storing a file hashed from disk moves its path to the new content and carries the tags over.</summary>
-    private async Task RehashPaths(IReadOnlyList<string> paths, bool dryRun)
+    private async Task RehashPaths(IReadOnlyList<string> paths, bool dryRun, CancellationToken cancellationToken)
     {
         var changed = 0;
 
@@ -84,6 +86,11 @@ internal class RepairCommand(IFile fileStore, IExistsFile existsFile, IFileScann
             if (!dryRun)
             {
                 fileStore.Store(state.Current);
+            }
+
+            if (!dryRun && state is PathState.Changed changedPath)
+            {
+                (await fileChanged.Publish(new FileChanged(changedPath.Stored, changedPath.Current), cancellationToken)).ForEach(consoleWriter.WriteLine);
             }
         });
 

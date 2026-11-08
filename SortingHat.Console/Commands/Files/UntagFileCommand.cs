@@ -7,12 +7,13 @@ using Funcky.Extensions;
 using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
+using SortingHat.API.Events;
 using SortingHat.API.Models;
 
 namespace SortingHat.CLI.Commands.Files;
 
 [UsedImplicitly]
-internal class UntagFileCommand(IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor, IFileScanner fileScanner, IFile fileStore, FileProgress progress) : IDeclaredCommand
+internal class UntagFileCommand(IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor, IFileScanner fileScanner, IFile fileStore, FileProgress progress, IFileEvents<FileUntagged> fileUntagged) : IDeclaredCommand
 {
     public CommandGrouping CommandGrouping => CommandGrouping.File;
     public string Name => "untag-files";
@@ -27,7 +28,7 @@ internal class UntagFileCommand(IConsoleWriter consoleWriter, IFilePathExtractor
 
         return filePathExtractor.FromFilePatterns(arguments.Where(a => a.IsFile), input.Has(FileOptions.Recursive)).Match(
             left: problems => Task.FromResult(Report(problems)),
-            right: paths => Untag(paths, tags));
+            right: paths => Untag(paths, tags, cancellationToken));
     }
 
     private bool Report(IEnumerable<string> problems)
@@ -38,13 +39,21 @@ internal class UntagFileCommand(IConsoleWriter consoleWriter, IFilePathExtractor
         return false;
     }
 
-    private async Task<bool> Untag(IReadOnlyList<string> paths, IReadOnlyList<Tag> tags)
+    private async Task<bool> Untag(IReadOnlyList<string> paths, IReadOnlyList<Tag> tags, CancellationToken cancellationToken)
     {
-        await progress.ForEach("Untagging", paths, async path => Untag((await fileScanner.Examine(path)).Current.File, tags));
+        await progress.ForEach("Untagging", paths, async path => await Untag((await fileScanner.Examine(path)).Current, tags, cancellationToken));
 
         return true;
     }
 
-    private void Untag(File file, IReadOnlyList<Tag> tags)
-        => tags.ForEach(tag => fileStore.Untag(file, tag));
+    /// <summary>The handlers hear of the file once, with all the tags, after they are removed.</summary>
+    private async Task Untag(FileAt file, IReadOnlyList<Tag> tags, CancellationToken cancellationToken)
+    {
+        tags.ForEach(tag => fileStore.Untag(file.File, tag));
+
+        if (tags.Count > 0)
+        {
+            (await fileUntagged.Publish(new FileUntagged(file, tags), cancellationToken)).ForEach(consoleWriter.WriteLine);
+        }
+    }
 }

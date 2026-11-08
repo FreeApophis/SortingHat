@@ -16,7 +16,7 @@ using SortingHat.API.Models;
 namespace SortingHat.CLI.Commands.Files;
 
 [UsedImplicitly]
-internal class TagFileCommand(ILogger logger, IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor, IFileScanner fileScanner, IFile fileStore, IAutoTagHandler autoTagHandler, FileProgress progress, IFileEvents<FileTagged> fileTagged) : IDeclaredCommand
+internal class TagFileCommand(ILogger logger, IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor, IFileScanner fileScanner, IFile fileStore, IAutoTagHandler autoTagHandler, FileProgress progress, IFileEvents<FileAdded> fileAdded, IFileEvents<FileChanged> fileChanged, IFileEvents<FileTagged> fileTagged) : IDeclaredCommand
 {
     public CommandGrouping CommandGrouping => CommandGrouping.File;
     public string Name => "tag-files";
@@ -82,6 +82,7 @@ internal class TagFileCommand(ILogger logger, IConsoleWriter consoleWriter, IFil
         if (masks.Count == 0)
         {
             fileStore.Store(state.Current);
+            await Stored(state, cancellationToken);
 
             return [];
         }
@@ -94,10 +95,24 @@ internal class TagFileCommand(ILogger logger, IConsoleWriter consoleWriter, IFil
 
         if (applied.Count > 0)
         {
+            await Stored(state, cancellationToken);
             (await fileTagged.Publish(new FileTagged(state.Current, applied), cancellationToken)).ForEach(consoleWriter.WriteLine);
         }
 
         return [.. tags.WhereSelect(tag => tag.Tag.LeftOrNone().Select(reason => (tag.Mask, reason)))];
+    }
+
+    /// <summary>The handlers hear of a file hat did not know, or whose content changed, once it is stored.</summary>
+    private async Task Stored(PathState state, CancellationToken cancellationToken)
+    {
+        IReadOnlyList<string> problems = state switch
+        {
+            PathState.New added => await fileAdded.Publish(new FileAdded(added.Current), cancellationToken),
+            PathState.Changed changed => await fileChanged.Publish(new FileChanged(changed.Stored, changed.Current), cancellationToken),
+            _ => [],
+        };
+
+        problems.ForEach(consoleWriter.WriteLine);
     }
 
     private void Tag(FileAt file, Tag tag)

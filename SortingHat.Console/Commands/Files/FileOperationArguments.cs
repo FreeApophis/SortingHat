@@ -19,10 +19,9 @@ internal static class FileOperationArguments
 
     public static readonly OptionDefinition DryRun = new() { Name = "dry-run", ShortName = "n", Description = "Shows what would happen, without changing any file or the database." };
 
-    public static Task<bool> Run(CommandInput input, Func<string, string, bool, bool> exportFiles)
-        => Task.FromResult(
-            (from search in input.Value(Search)
-             from destination in input.Value(Destination)
-             select exportFiles(search, destination, input.Has(DryRun)))
-            .GetOrElse(false));
+    public static Task<bool> Run(CommandInput input, Func<string, string, bool, Task<bool>> exportFiles)
+        => (from search in input.Value(Search)
+            from destination in input.Value(Destination)
+            select exportFiles(search, destination, input.Has(DryRun)))
+            .GetOrElse(Task.FromResult(false));
 }

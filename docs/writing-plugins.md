@@ -222,7 +222,13 @@ Register it as `builder.RegisterType<TaggedFileLogger>().As<IFileEventHandler<Fi
 
 | Event | When |
 |---|---|
+| `FileAdded(FileAt File)` | `tag-files` stored a file hat did not know: new content, or known content at a new path |
+| `FileChanged(FileAt Stored, FileAt Current)` | `tag-files` or `repair --rehash` stored new content at a known path; the tags were carried over |
 | `FileTagged(FileAt File, IReadOnlyList<Tag> Tags)` | `tag-files` stored the tags of a file: once per file, with all tags it got in that run |
+| `FileUntagged(FileAt File, IReadOnlyList<Tag> Tags)` | `untag-files` removed tags from a file: once per file, with all tags of that run |
+| `FileMoved(FileAt File, string Destination)` | `move-files` moved a file, on disk and in the database |
+
+Within one file, `FileAdded` or `FileChanged` comes before `FileTagged`. A dry run raises nothing, and neither does `copy-files`: a copy is not stored.
 
 - hat calls the handlers one after the other and awaits each one.
 - **A handler that throws** becomes a warning that names it; the change stays, and the other handlers still run.

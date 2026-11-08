@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Apophis.CLI.Writer;
 using Apophis.FileSystem;
 using Funcky.Extensions;
 using Funcky.Monads;
 using SortingHat.API.DI;
+using SortingHat.API.Events;
 using SortingHat.API.Models;
 using static Funcky.Functional;
 
@@ -16,11 +19,14 @@ namespace SortingHat.CLI.Commands.Files;
 /// Puts the files of a search into a folder: choose a source per file (asking when several copies exist), let <see cref="ExportPlan"/> decide the targets,
 /// then copy or move. One file that cannot be done is reported and skipped, the others still go.
 /// </summary>
-public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExistsFile existsFile, IExistsDirectory existsDirectory, IConsoleWriter consoleWriter, IUserPrompt prompt, IFile fileStore)
+public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExistsFile existsFile, IExistsDirectory existsDirectory, IConsoleWriter consoleWriter, IUserPrompt prompt, IFile fileStore, IFileEvents<FileMoved> fileMoved)
     where TFileOperation : IFileOperation
 {
     /// <summary>Windows ignores the case of file names, other systems do not.</summary>
     private static readonly StringComparer FileNameComparer = OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+
+    /// <summary>The files moved in this run, for the handlers once all moves are done.</summary>
+    private readonly List<FileMoved> _moved = [];
 
     private string Verb => fileOperation is IMoveFile ? "move" : "copy";
 
@@ -31,8 +37,9 @@ public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExist
     /// <param name="destination">The destination folder.</param>
     /// <param name="dryRun">Only shows what would happen: no file and nothing in the database changes.</param>
     /// <returns>Whether every file was (or in a dry run would be) copied or moved.</returns>
-    public bool ExportFiles(string search, string destination, bool dryRun)
+    public async Task<bool> ExportFiles(string search, string destination, bool dryRun)
     {
+        _moved.Clear();
         var destinationPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), destination));
 
         var exported = existsDirectory.Exists(destinationPath)
@@ -42,6 +49,11 @@ public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExist
         if (dryRun)
         {
             consoleWriter.WriteLine($"Dry run: nothing was {PastVerb}.");
+        }
+
+        foreach (var moved in _moved)
+        {
+            (await fileMoved.Publish(moved, CancellationToken.None)).ForEach(consoleWriter.WriteLine);
         }
 
         return exported;
@@ -121,6 +133,7 @@ public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExist
                     consoleWriter.WriteLine($"mv {target.Source} {target.Target}");
                     moveFile.Move(target.Source, target.Target);
                     fileStore.MovePath(source, target.Target);
+                    _moved.Add(new FileMoved(source, target.Target));
                     break;
                 default:
                     throw new NotSupportedException($"Unknown file operation {fileOperation.GetType().Name}.");
