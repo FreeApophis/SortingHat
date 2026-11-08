@@ -192,7 +192,7 @@ internal sealed class ExtensionAutoTag : IAutoTag
 - **The value** is `Option<string>`: none when the file has no such value, such as a PDF and a camera. hat then skips that tag for that file and says so in one line per mask. A value is made into a valid tag level for you (characters a tag cannot have become `-`). An exception also skips the tag, with the reason.
 - **Read once:** when several of your variables need the same expensive fact, read it with `file.Remember(key, info => ...)`; every variable gets the same result for that file.
 
-Register it as `builder.RegisterType<ExtensionAutoTag>().As<IAutoTag>()`; `hat help` lists it with its description.
+Register it as `builder.RegisterType<ExtensionAutoTag>().As<IAutoTag>()`; `hat help` lists it with its description, and `hat file-info --variables <file>` shows its value for a file (for a numbered variable, every number up to the last one with a value).
 
 ### File events: `IFileEventHandler<TEvent>`
 

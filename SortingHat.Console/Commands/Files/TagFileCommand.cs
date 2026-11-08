@@ -27,7 +27,8 @@ internal class TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter con
         => """
            Without tags, the files are only added to the database.
            A tag can contain variables, which are replaced per file, for example ':Files:{FileType.Category}'.
-           'hat help' lists the variables of the loaded plugins. A file without a value for a variable does not get that tag.
+           'hat help' lists the variables of the loaded plugins, 'hat file-info --variables <file>' shows their values for a file.
+           A file without a value for a variable does not get that tag.
            """;
 
     public IReadOnlyList<ArgumentDefinition> Arguments => [FileOptions.TagsAndFiles];

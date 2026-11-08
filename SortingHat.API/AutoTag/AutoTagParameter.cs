@@ -27,6 +27,12 @@ public abstract record AutoTagParameter
     /// <summary>How a variable with this parameter is written, for the help: <c>{CreatedAt.&lt;Year|Month&gt;}</c>.</summary>
     public abstract string Usage(string name);
 
+    /// <summary>
+    /// Every way to write the variable <paramref name="name"/>, without braces: <c>Camera.Make</c>; <c>CreatedAt.Year</c>, <c>CreatedAt.Month</c>, ...;
+    /// for a number <c>Folder.FromRoot.0</c>, <c>Folder.FromRoot.1</c>, ... without end, so take only as many as needed.
+    /// </summary>
+    public abstract IEnumerable<string> Forms(string name);
+
     /// <summary>The argument given after the name, or why it does not fit, completing "the variable {...} ...".</summary>
     internal abstract Either<string, AutoTagArgument> Parse(Option<string> argument);
 
@@ -34,6 +40,9 @@ public abstract record AutoTagParameter
     {
         public override string Usage(string name)
             => $"{{{name}}}";
+
+        public override IEnumerable<string> Forms(string name)
+            => [name];
 
         internal override Either<string, AutoTagArgument> Parse(Option<string> argument)
             => argument.Match(
@@ -45,6 +54,9 @@ public abstract record AutoTagParameter
     {
         public override string Usage(string name)
             => $"{{{name}.<number>}}";
+
+        public override IEnumerable<string> Forms(string name)
+            => Enumerable.Range(0, int.MaxValue).Select(number => $"{name}.{number}");
 
         internal override Either<string, AutoTagArgument> Parse(Option<string> argument)
             => argument
@@ -59,6 +71,9 @@ public abstract record AutoTagParameter
     {
         public override string Usage(string name)
             => $"{{{name}.<{string.Join("|", Choices)}>}}";
+
+        public override IEnumerable<string> Forms(string name)
+            => Choices.Select(choice => $"{name}.{choice}");
 
         internal override Either<string, AutoTagArgument> Parse(Option<string> argument)
             => argument

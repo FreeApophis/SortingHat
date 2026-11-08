@@ -473,3 +473,4 @@ SortingHat.API.Models.TagMoves
 static SortingHat.API.Models.TagMoves.Problem(System.Collections.Generic.IReadOnlyList<SortingHat.API.Models.Tag!>! tags, Funcky.Monads.Option<SortingHat.API.Models.Tag!> destination) -> Funcky.Monads.Option<string!>
 SortingHat.API.DI.IProjects.Export(SortingHat.API.Models.ProjectName! project, string! destination) -> Funcky.Monads.Either<string!, Funcky.Unit>
 SortingHat.API.DI.IProjects.Import(string! projectFile, SortingHat.API.Models.ProjectName! project) -> Funcky.Monads.Either<string!, Funcky.Unit>
+abstract SortingHat.API.AutoTag.AutoTagParameter.Forms(string! name) -> System.Collections.Generic.IEnumerable<string!>!
