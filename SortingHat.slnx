@@ -20,5 +20,4 @@
   <Project Path="SortingHat.Plugin.MoveOnTag/SortingHat.Plugin.MoveOnTag.csproj" />
   <Project Path="SortingHat.Test/SortingHat.Test.csproj" />
   <Project Path="SortingHat.Test.Plugin/SortingHat.Test.Plugin.csproj" />
-  <Project Path="SortingHat.UI/SortingHat.UI.csproj" />
 </Solution>

@@ -2,10 +2,6 @@
 
 SortingHat is a non traditional Document Management System for private users with the focus of organising Documents in non-hierarchical way.
 
-## UI Program
-
-The UI is in a barely usable state, please refer to the console Program
-
 ## Console Program
 
 The console program is called `hat`. A file can be added with `hat tag-files <file>`, tags are assigned with `hat tag-files :tag <file>`. Tags can contain variables which are filled in from the file itself, the available variables depend on the installed plugins.
