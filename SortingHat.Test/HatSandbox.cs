@@ -103,10 +103,12 @@ internal sealed class HatSandbox : IDisposable
     }
 
     /// <summary>Writes a file into the sandbox without telling hat about it; <see cref="FindFiles"/> knows it.</summary>
+    /// <remarks>The <paramref name="name"/> can contain folders, such as 'scans/2018/a.pdf'; they are created.</remarks>
     public string WriteFile(string name, string content)
     {
-        var path = Path.Combine(_root, name);
+        var path = Path.GetFullPath(Path.Combine(_root, name));
 
+        Directory.CreateDirectory(Path.GetDirectoryName(path) ?? _root);
         File.WriteAllText(path, content);
         _files.Add(path);
 

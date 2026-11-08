@@ -36,7 +36,8 @@ internal class TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter con
     {
         var arguments = input.Values(FileOptions.TagsAndFiles);
         var masks = arguments.Where(argument => argument.IsTag).Select(autoTagHandler.ParseMask).ToList();
-        var problems = masks.WhereSelect(mask => mask.LeftOrNone()).ToList();
+        var paths = filePathExtractor.FromFilePatterns(arguments.Where(argument => argument.IsFile), input.Has(FileOptions.Recursive));
+        IReadOnlyList<string> problems = [.. masks.WhereSelect(mask => mask.LeftOrNone()), .. paths.LeftOrNone().GetOrElse([])];
 
         if (problems.Count > 0)
         {
@@ -48,7 +49,7 @@ internal class TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter con
 
         var skipped = new List<(TagMask Mask, string Reason)>();
 
-        foreach (var path in filePathExtractor.FromFilePatterns(arguments.Where(argument => argument.IsFile), input.Has(FileOptions.Recursive)))
+        foreach (var path in paths.RightOrNone().GetOrElse([]))
         {
             skipped.AddRange(await TagFile(path, [.. masks.WhereSelect(mask => mask.RightOrNone())]));
         }

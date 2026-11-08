@@ -5,7 +5,7 @@ namespace SortingHat.CLI.Commands.Files;
 /// <summary>The options that several file commands share.</summary>
 internal static class FileOptions
 {
-    public static readonly OptionDefinition Recursive = new() { Name = "recursive", ShortName = "r", Description = "Iterate through directories recursively" };
+    public static readonly OptionDefinition Recursive = new() { Name = "recursive", ShortName = "r", Description = "Search the subfolders too; a folder argument needs it" };
 
     /// <summary>Tags and files share one argument, because only the last argument can take many values. A tag starts with a colon.</summary>
     public static readonly ArgumentDefinition TagsAndFiles = new()

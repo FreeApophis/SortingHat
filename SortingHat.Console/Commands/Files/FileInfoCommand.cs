@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Apophis.CLI.Writer;
+using Funcky.Extensions;
 using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
@@ -22,9 +23,21 @@ internal class FileInfoCommand(IConsoleWriter consoleWriter, IFilePathExtractor 
     public IReadOnlyList<ArgumentDefinition> Arguments => [Files];
     public IReadOnlyList<OptionDefinition> Options => [FileOptions.Recursive];
 
-    public async Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
+    public Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
+        => filePathExtractor.FromFilePatterns(input.Values(Files), input.Has(FileOptions.Recursive)).Match(
+            left: problems => Task.FromResult(Report(problems)),
+            right: Show);
+
+    private bool Report(IEnumerable<string> problems)
     {
-        foreach (var filePath in filePathExtractor.FromFilePatterns(input.Values(Files), input.Has(FileOptions.Recursive)))
+        problems.ForEach(consoleWriter.WriteLine);
+
+        return false;
+    }
+
+    private async Task<bool> Show(IReadOnlyList<string> paths)
+    {
+        foreach (var filePath in paths)
         {
             consoleWriter.WriteLine();
             consoleWriter.WriteLine($"File: {filePath}");

@@ -129,7 +129,7 @@ SortingHat.API.DI.IFile.Store(SortingHat.API.Models.FileAt! file) -> void
 SortingHat.API.DI.IFile.Tag(SortingHat.API.Models.FileAt! file, SortingHat.API.Models.Tag! tag) -> void
 SortingHat.API.DI.IFile.Untag(SortingHat.API.Models.File! file, SortingHat.API.Models.Tag! tag) -> void
 SortingHat.API.DI.IFilePathExtractor
-SortingHat.API.DI.IFilePathExtractor.FromFilePatterns(System.Collections.Generic.IEnumerable<string!>! filePatterns, bool recursive) -> System.Collections.Generic.IEnumerable<string!>!
+SortingHat.API.DI.IFilePathExtractor.FromFilePatterns(System.Collections.Generic.IEnumerable<string!>! filePatterns, bool recursive) -> Funcky.Monads.Either<System.Collections.Generic.IReadOnlyList<string!>!, System.Collections.Generic.IReadOnlyList<string!>!>
 SortingHat.API.DI.IFileScanner
 SortingHat.API.DI.IFileScanner.Examine(string! path) -> System.Threading.Tasks.Task<SortingHat.API.Models.PathState!>!
 SortingHat.API.DI.IFileScanner.Scan(string! path) -> System.Threading.Tasks.Task<SortingHat.API.Models.FileAt!>!
