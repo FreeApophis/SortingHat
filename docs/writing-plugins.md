@@ -101,6 +101,7 @@ Every plugin gets its own `AssemblyLoadContext`, so it can bring its own version
 - `Apophis.CLI`, `Apophis.FileSystem`, `Apophis.Utils`
 - `Autofac`
 - `Funcky`, `Funcky.Lexer`
+- `Serilog`
 
 Before hat touches a plugin's types, it checks what the plugin was built against:
 
@@ -109,7 +110,7 @@ Before hat touches a plugin's types, it checks what the plugin was built against
 
 `SortingHat.API` follows semantic versioning: new members and new extension points are a minor version, changes and removals a major version. hat's version is in `SortingHat.API/SortingHat.API.csproj`; `hat version` shows hat's own.
 
-Don't rely on anything else hat happens to have. Logging in particular: hat registers `ILogger<T>`, but `Microsoft.Extensions.Logging` is no contract assembly, so a plugin cannot use hat's logger.
+Don't rely on anything else hat happens to have.
 
 ## Extension points
 
@@ -243,9 +244,11 @@ Inject these into your services; they are the same ones hat's own commands use. 
 | `IPluginSettings<TPlugin>` | your plugin's own settings: `Global` for every project, `Project` for the active project |
 | `IConsoleWriter` | output lines |
 | `IUserPrompt` | yes/no questions and choices, none when hat cannot ask |
+| `Serilog.ILogger` | hat's log; the logger you get already names your class, such as `SortingHat.Plugin.MoveOnTag.MoveOnTagHandler` |
 | `ICopyFile`, `IMoveFile`, `IExistsFile`, `IExistsDirectory` | the file system, replaceable in tests |
 
 - Values with rules have their own types: `Tag.Parse(":tax:2018")`, `TagName`, `Hash.Parse(...)`, `ProjectName.Parse(...)` return `Either<string, T>` with the reason on the left. Parse user input once, then work with the type.
+- **Logging** goes to hat's log file (`logs` next to the databases, a file per day). Use message templates, `logger.Information("Moved {Source} to {Target}", source, target)`, not interpolated strings. Information is written by default; the user can change the level in `hat-config.json` (`"Log": { "MinimumLevel": "Warning" }`). Show the user what matters on the console as well: nobody reads the log unless something went wrong.
 - **Settings** come from `IPluginSettings<YourModule>`. hat keeps them apart from its own settings and from every other plugin, so any key is yours, such as `Rules`. Use `Project` for whatever names tags or files, because those belong to a project; `Global` for the rest. Values are strings; store structured values as JSON.
 
 ## Testing

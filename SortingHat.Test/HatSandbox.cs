@@ -81,6 +81,16 @@ internal sealed class HatSandbox : IDisposable
     public IReadOnlyList<string> Rows
         => [.. Lines.Select(line => Regex.Split(line.Trim(), " {3,}")).Where(cells => cells.Length > 1).Select(cells => string.Join('|', cells))];
 
+    /// <summary>The folder of hat's log files, next to the databases.</summary>
+    public string LogFolder
+        => Path.Combine(_databaseSettings.DbPath, "logs");
+
+    /// <summary>Everything hat has logged so far; read while hat may still write, so the file stays shared.</summary>
+    public string Log
+        => Directory.Exists(LogFolder)
+            ? string.Concat(Directory.GetFiles(LogFolder).Order().Select(ReadShared))
+            : string.Empty;
+
     /// <summary>The <paramref name="lines"/> the user types, each with Enter, when hat asks; hat runs in an interactive terminal from now on.</summary>
     public void Type(params IEnumerable<string> lines)
     {
@@ -190,5 +200,13 @@ internal sealed class HatSandbox : IDisposable
         using var scope = _pluginScope.Value.BeginLifetimeScope();
 
         return run(scope);
+    }
+
+    private static string ReadShared(string file)
+    {
+        using var stream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+        using var reader = new StreamReader(stream);
+
+        return reader.ReadToEnd();
     }
 }

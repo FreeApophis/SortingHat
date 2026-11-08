@@ -7,7 +7,7 @@ using Apophis.CLI.Writer;
 using Funcky.Extensions;
 using Funcky.Monads;
 using JetBrains.Annotations;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using SortingHat.API.AutoTag;
 using SortingHat.API.DI;
 using SortingHat.API.Events;
@@ -16,7 +16,7 @@ using SortingHat.API.Models;
 namespace SortingHat.CLI.Commands.Files;
 
 [UsedImplicitly]
-internal class TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor, IFileScanner fileScanner, IFile fileStore, IAutoTagHandler autoTagHandler, FileProgress progress, IFileEvents<FileTagged> fileTagged) : IDeclaredCommand
+internal class TagFileCommand(ILogger logger, IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor, IFileScanner fileScanner, IFile fileStore, IAutoTagHandler autoTagHandler, FileProgress progress, IFileEvents<FileTagged> fileTagged) : IDeclaredCommand
 {
     public CommandGrouping CommandGrouping => CommandGrouping.File;
     public string Name => "tag-files";
@@ -102,7 +102,7 @@ internal class TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter con
 
     private void Tag(FileAt file, Tag tag)
     {
-        logger.LogInformation($"File {file.Path} tagged with {tag.FullName}");
+        logger.Information("{Path} tagged with {Tag}", file.Path, tag.FullName);
 
         consoleWriter.WriteLine($"{file.Path} tagged with {tag.FullName}");
         fileStore.Tag(file, tag);

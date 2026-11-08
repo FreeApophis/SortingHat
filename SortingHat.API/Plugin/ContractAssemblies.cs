@@ -31,6 +31,7 @@ internal sealed record ContractAssemblies(IReadOnlyDictionary<string, Version> V
                 typeof(ContainerBuilder),
                 typeof(Option<>),
                 typeof(ILexemeWalker),
+                typeof(Serilog.ILogger),
             }
             .Select(type => type.Assembly.GetName())
             .WhereSelect(NameAndVersion)),

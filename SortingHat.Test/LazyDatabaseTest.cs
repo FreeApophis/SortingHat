@@ -47,7 +47,7 @@ public sealed class LazyDatabaseTest
 
         Assert.NotEqual(0, hat.Hat(["tag-files", ":x", path]));
 
-        Assert.Contains("the migration broke", hat.Lines);
+        Assert.Contains(hat.Lines, line => line.Contains("the migration broke"));
         File.Delete(hat.ProjectDatabaseFile("Default"));
     }
 }

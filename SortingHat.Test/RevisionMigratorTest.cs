@@ -1,7 +1,6 @@
 ﻿using System;
 using Autofac;
 using Microsoft.Data.Sqlite;
-using Microsoft.Extensions.Logging.Abstractions;
 using SortingHat.DB;
 using Xunit;
 
@@ -19,7 +18,7 @@ public sealed class RevisionMigratorTest : IDisposable
     {
         _hat.InScope(scope =>
         {
-            var migrator = new RevisionMigrator(NullLogger<RevisionMigrator>.Instance, typeof(RevisionMigratorTest).Assembly, []);
+            var migrator = new RevisionMigrator(Serilog.Core.Logger.None, typeof(RevisionMigratorTest).Assembly, []);
 
             return Assert.Throws<SqliteException>(() => migrator.Migrate(scope.Resolve<SQLiteProjectDatabase>()));
         });
@@ -70,7 +69,7 @@ public sealed class RevisionMigratorTest : IDisposable
     private void Migrate(ICodeMigration migration)
         => _hat.InScope(scope =>
         {
-            new RevisionMigrator(NullLogger<RevisionMigrator>.Instance, typeof(RevisionMigrator).Assembly, [migration]).Migrate(scope.Resolve<SQLiteProjectDatabase>());
+            new RevisionMigrator(Serilog.Core.Logger.None, typeof(RevisionMigrator).Assembly, [migration]).Migrate(scope.Resolve<SQLiteProjectDatabase>());
 
             return true;
         });

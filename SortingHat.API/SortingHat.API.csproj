@@ -15,7 +15,7 @@
     <PackageReference Include="Autofac" />
     <PackageReference Include="Funcky" />
     <PackageReference Include="JetBrains.Annotations" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="Serilog" />
   </ItemGroup>
 
   <ItemGroup>

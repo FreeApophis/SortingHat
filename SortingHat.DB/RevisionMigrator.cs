@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
 using Microsoft.Data.Sqlite;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace SortingHat.DB;
 
@@ -13,12 +13,12 @@ namespace SortingHat.DB;
 /// Runs the <c>*.migration</c> scripts embedded in <paramref name="migrations"/> and the <paramref name="codeMigrations"/> that have not run yet,
 /// ordered by their names (which start with a timestamp), each in its own transaction.
 /// </summary>
-internal class RevisionMigrator(ILogger<RevisionMigrator> logger, Assembly migrations, IEnumerable<ICodeMigration> codeMigrations) : IRevisionMigrator
+internal class RevisionMigrator(ILogger logger, Assembly migrations, IEnumerable<ICodeMigration> codeMigrations) : IRevisionMigrator
 {
     private const string CreateRevisionTableCommand = @"CREATE TABLE IF NOT EXISTS [Revisions] ([Id] INTEGER  NOT NULL PRIMARY KEY AUTOINCREMENT, [Name] VARCHAR(255)  UNIQUE NOT NULL, [MigratedAt] DATETIME DEFAULT CURRENT_TIME NOT NULL);";
 
     [UsedImplicitly]
-    public RevisionMigrator(ILogger<RevisionMigrator> logger, IEnumerable<ICodeMigration> codeMigrations)
+    public RevisionMigrator(ILogger logger, IEnumerable<ICodeMigration> codeMigrations)
         : this(logger, typeof(RevisionMigrator).Assembly, codeMigrations)
     {
     }
@@ -52,7 +52,7 @@ internal class RevisionMigrator(ILogger<RevisionMigrator> logger, Assembly migra
 
     private void Run(SQLiteDatabase db, Migration migration)
     {
-        logger.Log(LogLevel.Information, $"Run migration '{migration.Revision}' on database '{db.DbName}'");
+        logger.Information("Run migration {Revision} on database {Database}", migration.Revision, db.DbName);
 
         db.InTransaction(() =>
         {

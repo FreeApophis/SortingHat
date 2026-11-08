@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using Apophis.CLI.Writer;
 using Apophis.FileSystem;
 using Autofac;
+using Funcky.Monads;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using SortingHat.API;
 using SortingHat.API.DI;
 using SortingHat.API.Plugin;
@@ -27,8 +28,9 @@ internal class CompositionRoot
         Builder.RegisterType<Application>().AsSelf();
         Builder.RegisterType<CommandLine>().AsSelf();
 
-        Builder.RegisterType<LoggerFactory>().As<ILoggerFactory>().SingleInstance();
-        Builder.RegisterGeneric(typeof(Logger<>)).As(typeof(ILogger<>)).SingleInstance();
+        // the logger is disposed with the container, which writes what is left
+        Builder.Register(context => HatLog.Create(context.Resolve<DatabaseSettings>(), context.Resolve<LogSettings>())).As<ILogger>().SingleInstance();
+        Builder.RegisterModule<LoggerModule>();
 
         Builder.Register(_ => HatConsole.Create()).As<IAnsiConsole>().SingleInstance();
         Builder.RegisterType<PlainLineWriter>().As<IConsoleWriter>().SingleInstance();
@@ -48,7 +50,11 @@ internal class CompositionRoot
 
     /// <summary>The scope the application runs in: the <paramref name="container"/> with every plugin's modules registered.</summary>
     public static ILifetimeScope BeginPluginScope(IContainer container)
-        => container.BeginLifetimeScope(builder => container.Resolve<IPluginLoader>().RegisterModules(builder));
+        => container.BeginLifetimeScope(builder =>
+        {
+            builder.RegisterModule<LoggerModule>();
+            container.Resolve<IPluginLoader>().RegisterModules(builder);
+        });
 
     private void RegisterConfiguration()
     {
@@ -57,6 +63,8 @@ internal class CompositionRoot
 
         Builder.Register(c => configuration.GetSection("Database").Get<DatabaseSettings>()
             ?? throw new InvalidOperationException("The 'Database' section is missing in hat-config.json")).As<DatabaseSettings>();
+
+        Builder.Register(_ => Option.FromNullable(configuration.GetSection("Log").Get<LogSettings>()).GetOrElse(new LogSettings())).As<LogSettings>();
     }
 
     private static IConfigurationRoot ConfigurationRoot()
