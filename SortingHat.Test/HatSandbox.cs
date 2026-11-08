@@ -95,6 +95,13 @@ internal sealed class HatSandbox : IDisposable
         keys.ForEach(_console.Input.PushKey);
     }
 
+    /// <summary>hat runs in a terminal that can redraw its output, such as a progress bar: interactive, with ANSI sequences.</summary>
+    public void Terminal()
+    {
+        _console.Profile.Capabilities.Interactive = true;
+        _console.EmitAnsiSequences = true;
+    }
+
     /// <summary>A hat whose plugins folder is the <paramref name="fixture"/> folder of PluginFixtures, see the project file.</summary>
     public static HatSandbox WithPluginFixtures(string fixture)
         => WithPluginFixtures(fixture, NoOperation);

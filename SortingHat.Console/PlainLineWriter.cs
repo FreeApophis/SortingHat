@@ -6,8 +6,8 @@ using Spectre.Console;
 namespace SortingHat.CLI;
 
 /// <summary>
-/// The console of plugins: plain lines, written as they are to the output of the Spectre console.
-/// Not as markup, so '[' in a path stays, and not wrapped, so a long path stays on one line.
+/// The console of plugins: plain lines, written to the Spectre console as text.
+/// Not as markup, so '[' in a path stays. Through Spectre, so a line written while a progress bar shows goes above the bar.
 /// </summary>
 [UsedImplicitly]
 internal sealed class PlainLineWriter(IAnsiConsole console) : IConsoleWriter
@@ -19,7 +19,7 @@ internal sealed class PlainLineWriter(IAnsiConsole console) : IConsoleWriter
     {
         lock (_lock)
         {
-            console.Profile.Out.Writer.WriteLine(line);
+            console.WriteLine(line);
         }
     }
 

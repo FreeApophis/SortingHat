@@ -11,7 +11,7 @@ using SortingHat.API.Models;
 namespace SortingHat.CLI.Commands;
 
 [UsedImplicitly]
-internal class RepairCommand(IFile fileStore, IExistsFile existsFile, IFileScanner fileScanner, IConsoleWriter consoleWriter) : IDeclaredCommand
+internal class RepairCommand(IFile fileStore, IExistsFile existsFile, IFileScanner fileScanner, IConsoleWriter consoleWriter, FileProgress progress) : IDeclaredCommand
 {
     private static readonly OptionDefinition DryRun = new() { Name = "dry-run", ShortName = "n", Description = "Shows what would be repaired, without changing the database." };
 
@@ -69,7 +69,7 @@ internal class RepairCommand(IFile fileStore, IExistsFile existsFile, IFileScann
     {
         var changed = 0;
 
-        foreach (var path in paths)
+        await progress.ForEach("Hashing", paths, async path =>
         {
             var state = PathState.Decide(fileStore.Find(path), await fileScanner.Scan(path));
 
@@ -85,7 +85,7 @@ internal class RepairCommand(IFile fileStore, IExistsFile existsFile, IFileScann
             {
                 fileStore.Store(state.Current);
             }
-        }
+        });
 
         consoleWriter.WriteLine(dryRun
             ? $"Dry run: {paths.Count} files hashed again, {changed} changed, no hash was updated."

@@ -2,13 +2,12 @@
 using System.IO;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
-using Apophis.CLI.Writer;
 using SortingHat.API.Models;
 
 namespace SortingHat.API.DI;
 
 /// <summary>Hashes files with a new hash algorithm from <paramref name="newHashAlgorithm"/> per file, because one instance must not be used concurrently.</summary>
-internal class HashService(Func<HashAlgorithm> newHashAlgorithm, string algorithmName, IConsoleWriter consoleWriter) : IHashService
+internal class HashService(Func<HashAlgorithm> newHashAlgorithm, string algorithmName) : IHashService
 {
     private readonly string _algorithm = algorithmName.ToLowerInvariant();
 
@@ -19,10 +18,7 @@ internal class HashService(Func<HashAlgorithm> newHashAlgorithm, string algorith
             using var hashAlgorithm = newHashAlgorithm();
             using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
-            consoleWriter.WriteLine($"Hashing: '{path}'");
-            var digest = hashAlgorithm.ComputeHash(fileStream);
-            consoleWriter.WriteLine($"End Hashing: '{path}'");
-            return ToHash(digest);
+            return ToHash(hashAlgorithm.ComputeHash(fileStream));
         });
     }
 

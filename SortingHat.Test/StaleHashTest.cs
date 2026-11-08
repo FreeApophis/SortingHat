@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Autofac;
 using SortingHat.DB;
@@ -8,11 +9,17 @@ namespace SortingHat.Test;
 
 /// <summary>
 /// Files that change after hat has hashed them, through the real command line application with a real SQLite database and real files.
-/// hat prints "Hashing: '...'" whenever it reads a file to hash it, so the tests see whether it trusted the stored hash.
+/// <see cref="HashedFiles"/> records every file hat reads to hash it, so the tests see whether it trusted the stored hash.
 /// </summary>
 public sealed class StaleHashTest : IDisposable
 {
-    private readonly HatSandbox _hat = new();
+    private readonly HashedFiles _hashed = new();
+    private readonly HatSandbox _hat;
+
+    public StaleHashTest()
+    {
+        _hat = new HatSandbox(_hashed.Register);
+    }
 
     [Fact]
     public void GivenAnUnchangedFileThenTaggingItAgainTrustsTheStoredHash()
@@ -20,9 +27,7 @@ public sealed class StaleHashTest : IDisposable
         var path = OldFile("a.txt", "content");
         _hat.Hat(["tag-files", ":x", path]);
 
-        _hat.Hat(["tag-files", ":y", path]);
-
-        Assert.DoesNotContain(_hat.Lines, IsHashing);
+        Assert.Empty(HashedWhile(["tag-files", ":y", path]));
     }
 
     [Fact]
@@ -58,9 +63,7 @@ public sealed class StaleHashTest : IDisposable
         File.WriteAllText(path, "CONTENT");
         File.SetLastWriteTimeUtc(path, DateTime.UtcNow.AddMinutes(-30));
 
-        _hat.Hat(["tag-files", ":y", path]);
-
-        Assert.Contains(_hat.Lines, IsHashing);
+        Assert.Equal([path], HashedWhile(["tag-files", ":y", path]));
     }
 
     [Fact]
@@ -69,9 +72,7 @@ public sealed class StaleHashTest : IDisposable
         var path = _hat.WriteFile("a.txt", "content");
         _hat.Hat(["tag-files", ":x", path]);
 
-        _hat.Hat(["tag-files", ":y", path]);
-
-        Assert.Contains(_hat.Lines, IsHashing);
+        Assert.Equal([path], HashedWhile(["tag-files", ":y", path]));
     }
 
     [Fact]
@@ -81,9 +82,7 @@ public sealed class StaleHashTest : IDisposable
         _hat.Hat(["tag-files", ":x", path]);
         Execute("UPDATE FilePaths SET Size = NULL, ModifiedAt = NULL, VerifiedAt = NULL");
 
-        _hat.Hat(["tag-files", ":y", path]);
-
-        Assert.Contains(_hat.Lines, IsHashing);
+        Assert.Equal([path], HashedWhile(["tag-files", ":y", path]));
     }
 
     [Fact]
@@ -129,9 +128,7 @@ public sealed class StaleHashTest : IDisposable
         _hat.Hat(["tag-files", ":x", path]);
         File.SetLastWriteTimeUtc(path, DateTime.UtcNow.AddMinutes(-30));
 
-        _hat.Hat(["tag-files", ":y", path]);
-
-        Assert.Contains(_hat.Lines, IsHashing);
+        Assert.Equal([path], HashedWhile(["tag-files", ":y", path]));
         Assert.DoesNotContain(_hat.Lines, line => line.Contains("has changed"));
     }
 
@@ -194,8 +191,14 @@ public sealed class StaleHashTest : IDisposable
         return path;
     }
 
-    private static bool IsHashing(string line)
-        => line.StartsWith("Hashing:");
+    /// <summary>The files hat hashed while it ran with the <paramref name="arguments"/>.</summary>
+    private IReadOnlyList<string> HashedWhile(string[] arguments)
+    {
+        _hashed.Clear();
+        _hat.Hat(arguments);
+
+        return _hashed.Paths;
+    }
 
     /// <summary>A file last written an hour ago, so its fingerprint is trustworthy right away.</summary>
     private string OldFile(string name, string content)

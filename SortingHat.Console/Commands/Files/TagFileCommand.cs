@@ -15,7 +15,7 @@ using SortingHat.API.Models;
 namespace SortingHat.CLI.Commands.Files;
 
 [UsedImplicitly]
-internal class TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor, IFileScanner fileScanner, IFile fileStore, IAutoTagHandler autoTagHandler) : IDeclaredCommand
+internal class TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor, IFileScanner fileScanner, IFile fileStore, IAutoTagHandler autoTagHandler, FileProgress progress) : IDeclaredCommand
 {
     public CommandGrouping CommandGrouping => CommandGrouping.File;
     public string Name => "tag-files";
@@ -48,11 +48,9 @@ internal class TagFileCommand(ILogger<TagFileCommand> logger, IConsoleWriter con
         }
 
         var skipped = new List<(TagMask Mask, string Reason)>();
+        IReadOnlyList<TagMask> validMasks = [.. masks.WhereSelect(mask => mask.RightOrNone())];
 
-        foreach (var path in paths.RightOrNone().GetOrElse([]))
-        {
-            skipped.AddRange(await TagFile(path, [.. masks.WhereSelect(mask => mask.RightOrNone())]));
-        }
+        await progress.ForEach("Tagging", paths.RightOrNone().GetOrElse([]), async path => skipped.AddRange(await TagFile(path, validMasks)));
 
         Summary(skipped).ForEach(consoleWriter.WriteLine);
 

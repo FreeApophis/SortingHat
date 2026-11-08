@@ -12,7 +12,7 @@ using SortingHat.API.Models;
 namespace SortingHat.CLI.Commands.Files;
 
 [UsedImplicitly]
-internal class UntagFileCommand(IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor, IFileScanner fileScanner, IFile fileStore) : IDeclaredCommand
+internal class UntagFileCommand(IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor, IFileScanner fileScanner, IFile fileStore, FileProgress progress) : IDeclaredCommand
 {
     public CommandGrouping CommandGrouping => CommandGrouping.File;
     public string Name => "untag-files";
@@ -40,13 +40,11 @@ internal class UntagFileCommand(IConsoleWriter consoleWriter, IFilePathExtractor
 
     private async Task<bool> Untag(IReadOnlyList<string> paths, IReadOnlyList<Tag> tags)
     {
-        foreach (var path in paths)
-        {
-            var file = (await fileScanner.Examine(path)).Current.File;
-
-            tags.ForEach(tag => fileStore.Untag(file, tag));
-        }
+        await progress.ForEach("Untagging", paths, async path => Untag((await fileScanner.Examine(path)).Current.File, tags));
 
         return true;
     }
+
+    private void Untag(File file, IReadOnlyList<Tag> tags)
+        => tags.ForEach(tag => fileStore.Untag(file, tag));
 }

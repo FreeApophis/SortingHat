@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Security.Cryptography;
-using Apophis.CLI.Writer;
 using Autofac;
 using SortingHat.API.AutoTag;
 using SortingHat.API.DI;
@@ -26,7 +25,7 @@ public class CoreModule : Module
 
         // one hash algorithm per file, an instance must not be used concurrently
         builder.Register(_ => SHA256.Create()).As<HashAlgorithm>().InstancePerDependency().ExternallyOwned();
-        builder.Register(context => new HashService(context.Resolve<Func<HashAlgorithm>>(), nameof(SHA256), context.Resolve<IConsoleWriter>())).As<IHashService>().SingleInstance();
+        builder.Register(context => new HashService(context.Resolve<Func<HashAlgorithm>>(), nameof(SHA256))).As<IHashService>().SingleInstance();
 
         builder.RegisterType<CreatedAtAutoTag>().As<IAutoTag>().SingleInstance();
         builder.RegisterType<UpdatedAtAutoTag>().As<IAutoTag>().SingleInstance();
