@@ -148,6 +148,9 @@ SortingHat.API.DI.ITag.FileCounts() -> System.Collections.Generic.IReadOnlyDicti
 SortingHat.API.DI.ITag.GetTags() -> System.Collections.Generic.IReadOnlyList<SortingHat.API.Models.Tag!>!
 SortingHat.API.DI.ITag.Rename(SortingHat.API.Models.Tag! tag, SortingHat.API.Models.TagName! newName) -> bool
 SortingHat.API.DI.ITag.Store(SortingHat.API.Models.Tag! tag) -> void
+SortingHat.API.DI.IUserPrompt
+SortingHat.API.DI.IUserPrompt.Choose<T>(string! question, System.Collections.Generic.IReadOnlyList<T>! choices, System.Func<T, string!>! describe) -> Funcky.Monads.Option<T>
+SortingHat.API.DI.IUserPrompt.Confirm(string! question) -> Funcky.Monads.Option<bool>
 SortingHat.API.DI.OptionDefinition
 SortingHat.API.DI.OptionDefinition.<Clone>$() -> SortingHat.API.DI.OptionDefinition!
 SortingHat.API.DI.OptionDefinition.Description.get -> string!

@@ -33,6 +33,7 @@ internal class CompositionRoot
         Builder.Register(_ => HatConsole.Create()).As<IAnsiConsole>().SingleInstance();
         Builder.RegisterType<PlainLineWriter>().As<IConsoleWriter>().SingleInstance();
         Builder.RegisterType<FileProgress>().AsSelf().SingleInstance();
+        Builder.RegisterType<SpectreUserPrompt>().As<IUserPrompt>().SingleInstance();
         Builder.RegisterType<ApplicationName>().AsSelf().SingleInstance();
 
         RegisterCommands();

@@ -10,12 +10,11 @@ using SortingHat.API;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
 using SortingHat.DB;
-using Spectre.Console;
 
 namespace SortingHat.CLI.Commands.Projects;
 
 [UsedImplicitly]
-internal class DestroyProjectCommand(IProjects projects, ISettings settings, DatabaseSettings databaseSettings, IConsoleWriter consoleWriter, IAnsiConsole console) : IDeclaredCommand
+internal class DestroyProjectCommand(IProjects projects, ISettings settings, DatabaseSettings databaseSettings, IConsoleWriter consoleWriter, IUserPrompt prompt) : IDeclaredCommand
 {
     private static readonly ArgumentDefinition ProjectNames = new() { Name = "project-name", Description = "The projects to remove, in any letter case.", Arity = Arity.OneOrMore };
 
@@ -61,11 +60,9 @@ internal class DestroyProjectCommand(IProjects projects, ISettings settings, Dat
     {
         consoleWriter.WriteLine($"Removing the project '{project}' deletes its database with all its files and tags. The files on disk stay where they are.");
 
-        return console.Profile.Capabilities.Interactive
-            ? console.Prompt(new ConfirmationPrompt(Markup.Escape($"Remove the project '{project}'?")) { DefaultValue = false })
-                ? Remove(project)
-                : Keep(project)
-            : CannotAsk(project);
+        return prompt.Confirm($"Remove the project '{project}'?").Match(
+            none: () => CannotAsk(project),
+            some: yes => yes ? Remove(project) : Keep(project));
     }
 
     private bool CannotAsk(ProjectName project)

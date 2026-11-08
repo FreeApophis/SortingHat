@@ -156,7 +156,8 @@ internal sealed class HelloCommand(IConsoleWriter consoleWriter) : IDeclaredComm
 - **The result** decides the exit code: `true` is success, `false` is 1. Report the reason before you return `false`.
 - **The description** is one sentence that starts with a capital letter and ends with a period; the overview of `hat help` shows it. hat's tests check this for its own commands and for the plugins in this repository.
 - **Names are first come, first served.** hat's own commands come first, then the plugins in the order they load. When your command's name is taken, hat leaves it out; when only an alias is taken, hat drops that alias. Both with a warning, so check `hat help` after installing.
-- **Output** goes through `IConsoleWriter`: plain lines, written as they are. hat renders its own tables and prompts with Spectre.Console, but that is not part of the contract; a plugin cannot ask the user anything yet.
+- **Output** goes through `IConsoleWriter`: plain lines, written as they are. hat renders its own tables with Spectre.Console, but that is not part of the contract.
+- **Questions** go through `IUserPrompt`: `Confirm(question)` (only 'y' is yes, Enter is no) and `Choose(question, choices, describe)` (arrow keys). Both return none when hat cannot ask, such as in a script: decide what happens then, and say why, like `remove-project`, which keeps the project and names its `--yes` option.
 - **File arguments:** `IFilePathExtractor.FromFilePatterns(patterns, recursive)` resolves files, wildcards and (with `recursive`) folders the way hat's own commands do, and returns the problems on the left when an argument matches nothing. Offer a `recursive` option (`-r`) for it, like the `exif` command.
 
 ### Tag variables: `IAutoTag`
@@ -241,6 +242,7 @@ Inject these into your services; they are the same ones hat's own commands use. 
 | `IProjects` | the projects: list, create, remove, export, import |
 | `IPluginSettings<TPlugin>` | your plugin's own settings: `Global` for every project, `Project` for the active project |
 | `IConsoleWriter` | output lines |
+| `IUserPrompt` | yes/no questions and choices, none when hat cannot ask |
 | `ICopyFile`, `IMoveFile`, `IExistsFile`, `IExistsDirectory` | the file system, replaceable in tests |
 
 - Values with rules have their own types: `Tag.Parse(":tax:2018")`, `TagName`, `Hash.Parse(...)`, `ProjectName.Parse(...)` return `Either<string, T>` with the reason on the left. Parse user input once, then work with the type.

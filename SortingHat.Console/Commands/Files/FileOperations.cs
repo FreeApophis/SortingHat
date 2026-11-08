@@ -8,7 +8,6 @@ using Funcky.Extensions;
 using Funcky.Monads;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
-using Spectre.Console;
 using static Funcky.Functional;
 
 namespace SortingHat.CLI.Commands.Files;
@@ -17,7 +16,7 @@ namespace SortingHat.CLI.Commands.Files;
 /// Puts the files of a search into a folder: choose a source per file (asking when several copies exist), let <see cref="ExportPlan"/> decide the targets,
 /// then copy or move. One file that cannot be done is reported and skipped, the others still go.
 /// </summary>
-public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExistsFile existsFile, IExistsDirectory existsDirectory, IConsoleWriter consoleWriter, IAnsiConsole console, IFile fileStore)
+public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExistsFile existsFile, IExistsDirectory existsDirectory, IConsoleWriter consoleWriter, IUserPrompt prompt, IFile fileStore)
     where TFileOperation : IFileOperation
 {
     /// <summary>Windows ignores the case of file names, other systems do not.</summary>
@@ -96,12 +95,9 @@ public class FileOperations<TFileOperation>(TFileOperation fileOperation, IExist
 
     /// <summary>The user chooses with the arrow keys; where hat cannot ask, such as in a script, the file is skipped.</summary>
     private Either<string, FileAt> AskForSource(Hash hash, IReadOnlyList<FileAt> files)
-        => console.Profile.Capabilities.Interactive
-            ? Either<string, FileAt>.Right(console.Prompt(new SelectionPrompt<FileAt>()
-                .Title(Markup.Escape($"The file with hash {hash.Short} has several copies, which one do you want to {Verb}?"))
-                .UseConverter(file => Markup.Escape(file.Path))
-                .AddChoices(files)))
-            : Either<string, FileAt>.Left($"The file with hash {hash.Short} skipped: it has several copies, and hat can only ask which one in an interactive terminal.");
+        => prompt.Choose($"The file with hash {hash.Short} has several copies, which one do you want to {Verb}?", files, file => file.Path).Match(
+            none: () => Either<string, FileAt>.Left($"The file with hash {hash.Short} skipped: it has several copies, and hat can only ask which one in an interactive terminal."),
+            some: Either<string, FileAt>.Right);
 
     private bool Preview(ExportTarget target)
     {
