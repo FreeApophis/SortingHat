@@ -8,5 +8,5 @@ namespace SortingHat.Plugin.FileType.AutoTag;
 internal static class FileTypes
 {
     public static Option<FileType> Of(AutoTagFile file, IFileTypeFinder fileTypeFinder)
-        => file.Remember("FileType.Type", info => Option.FromNullable(fileTypeFinder.Identify(info)));
+        => file.Remember("FileType.Type", fileTypeFinder.Identify);
 }

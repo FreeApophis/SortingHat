@@ -26,7 +26,7 @@ internal class IdentifyCommand(IConsoleWriter consoleWriter, IFileTypeFinder fil
         {
             consoleWriter.WriteLine($"File: {path}");
 
-            foreach (var line in Lines(Option.FromNullable(fileTypeFinder.Identify(new System.IO.FileInfo(path)))))
+            foreach (var line in Lines(fileTypeFinder.Identify(new System.IO.FileInfo(path))))
             {
                 consoleWriter.WriteLine(line);
             }

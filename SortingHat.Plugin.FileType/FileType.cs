@@ -2,4 +2,4 @@
 
 namespace SortingHat.Plugin.FileType;
 
-internal sealed record FileType(string Category, string Name, IEnumerable<string> Extensions);
+internal sealed record FileType(string Category, string Name, IReadOnlyList<string> Extensions);

@@ -27,6 +27,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- FileTypeTest checks every signature of the FileType plugin against its own magic bytes -->
+    <None Include="..\SortingHat.Plugin.FileType\Resources\FileSignatures.csv" Link="Resources\FileSignatures.csv" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\SortingHat.API\SortingHat.API.csproj" />
     <ProjectReference Include="..\SortingHat.Console\SortingHat.CLI.csproj" />
     <ProjectReference Include="..\SortingHat.DB\SortingHat.DB.csproj" />

@@ -17,7 +17,7 @@ internal class FileTypeModule : Autofac.Module, IPlugin
     private const string SignatureResource = "SortingHat.Plugin.FileType.Resources.FileSignatures.csv";
 
     public string Name => "File Type Plugin";
-    public string Description => "This plugin can automatically can identify file type accoridng to their content, and als create automatically tags on file type.";
+    public string Description => "Identifies the type of a file from its content, with the identify command and the FileType variables for tag masks.";
 
     protected override void Load(ContainerBuilder builder)
     {
@@ -29,26 +29,17 @@ internal class FileTypeModule : Autofac.Module, IPlugin
         builder.RegisterType<FileTypeAutoTag>().As<IAutoTag>().SingleInstance();
         builder.RegisterType<FileTypeExtensionAutoTag>().As<IAutoTag>().SingleInstance();
 
-        LoadDetectors(builder);
+        builder.RegisterInstance(LoadSignatures());
     }
 
-    private static Stream SignatureStream()
+    private static Signatures LoadSignatures()
     {
-        return Assembly.GetExecutingAssembly().GetManifestResourceStream(SignatureResource)
+        using var resource = Assembly.GetExecutingAssembly().GetManifestResourceStream(SignatureResource)
             ?? throw new InvalidOperationException($"Embedded resource '{SignatureResource}' is missing.");
-    }
+        using var reader = new StreamReader(resource);
 
-    private void LoadDetectors(ContainerBuilder builder)
-    {
-        using TextReader reader = new StreamReader(SignatureStream());
-
-        string? line;
-        while ((line = reader.ReadLine()) != null)
-        {
-            if (!line.StartsWith("#"))
-            {
-                builder.RegisterInstance(FileTypeDetectorFactory.Create(line)).As<IFileTypeDetector>();
-            }
-        }
+        // the signatures are part of the plugin, a broken row is a bug: the plugin does not load and hat says why
+        return Signatures.Parse(reader.ReadToEnd())
+            .GetOrElse(reason => throw new InvalidOperationException($"FileSignatures.csv is broken, {reason}."));
     }
 }

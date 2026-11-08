@@ -113,6 +113,17 @@ internal sealed class HatSandbox : IDisposable
         return path;
     }
 
+    /// <summary>Writes a file with binary <paramref name="content"/> into the sandbox without telling hat about it.</summary>
+    public string WriteFile(string name, byte[] content)
+    {
+        var path = Path.Combine(_root, name);
+
+        File.WriteAllBytes(path, content);
+        _files.Add(path);
+
+        return path;
+    }
+
     public IEnumerable<string> FindFiles(string query)
     {
         Hat(["find-files", query]);
