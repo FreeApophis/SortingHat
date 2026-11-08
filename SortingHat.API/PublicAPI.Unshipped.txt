@@ -144,7 +144,7 @@ SortingHat.API.DI.IProjects
 SortingHat.API.DI.ISettings
 SortingHat.API.DI.ITag
 SortingHat.API.DI.ITag.Destroy(SortingHat.API.Models.Tag! tag) -> bool
-SortingHat.API.DI.ITag.FileCount(SortingHat.API.Models.Tag! tag) -> long
+SortingHat.API.DI.ITag.FileCounts() -> System.Collections.Generic.IReadOnlyDictionary<SortingHat.API.Models.Tag!, long>!
 SortingHat.API.DI.ITag.GetTags() -> System.Collections.Generic.IReadOnlyList<SortingHat.API.Models.Tag!>!
 SortingHat.API.DI.ITag.Rename(SortingHat.API.Models.Tag! tag, SortingHat.API.Models.TagName! newName) -> bool
 SortingHat.API.DI.ITag.Store(SortingHat.API.Models.Tag! tag) -> void

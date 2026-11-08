@@ -23,8 +23,9 @@ internal class ListTagsCommand(ITag tagStore, IConsoleWriter consoleWriter, IAns
         var tags = tagStore.GetTags();
         if (tags.Count > 0)
         {
+            var counts = tagStore.FileCounts();
             var table = LightTable.Create(LightTable.Column("Tag"), LightTable.Column("Files").RightAligned());
-            tags.ForEach(tag => table.AddCells(tag.FullName, $"{tagStore.FileCount(tag)}"));
+            tags.ForEach(tag => table.AddCells(tag.FullName, $"{counts.GetValueOrNone(tag).GetOrElse(0L)}"));
 
             console.Write(table);
         }

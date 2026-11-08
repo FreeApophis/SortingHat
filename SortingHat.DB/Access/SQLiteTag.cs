@@ -49,24 +49,28 @@ internal sealed class SQLiteTag(SQLiteProjectDatabase db) : ITag
                         select MoveAll(tagIds, destinationId),
             some: Either<string, Unit>.Left);
 
-    public long FileCount(Tag tag)
-        => Find(tag).Match(none: 0L, some: CountFiles);
+    /// <summary>Two queries, however many tags there are: the tree and the counts.</summary>
+    public IReadOnlyDictionary<Tag, long> FileCounts()
+    {
+        var counts = db.Query("SELECT TagId, COUNT(*) FROM FileTags GROUP BY TagId", reader => KeyValuePair.Create(reader.GetInt64(0), reader.GetInt64(1))).ToDictionary();
+
+        return TagsById().ToDictionary(tag => tag.Value, tag => counts.GetValueOrNone(tag.Key).GetOrElse(0L));
+    }
 
     /// <summary>Ordered like a tree (<see cref="Tag.Order"/>): every parent comes right before its children.</summary>
     public IReadOnlyList<Tag> GetTags()
-    {
-        var tags = db.Query(AllTags, ReadRow)
-            .Aggregate(ImmutableDictionary<long, Tag>.Empty, (known, row) => known.Add(row.Id, row.ParentId.Match(none: () => Tag.Root(row.Name), some: parentId => Known(known, parentId).Child(row.Name))));
+        => [.. TagsById().Values.Order(Tag.Order)];
 
-        return [.. tags.Values.Order(Tag.Order)];
-    }
+    /// <summary>The tag with the <paramref name="levels"/>, from the root down; a tag without levels means the database is damaged.</summary>
+    internal static Tag FromLevels(IEnumerable<TagName> levels)
+        => levels.Aggregate(
+            Option<Tag>.None,
+            (tag, level) => Option.Some(tag.Match(none: () => Tag.Root(level), some: parent => parent.Child(level))))
+            .GetOrElse(() => throw new InvalidDataException("The database is damaged: a tag without a name."));
 
-    internal Tag Load(long tagId)
-        => db.Query("SELECT Id, ParentId, Name FROM Tags WHERE Id = @tagId", ReadRow, new SqliteParameter("@tagId", tagId))
-            .FirstOrNone()
-            .Match(
-                none: () => throw new InvalidDataException($"The database is damaged: the tag {tagId} does not exist."),
-                some: row => row.ParentId.Match(none: () => Tag.Root(row.Name), some: parentId => Load(parentId).Child(row.Name)));
+    /// <summary>Every name in the database was written from a <see cref="TagName"/>, so one that does not parse means the database is damaged.</summary>
+    internal static TagName ReadName(string name)
+        => TagName.Parse(name).GetOrElse(problem => throw new InvalidDataException($"The database is damaged: {problem}"));
 
     /// <summary>Finds the tag by walking its path from the root, so <c>:2018</c> never matches <c>:tax:2018</c>.</summary>
     internal Option<long> Find(Tag tag)
@@ -83,13 +87,14 @@ internal sealed class SQLiteTag(SQLiteProjectDatabase db) : ITag
     private static (long Id, Option<long> ParentId, TagName Name) ReadRow(SqliteDataReader reader)
         => (reader.GetInt64(0), reader.IsDBNull(1) ? Option<long>.None : Option.Some(reader.GetInt64(1)), ReadName(reader.GetString(2)));
 
-    /// <summary>Every name in the database was written from a <see cref="TagName"/>, so one that does not parse means the database is damaged.</summary>
-    private static TagName ReadName(string name)
-        => TagName.Parse(name).GetOrElse(problem => throw new InvalidDataException($"The database is damaged: {problem}"));
-
     /// <summary>The tree query returns every parent before its children.</summary>
     private static Tag Known(ImmutableDictionary<long, Tag> known, long tagId)
         => known.GetValueOrNone(tagId).GetOrElse(() => throw new InvalidDataException($"The database is damaged: the tag {tagId} comes before its parent."));
+
+    /// <summary>Every tag by its id, built from one query of the whole tree.</summary>
+    private ImmutableDictionary<long, Tag> TagsById()
+        => db.Query(AllTags, ReadRow)
+            .Aggregate(ImmutableDictionary<long, Tag>.Empty, (known, row) => known.Add(row.Id, row.ParentId.Match(none: () => Tag.Root(row.Name), some: parentId => Known(known, parentId).Child(row.Name))));
 
     private static SqliteParameter ParentIdParameter(Option<long> parentId)
         => new("@parentId", parentId.Match(none: DBNull.Value, some: id => (object)id));
@@ -136,9 +141,6 @@ internal sealed class SQLiteTag(SQLiteProjectDatabase db) : ITag
             return false;
         }
     }
-
-    private long CountFiles(long tagId)
-        => db.ExecuteScalar("SELECT COUNT(*) FROM FileTags WHERE TagId = @tagId", new SqliteParameter("@tagId", tagId)) as long? ?? 0;
 
     private static string Where(Option<Tag> destination)
         => destination.Match(none: "the top level", some: tag => $"'{tag}'");

@@ -18,11 +18,23 @@ namespace SortingHat.DB.Access;
 [UsedImplicitly]
 internal sealed class SQLiteFile(SQLiteProjectDatabase db, SQLiteTag sqLiteTag, Parser parser) : IFile
 {
-    private const string AllFileTags = @"SELECT Tags.Id
-FROM Tags
-JOIN FileTags ON FileTags.TagId = Tags.Id
-JOIN Files ON FileTags.FileId = Files.Id
-WHERE Files.Hash = @hash";
+    /// <summary>
+    /// The levels of every tag of a file in one query: each tag of the file walks up to its root,
+    /// so a tag's rows come together, from the root down.
+    /// </summary>
+    private const string FileTagLevels = """
+        WITH RECURSIVE Level(TagId, ParentId, Name, Depth) AS (
+            SELECT Tags.Id, Tags.ParentId, Tags.Name, 0
+            FROM Tags
+            JOIN FileTags ON FileTags.TagId = Tags.Id
+            JOIN Files ON FileTags.FileId = Files.Id
+            WHERE Files.Hash = @hash
+            UNION ALL
+            SELECT Level.TagId, Tags.ParentId, Tags.Name, Level.Depth + 1
+            FROM Tags
+            JOIN Level ON Tags.Id = Level.ParentId)
+        SELECT TagId, Name FROM Level ORDER BY TagId, Depth DESC
+        """;
 
     private const string DuplicateQuery = @"SELECT Files.CreatedAt, Files.Hash, Files.Size, FilePaths.Path, COUNT(FilePaths.Id) AS DuplicateCount
 FROM FilePaths
@@ -74,8 +86,15 @@ WHERE FilePaths.Path = @filePath";
     public IReadOnlyList<File> GetDuplicates()
         => db.Query(DuplicateQuery, ReadFile);
 
+    /// <summary>Ordered like a tree (<see cref="Tag.Order"/>).</summary>
     public IReadOnlyList<Tag> GetTags(File file)
-        => db.Query(AllFileTags, reader => sqLiteTag.Load(reader.GetInt64(0)), HashParameter(file.Hash));
+        =>
+        [
+            .. db.Query(FileTagLevels, reader => (TagId: reader.GetInt64(0), Name: SQLiteTag.ReadName(reader.GetString(1))), HashParameter(file.Hash))
+                .GroupBy(level => level.TagId, level => level.Name)
+                .Select(SQLiteTag.FromLevels)
+                .Order(API.Models.Tag.Order),
+        ];
 
     public IReadOnlyList<string> GetPaths()
         => db.Query("SELECT FilePaths.Path FROM FilePaths", reader => reader.GetString(0));

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using Xunit;
 
 namespace SortingHat.Test;
@@ -22,6 +23,16 @@ public sealed class FileInfoTest : IDisposable
         Assert.Contains(_hat.Lines, line => line.StartsWith("File Hash: sha256:"));
         Assert.Contains("Tag: :tax:2018", _hat.Lines);
         Assert.Contains($"Path: {path}", _hat.Lines);
+    }
+
+    [Fact]
+    public void GivenAFileWithSeveralNestedTagsThenFileInfoShowsAllOfThemInTreeOrder()
+    {
+        var path = _hat.TaggedFile("a.txt", ":tax:2018", ":Bank", ":a:b:c");
+
+        Assert.Equal(0, _hat.Hat(["file-info", path]));
+
+        Assert.Equal(["Tag: :a:b:c", "Tag: :Bank", "Tag: :tax:2018"], _hat.Lines.Where(line => line.StartsWith("Tag:")));
     }
 
     [Fact]

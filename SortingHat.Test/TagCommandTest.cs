@@ -106,6 +106,18 @@ public sealed class TagCommandTest : IDisposable
     }
 
     [Fact]
+    public void GivenFilesOnNestedTagsThenListTagsCountsTheFilesOfEachTagExactly()
+    {
+        _hat.TaggedFile("a.txt", ":tax:2018");
+        _hat.TaggedFile("b.txt", ":tax:2018", ":tax:2019:q1");
+        _hat.TaggedFile("c.txt", ":bank");
+
+        Assert.Equal(0, _hat.Hat(["list-tags"]));
+
+        Assert.Equal(["Tag|Files", ":bank|1", ":tax|0", ":tax:2018|2", ":tax:2019|0", ":tax:2019:q1|1"], _hat.Rows);
+    }
+
+    [Fact]
     public void GivenNoTagsThenListTagsSaysSo()
     {
         Assert.Equal(0, _hat.Hat(["list-tags"]));

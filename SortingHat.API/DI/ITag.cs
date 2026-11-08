@@ -23,8 +23,8 @@ public interface ITag
     /// </summary>
     Either<string, Unit> Move(IReadOnlyList<Tag> tags, Option<Tag> destination);
 
-    /// <summary>The number of files tagged with exactly the <paramref name="tag"/>.</summary>
-    long FileCount(Tag tag);
+    /// <summary>For every tag, the number of files tagged with exactly that tag; 0 for a tag without files.</summary>
+    IReadOnlyDictionary<Tag, long> FileCounts();
 
     /// <summary>Every tag, each parent right before its children.</summary>
     IReadOnlyList<Tag> GetTags();
