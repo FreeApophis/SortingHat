@@ -27,11 +27,14 @@ internal class RevisionMigrator(ILogger<RevisionMigrator> logger, Assembly migra
     {
         Initialize(db);
 
-        foreach (var migration in Migrations(db).Where(migration => !HasMigrated(db, migration.Revision)))
+        foreach (var migration in Migrations(db.MigrationType).Where(migration => !HasMigrated(db, migration.Revision)))
         {
             Run(db, migration);
         }
     }
+
+    public IReadOnlySet<string> Revisions(MigrationType migrationType)
+        => Migrations(migrationType).Select(migration => migration.Revision).ToHashSet(StringComparer.Ordinal);
 
     /// <summary>
     /// Initialized the Migrations Table, this call is idempotent and can be called at any time.
@@ -61,9 +64,9 @@ internal class RevisionMigrator(ILogger<RevisionMigrator> logger, Assembly migra
     }
 
     /// <summary>A script is recorded by its resource name, a code migration by its name: never change either once it ran.</summary>
-    private IEnumerable<Migration> Migrations(SQLiteDatabase db)
+    private IEnumerable<Migration> Migrations(MigrationType migrationType)
     {
-        var prefix = $"{migrations.GetName().Name}.Migrations.{db.MigrationType}.";
+        var prefix = $"{migrations.GetName().Name}.Migrations.{migrationType}.";
 
         var scripts = migrations
             .GetManifestResourceNames()
@@ -71,7 +74,7 @@ internal class RevisionMigrator(ILogger<RevisionMigrator> logger, Assembly migra
             .Select(resource => new Migration(resource[prefix.Length..], resource, database => database.ExecuteNonQuery(Script(resource))));
 
         var code = codeMigrations
-            .Where(migration => migration.MigrationType == db.MigrationType)
+            .Where(migration => migration.MigrationType == migrationType)
             .Select(migration => new Migration(migration.Name, migration.Name, migration.Run));
 
         return scripts.Concat(code).OrderBy(migration => migration.Order, StringComparer.Ordinal);

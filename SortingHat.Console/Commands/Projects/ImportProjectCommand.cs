@@ -3,7 +3,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Apophis.CLI.Writer;
-using Apophis.FileSystem;
 using JetBrains.Annotations;
 using SortingHat.API;
 using SortingHat.API.DI;
@@ -13,7 +12,7 @@ namespace SortingHat.CLI.Commands.Projects;
 
 [UsedImplicitly]
 [method: UsedImplicitly]
-internal class ImportProjectCommand(IConsoleWriter consoleWriter, ICopyFile copyFile, DatabaseSettings databaseSettings, IProjects projects) : IDeclaredCommand
+internal class ImportProjectCommand(IConsoleWriter consoleWriter, DatabaseSettings databaseSettings, IProjects projects) : IDeclaredCommand
 {
     private static readonly ArgumentDefinition ProjectFile = new() { Name = "project-file", Description = "A project file, for example made with export." };
 
@@ -22,6 +21,7 @@ internal class ImportProjectCommand(IConsoleWriter consoleWriter, ICopyFile copy
     public CommandGrouping CommandGrouping => CommandGrouping.Project;
     public string Name => "import";
     public string Description => "Imports an exported project file as a new project.";
+    public string Details => "Only a SortingHat project this hat can open is imported; a project of an older hat is updated when it is first used.";
     public IReadOnlyList<ArgumentDefinition> Arguments => [ProjectFile, ProjectNameArgument];
 
     public Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
@@ -30,26 +30,22 @@ internal class ImportProjectCommand(IConsoleWriter consoleWriter, ICopyFile copy
             some: filePath => ImportProject(filePath, input.Value(ProjectNameArgument).GetOrElse(() => Path.GetFileNameWithoutExtension(filePath)))));
 
     private bool ImportProject(string filePath, string projectName)
-        => ProjectName.ParseNew(projectName, projects.GetProjects(), databaseSettings.Name)
-            .Match(left: Reject, right: project => Import(filePath, project));
+        => (from project in ProjectName.ParseNew(projectName, projects.GetProjects(), databaseSettings.Name)
+            from imported in projects.Import(filePath, project)
+            select $"New project '{project}' imported.")
+            .Match(left: Report, right: Imported);
 
-    private bool Reject(string problem)
+    private bool Imported(string message)
+    {
+        consoleWriter.WriteLine(message);
+
+        return true;
+    }
+
+    private bool Report(string problem)
     {
         consoleWriter.WriteLine(problem);
 
         return false;
     }
-
-    private bool Import(string filePath, ProjectName projectName)
-    {
-        copyFile.Copy(filePath, DestinationPath(projectName));
-        projects.AddProject(projectName);
-
-        consoleWriter.WriteLine($"New project '{projectName}' imported.");
-
-        return true;
-    }
-
-    private string DestinationPath(ProjectName project)
-        => Path.Combine(databaseSettings.DbPath, $"{project.Value}.db");
 }

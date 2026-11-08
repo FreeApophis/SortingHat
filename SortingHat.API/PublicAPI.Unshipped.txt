@@ -447,3 +447,5 @@ SortingHat.API.DI.ITag.Move(System.Collections.Generic.IReadOnlyList<SortingHat.
 SortingHat.API.Models.Tag.IsSelfOrAncestorOf(SortingHat.API.Models.Tag! other) -> bool
 SortingHat.API.Models.TagMoves
 static SortingHat.API.Models.TagMoves.Problem(System.Collections.Generic.IReadOnlyList<SortingHat.API.Models.Tag!>! tags, Funcky.Monads.Option<SortingHat.API.Models.Tag!> destination) -> Funcky.Monads.Option<string!>
+SortingHat.API.DI.IProjects.Export(SortingHat.API.Models.ProjectName! project, string! destination) -> Funcky.Monads.Either<string!, Funcky.Unit>
+SortingHat.API.DI.IProjects.Import(string! projectFile, SortingHat.API.Models.ProjectName! project) -> Funcky.Monads.Either<string!, Funcky.Unit>
