@@ -151,6 +151,10 @@ internal sealed class HatSandbox : IDisposable
         return path;
     }
 
+    /// <summary>Creates the folder <paramref name="name"/> in the sandbox and returns its full path.</summary>
+    public string CreateFolder(string name)
+        => Directory.CreateDirectory(Path.Combine(_root, name)).FullName;
+
     /// <summary>Writes a file with binary <paramref name="content"/> into the sandbox without telling hat about it.</summary>
     public string WriteFile(string name, byte[] content)
     {

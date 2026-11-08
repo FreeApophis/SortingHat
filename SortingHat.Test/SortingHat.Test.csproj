@@ -48,6 +48,7 @@
     <PluginFixture Include="..\SortingHat.Plugin.Exif\SortingHat.Plugin.Exif.csproj" />
     <PluginFixture Include="..\SortingHat.Plugin.ExtractRelevantText\SortingHat.Plugin.ExtractRelevantText.csproj" />
     <PluginFixture Include="..\SortingHat.Plugin.FileType\SortingHat.Plugin.FileType.csproj" />
+    <PluginFixture Include="..\SortingHat.Plugin.MoveOnTag\SortingHat.Plugin.MoveOnTag.csproj" />
     <PluginFixture Include="..\SortingHat.Test.Plugin\SortingHat.Test.Plugin.csproj" />
     <ProjectReference Include="@(PluginFixture)" ReferenceOutputAssembly="false" />
   </ItemGroup>
