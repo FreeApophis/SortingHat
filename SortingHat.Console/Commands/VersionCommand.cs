@@ -19,20 +19,6 @@ internal class VersionCommand(IAnsiConsole console) : IDeclaredCommand
     public IReadOnlyList<string> Aliases => ["v"];
     public string Description => "Shows the version of hat.";
 
-    public string Details
-        => """
-           This command shows the current version of the program, but probably you wanted to see this in ASCII Art anyway:
-
-              _____            _   _             _    _       _     __   ___
-             / ____|          | | (_)           | |  | |     | |   /_ | / _ \
-            | (___   ___  _ __| |_ _ _ __   __ _| |__| | __ _| |_   | || | | |
-             \___ \ / _ \| '__| __| | '_ \ / _` |  __  |/ _` | __|  | || | | |
-             ____) | (_) | |  | |_| | | | | (_| | |  | | (_| | |_   | || |_| |
-            |_____/ \___/|_|   \__|_|_| |_|\__, |_|  |_|\__,_|\__|  |_(_)___/
-                                            __/ |
-                                           |___/
-           """;
-
     public Task<bool> ExecuteAsync(CommandInput input, CancellationToken cancellationToken)
     {
         var version = Assembly.GetExecutingAssembly().GetName();
