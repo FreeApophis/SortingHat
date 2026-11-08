@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using Funcky;
 using Funcky.Extensions;
 using Funcky.Monads;
 using JetBrains.Annotations;
@@ -39,11 +40,14 @@ public class SQLiteTag(SQLiteProjectDatabase db) : ITag
                 none: false,
                 some: RenameTag(newName));
 
-    public bool Move(Tag tag, Tag destinationTag)
-        => (from tagId in Find(tag)
-            from destinationTagId in Find(destinationTag)
-            select MoveTag(tagId, destinationTagId))
-            .GetOrElse(false);
+    /// <summary>Everything is checked before the first tag moves, then all of them move in one transaction.</summary>
+    public Either<string, Unit> Move(IReadOnlyList<Tag> tags, Option<Tag> destination)
+        => TagMoves.Problem(tags, destination).Match(
+            none: () => from destinationId in DestinationId(destination)
+                        from tagIds in TagIds(tags)
+                        from free in NamesFree(tags.Zip(tagIds, (tag, tagId) => (Tag: tag, Id: tagId)), destination, destinationId)
+                        select MoveAll(tagIds, destinationId),
+            some: Either<string, Unit>.Left);
 
     public long FileCount(Tag tag)
         => Find(tag).Match(none: 0L, some: CountFiles);
@@ -113,10 +117,6 @@ public class SQLiteTag(SQLiteProjectDatabase db) : ITag
     private Func<long, bool> RenameTag(TagName newName)
         => tagId => UnlessRejected(() => Execute("UPDATE Tags SET Name = @tagName, NameKey = @key WHERE Id = @tagId", new SqliteParameter("@tagId", tagId), new SqliteParameter("@tagName", newName.Value), new SqliteParameter("@key", newName.Key)));
 
-    /// <summary>The unique tag name indexes reject a destination that already has a child with the same name.</summary>
-    private bool MoveTag(long tagId, long destinationTagId)
-        => UnlessRejected(() => Execute("UPDATE Tags SET ParentId = @destinationTagId WHERE Id = @tagId", new SqliteParameter("@tagId", tagId), new SqliteParameter("@destinationTagId", destinationTagId)));
-
     private bool Execute(string commandText, params SqliteParameter[] parameters)
     {
         db.ExecuteNonQuery(commandText, parameters);
@@ -139,4 +139,37 @@ public class SQLiteTag(SQLiteProjectDatabase db) : ITag
 
     private long CountFiles(long tagId)
         => db.ExecuteScalar("SELECT COUNT(*) FROM FileTags WHERE TagId = @tagId", new SqliteParameter("@tagId", tagId)) as long? ?? 0;
+
+    private static string Where(Option<Tag> destination)
+        => destination.Match(none: "the top level", some: tag => $"'{tag}'");
+
+    private Either<string, Option<long>> DestinationId(Option<Tag> destination)
+        => destination.Match(
+            none: () => Either<string, Option<long>>.Right(Option<long>.None),
+            some: tag => Find(tag).Match(
+                none: () => Either<string, Option<long>>.Left($"The tag '{tag}' does not exist."),
+                some: tagId => Either<string, Option<long>>.Right(Option.Some(tagId))));
+
+    private Either<string, ImmutableList<long>> TagIds(IReadOnlyList<Tag> tags)
+        => tags.Aggregate(
+            Either<string, ImmutableList<long>>.Right([]),
+            (found, tag) => from tagIds in found
+                            from tagId in Find(tag).Match(none: () => Either<string, long>.Left($"The tag '{tag}' does not exist."), some: Either<string, long>.Right)
+                            select tagIds.Add(tagId));
+
+    /// <summary>A tag already under the destination has its own name there, that is no conflict.</summary>
+    private Either<string, Unit> NamesFree(IEnumerable<(Tag Tag, long Id)> moves, Option<Tag> destination, Option<long> destinationId)
+        => moves
+            .FirstOrNone(move => FindChild(destinationId, move.Tag.Name).Match(none: false, some: childId => childId != move.Id))
+            .Match(
+                none: () => Either<string, Unit>.Right(Unit.Value),
+                some: move => Either<string, Unit>.Left($"'{move.Tag}' cannot move to {Where(destination)}, a tag named '{move.Tag.Name}' is already there."));
+
+    private Unit MoveAll(IReadOnlyList<long> tagIds, Option<long> destinationId)
+        => db.InTransaction(() =>
+        {
+            tagIds.ForEach(tagId => db.ExecuteNonQuery("UPDATE Tags SET ParentId = @parentId WHERE Id = @tagId", ParentIdParameter(destinationId), new SqliteParameter("@tagId", tagId)));
+
+            return Unit.Value;
+        });
 }

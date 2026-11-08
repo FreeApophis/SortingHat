@@ -143,7 +143,6 @@ SortingHat.API.DI.ITag
 SortingHat.API.DI.ITag.Destroy(SortingHat.API.Models.Tag! tag) -> bool
 SortingHat.API.DI.ITag.FileCount(SortingHat.API.Models.Tag! tag) -> long
 SortingHat.API.DI.ITag.GetTags() -> System.Collections.Generic.IReadOnlyList<SortingHat.API.Models.Tag!>!
-SortingHat.API.DI.ITag.Move(SortingHat.API.Models.Tag! tag, SortingHat.API.Models.Tag! destinationTag) -> bool
 SortingHat.API.DI.ITag.Rename(SortingHat.API.Models.Tag! tag, SortingHat.API.Models.TagName! newName) -> bool
 SortingHat.API.DI.ITag.Store(SortingHat.API.Models.Tag! tag) -> void
 SortingHat.API.DI.OptionDefinition
@@ -444,3 +443,7 @@ SortingHat.API.DI.IFile.Search(string! query) -> Funcky.Monads.Either<string!, S
 static SortingHat.API.Models.Tag.Order.get -> System.Collections.Generic.IComparer<SortingHat.API.Models.Tag!>!
 SortingHat.API.Models.TagName.Key.get -> string!
 static SortingHat.API.Models.TagName.KeyOf(string! name) -> string!
+SortingHat.API.DI.ITag.Move(System.Collections.Generic.IReadOnlyList<SortingHat.API.Models.Tag!>! tags, Funcky.Monads.Option<SortingHat.API.Models.Tag!> destination) -> Funcky.Monads.Either<string!, Funcky.Unit>
+SortingHat.API.Models.Tag.IsSelfOrAncestorOf(SortingHat.API.Models.Tag! other) -> bool
+SortingHat.API.Models.TagMoves
+static SortingHat.API.Models.TagMoves.Problem(System.Collections.Generic.IReadOnlyList<SortingHat.API.Models.Tag!>! tags, Funcky.Monads.Option<SortingHat.API.Models.Tag!> destination) -> Funcky.Monads.Option<string!>

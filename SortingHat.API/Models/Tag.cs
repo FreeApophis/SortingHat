@@ -57,6 +57,10 @@ public sealed record Tag
     public Tag Child(TagName name)
         => new(_levels.Add(name));
 
+    /// <summary>Whether <paramref name="other"/> is this tag or one of its children, at any depth.</summary>
+    public bool IsSelfOrAncestorOf(Tag other)
+        => other._levels.Length >= _levels.Length && _levels.SequenceEqual(other._levels.Take(_levels.Length));
+
     public bool Equals(Tag? other)
         => other is not null && _levels.SequenceEqual(other._levels);
 

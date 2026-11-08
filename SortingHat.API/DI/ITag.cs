@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Funcky;
+using Funcky.Monads;
 using SortingHat.API.Models;
 
 namespace SortingHat.API.DI;
@@ -15,8 +17,11 @@ public interface ITag
     /// <summary>Renames the last level of the <paramref name="tag"/>; false when it does not exist or a sibling already has the name.</summary>
     bool Rename(Tag tag, TagName newName);
 
-    /// <summary>Moves the <paramref name="tag"/> with its children under <paramref name="destinationTag"/>; false when one does not exist or the name is taken there.</summary>
-    bool Move(Tag tag, Tag destinationTag);
+    /// <summary>
+    /// Moves the <paramref name="tags"/> with their children under <paramref name="destination"/>, none for the top level.
+    /// All of them move or none: the reason when a tag does not exist, a name is taken there, or a tag would move into itself.
+    /// </summary>
+    Either<string, Unit> Move(IReadOnlyList<Tag> tags, Option<Tag> destination);
 
     /// <summary>The number of files tagged with exactly the <paramref name="tag"/>.</summary>
     long FileCount(Tag tag);
