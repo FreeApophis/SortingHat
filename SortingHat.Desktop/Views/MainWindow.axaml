@@ -1,0 +1,20 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="using:SortingHat.Desktop.Views"
+        x:Class="SortingHat.Desktop.Views.MainWindow"
+        x:DataType="views:MainViewModel"
+        Title="SortingHat"
+        Width="1100" Height="700">
+  <DockPanel>
+    <Border DockPanel.Dock="Bottom" IsVisible="{Binding HasMessages}" Padding="12,8" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
+      <ItemsControl x:Name="MessagePanel" ItemsSource="{Binding Messages}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="x:String">
+            <SelectableTextBlock Text="{Binding}" TextWrapping="Wrap" />
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </Border>
+    <Panel />
+  </DockPanel>
+</Window>

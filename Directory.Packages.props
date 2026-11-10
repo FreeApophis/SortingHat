@@ -9,6 +9,11 @@
   </ItemGroup>
   <ItemGroup>
     <PackageVersion Include="Autofac" Version="9.3.4" />
+    <PackageVersion Include="Avalonia" Version="12.1.6" />
+    <PackageVersion Include="Avalonia.Desktop" Version="12.1.6" />
+    <PackageVersion Include="Avalonia.Fonts.Inter" Version="12.1.6" />
+    <PackageVersion Include="Avalonia.Headless.XUnit" Version="12.1.6" />
+    <PackageVersion Include="Avalonia.Themes.Fluent" Version="12.1.6" />
     <PackageVersion Include="Funcky" Version="3.8.0" />
     <PackageVersion Include="Funcky.Lexer" Version="2.0.0" />
     <PackageVersion Include="JetBrains.Annotations" Version="2026.2.0" />
