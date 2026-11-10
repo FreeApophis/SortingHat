@@ -1,6 +1,6 @@
 ﻿namespace SortingHat.API.Parser.OperatorType;
 
-internal class ProgrammingOperatorType : IOperatorType
+internal sealed class ProgrammingOperatorType : IOperatorType
 {
     public string Not => "!";
     public string NotOpen => string.Empty;

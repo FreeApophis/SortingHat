@@ -21,13 +21,13 @@ internal static class QueryGrammar
     private static readonly IReadOnlyList<QueryPart> AfterOperand = [QueryPart.And, QueryPart.Or];
 
     /// <summary>The whole query is one expression: anything after it makes the query illegal instead of being ignored.</summary>
-    public static Either<ParseError, IParseNode> Parse(string query, IReadOnlyList<Lexeme> lexemes)
+    public static Either<ParseError, ParseNode> Parse(string query, IReadOnlyList<Lexeme> lexemes)
     {
         var input = new Input(query, lexemes);
 
         return Expression(input, 0).SelectMany(parsed => input.IsEnd(parsed.Next)
-            ? Either<ParseError, IParseNode>.Right(parsed.Node)
-            : Either<ParseError, IParseNode>.Left(input.Error(parsed.Next, $"{input.Describe(parsed.Next)} follows a complete query, combine the parts with 'and' or 'or'", AfterOperand)));
+            ? Either<ParseError, ParseNode>.Right(parsed.Node)
+            : Either<ParseError, ParseNode>.Left(input.Error(parsed.Next, $"{input.Describe(parsed.Next)} follows a complete query, combine the parts with 'and' or 'or'", AfterOperand)));
     }
 
     /// <summary>Expression := Term { Or Term }.</summary>
@@ -66,7 +66,7 @@ internal static class QueryGrammar
 
     /// <param name="Node">The parsed part of the query.</param>
     /// <param name="Next">The position of the lexeme after it.</param>
-    private sealed record Parsed(IParseNode Node, int Next);
+    private sealed record Parsed(ParseNode Node, int Next);
 
     /// <summary>The lexemes of the query; reading past the last one gives the end.</summary>
     private sealed record Input(string Query, IReadOnlyList<Lexeme> Lexemes)

@@ -1,6 +1,6 @@
 ﻿namespace SortingHat.API.Parser.OperatorType;
 
-internal class LogicalOperatorType : IOperatorType
+internal sealed class LogicalOperatorType : IOperatorType
 {
     public string Not => "¬";
     public string NotOpen => string.Empty;

@@ -1,21 +1,5 @@
-﻿using SortingHat.API.Parser.OperatorType;
+﻿namespace SortingHat.API.Parser.Nodes;
 
-namespace SortingHat.API.Parser.Nodes;
-
-public class NotOperatorNode : UnaryOperatorNode
-{
-    internal NotOperatorNode(IParseNode operand)
-        : base(operand)
-    {
-    }
-
-    public override void Accept(INodeVisitor visitor)
-    {
-        visitor.Visit(this);
-    }
-
-    internal object ToString(IOperatorType operatorType)
-    {
-        return operatorType.Not;
-    }
-}
+/// <summary>The files the operand does not match.</summary>
+/// <param name="Operand">The negated query.</param>
+public sealed record NotOperatorNode(ParseNode Operand) : ParseNode;

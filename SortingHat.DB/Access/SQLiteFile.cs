@@ -195,7 +195,7 @@ WHERE FilePaths.Path = @filePath";
         return fileId;
     }
 
-    private SearchResult Search(IParseNode expression)
+    private SearchResult Search(ParseNode expression)
     {
         var tags = SearchQuery.TagNames(expression)
             .Distinct()

@@ -5,9 +5,16 @@ abstract SortingHat.API.AutoTag.DateAutoTag.Date(SortingHat.API.AutoTag.AutoTagF
 abstract SortingHat.API.AutoTag.DateAutoTag.Name.get -> string!
 abstract SortingHat.API.Models.PathState.<Clone>$() -> SortingHat.API.Models.PathState!
 abstract SortingHat.API.Models.PathState.Current.get -> SortingHat.API.Models.FileAt!
+abstract SortingHat.API.Parser.Nodes.ParseNode.<Clone>$() -> SortingHat.API.Parser.Nodes.ParseNode!
 override sealed SortingHat.API.Models.PathState.Changed.Equals(SortingHat.API.Models.PathState? other) -> bool
 override sealed SortingHat.API.Models.PathState.Known.Equals(SortingHat.API.Models.PathState? other) -> bool
 override sealed SortingHat.API.Models.PathState.New.Equals(SortingHat.API.Models.PathState? other) -> bool
+override sealed SortingHat.API.Parser.Nodes.AndOperatorNode.Equals(SortingHat.API.Parser.Nodes.ParseNode? other) -> bool
+override sealed SortingHat.API.Parser.Nodes.BooleanNode.Equals(SortingHat.API.Parser.Nodes.ParseNode? other) -> bool
+override sealed SortingHat.API.Parser.Nodes.NotOperatorNode.Equals(SortingHat.API.Parser.Nodes.ParseNode? other) -> bool
+override sealed SortingHat.API.Parser.Nodes.OrOperatorNode.Equals(SortingHat.API.Parser.Nodes.ParseNode? other) -> bool
+override sealed SortingHat.API.Parser.Nodes.ParseNode.ToString() -> string!
+override sealed SortingHat.API.Parser.Nodes.TagNode.Equals(SortingHat.API.Parser.Nodes.ParseNode? other) -> bool
 override SortingHat.API.AutoTag.AutoTagArgument.Equals(object? obj) -> bool
 override SortingHat.API.AutoTag.AutoTagArgument.GetHashCode() -> int
 override SortingHat.API.AutoTag.AutoTagArgument.ToString() -> string!
@@ -66,6 +73,23 @@ override SortingHat.API.Models.Tag.ToString() -> string!
 override SortingHat.API.Models.TagName.Equals(object? obj) -> bool
 override SortingHat.API.Models.TagName.GetHashCode() -> int
 override SortingHat.API.Models.TagName.ToString() -> string!
+override SortingHat.API.Parser.Nodes.AndOperatorNode.<Clone>$() -> SortingHat.API.Parser.Nodes.AndOperatorNode!
+override SortingHat.API.Parser.Nodes.AndOperatorNode.Equals(object? obj) -> bool
+override SortingHat.API.Parser.Nodes.AndOperatorNode.GetHashCode() -> int
+override SortingHat.API.Parser.Nodes.BooleanNode.<Clone>$() -> SortingHat.API.Parser.Nodes.BooleanNode!
+override SortingHat.API.Parser.Nodes.BooleanNode.Equals(object? obj) -> bool
+override SortingHat.API.Parser.Nodes.BooleanNode.GetHashCode() -> int
+override SortingHat.API.Parser.Nodes.NotOperatorNode.<Clone>$() -> SortingHat.API.Parser.Nodes.NotOperatorNode!
+override SortingHat.API.Parser.Nodes.NotOperatorNode.Equals(object? obj) -> bool
+override SortingHat.API.Parser.Nodes.NotOperatorNode.GetHashCode() -> int
+override SortingHat.API.Parser.Nodes.OrOperatorNode.<Clone>$() -> SortingHat.API.Parser.Nodes.OrOperatorNode!
+override SortingHat.API.Parser.Nodes.OrOperatorNode.Equals(object? obj) -> bool
+override SortingHat.API.Parser.Nodes.OrOperatorNode.GetHashCode() -> int
+override SortingHat.API.Parser.Nodes.ParseNode.Equals(object? obj) -> bool
+override SortingHat.API.Parser.Nodes.ParseNode.GetHashCode() -> int
+override SortingHat.API.Parser.Nodes.TagNode.<Clone>$() -> SortingHat.API.Parser.Nodes.TagNode!
+override SortingHat.API.Parser.Nodes.TagNode.Equals(object? obj) -> bool
+override SortingHat.API.Parser.Nodes.TagNode.GetHashCode() -> int
 override SortingHat.API.Parser.ParseError.Equals(object? obj) -> bool
 override SortingHat.API.Parser.ParseError.GetHashCode() -> int
 override SortingHat.API.Parser.ParseError.ToString() -> string!
@@ -311,38 +335,44 @@ SortingHat.API.Models.TagName
 SortingHat.API.Models.TagName.<Clone>$() -> SortingHat.API.Models.TagName!
 SortingHat.API.Models.TagName.Equals(SortingHat.API.Models.TagName? other) -> bool
 SortingHat.API.Models.TagName.Value.get -> string!
-SortingHat.API.Parser.INodeVisitor
-SortingHat.API.Parser.INodeVisitor.Visit(SortingHat.API.Parser.Nodes.AndOperatorNode! op) -> void
-SortingHat.API.Parser.INodeVisitor.Visit(SortingHat.API.Parser.Nodes.BinaryOperatorNode! op) -> void
-SortingHat.API.Parser.INodeVisitor.Visit(SortingHat.API.Parser.Nodes.BooleanNode! boolean) -> void
-SortingHat.API.Parser.INodeVisitor.Visit(SortingHat.API.Parser.Nodes.NotOperatorNode! op) -> void
-SortingHat.API.Parser.INodeVisitor.Visit(SortingHat.API.Parser.Nodes.OrOperatorNode! op) -> void
-SortingHat.API.Parser.INodeVisitor.Visit(SortingHat.API.Parser.Nodes.TagNode! tag) -> void
-SortingHat.API.Parser.INodeVisitor.Visit(SortingHat.API.Parser.Nodes.UnaryOperatorNode! op) -> void
 SortingHat.API.Parser.LexerRules
 SortingHat.API.Parser.Nodes.AndOperatorNode
-SortingHat.API.Parser.Nodes.BinaryOperatorNode
-SortingHat.API.Parser.Nodes.BinaryOperatorNode.LeftOperand.get -> SortingHat.API.Parser.Nodes.IParseNode!
-SortingHat.API.Parser.Nodes.BinaryOperatorNode.RightOperand.get -> SortingHat.API.Parser.Nodes.IParseNode!
+SortingHat.API.Parser.Nodes.AndOperatorNode.AndOperatorNode(SortingHat.API.Parser.Nodes.ParseNode! LeftOperand, SortingHat.API.Parser.Nodes.ParseNode! RightOperand) -> void
+SortingHat.API.Parser.Nodes.AndOperatorNode.Deconstruct(out SortingHat.API.Parser.Nodes.ParseNode! LeftOperand, out SortingHat.API.Parser.Nodes.ParseNode! RightOperand) -> void
+SortingHat.API.Parser.Nodes.AndOperatorNode.Equals(SortingHat.API.Parser.Nodes.AndOperatorNode? other) -> bool
+SortingHat.API.Parser.Nodes.AndOperatorNode.LeftOperand.get -> SortingHat.API.Parser.Nodes.ParseNode!
+SortingHat.API.Parser.Nodes.AndOperatorNode.LeftOperand.init -> void
+SortingHat.API.Parser.Nodes.AndOperatorNode.RightOperand.get -> SortingHat.API.Parser.Nodes.ParseNode!
+SortingHat.API.Parser.Nodes.AndOperatorNode.RightOperand.init -> void
 SortingHat.API.Parser.Nodes.BooleanNode
-SortingHat.API.Parser.Nodes.BooleanNode.Accept(SortingHat.API.Parser.INodeVisitor! visitor) -> void
 SortingHat.API.Parser.Nodes.BooleanNode.BoolConstant.get -> bool
-SortingHat.API.Parser.Nodes.IParseNode
-SortingHat.API.Parser.Nodes.IParseNode.Accept(SortingHat.API.Parser.INodeVisitor! visitor) -> void
+SortingHat.API.Parser.Nodes.BooleanNode.BoolConstant.init -> void
+SortingHat.API.Parser.Nodes.BooleanNode.BooleanNode(bool BoolConstant) -> void
+SortingHat.API.Parser.Nodes.BooleanNode.Deconstruct(out bool BoolConstant) -> void
+SortingHat.API.Parser.Nodes.BooleanNode.Equals(SortingHat.API.Parser.Nodes.BooleanNode? other) -> bool
 SortingHat.API.Parser.Nodes.NotOperatorNode
+SortingHat.API.Parser.Nodes.NotOperatorNode.Deconstruct(out SortingHat.API.Parser.Nodes.ParseNode! Operand) -> void
+SortingHat.API.Parser.Nodes.NotOperatorNode.Equals(SortingHat.API.Parser.Nodes.NotOperatorNode? other) -> bool
+SortingHat.API.Parser.Nodes.NotOperatorNode.NotOperatorNode(SortingHat.API.Parser.Nodes.ParseNode! Operand) -> void
+SortingHat.API.Parser.Nodes.NotOperatorNode.Operand.get -> SortingHat.API.Parser.Nodes.ParseNode!
+SortingHat.API.Parser.Nodes.NotOperatorNode.Operand.init -> void
 SortingHat.API.Parser.Nodes.OrOperatorNode
+SortingHat.API.Parser.Nodes.OrOperatorNode.Deconstruct(out SortingHat.API.Parser.Nodes.ParseNode! LeftOperand, out SortingHat.API.Parser.Nodes.ParseNode! RightOperand) -> void
+SortingHat.API.Parser.Nodes.OrOperatorNode.Equals(SortingHat.API.Parser.Nodes.OrOperatorNode? other) -> bool
+SortingHat.API.Parser.Nodes.OrOperatorNode.LeftOperand.get -> SortingHat.API.Parser.Nodes.ParseNode!
+SortingHat.API.Parser.Nodes.OrOperatorNode.LeftOperand.init -> void
+SortingHat.API.Parser.Nodes.OrOperatorNode.OrOperatorNode(SortingHat.API.Parser.Nodes.ParseNode! LeftOperand, SortingHat.API.Parser.Nodes.ParseNode! RightOperand) -> void
+SortingHat.API.Parser.Nodes.OrOperatorNode.RightOperand.get -> SortingHat.API.Parser.Nodes.ParseNode!
+SortingHat.API.Parser.Nodes.OrOperatorNode.RightOperand.init -> void
+SortingHat.API.Parser.Nodes.ParseNode
+SortingHat.API.Parser.Nodes.ParseNode.ParseNode() -> void
+SortingHat.API.Parser.Nodes.ParseNode.ParseNode(SortingHat.API.Parser.Nodes.ParseNode! original) -> void
 SortingHat.API.Parser.Nodes.TagNode
-SortingHat.API.Parser.Nodes.TagNode.Accept(SortingHat.API.Parser.INodeVisitor! visitor) -> void
+SortingHat.API.Parser.Nodes.TagNode.Deconstruct(out string! Tag) -> void
+SortingHat.API.Parser.Nodes.TagNode.Equals(SortingHat.API.Parser.Nodes.TagNode? other) -> bool
 SortingHat.API.Parser.Nodes.TagNode.Tag.get -> string!
-SortingHat.API.Parser.Nodes.UnaryOperatorNode
-SortingHat.API.Parser.Nodes.UnaryOperatorNode.Operand.get -> SortingHat.API.Parser.Nodes.IParseNode!
-SortingHat.API.Parser.OperatorType.TextOperatorType
-SortingHat.API.Parser.OperatorType.TextOperatorType.And.get -> string!
-SortingHat.API.Parser.OperatorType.TextOperatorType.Not.get -> string!
-SortingHat.API.Parser.OperatorType.TextOperatorType.NotClose.get -> string!
-SortingHat.API.Parser.OperatorType.TextOperatorType.NotOpen.get -> string!
-SortingHat.API.Parser.OperatorType.TextOperatorType.Or.get -> string!
-SortingHat.API.Parser.OperatorType.TextOperatorType.TextOperatorType() -> void
+SortingHat.API.Parser.Nodes.TagNode.Tag.init -> void
+SortingHat.API.Parser.Nodes.TagNode.TagNode(string! Tag) -> void
 SortingHat.API.Parser.ParseError
 SortingHat.API.Parser.ParseError.<Clone>$() -> SortingHat.API.Parser.ParseError!
 SortingHat.API.Parser.ParseError.Deconstruct(out string! Query, out int Position, out string! Reason, out System.Collections.Generic.IReadOnlyList<SortingHat.API.Parser.QueryPart>! Expected, out bool IsIncomplete) -> void
@@ -360,7 +390,7 @@ SortingHat.API.Parser.ParseError.Query.init -> void
 SortingHat.API.Parser.ParseError.Reason.get -> string!
 SortingHat.API.Parser.ParseError.Reason.init -> void
 SortingHat.API.Parser.Parser
-SortingHat.API.Parser.Parser.Parse(string! query) -> Funcky.Monads.Either<SortingHat.API.Parser.ParseError!, SortingHat.API.Parser.Nodes.IParseNode!>
+SortingHat.API.Parser.Parser.Parse(string! query) -> Funcky.Monads.Either<SortingHat.API.Parser.ParseError!, SortingHat.API.Parser.Nodes.ParseNode!>
 SortingHat.API.Parser.QueryPart
 SortingHat.API.Parser.QueryPart.And = 1 -> SortingHat.API.Parser.QueryPart
 SortingHat.API.Parser.QueryPart.ClosedParenthesis = 5 -> SortingHat.API.Parser.QueryPart
@@ -423,11 +453,6 @@ override SortingHat.API.Models.ProjectName.Equals(object? obj) -> bool
 override SortingHat.API.Models.ProjectName.GetHashCode() -> int
 override SortingHat.API.Models.ProjectName.ToString() -> string!
 override SortingHat.API.Models.Tag.GetHashCode() -> int
-override SortingHat.API.Parser.Nodes.AndOperatorNode.Accept(SortingHat.API.Parser.INodeVisitor! visitor) -> void
-override SortingHat.API.Parser.Nodes.BooleanNode.ToString() -> string!
-override SortingHat.API.Parser.Nodes.NotOperatorNode.Accept(SortingHat.API.Parser.INodeVisitor! visitor) -> void
-override SortingHat.API.Parser.Nodes.OrOperatorNode.Accept(SortingHat.API.Parser.INodeVisitor! visitor) -> void
-override SortingHat.API.Parser.Nodes.TagNode.ToString() -> string!
 override SortingHat.API.Parser.Token.AndToken.ToString() -> string!
 override SortingHat.API.Parser.Token.ClosedParenthesisToken.ToString() -> string!
 override SortingHat.API.Parser.Token.EpsilonToken.ToString() -> string!
@@ -493,6 +518,18 @@ static SortingHat.API.Models.TagName.operator !=(SortingHat.API.Models.TagName? 
 static SortingHat.API.Models.TagName.operator ==(SortingHat.API.Models.TagName? left, SortingHat.API.Models.TagName? right) -> bool
 static SortingHat.API.Models.TagName.Parse(string! name) -> Funcky.Monads.Either<string!, SortingHat.API.Models.TagName!>
 static SortingHat.API.Parser.LexerRules.Create() -> Funcky.Lexer.LexerRuleBook!
+static SortingHat.API.Parser.Nodes.AndOperatorNode.operator !=(SortingHat.API.Parser.Nodes.AndOperatorNode? left, SortingHat.API.Parser.Nodes.AndOperatorNode? right) -> bool
+static SortingHat.API.Parser.Nodes.AndOperatorNode.operator ==(SortingHat.API.Parser.Nodes.AndOperatorNode? left, SortingHat.API.Parser.Nodes.AndOperatorNode? right) -> bool
+static SortingHat.API.Parser.Nodes.BooleanNode.operator !=(SortingHat.API.Parser.Nodes.BooleanNode? left, SortingHat.API.Parser.Nodes.BooleanNode? right) -> bool
+static SortingHat.API.Parser.Nodes.BooleanNode.operator ==(SortingHat.API.Parser.Nodes.BooleanNode? left, SortingHat.API.Parser.Nodes.BooleanNode? right) -> bool
+static SortingHat.API.Parser.Nodes.NotOperatorNode.operator !=(SortingHat.API.Parser.Nodes.NotOperatorNode? left, SortingHat.API.Parser.Nodes.NotOperatorNode? right) -> bool
+static SortingHat.API.Parser.Nodes.NotOperatorNode.operator ==(SortingHat.API.Parser.Nodes.NotOperatorNode? left, SortingHat.API.Parser.Nodes.NotOperatorNode? right) -> bool
+static SortingHat.API.Parser.Nodes.OrOperatorNode.operator !=(SortingHat.API.Parser.Nodes.OrOperatorNode? left, SortingHat.API.Parser.Nodes.OrOperatorNode? right) -> bool
+static SortingHat.API.Parser.Nodes.OrOperatorNode.operator ==(SortingHat.API.Parser.Nodes.OrOperatorNode? left, SortingHat.API.Parser.Nodes.OrOperatorNode? right) -> bool
+static SortingHat.API.Parser.Nodes.ParseNode.operator !=(SortingHat.API.Parser.Nodes.ParseNode? left, SortingHat.API.Parser.Nodes.ParseNode? right) -> bool
+static SortingHat.API.Parser.Nodes.ParseNode.operator ==(SortingHat.API.Parser.Nodes.ParseNode? left, SortingHat.API.Parser.Nodes.ParseNode? right) -> bool
+static SortingHat.API.Parser.Nodes.TagNode.operator !=(SortingHat.API.Parser.Nodes.TagNode? left, SortingHat.API.Parser.Nodes.TagNode? right) -> bool
+static SortingHat.API.Parser.Nodes.TagNode.operator ==(SortingHat.API.Parser.Nodes.TagNode? left, SortingHat.API.Parser.Nodes.TagNode? right) -> bool
 static SortingHat.API.Parser.ParseError.operator !=(SortingHat.API.Parser.ParseError? left, SortingHat.API.Parser.ParseError? right) -> bool
 static SortingHat.API.Parser.ParseError.operator ==(SortingHat.API.Parser.ParseError? left, SortingHat.API.Parser.ParseError? right) -> bool
 static SortingHat.API.Parser.Parser.Create() -> SortingHat.API.Parser.Parser!
@@ -505,8 +542,6 @@ virtual SortingHat.API.AutoTag.AutoTagParameter.PrintMembers(System.Text.StringB
 virtual SortingHat.API.Models.PathState.EqualityContract.get -> System.Type!
 virtual SortingHat.API.Models.PathState.Equals(SortingHat.API.Models.PathState? other) -> bool
 virtual SortingHat.API.Models.PathState.PrintMembers(System.Text.StringBuilder! builder) -> bool
-virtual SortingHat.API.Parser.Nodes.BinaryOperatorNode.Accept(SortingHat.API.Parser.INodeVisitor! visitor) -> void
-virtual SortingHat.API.Parser.Nodes.UnaryOperatorNode.Accept(SortingHat.API.Parser.INodeVisitor! visitor) -> void
 SortingHat.API.Models.Tag.<Clone>$() -> SortingHat.API.Models.Tag!
 static SortingHat.API.Models.Tag.operator !=(SortingHat.API.Models.Tag? left, SortingHat.API.Models.Tag? right) -> bool
 static SortingHat.API.Models.Tag.operator ==(SortingHat.API.Models.Tag? left, SortingHat.API.Models.Tag? right) -> bool
@@ -528,3 +563,6 @@ static SortingHat.API.Models.TagMoves.Problem(System.Collections.Generic.IReadOn
 SortingHat.API.DI.IProjects.Export(SortingHat.API.Models.ProjectName! project, string! destination) -> Funcky.Monads.Either<string!, Funcky.Unit>
 SortingHat.API.DI.IProjects.Import(string! projectFile, SortingHat.API.Models.ProjectName! project) -> Funcky.Monads.Either<string!, Funcky.Unit>
 abstract SortingHat.API.AutoTag.AutoTagParameter.Forms(string! name) -> System.Collections.Generic.IEnumerable<string!>!
+virtual SortingHat.API.Parser.Nodes.ParseNode.EqualityContract.get -> System.Type!
+virtual SortingHat.API.Parser.Nodes.ParseNode.Equals(SortingHat.API.Parser.Nodes.ParseNode? other) -> bool
+virtual SortingHat.API.Parser.Nodes.ParseNode.PrintMembers(System.Text.StringBuilder! builder) -> bool

@@ -32,7 +32,7 @@ public sealed class Parser
         => new(LexerRules.Create());
 
     /// <summary>The <paramref name="query"/> as a syntax tree, or why it is no valid query.</summary>
-    public Either<ParseError, IParseNode> Parse(string query)
+    public Either<ParseError, ParseNode> Parse(string query)
         => Lexemes(query).SelectMany(lexemes => QueryGrammar.Parse(query, lexemes));
 
     /// <summary>The lexer reports a character no rule knows with an exception, the only one the parser expects.</summary>

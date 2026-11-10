@@ -1,21 +1,5 @@
 ﻿namespace SortingHat.API.Parser.Nodes;
 
-public sealed class TagNode : IParseNode
-{
-    internal TagNode(string tag)
-    {
-        Tag = tag;
-    }
-
-    public string Tag { get; }
-
-    public void Accept(INodeVisitor visitor)
-    {
-        visitor.Visit(this);
-    }
-
-    public override string ToString()
-    {
-        return Tag;
-    }
-}
+/// <summary>Files tagged with the tag or one of its descendants.</summary>
+/// <param name="Tag">The tag as written in the query, such as ':tax:2018'.</param>
+public sealed record TagNode(string Tag) : ParseNode;

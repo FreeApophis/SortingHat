@@ -1,21 +1,6 @@
-﻿using SortingHat.API.Parser.OperatorType;
+﻿namespace SortingHat.API.Parser.Nodes;
 
-namespace SortingHat.API.Parser.Nodes;
-
-public class OrOperatorNode : BinaryOperatorNode
-{
-    internal OrOperatorNode(IParseNode leftOperand, IParseNode rightOperand)
-        : base(leftOperand, rightOperand)
-    {
-    }
-
-    public override void Accept(INodeVisitor visitor)
-    {
-        visitor.Visit(this);
-    }
-
-    internal object ToString(IOperatorType operatorType)
-    {
-        return operatorType.Or;
-    }
-}
+/// <summary>The files at least one operand matches.</summary>
+/// <param name="LeftOperand">The query left of 'or'.</param>
+/// <param name="RightOperand">The query right of 'or'.</param>
+public sealed record OrOperatorNode(ParseNode LeftOperand, ParseNode RightOperand) : ParseNode;

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Funcky.Extensions;
 using SortingHat.API.Parser.Nodes;
@@ -18,26 +17,27 @@ internal static class SearchQuery
         JOIN FilePaths ON FilePaths.FileId = Files.Id
         """;
 
-    public static IEnumerable<string> TagNames(IParseNode expression)
+    public static IEnumerable<string> TagNames(ParseNode expression)
         => expression switch
         {
-            BinaryOperatorNode binary => TagNames(binary.LeftOperand).Concat(TagNames(binary.RightOperand)),
-            UnaryOperatorNode unary => TagNames(unary.Operand),
+            AndOperatorNode and => TagNames(and.LeftOperand).Concat(TagNames(and.RightOperand)),
+            OrOperatorNode or => TagNames(or.LeftOperand).Concat(TagNames(or.RightOperand)),
+            NotOperatorNode not => TagNames(not.Operand),
+            BooleanNode => [],
             TagNode tag => [tag.Tag],
-            _ => [],
         };
 
     /// <param name="expression">The parsed search expression.</param>
     /// <param name="tagParameters">The SQL parameter holding the tag id for every known tag name, unknown tags are missing.</param>
     /// <returns>The query selecting the files matching the expression.</returns>
-    public static string Sql(IParseNode expression, IReadOnlyDictionary<string, string> tagParameters)
+    public static string Sql(ParseNode expression, IReadOnlyDictionary<string, string> tagParameters)
         => $"""
             {Select}
             WHERE {Condition(expression, tagParameters)}
             ORDER BY Files.Hash, FilePaths.Path
             """;
 
-    private static string Condition(IParseNode expression, IReadOnlyDictionary<string, string> tagParameters)
+    private static string Condition(ParseNode expression, IReadOnlyDictionary<string, string> tagParameters)
         => expression switch
         {
             AndOperatorNode andNode => $"({Condition(andNode.LeftOperand, tagParameters)} AND {Condition(andNode.RightOperand, tagParameters)})",
@@ -47,7 +47,6 @@ internal static class SearchQuery
 
             // an unknown tag is not on any file
             TagNode tag => tagParameters.GetValueOrNone(tag.Tag).Match(none: "0", some: TaggedWithin),
-            _ => throw new NotSupportedException($"The search expression {expression.GetType().Name} is not supported."),
         };
 
     /// <summary>

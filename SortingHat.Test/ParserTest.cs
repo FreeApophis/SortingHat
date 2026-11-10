@@ -35,6 +35,16 @@ public sealed class ParserTest
         => Assert.Equal("(not(not(not(:A))) and not(not(:B)))", Written(Valid("!!!:A && !!:B"), new TextOperatorType()));
 
     [Fact]
+    public void GivenAQueryThenItsTreeEqualsTheSameTreeBuiltByHand()
+        => Assert.Equal(
+            new OrOperatorNode(new TagNode(":a"), new AndOperatorNode(new TagNode(":b"), new NotOperatorNode(new BooleanNode(true)))),
+            Valid(":a or :b and not true"));
+
+    [Fact]
+    public void GivenAParsedQueryThenItIsWrittenAsTextQuery()
+        => Assert.Equal("(:a or (:b and not(true)))", Valid(":a || :b && !true").ToString());
+
+    [Fact]
     public void GivenTheSameQueryTwiceThenTheParserGivesTheSameResultBecauseItKeepsNoState()
     {
         _ = _parser.Parse(":a :b");
@@ -104,15 +114,10 @@ public sealed class ParserTest
     public void GivenACompleteQueryThenItParses(string query)
         => Assert.True(_parser.Parse(query).Match(left: False, right: True));
 
-    private static string Written(IParseNode node, IOperatorType operatorType)
-    {
-        var visitor = new ToStringVisitor(operatorType);
-        node.Accept(visitor);
+    private static string Written(ParseNode node, IOperatorType operatorType)
+        => node.ToString(operatorType);
 
-        return visitor.Result;
-    }
-
-    private IParseNode Valid(string query)
+    private ParseNode Valid(string query)
         => Assert.Right(_parser.Parse(query));
 
     private ParseError Error(string query)
