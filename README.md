@@ -69,6 +69,16 @@ Examples:
     This will tag all files in the current directory, the possible automatic tags depend on your plugins.
 ```
 
+## Desktop App
+
+`SortingHat.Desktop` is a desktop app on [Avalonia](https://avaloniaui.net/) for Windows, Linux and macOS. It is installed next to `hat`: both read the same `hat-config.json`, use the same databases and load the same plugins.
+
+* **Search:** type a query such as `:tax:2018 and not :bank`; the files are searched when you pause typing, or at once with Enter. An invalid query says why, and tags and operators are completed while you type.
+* **Browse:** select a result to see its tags, paths, names and hash; double-click it or press Open to open it with the program of your system.
+* **Tag tree:** every tag with the number of its files. Click a tag to find its files; rename, move and remove tags from its context menu.
+
+Tagging files, projects and copying or moving files are still done with `hat`.
+
 ## Build and publish
 
 ```sh
@@ -76,7 +86,7 @@ dotnet build
 dotnet test
 ```
 
-`Scripts/publish.ps1` (Windows) and `Scripts/publish.sh` publish `hat` with all plugins into `publish/`. Plugins are loaded from the `plugins` folder next to the executable.
+`Scripts/publish.ps1` (Windows) and `Scripts/publish.sh` publish `hat` and the desktop app with all plugins into `publish/`. Plugins are loaded from the `plugins` folder next to the executables.
 
 # Plugins
 

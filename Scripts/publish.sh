@@ -5,6 +5,9 @@ sorting_hat_root="$(dirname $(readlink -f $0))/.."
 publish="$sorting_hat_root/publish"
 dotnet publish $sorting_hat_root/SortingHat.Console/SortingHat.CLI.csproj --configuration Release --output $publish
 
+# the desktop app next to hat: both read the same hat-config.json and load the same plugins
+dotnet publish $sorting_hat_root/SortingHat.Desktop/SortingHat.Desktop.csproj --configuration Release --output $publish
+
 # every plugin in its own folder: plugins/<name>/<name>.dll, the layout hat loads
 for plugin in "$sorting_hat_root"/SortingHat.Plugin.*/; do
     name="$(basename "$plugin")"
