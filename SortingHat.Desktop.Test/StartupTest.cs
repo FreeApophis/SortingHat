@@ -11,7 +11,7 @@ public sealed class StartupTest
     [AvaloniaFact]
     public async Task GivenAnUnknownLogLevelThenTheWindowShowsTheWarning()
     {
-        using var desktop = new DesktopSandbox(builder => builder.RegisterInstance(new LogSettings { MinimumLevel = "Loud" }));
+        await using var desktop = new DesktopSandbox(builder => builder.RegisterInstance(new LogSettings { MinimumLevel = "Loud" }));
 
         await desktop.Idle();
 
@@ -21,7 +21,7 @@ public sealed class StartupTest
     [AvaloniaFact]
     public async Task GivenNoProblemsThenTheWindowShowsNoMessages()
     {
-        using var desktop = new DesktopSandbox();
+        await using var desktop = new DesktopSandbox();
 
         await desktop.Idle();
 

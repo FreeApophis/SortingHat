@@ -1,20 +1,127 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:views="using:SortingHat.Desktop.Views"
+        xmlns:core="using:SortingHat.Desktop.Core"
         x:Class="SortingHat.Desktop.Views.MainWindow"
         x:DataType="views:MainViewModel"
         Title="SortingHat"
         Width="1100" Height="700">
+  <Window.Resources>
+    <views:LocalDateConverter x:Key="LocalDate" />
+  </Window.Resources>
+  <Window.Styles>
+    <Style Selector="TextBlock.secondary">
+      <Setter Property="Opacity" Value="0.65" />
+    </Style>
+    <Style Selector="TextBlock.heading">
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Margin" Value="0,12,0,4" />
+    </Style>
+  </Window.Styles>
+
   <DockPanel>
+    <!-- what the user should know: startup warnings, plugin output, failed effects -->
     <Border DockPanel.Dock="Bottom" IsVisible="{Binding HasMessages}" Padding="12,8" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
-      <ItemsControl x:Name="MessagePanel" ItemsSource="{Binding Messages}">
-        <ItemsControl.ItemTemplate>
-          <DataTemplate x:DataType="x:String">
-            <SelectableTextBlock Text="{Binding}" TextWrapping="Wrap" />
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
+      <ScrollViewer MaxHeight="120">
+        <ItemsControl x:Name="MessagePanel" ItemsSource="{Binding Messages}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="x:String">
+              <SelectableTextBlock Text="{Binding}" TextWrapping="Wrap" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
     </Border>
-    <Panel />
+
+    <!-- the query bar -->
+    <StackPanel DockPanel.Dock="Top" Margin="12,12,12,4" Spacing="4">
+      <TextBox x:Name="QueryBox" Text="{Binding Query}" PlaceholderText="Search with tags, for example :tax:2018 and not :bank" KeyDown="OnQueryKeyDown" />
+      <TextBlock x:Name="QueryProblem" Text="{Binding QueryProblem}" IsVisible="{Binding HasQueryProblem}" Classes.secondary="{Binding IsQueryIncomplete}" Foreground="{DynamicResource SystemFillColorCriticalBrush}" TextWrapping="Wrap" />
+      <ListBox x:Name="Completions" ItemsSource="{Binding Completions}" IsVisible="{Binding HasCompletions}" MaxHeight="200" Tapped="OnCompletionTapped" />
+    </StackPanel>
+
+    <Grid ColumnDefinitions="240,Auto,*,Auto,360" Margin="12,4,12,12">
+      <!-- the tag tree, and the change the user is making to it -->
+      <DockPanel Grid.Column="0">
+        <Border x:Name="TagEditBar" DockPanel.Dock="Top" IsVisible="{Binding HasTagEdit}" Padding="0,0,0,8">
+          <StackPanel Spacing="4">
+            <TextBlock x:Name="TagEditPrompt" Text="{Binding TagEditPrompt}" TextWrapping="Wrap" />
+            <TextBox x:Name="TagEditText" Text="{Binding TagEditText}" IsVisible="{Binding TagEditHasText}" KeyDown="OnTagEditKeyDown" />
+            <TextBlock x:Name="TagEditProblem" Text="{Binding TagEditProblem}" IsVisible="{Binding HasTagEditProblem}" Foreground="{DynamicResource SystemFillColorCriticalBrush}" TextWrapping="Wrap" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Button x:Name="TagEditConfirm" Content="{Binding TagEditAction}" Classes="accent" Click="OnTagEditConfirmClick" />
+              <Button x:Name="TagEditCancel" Content="Cancel" Click="OnTagEditCancelClick" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+        <TreeView x:Name="TagTree" ItemsSource="{Binding TagTree}" SelectionChanged="OnTagSelectionChanged">
+          <TreeView.Styles>
+            <Style Selector="TreeViewItem">
+              <Setter Property="IsExpanded" Value="True" />
+            </Style>
+          </TreeView.Styles>
+          <TreeView.ItemTemplate>
+            <TreeDataTemplate x:DataType="core:TagTreeNode" ItemsSource="{Binding Children}">
+              <StackPanel Orientation="Horizontal" Spacing="6" Background="Transparent">
+                <StackPanel.ContextMenu>
+                  <ContextMenu>
+                    <MenuItem Header="Rename…" Click="OnRenameTagClick" />
+                    <MenuItem Header="Move…" Click="OnMoveTagClick" />
+                    <MenuItem Header="Remove…" Click="OnRemoveTagClick" />
+                  </ContextMenu>
+                </StackPanel.ContextMenu>
+                <TextBlock Text="{Binding Name}" />
+                <TextBlock Text="{Binding FileCount}" Classes="secondary" />
+              </StackPanel>
+            </TreeDataTemplate>
+          </TreeView.ItemTemplate>
+        </TreeView>
+      </DockPanel>
+
+      <GridSplitter Grid.Column="1" Width="6" Background="Transparent" ResizeDirection="Columns" />
+
+      <!-- the results -->
+      <DockPanel Grid.Column="2">
+        <TextBlock x:Name="Summary" DockPanel.Dock="Top" Text="{Binding Summary}" Classes="secondary" Margin="0,0,0,4" />
+        <ListBox x:Name="Results" ItemsSource="{Binding Results}" SelectionChanged="OnResultSelectionChanged" DoubleTapped="OnResultDoubleTapped">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="core:ResultRow">
+              <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="16">
+                <StackPanel Grid.Column="0">
+                  <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                  <TextBlock Text="{Binding Folder}" Classes="secondary" FontSize="12" TextTrimming="PathSegmentEllipsis" />
+                </StackPanel>
+                <TextBlock Grid.Column="1" Text="{Binding Size}" Classes="secondary" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="2" Text="{Binding CreatedAt, Converter={StaticResource LocalDate}}" Classes="secondary" VerticalAlignment="Center" />
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </DockPanel>
+
+      <GridSplitter Grid.Column="3" Width="6" Background="Transparent" ResizeDirection="Columns" />
+
+      <!-- the details of the selected file -->
+      <ScrollViewer Grid.Column="4">
+        <StackPanel x:Name="Details" IsVisible="{Binding HasDetails}" Margin="8,0,0,0">
+          <Button x:Name="OpenButton" Content="Open" Click="OnOpenClick" />
+          <TextBlock Classes="heading" Text="Tags" />
+          <ItemsControl ItemsSource="{Binding DetailTags}" />
+          <TextBlock Classes="heading" Text="Paths" />
+          <ItemsControl ItemsSource="{Binding DetailPaths}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="x:String">
+                <SelectableTextBlock Text="{Binding}" TextWrapping="Wrap" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <TextBlock Classes="heading" Text="Names" />
+          <ItemsControl ItemsSource="{Binding DetailNames}" />
+          <TextBlock Classes="heading" Text="Content" />
+          <TextBlock Text="{Binding DetailSize}" TextWrapping="Wrap" />
+          <SelectableTextBlock Text="{Binding DetailHash}" Classes="secondary" FontSize="12" TextWrapping="Wrap" />
+        </StackPanel>
+      </ScrollViewer>
+    </Grid>
   </DockPanel>
 </Window>

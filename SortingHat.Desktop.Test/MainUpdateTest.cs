@@ -26,6 +26,6 @@ public sealed class MainUpdateTest
     }
 
     [Fact]
-    public void GivenTheStartThenTheWindowLoadsTheStartupWarnings()
-        => Assert.Equal([new Effect.LoadStartupWarnings()], MainState.Start);
+    public void GivenTheStartThenTheWindowLoadsTheStartupWarningsAndTheTags()
+        => Assert.Equal([new Effect.LoadStartupWarnings(), new Effect.LoadTags()], MainState.Start);
 }

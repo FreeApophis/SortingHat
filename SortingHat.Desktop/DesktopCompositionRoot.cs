@@ -18,6 +18,8 @@ internal sealed class DesktopCompositionRoot
 
         Builder.RegisterType<MessagePanelWriter>().As<IConsoleWriter>().InstancePerMatchingLifetimeScope(PluginScope.Tag);
         Builder.RegisterType<NoUserPrompt>().As<IUserPrompt>().SingleInstance();
+        Builder.RegisterType<SystemFileOpener>().As<IFileOpener>().SingleInstance();
+        Builder.RegisterInstance(SearchPause.Default);
 
         // one store per window, in the scope of the plugins, so its effects see the plugins' registrations
         Builder.RegisterType<EffectRunner>().AsSelf().InstancePerMatchingLifetimeScope(PluginScope.Tag);
