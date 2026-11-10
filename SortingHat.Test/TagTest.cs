@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Funcky.Extensions;
 using Funcky.Monads;
 using SortingHat.API.Models;
 using Xunit;
@@ -20,7 +21,7 @@ public sealed class TagTest
 
     [Fact]
     public void GivenATagWithOneLevelThenItHasNoParent()
-        => Assert.Equal(Option<Tag>.None, Valid(":tax").Parent);
+        => Assert.None(Valid(":tax").Parent);
 
     [Fact]
     public void GivenATagThenItIsWrittenAsItWasParsed()
@@ -119,20 +120,20 @@ public sealed class TagTest
     [InlineData("v1.2", "v1.2")]
     [InlineData("C++", "C++")]
     public void GivenAValueFromAFileThenEveryRunOfOtherCharactersBecomesOneDash(string value, string name)
-        => Assert.Equal(Option.Some(name), TagName.FromValue(value).Select(tagName => tagName.Value));
+        => Assert.Some(name, TagName.FromValue(value).Select(tagName => tagName.Value));
 
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
     [InlineData("&&")]
     public void GivenAValueWithoutAnyCharacterOfATagNameThenItGivesNoName(string value)
-        => Assert.Equal(Option<TagName>.None, TagName.FromValue(value));
+        => Assert.None(TagName.FromValue(value));
 
     private static Tag Valid(string text)
-        => Tag.Parse(text).GetOrElse(problem => throw new InvalidOperationException(problem));
+        => Assert.Right(Tag.Parse(text));
 
     private static TagName ValidName(string text)
-        => TagName.Parse(text).GetOrElse(problem => throw new InvalidOperationException(problem));
+        => Assert.Right(TagName.Parse(text));
 
     private static string Invalid<T>(Either<string, T> parsed)
         where T : notnull

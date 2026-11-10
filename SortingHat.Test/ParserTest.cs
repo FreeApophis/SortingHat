@@ -1,4 +1,5 @@
 ﻿using System;
+using Funcky.Extensions;
 using SortingHat.API.Parser;
 using SortingHat.API.Parser.Nodes;
 using SortingHat.API.Parser.OperatorType;
@@ -112,7 +113,7 @@ public sealed class ParserTest
     }
 
     private IParseNode Valid(string query)
-        => _parser.Parse(query).GetOrElse(error => throw new InvalidOperationException(error.Message));
+        => Assert.Right(_parser.Parse(query));
 
     private ParseError Error(string query)
         => _parser.Parse(query).Match(left: Identity, right: node => throw new InvalidOperationException($"Expected an error, but '{query}' parsed to {node}."));

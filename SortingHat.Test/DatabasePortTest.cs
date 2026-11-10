@@ -14,7 +14,7 @@ public sealed class DatabasePortTest : IDisposable
 
     [Fact]
     public void GivenAKeyThatWasNeverSetThenItHasNoValue()
-        => Assert.Equal(Option<string>.None, _hat.InScope(scope => scope.Resolve<ISettings>().Get("never-set")));
+        => Assert.None(_hat.InScope(scope => scope.Resolve<ISettings>().Get("never-set")));
 
     [Fact]
     public void GivenAKeySetTwiceThenItHasTheLastValue()
@@ -22,7 +22,7 @@ public sealed class DatabasePortTest : IDisposable
         _hat.InScope(scope => Set(scope.Resolve<ISettings>(), "colour", "red"));
         _hat.InScope(scope => Set(scope.Resolve<ISettings>(), "colour", "blue"));
 
-        Assert.Equal(Option.Some("blue"), _hat.InScope(scope => scope.Resolve<ISettings>().Get("colour")));
+        Assert.Some("blue", _hat.InScope(scope => scope.Resolve<ISettings>().Get("colour")));
     }
 
     [Fact]
@@ -42,7 +42,7 @@ public sealed class DatabasePortTest : IDisposable
 
         var statistics = _hat.InScope(scope => scope.Resolve<IProjectDatabase>().GetStatistics());
 
-        Assert.Equal(Option.Some(1L), statistics.GetValueOrNone("Files"));
+        Assert.Some(1L, statistics.GetValueOrNone("Files"));
     }
 
     public void Dispose()

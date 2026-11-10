@@ -1,5 +1,6 @@
 ﻿using System;
 using Autofac;
+using Funcky.Extensions;
 using Funcky.Monads;
 using SortingHat.API.Plugin;
 using Xunit;
@@ -19,7 +20,7 @@ public sealed class PluginSettingsTest : IDisposable
     {
         InScope(settings => settings.Global.Set("Colour", "green"));
 
-        Assert.Equal(Option.Some("green"), Get(settings => settings.Global.Get("Colour")));
+        Assert.Some("green", Get(settings => settings.Global.Get("Colour")));
     }
 
     [Fact]
@@ -29,7 +30,7 @@ public sealed class PluginSettingsTest : IDisposable
         _hat.Hat(["new-project", "other"]);
         _hat.Hat(["switch-project", "other"]);
 
-        Assert.Equal(Option.Some("green"), Get(settings => settings.Global.Get("Colour")));
+        Assert.Some("green", Get(settings => settings.Global.Get("Colour")));
     }
 
     [Fact]
@@ -39,10 +40,10 @@ public sealed class PluginSettingsTest : IDisposable
         _hat.Hat(["new-project", "other"]);
         _hat.Hat(["switch-project", "other"]);
 
-        Assert.Equal(Option<string>.None, Get(settings => settings.Project.Get("Colour")));
+        Assert.None(Get(settings => settings.Project.Get("Colour")));
 
         _hat.Hat(["switch-project", "Default"]);
-        Assert.Equal(Option.Some("green"), Get(settings => settings.Project.Get("Colour")));
+        Assert.Some("green", Get(settings => settings.Project.Get("Colour")));
     }
 
     [Fact]
@@ -50,7 +51,7 @@ public sealed class PluginSettingsTest : IDisposable
     {
         InScope(settings => settings.Global.Set("Colour", "green"));
 
-        Assert.Equal(Option<string>.None, Get(settings => settings.Project.Get("Colour")));
+        Assert.None(Get(settings => settings.Project.Get("Colour")));
     }
 
     [Fact]
@@ -68,7 +69,7 @@ public sealed class PluginSettingsTest : IDisposable
         _hat.Hat(["new-project", "other"]);
         _hat.Hat(["switch-project", "other"]);
 
-        Assert.Equal(Option<string>.None, Get(settings => settings.Global.Get("ProjectDatabaseName")));
+        Assert.None(Get(settings => settings.Global.Get("ProjectDatabaseName")));
     }
 
     public void Dispose()

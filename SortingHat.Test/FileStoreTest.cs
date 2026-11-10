@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Linq;
 using Autofac;
-using Funcky.Monads;
+using Funcky.Extensions;
 using SortingHat.API.DI;
-using SortingHat.API.Models;
 using Xunit;
 using File = System.IO.File;
 
@@ -36,7 +35,7 @@ public sealed class FileStoreTest : IDisposable
 
     [Fact]
     public void GivenAnUnknownPathThenNothingIsFound()
-        => Assert.Equal(Option<FileAt>.None, _hat.InScope(scope => scope.Resolve<IFile>().Find(_hat.WriteFile("a.txt", "a"))));
+        => Assert.None(_hat.InScope(scope => scope.Resolve<IFile>().Find(_hat.WriteFile("a.txt", "a"))));
 
     public void Dispose()
         => _hat.Dispose();

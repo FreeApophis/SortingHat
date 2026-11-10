@@ -1,4 +1,5 @@
 ﻿using System;
+using Funcky.Extensions;
 using Funcky.Monads;
 using SortingHat.API.Models;
 using Xunit;
@@ -50,20 +51,20 @@ public sealed class PathStateTest
     {
         var stored = new FileAt(Stored, Path, Fingerprint);
 
-        Assert.Equal(Option.Some<PathState>(new PathState.Known(stored)), PathState.Trust(stored, Fingerprint.Size, Fingerprint.ModifiedAtUtc));
+        Assert.Some<PathState>(new PathState.Known(stored), PathState.Trust(stored, Fingerprint.Size, Fingerprint.ModifiedAtUtc));
     }
 
     [Fact]
     public void GivenTheFileOnDiskNoLongerMatchesTheFingerprintThenItMustBeHashed()
-        => Assert.Equal(Option<PathState>.None, PathState.Trust(new FileAt(Stored, Path, Fingerprint), Fingerprint.Size + 1, Fingerprint.ModifiedAtUtc));
+        => Assert.None(PathState.Trust(new FileAt(Stored, Path, Fingerprint), Fingerprint.Size + 1, Fingerprint.ModifiedAtUtc));
 
     [Fact]
     public void GivenAStoredPathWithoutFingerprintThenItMustBeHashed()
-        => Assert.Equal(Option<PathState>.None, PathState.Trust(new FileAt(Stored, Path, Option<PathFingerprint>.None), Fingerprint.Size, Fingerprint.ModifiedAtUtc));
+        => Assert.None(PathState.Trust(new FileAt(Stored, Path, Option<PathFingerprint>.None), Fingerprint.Size, Fingerprint.ModifiedAtUtc));
 
     [Fact]
     public void GivenNothingStoredThenItMustBeHashed()
-        => Assert.Equal(Option<PathState>.None, PathState.Trust(Option<FileAt>.None, Fingerprint.Size, Fingerprint.ModifiedAtUtc));
+        => Assert.None(PathState.Trust(Option<FileAt>.None, Fingerprint.Size, Fingerprint.ModifiedAtUtc));
 
     [Fact]
     public void GivenAnyStateThenCurrentIsTheFileAtThePathToWorkWith()
@@ -75,5 +76,5 @@ public sealed class PathStateTest
     }
 
     private static Hash Hash(string text)
-        => API.Models.Hash.Parse(text).GetOrElse(problem => throw new InvalidOperationException(problem));
+        => Assert.Right(API.Models.Hash.Parse(text));
 }

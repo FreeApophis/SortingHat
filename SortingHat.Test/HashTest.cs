@@ -1,4 +1,5 @@
-﻿using Funcky.Monads;
+﻿using Funcky.Extensions;
+using Funcky.Monads;
 using SortingHat.API.Models;
 using Xunit;
 using static Funcky.Functional;
@@ -59,7 +60,7 @@ public sealed class HashTest
         => IsInvalid(Hash.Parse(text));
 
     private static Hash Valid(string text)
-        => Hash.Parse(text).GetOrElse(problem => throw new Xunit.Sdk.XunitException(problem));
+        => Assert.Right(Hash.Parse(text));
 
     private static void IsInvalid(Either<string, Hash> parsed)
         => Assert.True(parsed.Match(left: True, right: False), $"Expected an error, but the text was accepted: {parsed}");

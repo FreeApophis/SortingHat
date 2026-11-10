@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Funcky.Extensions;
 using Funcky.Monads;
 using SortingHat.API.Models;
 using Xunit;
@@ -30,7 +31,7 @@ public sealed class TagMoveTest : IDisposable
     [InlineData(new[] { ":a", ":b" }, ":c")]
     [InlineData(new[] { ":ab" }, ":a")]
     public void GivenTagsThatCanMoveThenThereIsNoProblem(string[] tags, string destination)
-        => Assert.Equal(Option<string>.None, TagMoves.Problem([.. tags.Select(Valid)], Option.Some(Valid(destination))));
+        => Assert.None(TagMoves.Problem([.. tags.Select(Valid)], Option.Some(Valid(destination))));
 
     [Fact]
     public void GivenTheTopLevelAsDestinationThenMoveTagsMovesTheTagThere()
@@ -106,8 +107,8 @@ public sealed class TagMoveTest : IDisposable
         => _hat.Dispose();
 
     private static Tag Valid(string text)
-        => Tag.Parse(text).GetOrElse(problem => throw new InvalidOperationException(problem));
+        => Assert.Right(Tag.Parse(text));
 
     private static string Problem(string[] tags, Option<string> destination)
-        => TagMoves.Problem([.. tags.Select(Valid)], destination.Select(Valid)).GetOrElse(() => throw new InvalidOperationException("Expected a problem."));
+        => Assert.Some(TagMoves.Problem([.. tags.Select(Valid)], destination.Select(Valid)));
 }

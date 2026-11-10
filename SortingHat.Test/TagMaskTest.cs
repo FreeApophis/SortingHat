@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Funcky.Extensions;
 using Funcky.Monads;
 using SortingHat.API.AutoTag;
 using SortingHat.API.Models;
@@ -94,14 +95,14 @@ public sealed class TagMaskTest
 
         var tag = TagMask.Parse(":{Exif.Make}:{Exif.Model}", [cached]).SelectMany(mask => mask.Apply(file));
 
-        Assert.Equal(Either<string, string>.Right(":Make1:Model1"), tag.Select(found => found.FullName));
+        Assert.Right(":Make1:Model1", tag.Select(found => found.FullName));
     }
 
     private static TagMask Mask(string text)
-        => TagMask.Parse(text, AutoTags).GetOrElse(problem => throw new InvalidOperationException(problem));
+        => Assert.Right(TagMask.Parse(text, AutoTags));
 
     private static Tag Tagged(string mask)
-        => Mask(mask).Apply(FixedAutoTag.AnyFile).GetOrElse(problem => throw new InvalidOperationException(problem));
+        => Assert.Right(Mask(mask).Apply(FixedAutoTag.AnyFile));
 
     private static string Problem<T>(Either<string, T> result)
         where T : notnull
