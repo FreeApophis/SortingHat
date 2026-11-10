@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- What every host of SortingHat shares (hat and the desktop app): configuration, logging, the plugin scope and the workflows. Plugins never see it. -->
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" />
+    <PackageReference Include="JetBrains.Annotations" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
+    <PackageReference Include="Serilog" />
+    <PackageReference Include="Serilog.Sinks.File" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Apophis.FileSystem\Apophis.FileSystem.csproj" />
+    <ProjectReference Include="..\SortingHat.API\SortingHat.API.csproj" />
+    <ProjectReference Include="..\SortingHat.DB\SortingHat.DB.csproj" />
+  </ItemGroup>
+
+</Project>

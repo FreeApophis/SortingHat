@@ -9,6 +9,7 @@ using Funcky.Monads;
 using Microsoft.Data.Sqlite;
 using SortingHat.API;
 using SortingHat.API.Plugin;
+using SortingHat.App;
 using SortingHat.CLI;
 using Spectre.Console;
 using Spectre.Console.Testing;
@@ -57,7 +58,7 @@ internal sealed class HatSandbox : IDisposable
         _container = compositionRoot.Build();
 
         // like Program.Main, the plugins are loaded once, on the first run
-        _pluginScope = new Lazy<ILifetimeScope>(() => CompositionRoot.BeginPluginScope(_container));
+        _pluginScope = new Lazy<ILifetimeScope>(() => PluginScope.Begin(_container));
     }
 
     /// <summary>

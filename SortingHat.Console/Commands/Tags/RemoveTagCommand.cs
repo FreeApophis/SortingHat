@@ -6,11 +6,13 @@ using Apophis.CLI.Writer;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
+using SortingHat.App.Tags;
+using static Funcky.Functional;
 
 namespace SortingHat.CLI.Commands.Tags;
 
 [UsedImplicitly]
-internal class RemoveTagCommand(ITag tagStore, IConsoleWriter consoleWriter) : IDeclaredCommand
+internal class RemoveTagCommand(TagEdits tagEdits, IConsoleWriter consoleWriter) : IDeclaredCommand
 {
     private static readonly ArgumentDefinition Tags = new() { Name = "tag", Description = "The tags to remove, for example ':tax:2018'.", Arity = Arity.OneOrMore };
 
@@ -24,9 +26,7 @@ internal class RemoveTagCommand(ITag tagStore, IConsoleWriter consoleWriter) : I
         => Task.FromResult(input.Values(Tags).Aggregate(true, (removed, tag) => RemoveTag(tag) && removed));
 
     private bool RemoveTag(string text)
-        => Tag.Parse(text).Match(
-            left: Report,
-            right: tag => tagStore.Destroy(tag) || Report($"The tag '{text}' does not exist or still has child tags."));
+        => Tag.Parse(text).SelectMany(tagEdits.Remove).Match(left: Report, right: True);
 
     private bool Report(string problem)
     {

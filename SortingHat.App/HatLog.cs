@@ -3,10 +3,10 @@ using Serilog;
 using Serilog.Events;
 using SortingHat.API;
 
-namespace SortingHat.CLI;
+namespace SortingHat.App;
 
 /// <summary>hat's log: a file per day in the folder 'logs' next to the databases, the last 31 days kept.</summary>
-internal static class HatLog
+public static class HatLog
 {
     private const string Template = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}";
 

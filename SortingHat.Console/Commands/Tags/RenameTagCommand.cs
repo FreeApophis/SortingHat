@@ -5,11 +5,13 @@ using Apophis.CLI.Writer;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
+using SortingHat.App.Tags;
+using static Funcky.Functional;
 
 namespace SortingHat.CLI.Commands.Tags;
 
 [UsedImplicitly]
-internal class RenameTagCommand(IConsoleWriter consoleWriter, ITag tagStore) : IDeclaredCommand
+internal class RenameTagCommand(IConsoleWriter consoleWriter, TagEdits tagEdits) : IDeclaredCommand
 {
     private static readonly ArgumentDefinition TagArgument = new() { Name = "tag", Description = "The tag to rename, for example ':tax:2018'." };
 
@@ -32,9 +34,8 @@ internal class RenameTagCommand(IConsoleWriter consoleWriter, ITag tagStore) : I
             ? Report($"The new name '{newName}' cannot be a tag, give only the new name of the last level, for example '2019'.")
             : (from tag in Tag.Parse(text)
                from name in TagName.Parse(newName)
-               select (Tag: tag, Name: name)).Match(
-                left: Report,
-                right: rename => tagStore.Rename(rename.Tag, rename.Name) || Report($"The tag '{text}' does not exist, or one of its siblings is already named '{newName}'."));
+               from renamed in tagEdits.Rename(tag, name)
+               select renamed).Match(left: Report, right: True);
 
     private bool Report(string problem)
     {

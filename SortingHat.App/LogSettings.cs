@@ -2,10 +2,10 @@
 using Funcky.Monads;
 using Serilog.Events;
 
-namespace SortingHat.CLI;
+namespace SortingHat.App;
 
 /// <summary>The section 'Log' of hat-config.json; without it, hat logs Information and up.</summary>
-internal sealed record LogSettings
+public sealed record LogSettings
 {
     /// <summary>The lowest level written to the log: Verbose, Debug, Information, Warning, Error or Fatal.</summary>
     public string MinimumLevel { get; init; } = nameof(LogEventLevel.Information);

@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Autofac;
 using SortingHat.API.DI;
-using SortingHat.CLI;
+using SortingHat.App;
 using Xunit;
 
 namespace SortingHat.Test;

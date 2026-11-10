@@ -6,14 +6,14 @@ using Autofac.Core.Registration;
 using Autofac.Core.Resolving.Pipeline;
 using Serilog;
 
-namespace SortingHat.CLI;
+namespace SortingHat.App;
 
 /// <summary>
 /// Gives every class that takes a Serilog <see cref="ILogger"/> one that names the class, such as
 /// <c>SortingHat.Plugin.MoveOnTag.MoveOnTagHandler</c>, so neither hat nor a plugin has to call ForContext.
 /// It works on the registrations of the builder it is registered with: the container and the scope of the plugins each get it.
 /// </summary>
-internal sealed class LoggerModule : Module
+public sealed class LoggerModule : Module
 {
     protected override void AttachToComponentRegistration(IComponentRegistryBuilder componentRegistry, IComponentRegistration registration)
         => registration.PipelineBuilding += (_, pipeline) => pipeline.Use(new ContextLogger());

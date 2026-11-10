@@ -8,11 +8,12 @@ using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API.DI;
 using SortingHat.API.Models;
+using SortingHat.App.Tags;
 
 namespace SortingHat.CLI.Commands.Tags;
 
 [UsedImplicitly]
-internal class MoveTagCommand(ITag tagStore, IConsoleWriter consoleWriter) : IDeclaredCommand
+internal class MoveTagCommand(TagEdits tagEdits, IConsoleWriter consoleWriter) : IDeclaredCommand
 {
     private const string TopLevel = ":";
 
@@ -54,7 +55,7 @@ internal class MoveTagCommand(ITag tagStore, IConsoleWriter consoleWriter) : IDe
     private bool MoveTags(IEnumerable<string> sourceTexts, string destinationText)
         => (from destination in Destination(destinationText)
             from sources in Sources(sourceTexts)
-            from moved in tagStore.Move(sources, destination)
+            from moved in tagEdits.Move(sources, destination)
             select $"Moved {string.Join(", ", sources.Select(tag => $"'{tag}'"))} to {destination.Match(none: "the top level", some: tag => $"'{tag}'")}.")
             .Match(left: Report, right: Done);
 

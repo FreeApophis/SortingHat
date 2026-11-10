@@ -12,6 +12,7 @@
   <Project Path="Apophis.FileSystem/Apophis.FileSystem.csproj" />
   <Project Path="Apophis.Utils/Apophis.Utils.csproj" />
   <Project Path="SortingHat.API/SortingHat.API.csproj" />
+  <Project Path="SortingHat.App/SortingHat.App.csproj" />
   <Project Path="SortingHat.Console/SortingHat.CLI.csproj" />
   <Project Path="SortingHat.DB/SortingHat.DB.csproj" />
   <Project Path="SortingHat.Plugin.Exif/SortingHat.Plugin.Exif.csproj" />

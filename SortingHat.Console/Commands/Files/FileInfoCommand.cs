@@ -1,19 +1,17 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Apophis.CLI.Writer;
 using Funcky.Extensions;
-using Funcky.Monads;
 using JetBrains.Annotations;
 using SortingHat.API.AutoTag;
 using SortingHat.API.DI;
-using SortingHat.API.Models;
+using SortingHat.App.Files;
 
 namespace SortingHat.CLI.Commands.Files;
 
 [UsedImplicitly]
-internal class FileInfoCommand(IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor, IFileScanner fileScanner, IFile fileStore, IAutoTagHandler autoTagHandler) : IDeclaredCommand
+internal class FileInfoCommand(IConsoleWriter consoleWriter, IFilePathExtractor filePathExtractor, FileReports fileReports, IAutoTagHandler autoTagHandler) : IDeclaredCommand
 {
     private static readonly ArgumentDefinition Files = new() { Name = "file", Description = "Files or file patterns such as '*.pdf'.", Arity = Arity.OneOrMore };
 
@@ -45,7 +43,7 @@ internal class FileInfoCommand(IConsoleWriter consoleWriter, IFilePathExtractor 
             consoleWriter.WriteLine();
             consoleWriter.WriteLine($"File: {filePath}");
 
-            foreach (var line in (await Report(filePath)).Lines)
+            foreach (var line in (await fileReports.Report(filePath)).Lines)
             {
                 consoleWriter.WriteLine(line);
             }
@@ -69,30 +67,5 @@ internal class FileInfoCommand(IConsoleWriter consoleWriter, IFilePathExtractor 
             consoleWriter.WriteLine("Tag variables:");
             lines.ForEach(consoleWriter.WriteLine);
         }
-    }
-
-    /// <summary>The content the database knows for the path: the content before the change when the file was edited.</summary>
-    private static Option<File> StoredContent(PathState state)
-        => state switch
-        {
-            PathState.Changed changed => changed.Stored.File,
-            PathState.Known known => known.Current.File,
-            _ => Option<File>.None,
-        };
-
-    private FileDetails Details(File file)
-        => new(
-            file.CreatedAt,
-            file.Size,
-            file.Hash,
-            [.. fileStore.GetTags(file).Select(tag => tag.FullName)],
-            fileStore.GetNames(file),
-            fileStore.GetPaths(file));
-
-    private async Task<FileInfoReport> Report(string path)
-    {
-        var state = await fileScanner.Examine(path);
-
-        return FileInfoReport.Decide(StoredContent(state).Select(Details), state is PathState.Changed, Details(state.Current.File));
     }
 }

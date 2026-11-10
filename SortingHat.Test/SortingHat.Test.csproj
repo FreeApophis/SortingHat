@@ -34,6 +34,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SortingHat.API\SortingHat.API.csproj" />
+    <ProjectReference Include="..\SortingHat.App\SortingHat.App.csproj" />
     <ProjectReference Include="..\SortingHat.Console\SortingHat.CLI.csproj" />
     <ProjectReference Include="..\SortingHat.DB\SortingHat.DB.csproj" />
   </ItemGroup>

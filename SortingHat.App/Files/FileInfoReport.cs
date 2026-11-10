@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using Funcky.Monads;
 
-namespace SortingHat.CLI.Commands.Files;
+namespace SortingHat.App.Files;
 
 /// <summary>What file-info tells about one path. hat knows a file by its content, so a path it does not know can still have known content.</summary>
-internal abstract record FileInfoReport
+public abstract record FileInfoReport
 {
     private FileInfoReport()
     {

@@ -1,27 +1,21 @@
 ﻿using System;
 using Apophis.CLI.Writer;
-using Funcky.Monads;
+using Funcky.Extensions;
 using JetBrains.Annotations;
 using Serilog;
 using SortingHat.API;
-using SortingHat.API.Plugin;
+using SortingHat.App;
 
 namespace SortingHat.CLI;
 
 [UsedImplicitly]
-internal class Application(ILogger logger, IConsoleWriter consoleWriter, CommandLine commandLine, CommandNames commandNames, IPluginLoader pluginLoader, DatabaseSettings databaseSettings, LogSettings logSettings)
+internal class Application(ILogger logger, IConsoleWriter consoleWriter, CommandLine commandLine, CommandNames commandNames, StartupReport startupReport, DatabaseSettings databaseSettings)
 {
     /// <summary>Runs hat with the command line <paramref name="args"/> and returns its exit code.</summary>
     internal int Run(string[] args)
     {
-        foreach (var problem in pluginLoader.Problems)
-        {
-            logger.Warning("Plugin {Plugin} not loaded: {Reason}", problem.Source, problem.Reason);
-            consoleWriter.WriteLine($"Warning: plugin '{problem.Source}' not loaded: {problem.Reason}.");
-        }
-
+        startupReport.Warnings().ForEach(consoleWriter.WriteLine);
         commandNames.Warnings.ForEach(consoleWriter.WriteLine);
-        logSettings.Level.LeftOrNone().AndThen(consoleWriter.WriteLine);
 
         try
         {
