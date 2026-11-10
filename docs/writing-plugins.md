@@ -19,7 +19,7 @@ A plugin is a class library that references `SortingHat.API` and nothing else of
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <!-- the build output is a plugin folder: the plugin with all its own dependencies -->
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <Version>1.0.0</Version>
