@@ -122,7 +122,7 @@ internal sealed class MainViewModel : INotifyPropertyChanged
         {
             TagEdit.Renaming renaming => renaming.Text,
             TagEdit.Moving moving => moving.Text,
-            _ => string.Empty,
+            TagEdit.Removing => string.Empty,
         };
 
     /// <summary>The binding writes the query back after every change; only a new query is a message.</summary>

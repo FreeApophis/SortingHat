@@ -30,7 +30,9 @@ public sealed class FileArgumentTest
     private static string Parse(string argument)
         => FileArgument.Parse(argument, CurrentDirectory).Match(
             left: reason => $"problem {reason}",
-            right: parsed => parsed.Match(
-                exact: exact => $"path {exact.Path}",
-                wildcard: wildcard => $"pattern {wildcard.Pattern} in {wildcard.Folder}"));
+            right: parsed => parsed switch
+            {
+                FileArgument.Exact exact => $"path {exact.Path}",
+                FileArgument.Wildcard wildcard => $"pattern {wildcard.Pattern} in {wildcard.Folder}",
+            });
 }

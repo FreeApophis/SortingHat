@@ -35,7 +35,7 @@ internal static class TagUpdate
                 {
                     TagEdit.Renaming renaming => renaming with { Text = text },
                     TagEdit.Moving moving => moving with { Text = text },
-                    _ => edit,
+                    TagEdit.Removing => edit,
                 }),
                 Problem = Option<string>.None,
             },
@@ -67,7 +67,6 @@ internal static class TagUpdate
             TagEdit.Renaming renaming => TagName.Parse(renaming.Text.Trim()).Select(name => (Effect)new Effect.RenameTag(renaming.Tag, name)),
             TagEdit.Moving moving => Destination(moving.Text.Trim()).Select(destination => (Effect)new Effect.MoveTag(moving.Tag, destination)),
             TagEdit.Removing removing => new Effect.RemoveTag(removing.Tag),
-            _ => throw new ArgumentOutOfRangeException(nameof(edit), edit, "Every edit is handled."),
         };
 
     private static Either<string, Option<Tag>> Destination(string text)

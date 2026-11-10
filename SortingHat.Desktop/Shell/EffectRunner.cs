@@ -43,7 +43,6 @@ internal sealed class EffectRunner(
                 Effect.RenameTag rename => Use(tagEdits, edits => new Message.TagEdited(edits.Rename(rename.Tag, rename.NewName).Select(renamed => $"Renamed '{rename.Tag}' to '{renamed}'."))),
                 Effect.MoveTag move => Use(tagEdits, edits => new Message.TagEdited(edits.Move([move.Tag], move.Destination).Select(_ => $"Moved '{move.Tag}' to {move.Destination.Match(none: "the top level", some: tag => $"'{tag}'")}."))),
                 Effect.RemoveTag remove => Use(tagEdits, edits => new Message.TagEdited(edits.Remove(remove.Tag).Select(_ => $"Removed '{remove.Tag}'."))),
-                _ => throw new ArgumentOutOfRangeException(nameof(effect), effect, "Every effect is handled."),
             };
         }
         catch (Exception exception)

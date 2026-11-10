@@ -1,12 +1,11 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using Funcky.Monads;
 
 namespace SortingHat.API;
 
 /// <summary>A file argument on the command line: the path of a file or folder, or a pattern with wildcards in its file name such as 'C:\scans\*.pdf'.</summary>
-internal abstract record FileArgument
+internal closed record FileArgument
 {
     private FileArgument(string argument)
         => Argument = argument;
@@ -17,8 +16,6 @@ internal abstract record FileArgument
     /// <summary>Resolves a relative <paramref name="argument"/> against <paramref name="currentDirectory"/>; wildcards in a folder name are not allowed.</summary>
     public static Either<string, FileArgument> Parse(string argument, string currentDirectory)
         => Classify(argument, Path.TrimEndingDirectorySeparator(Path.GetFullPath(argument, currentDirectory)));
-
-    public abstract TResult Match<TResult>(Func<Exact, TResult> exact, Func<Wildcard, TResult> wildcard);
 
     private static Either<string, FileArgument> Classify(string argument, string fullPath)
         => Option.FromNullable(Path.GetDirectoryName(fullPath)).Match(
@@ -41,9 +38,6 @@ internal abstract record FileArgument
 
         /// <summary>The full path.</summary>
         public string Path { get; }
-
-        public override TResult Match<TResult>(Func<Exact, TResult> exact, Func<Wildcard, TResult> wildcard)
-            => exact(this);
     }
 
     /// <summary>A <see cref="Pattern"/> such as '*.pdf' for the files in <see cref="Folder"/>.</summary>
@@ -57,8 +51,5 @@ internal abstract record FileArgument
         public string Folder { get; }
 
         public string Pattern { get; }
-
-        public override TResult Match<TResult>(Func<Exact, TResult> exact, Func<Wildcard, TResult> wildcard)
-            => wildcard(this);
     }
 }

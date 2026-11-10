@@ -296,6 +296,7 @@ SortingHat.API.Models.PathFingerprint.StillMatches(long size, System.DateTime mo
 SortingHat.API.Models.PathFingerprint.TakenAtUtc.get -> System.DateTime
 SortingHat.API.Models.PathFingerprint.TakenAtUtc.init -> void
 SortingHat.API.Models.PathState
+SortingHat.API.Models.PathState.PathState() -> void
 SortingHat.API.Models.PathState.Changed
 SortingHat.API.Models.PathState.Changed.Changed(SortingHat.API.Models.FileAt! Stored, SortingHat.API.Models.FileAt! Current) -> void
 SortingHat.API.Models.PathState.Changed.Deconstruct(out SortingHat.API.Models.FileAt! Stored, out SortingHat.API.Models.FileAt! Current) -> void

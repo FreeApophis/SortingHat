@@ -35,6 +35,6 @@ public sealed class FileReports(IFileScanner fileScanner, IFile fileStore)
         {
             PathState.Changed changed => changed.Stored.File,
             PathState.Known known => known.Current.File,
-            _ => Option<File>.None,
+            PathState.New => Option<File>.None,
         };
 }

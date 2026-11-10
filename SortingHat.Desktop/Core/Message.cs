@@ -6,12 +6,8 @@ using SortingHat.App.Files;
 namespace SortingHat.Desktop.Core;
 
 /// <summary>Something that happened: the user did something, or an <see cref="Effect"/> has a result.</summary>
-internal abstract record Message
+internal closed record Message
 {
-    private Message()
-    {
-    }
-
     /// <summary>The warnings of the start, such as plugins that were not loaded.</summary>
     public sealed record StartupWarningsLoaded(IReadOnlyList<string> Warnings) : Message;
 

@@ -4,7 +4,7 @@ namespace SortingHat.Desktop.Core;
 
 /// <summary>A change to the tag tree the user started; it waits for the user to confirm it.</summary>
 /// <param name="Tag">The tag to change.</param>
-internal abstract record TagEdit(Tag Tag)
+internal closed record TagEdit(Tag Tag)
 {
     /// <summary>What the edit bar asks.</summary>
     public abstract string Prompt { get; }

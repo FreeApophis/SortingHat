@@ -33,7 +33,6 @@ internal static class MainUpdate
             Message.ResultSelected selected => Selected(state, selected.File),
             Message.DetailsLoaded loaded => new(state.Search.Selected == Option.Some(loaded.File) ? state with { Search = state.Search with { Details = loaded.Details } } : state, []),
             Message.OpenRequested open => new(state, [new Effect.Open(open.File.Path)]),
-            _ => throw new ArgumentOutOfRangeException(nameof(message), message, "Every message is handled."),
         };
 
     /// <summary>A valid query is searched once the user pauses; an invalid one only says why.</summary>

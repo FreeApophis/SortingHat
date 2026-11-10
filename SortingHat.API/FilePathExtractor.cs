@@ -28,15 +28,17 @@ internal class FilePathExtractor : IFilePathExtractor
     }
 
     private static Either<string, IReadOnlyList<string>> Files(FileArgument argument, bool recursive)
-        => argument.Match(
-            exact: exact => File.Exists(exact.Path)
+        => argument switch
+        {
+            FileArgument.Exact exact => File.Exists(exact.Path)
                 ? Either<string, IReadOnlyList<string>>.Right([RealCase(exact.Path)])
                 : Directory.Exists(exact.Path)
                     ? Folder(exact, recursive)
                     : Either<string, IReadOnlyList<string>>.Left($"'{argument.Argument}' is no file or folder."),
-            wildcard: wildcard => Directory.Exists(wildcard.Folder)
+            FileArgument.Wildcard wildcard => Directory.Exists(wildcard.Folder)
                 ? Search(argument, RealCase(wildcard.Folder), wildcard.Pattern, recursive)
-                : Either<string, IReadOnlyList<string>>.Left($"'{argument.Argument}' matches no file, there is no folder '{wildcard.Folder}'."));
+                : Either<string, IReadOnlyList<string>>.Left($"'{argument.Argument}' matches no file, there is no folder '{wildcard.Folder}'."),
+        };
 
     /// <summary>A folder means everything in it, so it needs recursion, like 'cp -r': naming a folder by mistake does not take all its files.</summary>
     private static Either<string, IReadOnlyList<string>> Folder(FileArgument.Exact folder, bool recursive)

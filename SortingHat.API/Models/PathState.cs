@@ -6,12 +6,8 @@ namespace SortingHat.API.Models;
 /// <summary>
 /// What hat knows about a path: nothing (<see cref="New"/>), its content (<see cref="Known"/>), or content the file no longer has (<see cref="Changed"/>).
 /// </summary>
-public abstract record PathState
+public closed record PathState
 {
-    private PathState()
-    {
-    }
-
     /// <summary>The file at the path as it is now: the one to store or tag.</summary>
     public abstract FileAt Current { get; }
 

@@ -109,7 +109,7 @@ internal class TagFileCommand(ILogger logger, IConsoleWriter consoleWriter, IFil
         {
             PathState.New added => await fileAdded.Publish(new FileAdded(added.Current), cancellationToken),
             PathState.Changed changed => await fileChanged.Publish(new FileChanged(changed.Stored, changed.Current), cancellationToken),
-            _ => [],
+            PathState.Known => [],
         };
 
         problems.ForEach(consoleWriter.WriteLine);
